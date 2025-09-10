@@ -16,6 +16,9 @@
     <Filter Include="Core\IoCore\IocpCore">
       <UniqueIdentifier>{e719f3c9-0fbb-4f6c-9384-f5c2635dfcd9}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Network">
+      <UniqueIdentifier>{3513e6c4-669e-4751-a0c5-75142b162f40}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp">
@@ -29,6 +32,9 @@
     </ClCompile>
     <ClCompile Include="IocpCore.cpp">
       <Filter>Core\IoCore\IocpCore</Filter>
+    </ClCompile>
+    <ClCompile Include="Session.cpp">
+      <Filter>Network</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -46,6 +52,9 @@
     </ClInclude>
     <ClInclude Include="IocpCore.h">
       <Filter>Core\IoCore\IocpCore</Filter>
+    </ClInclude>
+    <ClInclude Include="Session.h">
+      <Filter>Network</Filter>
     </ClInclude>
     <ClInclude Include="IoObject.h">
       <Filter>Core\IoCore</Filter>
