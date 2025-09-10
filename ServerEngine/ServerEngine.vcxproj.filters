@@ -47,5 +47,8 @@
     <ClInclude Include="IocpCore.h">
       <Filter>Core\IoCore\IocpCore</Filter>
     </ClInclude>
+    <ClInclude Include="Types.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
