@@ -13,6 +13,9 @@
     <Filter Include="Core\IoCore">
       <UniqueIdentifier>{02056211-a2d9-4f88-b7b4-565c84669de3}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Core\IoCore\IocpCore">
+      <UniqueIdentifier>{e719f3c9-0fbb-4f6c-9384-f5c2635dfcd9}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp">
@@ -23,6 +26,9 @@
     </ClCompile>
     <ClCompile Include="IoCore.cpp">
       <Filter>Core\IoCore</Filter>
+    </ClCompile>
+    <ClCompile Include="IocpCore.cpp">
+      <Filter>Core\IoCore\IocpCore</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -37,6 +43,9 @@
     </ClInclude>
     <ClInclude Include="IoCore.h">
       <Filter>Core\IoCore</Filter>
+    </ClInclude>
+    <ClInclude Include="IocpCore.h">
+      <Filter>Core\IoCore\IocpCore</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
