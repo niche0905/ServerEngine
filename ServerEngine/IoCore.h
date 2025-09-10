@@ -26,7 +26,7 @@ public:
 
 	virtual bool Dispatch(DWORD timeoutMs = INFINITE) = 0;
 	
-	virtual void AttachSession(Session& session) = 0;
+	virtual bool AttachSession(Session& session) = 0;
 	virtual void DetachSession(Session& session) = 0;
 
 private:
