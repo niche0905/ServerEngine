@@ -7,6 +7,7 @@
 #include <Windows.h>
 #include <iostream>
 #include <cassert>
+#include <atomic>
 
 #include <WinSock2.h>
 #include <MSWSock.h>
