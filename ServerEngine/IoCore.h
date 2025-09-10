@@ -11,18 +11,23 @@
 
 class Session;
 
+enum class IoBackend { IOCP, RIO };
+
 class IoCore
 {
 public:
 	IoCore();
 	~IoCore();
 
-	bool Initialize();
+	virtual IoBackend Backend() const noexcept = 0;
 
-	bool Dispatch(DWORD timeoutMs = INFINITE);
+	virtual bool Initialize() = 0;
+	virtual void Terminate() = 0;
+
+	virtual bool Dispatch(DWORD timeoutMs = INFINITE) = 0;
 	
-	void AttachSession(Session session);
-	void DetachSession(Session session);
+	virtual void AttachSession(Session& session) = 0;
+	virtual void DetachSession(Session& session) = 0;
 
 private:
 
