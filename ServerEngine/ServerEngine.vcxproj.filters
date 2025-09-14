@@ -19,6 +19,9 @@
     <Filter Include="Network">
       <UniqueIdentifier>{3513e6c4-669e-4751-a0c5-75142b162f40}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Network\Buffer">
+      <UniqueIdentifier>{b55f24a3-d61f-449d-84af-8c9a0b1838c2}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp">
@@ -61,6 +64,9 @@
     </ClInclude>
     <ClInclude Include="Types.h">
       <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="BaseBuffer.h">
+      <Filter>Network\Buffer</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

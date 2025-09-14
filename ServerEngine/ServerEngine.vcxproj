@@ -157,6 +157,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="BaseBuffer.h" />
     <ClInclude Include="Container.h" />
     <ClInclude Include="CorePch.h" />
     <ClInclude Include="IoCore.h" />
