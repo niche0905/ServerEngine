@@ -12,7 +12,7 @@
 //
 
 template<typename T>
-class BaseBuffer : public std::enable_shared_from_this<BaseBuffer>
+class BaseBuffer : public std::enable_shared_from_this<BaseBuffer<T>>
 {
 public:
 	virtual T*			Data() abstract;

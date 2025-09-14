@@ -22,6 +22,9 @@
     <Filter Include="Network\Buffer">
       <UniqueIdentifier>{b55f24a3-d61f-449d-84af-8c9a0b1838c2}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Network\Buffer\LinearBuffer">
+      <UniqueIdentifier>{9685afe8-e679-431e-bc96-ac131a6e1bd5}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp">
@@ -38,6 +41,9 @@
     </ClCompile>
     <ClCompile Include="Session.cpp">
       <Filter>Network</Filter>
+    </ClCompile>
+    <ClCompile Include="LinearBuffer.cpp">
+      <Filter>Network\Buffer\LinearBuffer</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -70,6 +76,9 @@
     </ClInclude>
     <ClInclude Include="RecvBuffer.h">
       <Filter>Network\Buffer</Filter>
+    </ClInclude>
+    <ClInclude Include="LinearBuffer.h">
+      <Filter>Network\Buffer\LinearBuffer</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -15,6 +15,16 @@ protected:
 	inline static constexpr size_t BUFFER_COUNT = 10;
 
 public:
+	RecvBuffer() : capacity_(0), size_(0), bufferSize_(0) {}
+	virtual ~RecvBuffer() {}
+
+	RecvBuffer(size_t bufferSize) : bufferSize_(static_cast<int32>(bufferSize)), capacity_(bufferSize * BUFFER_COUNT), size_(0) {}
+
+public:
+	size_t										Size() const override { return size_; }
+	size_t										Capacity() const override { return capacity_; }
+
+public:
 	// 호출자가 제공하는 WSABUF[2]를 채워줍니다
 	// 반환값은 WSABUF에 채워진 개수입니다 (0 ~ 2)
 	virtual DWORD								PrepareRecv(WSABUF (&wsabuf)[2]) noexcept abstract;
@@ -28,7 +38,15 @@ public:
 	// 파서가 버퍼에 담긴 데이터를 제거합니다
 	virtual void								Consume(size_t nums) noexcept abstract;
 
+	// 버퍼에 담긴 데이터의 크기를 반환합니다
+	virtual size_t								DataSize() const noexcept { return size_; }
+
 	// 버퍼에 남은 여유 공간의 크기를 반환합니다
-	virtual size_t								FreeSize() const noexcept abstract;
+	virtual size_t								FreeSize() const noexcept { return (capacity_ - size_); }
+
+protected:
+	int32 capacity_;
+	int32 size_;
+	int32 bufferSize_;
 
 };
