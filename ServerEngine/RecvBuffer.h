@@ -1,14 +1,15 @@
 #pragma once
 #include "BaseBuffer.h"
 
-/*----------
-   Buffer
-----------*/
+/*--------------
+   RecvBuffer
+--------------*/
 //
-// Buffer는 BYTE형식의 데이터를 담는 그릇입니다
+// RecvBuffer는 BYTE형식의 데이터를 담는 그릇입니다
+// RecvBuffer는 데이터를 받기 위한 용도로 사용됩니다
 // 
 
-class Buffer : public BaseBuffer<byte>
+class RecvBuffer : public BaseBuffer<byte>
 {
 protected:
 	inline static constexpr size_t BUFFER_COUNT = 10;
