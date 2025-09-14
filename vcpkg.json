@@ -1,0 +1,12 @@
+{
+  "name": "server-library",
+  "version": "1.0.0",
+  "dependencies": [
+    "jsoncpp",
+    "boost",
+    "protobuf",
+    "behaviortree-cpp",
+    "glm",
+    "tbb"
+  ]
+}

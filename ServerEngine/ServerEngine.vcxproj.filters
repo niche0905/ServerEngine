@@ -63,4 +63,9 @@
       <Filter>Utils</Filter>
     </ClInclude>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="..\vcpkg.json">
+      <Filter>Utils</Filter>
+    </None>
+  </ItemGroup>
 </Project>
