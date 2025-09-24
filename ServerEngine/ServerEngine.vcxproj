@@ -158,6 +158,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="BaseBuffer.h" />
+    <ClInclude Include="CirculationBuffer.h" />
     <ClInclude Include="RecvBuffer.h" />
     <ClInclude Include="Container.h" />
     <ClInclude Include="CorePch.h" />
@@ -170,6 +171,7 @@
     <ClInclude Include="Types.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="CirculationBuffer.cpp" />
     <ClCompile Include="CorePch.cpp" />
     <ClCompile Include="IoCore.cpp" />
     <ClCompile Include="IocpCore.cpp" />

@@ -25,6 +25,9 @@
     <Filter Include="Network\Buffer\LinearBuffer">
       <UniqueIdentifier>{9685afe8-e679-431e-bc96-ac131a6e1bd5}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Network\Buffer\CirculationBuffer">
+      <UniqueIdentifier>{f4f29f93-fcf2-4beb-a64d-461b0afbb861}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp">
@@ -44,6 +47,9 @@
     </ClCompile>
     <ClCompile Include="LinearBuffer.cpp">
       <Filter>Network\Buffer\LinearBuffer</Filter>
+    </ClCompile>
+    <ClCompile Include="CirculationBuffer.cpp">
+      <Filter>Network\Buffer\CirculationBuffer</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -79,6 +85,9 @@
     </ClInclude>
     <ClInclude Include="LinearBuffer.h">
       <Filter>Network\Buffer\LinearBuffer</Filter>
+    </ClInclude>
+    <ClInclude Include="CirculationBuffer.h">
+      <Filter>Network\Buffer\CirculationBuffer</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
