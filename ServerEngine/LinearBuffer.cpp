@@ -25,7 +25,7 @@ bool LinearBuffer::OnWrite(byte* data, size_t nums)
 
 void LinearBuffer::OnRead(size_t nums)
 {
-	if (nums >= Size())
+	if (nums > Size())
 		return;		// 잘못된 요청
 
 	readPos_ += static_cast<int32>(nums);

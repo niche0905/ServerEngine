@@ -27,7 +27,7 @@ public:
 	void								Commit(size_t nums) noexcept override;
 	std::pair<const byte*, size_t>		Peek() const noexcept override;
 	void								Consume(size_t nums) noexcept override;
-	size_t								DataSize() const noexcept override { return (writePos_ - readPos_); }
+	size_t								DataSize() const noexcept override { return size_; }
 	size_t								FreeSize() const noexcept override { return HasWrapped()? ContinuousSize() : ContinuousSize() + SpareSize(); }
 
 private:

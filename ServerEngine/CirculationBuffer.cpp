@@ -43,12 +43,11 @@ bool CirculationBuffer::OnWrite(byte* data, size_t nums)
 
 void CirculationBuffer::OnRead(size_t nums)
 {
-	if (nums >= Size())
+	if (nums > Size())
 		return;		// 잘못된 요청
 
-	readPos_ += static_cast<int32>(nums);
 	// 환형 버퍼이므로 readPos_가 capacity_를 넘으면 readPos_를 0부터 다시 시작
-	readPos_ = (readPos_ >= capacity_) ? readPos_ - capacity_ : readPos_;
+	readPos_ = static_cast<int32>((readPos_ + nums) % capacity_);
 	size_ -= nums;
 	Clean();
 	return;
@@ -121,14 +120,7 @@ void CirculationBuffer::Consume(size_t nums) noexcept
 
 void CirculationBuffer::Clean()
 {
-	const size_t dataSize = DataSize();
-
-	if (dataSize == 0) {
-		if (size_ != 0) {
-			// 문제 상황
-			assert(false);
-		}
-
+	if (size_ == 0) {
 		writePos_ = 0;
 		readPos_ = 0;
 	}
