@@ -28,13 +28,13 @@ public:
 	std::pair<const byte*, size_t>		Peek() const noexcept override;
 	void								Consume(size_t nums) noexcept override;
 	size_t								DataSize() const noexcept override { return size_; }
-	size_t								FreeSize() const noexcept override { return HasWrapped()? ContinuousSize() : ContinuousSize() + SpareSize(); }
+	size_t								FreeSize() const noexcept override { return capacity_ - size_; }
 
 private:
 	bool								HasWrapped() const noexcept { return writePos_ < readPos_; }
 
-	size_t								ContinuousSize() const noexcept { return HasWrapped() ? (readPos_ - writePos_) : (capacity_ - writePos_); }
-	size_t								SpareSize() const noexcept { return HasWrapped() ? (readPos_ - writePos_) : readPos_ ; }
+	size_t								FreeSeg1() const noexcept { return HasWrapped() ? (readPos_ - writePos_) : (capacity_ - writePos_); }
+	size_t								FreeSeg2() const noexcept { return HasWrapped() ? 0 : readPos_; }
 
 	void								Clean();
 

@@ -17,25 +17,23 @@ bool CirculationBuffer::OnWrite(byte* data, size_t nums)
 	if (nums > FreeSize())
 		return false;
 
-	const size_t continousSize = ContinuousSize();
-	const size_t spareSize = SpareSize();
-
 	size_t remainSize = nums;
 
-	if (remainSize > continousSize) {
-		std::memcpy(buffer_.data() + writePos_, data, continousSize);
-		remainSize -= continousSize;
-		data += continousSize;
-		writePos_ = 0;
+	// 1st segment
+	const size_t seg1 = FreeSeg1();
+	const size_t moveSize = (remainSize <= seg1) ? remainSize : seg1;
+	std::memcpy(buffer_.data() + writePos_, data, moveSize);
+	writePos_ = static_cast<int32>((writePos_ + moveSize) % capacity_);
+	size_ += moveSize;
+	remainSize -= moveSize;
+	data += moveSize;
 
+	// 2nd segment (non-wrap에서만 남음)
+	if (remainSize > 0) {
+		// seg2 == readPos_ (버퍼 처음부터)
 		std::memcpy(buffer_.data(), data, remainSize);
-		writePos_ += static_cast<int32>(remainSize);
-		size_ += nums;
-	}
-	else {
-		std::memcpy(buffer_.data() + writePos_, data, remainSize);
-		writePos_ += static_cast<int32>(remainSize);
-		size_ += nums;
+		writePos_ = static_cast<int32>(remainSize); // 0에서 n만큼 이동
+		size_ += remainSize;
 	}
 
 	return true;
@@ -55,37 +53,29 @@ void CirculationBuffer::OnRead(size_t nums)
 
 DWORD CirculationBuffer::PrepareRecv(WSABUF(&wsabuf)[2]) noexcept
 {
-	bool wrapped = HasWrapped();
-	const size_t continousSize = ContinuousSize();
-	const size_t spareSize = SpareSize();
+	const size_t seg1 = FreeSeg1();
+	const size_t seg2 = FreeSeg2();
 
-	if (continousSize == 0 && spareSize == 0)
+	if (seg1 == 0 && seg2 == 0)
 		// 문제가 되는 상황
 		return 0;
 
-	if (wrapped) {
-		// writePos_가 readPos_보다 앞에 있는 상황
+	if (seg1 > 0) {
 		wsabuf[0].buf = reinterpret_cast<char*>(buffer_.data() + writePos_);
-		wsabuf[0].len = static_cast<ULONG>(continousSize);
+		wsabuf[0].len = static_cast<ULONG>(seg1);
+		if (seg2 > 0) {
+			wsabuf[1].buf = reinterpret_cast<char*>(buffer_.data());
+			wsabuf[1].len = static_cast<ULONG>(seg2);
+			return 2;
+		}
 		return 1;
 	}
 	else {
-
-		wsabuf[0].buf = reinterpret_cast<char*>(buffer_.data() + writePos_);
-		wsabuf[0].len = static_cast<ULONG>(continousSize);
-
-		if (spareSize == 0)
-			return 1;
-
-		wsabuf[1].buf = reinterpret_cast<char*>(buffer_.data());
-		wsabuf[1].len = static_cast<ULONG>(spareSize);
-
-		if (continousSize == 0)
-			return 1;
-
-		return 2;
+		// seg1 == 0, seg2 > 0
+		wsabuf[0].buf = reinterpret_cast<char*>(buffer_.data());
+		wsabuf[0].len = static_cast<ULONG>(seg2);
+		return 1;
 	}
-
 }
 
 void CirculationBuffer::Commit(size_t nums) noexcept
