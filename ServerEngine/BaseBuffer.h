@@ -16,6 +16,7 @@ class BaseBuffer : public std::enable_shared_from_this<BaseBuffer<T>>
 {
 public:
 	virtual T*			Data() = 0;
+	virtual const T*	Data() const = 0;
 	virtual size_t		Size() const = 0;
 	virtual size_t		Capacity() const = 0;
 

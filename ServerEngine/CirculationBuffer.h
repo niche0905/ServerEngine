@@ -19,6 +19,7 @@ public:
 
 public:
 	byte*								Data() override { return buffer_.data(); }
+	const byte*							Data() const override { return buffer_.data(); }
 	bool								OnWrite(byte* data, size_t nums) override;
 	void								OnRead(size_t nums) override;
 

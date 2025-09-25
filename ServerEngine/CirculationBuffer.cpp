@@ -112,6 +112,10 @@ ReadView CirculationBuffer::PeekView() const noexcept
 		view.seg2.length = 0;
 	}
 
+#ifdef _DEBUG
+	assert(v.Total() == DataSize());
+#endif
+
 	return view;
 }
 
