@@ -63,8 +63,8 @@ public:
 	virtual size_t								FreeSize() const noexcept { return (capacity_ - size_); }
 
 protected:
-	int32 capacity_;
-	int32 size_;
-	int32 bufferSize_;
+	size_t capacity_;
+	size_t size_;
+	size_t bufferSize_;
 
 };

@@ -27,7 +27,7 @@ public:
 	ReadView							PeekView() const noexcept override;
 	bool								PeekInto(void* dst, size_t need) const noexcept override;
 	void								Consume(size_t nums) noexcept override;
-	size_t								DataSize() const noexcept override { return (writePos_ - readPos_); }
+	size_t								DataSize() const noexcept override { return size_; }
 	size_t								FreeSize() const noexcept override { return (capacity_ - writePos_); }
 
 private:
@@ -35,8 +35,8 @@ private:
 	void								MoveData();
 
 private:
-	int32								writePos_ = 0;
-	int32								readPos_ = 0;
+	size_t								writePos_ = 0;
+	size_t								readPos_ = 0;
 	std::vector<byte>					buffer_;
 
 };

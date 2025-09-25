@@ -40,8 +40,8 @@ private:
 	void								Clean();
 
 private:
-	int32								writePos_ = 0;
-	int32								readPos_ = 0;
+	size_t								writePos_ = 0;
+	size_t								readPos_ = 0;
 	std::vector<byte>					buffer_;
 
 };

@@ -17,7 +17,7 @@ bool LinearBuffer::OnWrite(byte* data, size_t nums)
 	if (nums > FreeSize())
 		return false;
 
-	std::memcpy(buffer_.data() + size_, data, nums);
+	std::memcpy(buffer_.data() + writePos_, data, nums);
 	writePos_ += static_cast<int32>(nums);
 	size_ += nums;
 	return true;
