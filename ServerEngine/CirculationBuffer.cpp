@@ -23,7 +23,7 @@ bool CirculationBuffer::OnWrite(byte* data, size_t nums)
 	const size_t seg1 = FreeSeg1();
 	const size_t moveSize = (remainSize <= seg1) ? remainSize : seg1;
 	std::memcpy(buffer_.data() + writePos_, data, moveSize);
-	writePos_ = static_cast<int32>((writePos_ + moveSize) % capacity_);
+	writePos_ = ((writePos_ + moveSize) % capacity_);
 	size_ += moveSize;
 	remainSize -= moveSize;
 	data += moveSize;
@@ -32,7 +32,7 @@ bool CirculationBuffer::OnWrite(byte* data, size_t nums)
 	if (remainSize > 0) {
 		// seg2 == readPos_ (버퍼 처음부터)
 		std::memcpy(buffer_.data(), data, remainSize);
-		writePos_ = static_cast<int32>(remainSize); // 0에서 n만큼 이동
+		writePos_ = remainSize; // 0에서 n만큼 이동
 		size_ += remainSize;
 	}
 
@@ -45,7 +45,7 @@ void CirculationBuffer::OnRead(size_t nums)
 		return;		// 잘못된 요청
 
 	// 환형 버퍼이므로 readPos_가 capacity_를 넘으면 readPos_를 0부터 다시 시작
-	readPos_ = static_cast<int32>((readPos_ + nums) % capacity_);
+	readPos_ = ((readPos_ + nums) % capacity_);
 	size_ -= nums;
 	Clean();
 	return;
@@ -83,7 +83,7 @@ void CirculationBuffer::Commit(size_t nums) noexcept
 	if (nums > FreeSize())
 		return;		// 잘못된 요청
 
-	writePos_ += static_cast<int32>(nums);
+	writePos_ += nums;
 	size_ += nums;
 
 	// 환형 버퍼이므로 writePos_가 capacity_를 넘으면 writePos_를 0부터 다시 시작
@@ -113,7 +113,7 @@ ReadView CirculationBuffer::PeekView() const noexcept
 	}
 
 #ifdef _DEBUG
-	assert(v.Total() == DataSize());
+	assert(view.Total() == DataSize());
 #endif
 
 	return view;

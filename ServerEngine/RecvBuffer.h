@@ -19,7 +19,7 @@ public:
 	RecvBuffer() : capacity_(0), size_(0), bufferSize_(0) {}
 	virtual ~RecvBuffer() {}
 
-	RecvBuffer(size_t bufferSize) : bufferSize_(static_cast<int32>(bufferSize)), capacity_(bufferSize * BUFFER_COUNT), size_(0) {}
+	RecvBuffer(size_t bufferSize) : bufferSize_(bufferSize), capacity_(bufferSize * BUFFER_COUNT), size_(0) {}
 
 public:
 	size_t										Size() const override { return size_; }

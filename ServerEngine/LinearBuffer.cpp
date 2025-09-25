@@ -18,7 +18,7 @@ bool LinearBuffer::OnWrite(byte* data, size_t nums)
 		return false;
 
 	std::memcpy(buffer_.data() + writePos_, data, nums);
-	writePos_ += static_cast<int32>(nums);
+	writePos_ += nums;
 	size_ += nums;
 	return true;
 }
@@ -28,7 +28,7 @@ void LinearBuffer::OnRead(size_t nums)
 	if (nums > Size())
 		return;		// 肋给等 夸没
 
-	readPos_ += static_cast<int32>(nums);
+	readPos_ += nums;
 	size_ -= nums;
 	Clean();
 	return;
@@ -49,7 +49,7 @@ void LinearBuffer::Commit(size_t nums) noexcept
 	if (nums > FreeSize())
 		return;		// 肋给等 夸没
 
-	writePos_ += static_cast<int32>(nums);
+	writePos_ += nums;
 	size_ += nums;
 	return;
 }
@@ -113,5 +113,5 @@ void LinearBuffer::MoveData()
 
 	std::memcpy(buffer_.data(), buffer_.data() + readPos_, dataSize);
 	readPos_ = 0;
-	writePos_ = static_cast<int32>(dataSize);
+	writePos_ = dataSize;
 }
