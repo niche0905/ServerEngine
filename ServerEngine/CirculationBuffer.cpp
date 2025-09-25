@@ -92,15 +92,43 @@ void CirculationBuffer::Commit(size_t nums) noexcept
 	return;
 }
 
-std::pair<const byte*, size_t> CirculationBuffer::Peek() const noexcept
+ReadView CirculationBuffer::PeekView() const noexcept
 {
-	const size_t dataSize = DataSize();
+	ReadView view{};
+	if (size_ == 0) return view;
 
-	// TODO: 환형 버퍼이므로 readPos_가 capacity_를 넘으면 readPos_를 0부터 다시 시작 (해당 배열의 안정성을 보장해 주어야 한다)
-	if (dataSize > 0)
-		return std::pair<const byte*, size_t>(buffer_.data() + readPos_, dataSize);
+	if (HasWrapped()) {
+		// [read..end) 가 seg1, [0..write) 가 seg2
+		view.seg1.buffer = buffer_.data() + readPos_;
+		view.seg1.length = capacity_ - readPos_;
+		view.seg2.buffer = buffer_.data();
+		view.seg2.length = writePos_;
+	}
+	else {
+		// [read..write)만 존재
+		view.seg1.buffer = buffer_.data() + readPos_;
+		view.seg1.length = writePos_ - readPos_;
+		view.seg2.buffer = nullptr;
+		view.seg2.length = 0;
+	}
 
-	return std::pair<const byte*, size_t>();
+	return view;
+}
+
+bool CirculationBuffer::PeekInto(void* dst, size_t need) const noexcept
+{
+	if (need > size_) return false;
+	auto v = PeekView();
+	if (need <= v.seg1.length) {
+		std::memcpy(dst, v.seg1.buffer, need);
+		return true;
+	}
+	// 두 조각
+	const size_t n1 = v.seg1.length;
+	const size_t n2 = need - n1;
+	std::memcpy(dst, v.seg1.buffer, n1);
+	std::memcpy(static_cast<byte*>(dst) + n1, v.seg2.buffer, n2);
+	return true;
 }
 
 void CirculationBuffer::Consume(size_t nums) noexcept

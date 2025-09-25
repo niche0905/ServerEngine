@@ -1,5 +1,6 @@
 #pragma once
 #include "BaseBuffer.h"
+#include "ReadView.h"
 
 /*--------------
    RecvBuffer
@@ -33,7 +34,24 @@ public:
 	virtual void								Commit(size_t nums) noexcept = 0;
 
 	// 파서가 버퍼에 담긴 데이터를 제거하지 않고 읽기만 합니다
-	virtual std::pair<const byte*, size_t>		Peek() const noexcept = 0;
+	virtual ReadView							PeekView() const noexcept = 0;
+
+	// 파서가 버퍼에 담긴 데이터를 제거하지 않고 읽기만 합니다(최대 1개 구간 <= 단일 구간)
+	virtual std::pair<const byte*, size_t>		Peek() const noexcept
+	{
+		// 하위 호환: 첫 연속 구간만 노출
+		ReadView v = PeekView();
+		return { v.seg1.buffer, v.seg1.length };
+	}
+
+	// 파서가 버퍼에 담긴 데이터를 제거하지 않고 읽기만 합니다(need 크기 만큼 읽기 시도, 불가능하면 false) dst에 복사
+	virtual bool								PeekInto(void* dst, size_t need) const noexcept = 0;
+
+	virtual size_t								PeekAll(void* dst) const noexcept
+	{
+		PeekInto(dst, size_);
+		return size_;
+	}
 
 	// 파서가 버퍼에 담긴 데이터를 제거합니다
 	virtual void								Consume(size_t nums) noexcept = 0;

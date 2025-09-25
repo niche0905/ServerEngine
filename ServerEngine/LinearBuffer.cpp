@@ -54,14 +54,31 @@ void LinearBuffer::Commit(size_t nums) noexcept
 	return;
 }
 
-std::pair<const byte*, size_t> LinearBuffer::Peek() const noexcept
+ReadView LinearBuffer::PeekView() const noexcept
 {
-	const size_t dataSize = DataSize();
+	ReadView view{};
+	if (size_ == 0) return view;
 
-	if (dataSize > 0)
-		return std::pair<const byte*, size_t>(buffer_.data() + readPos_, dataSize);
+	view.seg1.buffer = buffer_.data() + readPos_;
+	view.seg1.length = DataSize();
+	view.seg2.buffer = nullptr;
+	view.seg2.length = 0;
 
-	return std::pair<const byte*, size_t>();
+	return view;
+}
+
+bool LinearBuffer::PeekInto(void* dst, size_t need) const noexcept
+{
+	if (need > size_) return false;
+	auto v = PeekView();
+
+	if (need > v.seg1.length) {
+		// 문제 상황 발생
+		assert(false);
+	}
+
+	std::memcpy(dst, v.seg1.buffer, need);
+	return true;
 }
 
 void LinearBuffer::Consume(size_t nums) noexcept

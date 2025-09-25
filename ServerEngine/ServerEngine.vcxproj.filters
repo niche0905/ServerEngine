@@ -89,6 +89,9 @@
     <ClInclude Include="CirculationBuffer.h">
       <Filter>Network\Buffer\CirculationBuffer</Filter>
     </ClInclude>
+    <ClInclude Include="ReadView.h">
+      <Filter>Network\Buffer</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\vcpkg.json">

@@ -167,6 +167,7 @@
     <ClInclude Include="IoObject.h" />
     <ClInclude Include="LinearBuffer.h" />
     <ClInclude Include="pch.h" />
+    <ClInclude Include="ReadView.h" />
     <ClInclude Include="Session.h" />
     <ClInclude Include="Types.h" />
   </ItemGroup>

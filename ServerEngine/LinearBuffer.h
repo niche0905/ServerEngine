@@ -24,7 +24,8 @@ public:
 public:
 	DWORD								PrepareRecv(WSABUF(&wsabuf)[2]) noexcept override;
 	void								Commit(size_t nums) noexcept override;
-	std::pair<const byte*, size_t>		Peek() const noexcept override;
+	ReadView							PeekView() const noexcept override;
+	bool								PeekInto(void* dst, size_t need) const noexcept override;
 	void								Consume(size_t nums) noexcept override;
 	size_t								DataSize() const noexcept override { return (writePos_ - readPos_); }
 	size_t								FreeSize() const noexcept override { return (capacity_ - writePos_); }
