@@ -57,6 +57,9 @@
     <ClCompile Include="IoEvent.cpp">
       <Filter>Network\Event</Filter>
     </ClCompile>
+    <ClCompile Include="SendBuffer.cpp">
+      <Filter>Network\Buffer</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h">
@@ -100,6 +103,9 @@
     </ClInclude>
     <ClInclude Include="IoEvent.h">
       <Filter>Network\Event</Filter>
+    </ClInclude>
+    <ClInclude Include="SendBuffer.h">
+      <Filter>Network\Buffer</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
