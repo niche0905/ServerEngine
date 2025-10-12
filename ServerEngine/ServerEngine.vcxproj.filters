@@ -28,6 +28,9 @@
     <Filter Include="Network\Buffer\CirculationBuffer">
       <UniqueIdentifier>{f4f29f93-fcf2-4beb-a64d-461b0afbb861}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Network\Event">
+      <UniqueIdentifier>{c169b6b1-d2ab-46ba-8cc6-f11cc054713e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp">
@@ -50,6 +53,9 @@
     </ClCompile>
     <ClCompile Include="CirculationBuffer.cpp">
       <Filter>Network\Buffer\CirculationBuffer</Filter>
+    </ClCompile>
+    <ClCompile Include="IoEvent.cpp">
+      <Filter>Network\Event</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -91,6 +97,9 @@
     </ClInclude>
     <ClInclude Include="ReadView.h">
       <Filter>Network\Buffer</Filter>
+    </ClInclude>
+    <ClInclude Include="IoEvent.h">
+      <Filter>Network\Event</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
