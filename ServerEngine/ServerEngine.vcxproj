@@ -172,6 +172,7 @@
     <ClInclude Include="ReadView.h" />
     <ClInclude Include="SendBuffer.h" />
     <ClInclude Include="Session.h" />
+    <ClInclude Include="SocketUtils.h" />
     <ClInclude Include="Types.h" />
   </ItemGroup>
   <ItemGroup>
@@ -190,6 +191,7 @@
     </ClCompile>
     <ClCompile Include="SendBuffer.cpp" />
     <ClCompile Include="Session.cpp" />
+    <ClCompile Include="SocketUtils.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\vcpkg.json" />

@@ -63,6 +63,9 @@
     <ClCompile Include="NetworkAddress.cpp">
       <Filter>Network</Filter>
     </ClCompile>
+    <ClCompile Include="SocketUtils.cpp">
+      <Filter>Network</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h">
@@ -111,6 +114,9 @@
       <Filter>Network\Buffer</Filter>
     </ClInclude>
     <ClInclude Include="NetworkAddress.h">
+      <Filter>Network</Filter>
+    </ClInclude>
+    <ClInclude Include="SocketUtils.h">
       <Filter>Network</Filter>
     </ClInclude>
   </ItemGroup>
