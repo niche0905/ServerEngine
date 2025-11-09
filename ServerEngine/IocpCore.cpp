@@ -1,6 +1,10 @@
 #include "pch.h"
 #include "IocpCore.h"
 
+/*-------------
+   IocpCore
+-------------*/
+
 bool IocpCore::Initialize()
 {
 	iocpHandle_ = ::CreateIoCompletionPort(INVALID_HANDLE_VALUE, nullptr, 0, 0);
