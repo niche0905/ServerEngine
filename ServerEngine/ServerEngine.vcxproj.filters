@@ -7,9 +7,6 @@
     <Filter Include="Core\PCH">
       <UniqueIdentifier>{bd8efd36-bbb0-4755-9a15-913752014452}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Utils">
-      <UniqueIdentifier>{a66cc01d-e0d4-4135-b977-43287535cf9e}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Core\IoCore">
       <UniqueIdentifier>{02056211-a2d9-4f88-b7b4-565c84669de3}</UniqueIdentifier>
     </Filter>
@@ -30,6 +27,12 @@
     </Filter>
     <Filter Include="Network\Event">
       <UniqueIdentifier>{c169b6b1-d2ab-46ba-8cc6-f11cc054713e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\IoCore\RioCore">
+      <UniqueIdentifier>{eeccc45e-cef5-46af-81af-d7f0a552d34b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Utils">
+      <UniqueIdentifier>{a66cc01d-e0d4-4135-b977-43287535cf9e}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -65,6 +68,9 @@
     </ClCompile>
     <ClCompile Include="SocketUtils.cpp">
       <Filter>Network</Filter>
+    </ClCompile>
+    <ClCompile Include="RioCore.cpp">
+      <Filter>Core\IoCore\RioCore</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -118,6 +124,9 @@
     </ClInclude>
     <ClInclude Include="SocketUtils.h">
       <Filter>Network</Filter>
+    </ClInclude>
+    <ClInclude Include="RioCore.h">
+      <Filter>Core\IoCore\RioCore</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
