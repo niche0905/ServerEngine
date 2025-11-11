@@ -23,3 +23,8 @@ bool RioCore::AttachIoObject(std::shared_ptr<IoObject> ioObject)
 {
 	return false;
 }
+
+bool RioCore::LoadRioFunctions()
+{
+	return false;
+}
