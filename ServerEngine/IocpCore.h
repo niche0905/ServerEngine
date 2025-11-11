@@ -18,8 +18,8 @@ public:
 
 	bool Dispatch(DWORD timeoutMs = INFINITE) override;
 
-	bool AttachSession(Session& session) override;
-	void DetachSession(Session& session) override;
+	bool AttachIoObject(std::shared_ptr<IoObject> ioObject) override;
+	void DetachIoObject(std::shared_ptr<IoObject> ioObject) override;
 
 private:
 	HANDLE iocpHandle_{ INVALID_HANDLE_VALUE };

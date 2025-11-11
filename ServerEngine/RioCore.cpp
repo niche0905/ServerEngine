@@ -19,11 +19,11 @@ bool RioCore::Dispatch(DWORD timeoutMs)
 	return false;
 }
 
-bool RioCore::AttachSession(Session& session)
+bool RioCore::AttachIoObject(std::shared_ptr<IoObject> ioObject)
 {
 	return false;
 }
 
-void RioCore::DetachSession(Session& session)
+void RioCore::DetachIoObject(std::shared_ptr<IoObject> ioObject)
 {
 }

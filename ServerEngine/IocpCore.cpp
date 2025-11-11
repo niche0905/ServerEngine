@@ -23,13 +23,13 @@ bool IocpCore::Dispatch(DWORD timeoutMs)
 	return false;
 }
 
-bool IocpCore::AttachSession(Session& session)
+bool IocpCore::AttachIoObject(std::shared_ptr<IoObject> ioObject)
 {
 	//return ::CreateIoCompletionPort()
 	return false;
 }
 
-void IocpCore::DetachSession(Session& session)
+void IocpCore::DetachIoObject(std::shared_ptr<IoObject> ioObject)
 {
 
 }

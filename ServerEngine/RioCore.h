@@ -18,8 +18,8 @@ public:
 	
 	bool Dispatch(DWORD timeoutMs = INFINITE) override;
 	
-	bool AttachSession(Session& session) override;
-	void DetachSession(Session& session) override;
+	bool AttachIoObject(std::shared_ptr<IoObject> ioObject) override;
+	void DetachIoObject(std::shared_ptr<IoObject> ioObject) override;
 
 private:
 	// TODO: RIO 관련 멤버 변수들 추가

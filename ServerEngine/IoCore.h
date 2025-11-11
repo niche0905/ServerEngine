@@ -1,4 +1,5 @@
 #pragma once
+#include "IoObject.h"
 
 /*-----------
    IoCore
@@ -9,7 +10,7 @@
 // 공통된 필수 함수를 가상함수로 설정하였습니다
 //
 
-class Session;
+class IoObject;
 
 enum class IoBackend { IOCP, RIO };
 
@@ -30,8 +31,8 @@ public:
 	virtual bool Dispatch(DWORD timeoutMs = INFINITE) = 0;
 	
 	// 세션을 IoCore에 연결 및 해제하는 순수 가상 함수
-	virtual bool AttachSession(Session& session) = 0;
-	virtual void DetachSession(Session& session) = 0;
+	virtual bool AttachIoObject(std::shared_ptr<IoObject> ioObject) = 0;
+	virtual void DetachIoObject(std::shared_ptr<IoObject> ioObject) = 0;
 
 private:
 
