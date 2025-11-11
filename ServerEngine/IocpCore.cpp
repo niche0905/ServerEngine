@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "IocpCore.h"
+#include "IoEvent.h"
 
 /*-------------
    IocpCore
@@ -19,8 +20,35 @@ void IocpCore::Terminate()
 bool IocpCore::Dispatch(DWORD timeoutMs)
 {
 	// TODO: Seession과 IoObject가 구현이 되어야 구현 가능
+	DWORD numOfBytes = 0;
+	ULONG_PTR completionKey = 0;
+	IoEvent* ioEvent = nullptr;
 
-	return false;
+	if (::GetQueuedCompletionStatus(iocpHandle_, OUT &numOfBytes, OUT &completionKey, OUT reinterpret_cast<LPOVERLAPPED*>(&ioEvent), timeoutMs)) {
+		if (ioEvent) {
+			if (std::shared_ptr<IoObject> owner = ioEvent->owner_) {
+				owner->Dispatch(ioEvent, static_cast<int32>(numOfBytes));
+			}
+		}
+	}
+	else {
+
+		int32 errorCode = ::WSAGetLastError();
+		switch (errorCode)
+		{
+		case WAIT_TIMEOUT:
+			return false;
+		default:
+			// TODO: Error 로그 남기기
+			if (std::shared_ptr<IoObject> owner = ioEvent->owner_)
+			{
+				owner->Dispatch(ioEvent, static_cast<int32>(numOfBytes));
+			}
+			break;
+		}
+	}
+
+	return true;
 }
 
 bool IocpCore::AttachIoObject(std::shared_ptr<IoObject> ioObject)
