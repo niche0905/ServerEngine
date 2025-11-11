@@ -37,8 +37,8 @@ private:
 	// Completion Queue 핸들
 	RIO_CQ rioCq_{ RIO_INVALID_CQ };
 
-	// Completion Notify 핸들
-	HANDLE completionEvent_{ INVALID_HANDLE_VALUE };
+	// Completion 알림
+	RIO_NOTIFICATION_COMPLETION completionType_{};
 
 };
 
