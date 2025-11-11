@@ -19,7 +19,6 @@ void IocpCore::Terminate()
 
 bool IocpCore::Dispatch(DWORD timeoutMs)
 {
-	// TODO: Seession과 IoObject가 구현이 되어야 구현 가능
 	DWORD numOfBytes = 0;
 	ULONG_PTR completionKey = 0;
 	IoEvent* ioEvent = nullptr;
