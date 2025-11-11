@@ -25,11 +25,5 @@ bool IocpCore::Dispatch(DWORD timeoutMs)
 
 bool IocpCore::AttachIoObject(std::shared_ptr<IoObject> ioObject)
 {
-	//return ::CreateIoCompletionPort()
-	return false;
-}
-
-void IocpCore::DetachIoObject(std::shared_ptr<IoObject> ioObject)
-{
-
+	return ::CreateIoCompletionPort(ioObject->GetHandle(), iocpHandle_, 0, 0);
 }

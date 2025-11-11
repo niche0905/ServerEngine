@@ -32,7 +32,7 @@ public:
 	
 	// 세션을 IoCore에 연결 및 해제하는 순수 가상 함수
 	virtual bool AttachIoObject(std::shared_ptr<IoObject> ioObject) = 0;
-	virtual void DetachIoObject(std::shared_ptr<IoObject> ioObject) = 0;
+	//virtual void DetachIoObject(std::shared_ptr<IoObject> ioObject) = 0;	// 등록된 핸들을 해제하는 건 없다더라
 
 private:
 
