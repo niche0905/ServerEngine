@@ -34,6 +34,9 @@
     <Filter Include="Utils">
       <UniqueIdentifier>{a66cc01d-e0d4-4135-b977-43287535cf9e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Utils\ObjectPool">
+      <UniqueIdentifier>{864a4395-3689-46d9-961d-2f94f2528a30}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp">
@@ -127,6 +130,12 @@
     </ClInclude>
     <ClInclude Include="RioCore.h">
       <Filter>Core\IoCore\RioCore</Filter>
+    </ClInclude>
+    <ClInclude Include="PoolObject.h">
+      <Filter>Utils\ObjectPool</Filter>
+    </ClInclude>
+    <ClInclude Include="ObjectPool.h">
+      <Filter>Utils\ObjectPool</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -161,6 +161,8 @@
     <ClInclude Include="CirculationBuffer.h" />
     <ClInclude Include="IoEvent.h" />
     <ClInclude Include="NetworkAddress.h" />
+    <ClInclude Include="ObjectPool.h" />
+    <ClInclude Include="PoolObject.h" />
     <ClInclude Include="RecvBuffer.h" />
     <ClInclude Include="Container.h" />
     <ClInclude Include="CorePch.h" />
