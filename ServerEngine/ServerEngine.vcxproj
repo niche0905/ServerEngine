@@ -159,6 +159,7 @@
   <ItemGroup>
     <ClInclude Include="BaseBuffer.h" />
     <ClInclude Include="CirculationBuffer.h" />
+    <ClInclude Include="IntrusivePool.h" />
     <ClInclude Include="IoEvent.h" />
     <ClInclude Include="NetworkAddress.h" />
     <ClInclude Include="ExternalPool.h" />

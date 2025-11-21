@@ -137,6 +137,9 @@
     <ClInclude Include="ExternalPool.h">
       <Filter>Utils\ObjectPool</Filter>
     </ClInclude>
+    <ClInclude Include="IntrusivePool.h">
+      <Filter>Utils\ObjectPool</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\vcpkg.json">
