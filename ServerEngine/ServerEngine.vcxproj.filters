@@ -134,7 +134,7 @@
     <ClInclude Include="PoolObject.h">
       <Filter>Utils\ObjectPool</Filter>
     </ClInclude>
-    <ClInclude Include="ObjectPool.h">
+    <ClInclude Include="ExternalPool.h">
       <Filter>Utils\ObjectPool</Filter>
     </ClInclude>
   </ItemGroup>
