@@ -5,6 +5,14 @@
 #include <memory>
 #include <mutex>
 
+/*----------------
+   ExternalPool
+----------------*/
+//
+// ExternalPool은 PoolObject 개념을 따르는 객체들을 관리하는 객체 풀입니다
+// 외부에서 객체의 생명주기를 관리하며, 필요에 따라 객체를 획득하고 반환할 수 있습니다
+//
+
 template <typename T>
 requires PoolObject<T>
 class ExternalPool
