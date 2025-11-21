@@ -7,10 +7,10 @@
 
 template <typename T>
 requires PoolObject<T>
-class ObjectPool
+class ExternalPool
 {
 public:
-    explicit ObjectPool(size_t initialSize = 10, bool threadSafe = false)
+    explicit ExternalPool(size_t initialSize = 10, bool threadSafe = false)
         : threadSafe_(threadSafe)
     {
         for (size_t i = 0; i < initialSize; ++i)
