@@ -1,8 +1,9 @@
 #pragma once
 
 // TODO: 필요한 것들 추가
-#include "Container.h"
 #include "Types.h"
+#include "Container.h"
+#include "ThreadLocalStorage.h"
 
 #include <Windows.h>
 #include <iostream>

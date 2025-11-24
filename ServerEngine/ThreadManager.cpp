@@ -41,7 +41,8 @@ void ThreadManager::Join()
 
 void ThreadManager::InitTLS()
 {
-	// TODO: TLS 만들고 초기화
+	static std::atomic<uint32> SThreadID{ 1 };
+	TLS().thread_id = SThreadID.fetch_add(1);	// unique thread id assign
 }
 
 void ThreadManager::DestroyTLS()
