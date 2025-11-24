@@ -43,6 +43,12 @@
     <Filter Include="Core\Thread">
       <UniqueIdentifier>{f914aba9-0dd8-413d-af66-070f1b47a1e9}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Network\Event\IOCP">
+      <UniqueIdentifier>{a157ade5-17e9-469e-89ee-e0d9b7114311}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Network\Event\RIO">
+      <UniqueIdentifier>{735c4188-3abc-40d9-9af7-7358a14e7673}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp">
@@ -87,11 +93,11 @@
     <ClCompile Include="ThreadLocalStorage.cpp">
       <Filter>Core\Thread</Filter>
     </ClCompile>
-    <ClCompile Include="IocpEvent.cpp">
-      <Filter>Network\Event</Filter>
-    </ClCompile>
     <ClCompile Include="RioEvent.cpp">
-      <Filter>Network\Event</Filter>
+      <Filter>Network\Event\RIO</Filter>
+    </ClCompile>
+    <ClCompile Include="IocpEvent.cpp">
+      <Filter>Network\Event\IOCP</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -173,11 +179,17 @@
     <ClInclude Include="ThreadContext.h">
       <Filter>Core\Thread</Filter>
     </ClInclude>
-    <ClInclude Include="IocpEvent.h">
-      <Filter>Network\Event</Filter>
-    </ClInclude>
     <ClInclude Include="RioEvent.h">
-      <Filter>Network\Event</Filter>
+      <Filter>Network\Event\RIO</Filter>
+    </ClInclude>
+    <ClInclude Include="IocpEvent.h">
+      <Filter>Network\Event\IOCP</Filter>
+    </ClInclude>
+    <ClInclude Include="IocpConnectionEvent.h">
+      <Filter>Network\Event\IOCP</Filter>
+    </ClInclude>
+    <ClInclude Include="IocpIoEvent.h">
+      <Filter>Network\Event\IOCP</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
