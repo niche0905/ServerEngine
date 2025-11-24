@@ -159,6 +159,7 @@
   <ItemGroup>
     <ClInclude Include="BaseBuffer.h" />
     <ClInclude Include="CirculationBuffer.h" />
+    <ClInclude Include="ConsoleLogger.h" />
     <ClInclude Include="IntrusivePool.h" />
     <ClInclude Include="IoEvent.h" />
     <ClInclude Include="NetworkAddress.h" />
@@ -178,9 +179,11 @@
     <ClInclude Include="Session.h" />
     <ClInclude Include="SocketUtils.h" />
     <ClInclude Include="Types.h" />
+    <ClInclude Include="ConsoleColor.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CirculationBuffer.cpp" />
+    <ClCompile Include="ConsoleLogger.cpp" />
     <ClCompile Include="CorePch.cpp" />
     <ClCompile Include="IoCore.cpp" />
     <ClCompile Include="IocpCore.cpp" />

@@ -37,6 +37,9 @@
     <Filter Include="Utils\ObjectPool">
       <UniqueIdentifier>{864a4395-3689-46d9-961d-2f94f2528a30}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Utils\Log">
+      <UniqueIdentifier>{5f5080bb-c39f-49ed-8340-1403c1604034}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp">
@@ -74,6 +77,9 @@
     </ClCompile>
     <ClCompile Include="RioCore.cpp">
       <Filter>Core\IoCore\RioCore</Filter>
+    </ClCompile>
+    <ClCompile Include="ConsoleLogger.cpp">
+      <Filter>Utils\Log</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -139,6 +145,12 @@
     </ClInclude>
     <ClInclude Include="IntrusivePool.h">
       <Filter>Utils\ObjectPool</Filter>
+    </ClInclude>
+    <ClInclude Include="ConsoleLogger.h">
+      <Filter>Utils\Log</Filter>
+    </ClInclude>
+    <ClInclude Include="ConsoleColor.h">
+      <Filter>Utils\Log</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
