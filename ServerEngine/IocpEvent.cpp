@@ -1,9 +1,9 @@
 #include "pch.h"
 #include "IocpEvent.h"
 
-/*------------
-   IIoEvent
-------------*/
+/*-------------
+   IocpEvent
+-------------*/
 
 IocpEvent::IocpEvent(IoEventType type)
 	: type_(type)

@@ -1,11 +1,11 @@
 #pragma once
 #include "IIoEvent.h"
 
-/*------------
-   IIoEvent
-------------*/
+/*-------------
+   IocpEvent
+-------------*/
 //
-// IIoEvent는 비동기 입출력 이벤트의 인터페이스입니다
+// IocpEvent는 I/O Completion Port에서 사용하는 이벤트 객체입니다.
 //
 
 class IocpEvent : public IIoEvent, public OVERLAPPED
