@@ -66,9 +66,6 @@
     <ClCompile Include="CirculationBuffer.cpp">
       <Filter>Network\Buffer\CirculationBuffer</Filter>
     </ClCompile>
-    <ClCompile Include="IoEvent.cpp">
-      <Filter>Network\Event</Filter>
-    </ClCompile>
     <ClCompile Include="SendBuffer.cpp">
       <Filter>Network\Buffer</Filter>
     </ClCompile>
@@ -131,7 +128,7 @@
     <ClInclude Include="ReadView.h">
       <Filter>Network\Buffer</Filter>
     </ClInclude>
-    <ClInclude Include="IoEvent.h">
+    <ClInclude Include="IIoEvent.h">
       <Filter>Network\Event</Filter>
     </ClInclude>
     <ClInclude Include="SendBuffer.h">
