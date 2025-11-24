@@ -87,6 +87,9 @@
     <ClCompile Include="ThreadManager.cpp">
       <Filter>Core\Thread</Filter>
     </ClCompile>
+    <ClCompile Include="ThreadLocalStorage.cpp">
+      <Filter>Core\Thread</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h">
@@ -159,6 +162,12 @@
       <Filter>Utils\Log</Filter>
     </ClInclude>
     <ClInclude Include="ThreadManager.h">
+      <Filter>Core\Thread</Filter>
+    </ClInclude>
+    <ClInclude Include="ThreadLocalStorage.h">
+      <Filter>Core\Thread</Filter>
+    </ClInclude>
+    <ClInclude Include="ThreadContext.h">
       <Filter>Core\Thread</Filter>
     </ClInclude>
   </ItemGroup>
