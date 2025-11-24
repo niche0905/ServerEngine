@@ -9,6 +9,7 @@
 #include <cassert>
 #include <mutex>
 #include <atomic>
+#include <functional>
 
 #include <WinSock2.h>
 #include <MSWSock.h>

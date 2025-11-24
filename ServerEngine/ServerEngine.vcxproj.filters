@@ -40,6 +40,9 @@
     <Filter Include="Utils\Log">
       <UniqueIdentifier>{5f5080bb-c39f-49ed-8340-1403c1604034}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Core\Thread">
+      <UniqueIdentifier>{f914aba9-0dd8-413d-af66-070f1b47a1e9}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp">
@@ -80,6 +83,9 @@
     </ClCompile>
     <ClCompile Include="ConsoleLogger.cpp">
       <Filter>Utils\Log</Filter>
+    </ClCompile>
+    <ClCompile Include="ThreadManager.cpp">
+      <Filter>Core\Thread</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -151,6 +157,9 @@
     </ClInclude>
     <ClInclude Include="ConsoleColor.h">
       <Filter>Utils\Log</Filter>
+    </ClInclude>
+    <ClInclude Include="ThreadManager.h">
+      <Filter>Core\Thread</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

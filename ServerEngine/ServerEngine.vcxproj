@@ -178,6 +178,7 @@
     <ClInclude Include="SendBuffer.h" />
     <ClInclude Include="Session.h" />
     <ClInclude Include="SocketUtils.h" />
+    <ClInclude Include="ThreadManager.h" />
     <ClInclude Include="Types.h" />
     <ClInclude Include="ConsoleColor.h" />
   </ItemGroup>
@@ -200,6 +201,7 @@
     <ClCompile Include="SendBuffer.cpp" />
     <ClCompile Include="Session.cpp" />
     <ClCompile Include="SocketUtils.cpp" />
+    <ClCompile Include="ThreadManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\vcpkg.json" />
