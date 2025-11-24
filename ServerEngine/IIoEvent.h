@@ -17,11 +17,11 @@ enum class IoEventType : uint8
 
 };
 
-/*-----------
-   IoEvent
------------*/
+/*------------
+   IIoEvent
+------------*/
 //
-// IoEvent는 비동기 입출력의 결과를 나타냅니다
+// IIoEvent는 비동기 입출력 이벤트의 인터페이스입니다
 //
 
 class IIoEvent 
