@@ -87,6 +87,9 @@
     <ClCompile Include="ThreadLocalStorage.cpp">
       <Filter>Core\Thread</Filter>
     </ClCompile>
+    <ClCompile Include="IocpEvent.cpp">
+      <Filter>Network\Event</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h">
@@ -166,6 +169,9 @@
     </ClInclude>
     <ClInclude Include="ThreadContext.h">
       <Filter>Core\Thread</Filter>
+    </ClInclude>
+    <ClInclude Include="IocpEvent.h">
+      <Filter>Network\Event</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
