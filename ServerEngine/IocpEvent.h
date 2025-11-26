@@ -8,7 +8,7 @@
 // IocpEvent는 I/O Completion Port에서 사용하는 이벤트 객체입니다.
 //
 
-class IocpEvent : public IIoEvent, public OVERLAPPED
+class IocpEvent : public OVERLAPPED, public IIoEvent
 {
 public:
 	IocpEvent(IoEventType type);

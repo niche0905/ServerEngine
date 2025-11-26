@@ -1,6 +1,6 @@
 #include "pch.h"
 #include "IocpCore.h"
-#include "IoEvent.h"
+#include "IIoEvent.h"
 
 /*-------------
    IocpCore
@@ -21,11 +21,11 @@ bool IocpCore::Dispatch(DWORD timeoutMs)
 {
 	DWORD numOfBytes = 0;
 	ULONG_PTR completionKey = 0;
-	IoEvent* ioEvent = nullptr;
+	IIoEvent* ioEvent = nullptr;
 
 	if (::GetQueuedCompletionStatus(iocpHandle_, OUT &numOfBytes, OUT &completionKey, OUT reinterpret_cast<LPOVERLAPPED*>(&ioEvent), timeoutMs)) {
 		if (ioEvent) {
-			if (std::shared_ptr<IoObject> owner = ioEvent->owner_) {
+			if (std::shared_ptr<IoObject> owner = ioEvent->GetOwner()) {
 				owner->Dispatch(ioEvent, static_cast<int32>(numOfBytes));
 			}
 		}
@@ -39,8 +39,7 @@ bool IocpCore::Dispatch(DWORD timeoutMs)
 			return false;
 		default:
 			// TODO: Error 로그 남기기
-			if (std::shared_ptr<IoObject> owner = ioEvent->owner_)
-			{
+			if (std::shared_ptr<IoObject> owner = ioEvent->GetOwner()) {
 				owner->Dispatch(ioEvent, static_cast<int32>(numOfBytes));
 			}
 			break;
