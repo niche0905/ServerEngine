@@ -49,6 +49,9 @@
     <Filter Include="Network\Event\RIO">
       <UniqueIdentifier>{735c4188-3abc-40d9-9af7-7358a14e7673}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Network\Address">
+      <UniqueIdentifier>{762bbe81-aa11-4be7-9cfa-5a366636373f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp">
@@ -75,9 +78,6 @@
     <ClCompile Include="SendBuffer.cpp">
       <Filter>Network\Buffer</Filter>
     </ClCompile>
-    <ClCompile Include="NetworkAddress.cpp">
-      <Filter>Network</Filter>
-    </ClCompile>
     <ClCompile Include="SocketUtils.cpp">
       <Filter>Network</Filter>
     </ClCompile>
@@ -98,6 +98,9 @@
     </ClCompile>
     <ClCompile Include="IocpEvent.cpp">
       <Filter>Network\Event\IOCP</Filter>
+    </ClCompile>
+    <ClCompile Include="NetworkAddress.cpp">
+      <Filter>Network\Address</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -146,9 +149,6 @@
     <ClInclude Include="SendBuffer.h">
       <Filter>Network\Buffer</Filter>
     </ClInclude>
-    <ClInclude Include="NetworkAddress.h">
-      <Filter>Network</Filter>
-    </ClInclude>
     <ClInclude Include="SocketUtils.h">
       <Filter>Network</Filter>
     </ClInclude>
@@ -190,6 +190,9 @@
     </ClInclude>
     <ClInclude Include="IocpIoEvent.h">
       <Filter>Network\Event\IOCP</Filter>
+    </ClInclude>
+    <ClInclude Include="NetworkAddress.h">
+      <Filter>Network\Address</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
