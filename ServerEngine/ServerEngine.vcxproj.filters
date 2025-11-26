@@ -66,9 +66,6 @@
     <ClCompile Include="IocpCore.cpp">
       <Filter>Core\IoCore\IocpCore</Filter>
     </ClCompile>
-    <ClCompile Include="Session.cpp">
-      <Filter>Network</Filter>
-    </ClCompile>
     <ClCompile Include="LinearBuffer.cpp">
       <Filter>Network\Buffer\LinearBuffer</Filter>
     </ClCompile>
@@ -102,6 +99,9 @@
     <ClCompile Include="NetworkAddress.cpp">
       <Filter>Network\Address</Filter>
     </ClCompile>
+    <ClCompile Include="SessionBase.cpp">
+      <Filter>Network</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h">
@@ -118,9 +118,6 @@
     </ClInclude>
     <ClInclude Include="IocpCore.h">
       <Filter>Core\IoCore\IocpCore</Filter>
-    </ClInclude>
-    <ClInclude Include="Session.h">
-      <Filter>Network</Filter>
     </ClInclude>
     <ClInclude Include="IoObject.h">
       <Filter>Core\IoCore</Filter>
@@ -195,6 +192,9 @@
       <Filter>Network\Address</Filter>
     </ClInclude>
     <ClInclude Include="IoBackend.h">
+      <Filter>Network</Filter>
+    </ClInclude>
+    <ClInclude Include="SessionBase.h">
       <Filter>Network</Filter>
     </ClInclude>
   </ItemGroup>
