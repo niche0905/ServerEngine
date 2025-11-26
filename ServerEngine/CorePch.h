@@ -4,6 +4,7 @@
 #include "Types.h"
 #include "Container.h"
 #include "ThreadLocalStorage.h"
+#include "SocketUtils.h"
 
 #include <Windows.h>
 #include <iostream>

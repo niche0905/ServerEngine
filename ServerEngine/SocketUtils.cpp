@@ -51,6 +51,40 @@ void SocketUtils::Close(SOCKET& socket)
 	socket = INVALID_SOCKET;
 }
 
+std::wstring SocketUtils::GetWinErrorString(DWORD errorCode)
+{
+	LPWSTR buffer = nullptr;
+
+	DWORD len = FormatMessageW(
+		FORMAT_MESSAGE_ALLOCATE_BUFFER |
+		FORMAT_MESSAGE_FROM_SYSTEM |
+		FORMAT_MESSAGE_IGNORE_INSERTS,
+		nullptr,
+		errorCode,
+		MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+		reinterpret_cast<LPWSTR>(&buffer),
+		0,
+		nullptr);
+
+	std::wstring message;
+
+	if (len == 0)
+	{
+		message = L"Unknown Windows Error";
+	}
+	else
+	{
+		message = buffer;
+		LocalFree(buffer);
+	}
+
+	// trailing \r\n elimination
+	while (!message.empty() && (message.back() == L'\n' || message.back() == L'\r'))
+		message.pop_back();
+
+	return message;
+}
+
 bool SocketUtils::SetLinger(SOCKET socket, bool onOff, uint16 linger)
 {
 	LINGER option;

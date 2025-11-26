@@ -29,6 +29,10 @@ public:
 	// 소켓 닫기
 	static void Close(SOCKET& socket);
 
+// Windows Error
+public:
+	static std::wstring GetWinErrorString(DWORD errorCode);
+
 // 소켓 옵션 설정 함수들
 public:
 	// Linger 옵션 설정 (소켓 닫기 시 대기 시간)
