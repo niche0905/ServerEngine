@@ -1,7 +1,7 @@
 #pragma once
 #include <string_view>
 #include "IoObject.h"
-#include "IoEvent.h"
+#include "IIoEvent.h"
 #include "NetworkAddress.h"
 
 /*------------
@@ -45,7 +45,7 @@ public:
 
 private:
 	virtual HANDLE GetHandle() override;
-	virtual void Dispatch(class IoEvent* ioEvent, int32 numOfBytes = 0) override;
+	virtual void Dispatch(class IIoEvent* ioEvent, int32 numOfBytes = 0) override;
 
 private:
 	bool RegisterConnect();
@@ -81,10 +81,10 @@ private:
 	// TODO: Send Buffer Queue 형태로 Scatter/Gather 구현 필요 (atomic<bool>)
 
 private:
-	ConnectEvent				connectEvent_;
-	DisconnectEvent				disconnectEvent_;
-	RecvEvent					recvEvent_;
-	SendEvent					sendEvent_;
+	//ConnectEvent				connectEvent_;
+	//DisconnectEvent				disconnectEvent_;
+	//RecvEvent					recvEvent_;
+	//SendEvent					sendEvent_;
 
 };
 
