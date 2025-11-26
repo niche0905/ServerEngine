@@ -162,6 +162,7 @@
     <ClInclude Include="ConsoleLogger.h" />
     <ClInclude Include="IntrusivePool.h" />
     <ClInclude Include="IIoEvent.h" />
+    <ClInclude Include="IoBackend.h" />
     <ClInclude Include="IocpConnectionEvent.h" />
     <ClInclude Include="IocpEvent.h" />
     <ClInclude Include="IocpIoEvent.h" />

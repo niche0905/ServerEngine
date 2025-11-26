@@ -194,6 +194,9 @@
     <ClInclude Include="NetworkAddress.h">
       <Filter>Network\Address</Filter>
     </ClInclude>
+    <ClInclude Include="IoBackend.h">
+      <Filter>Network</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\vcpkg.json">
