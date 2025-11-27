@@ -29,6 +29,8 @@ public:
 	// TODO: GetService()... Service부터 구현하고
 	//		 SetService()
 
+	virtual std::shared_ptr<SessionBase> GetSessionRef() = 0;
+
 // Network interface
 public:
 	const NetAddr& GetNetAddr() const { return netAddr_; }
