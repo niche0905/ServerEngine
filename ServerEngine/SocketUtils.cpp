@@ -17,7 +17,7 @@ void SocketUtils::Initialize()
 		// assert(false);
 	}
 
-	SOCKET dummySocket = CreateSocket();
+	SOCKET dummySocket = SocketCreator<BackendType::IOCP>::Create();
 	// TODO: 에러 처리 assert
 	BindWindowsFunctions(dummySocket, WSAID_CONNECTEX, reinterpret_cast<LPVOID*>(&ConnectEx));
 	BindWindowsFunctions(dummySocket, WSAID_DISCONNECTEX, reinterpret_cast<LPVOID*>(&DisconnectEx));
@@ -39,7 +39,7 @@ bool SocketUtils::BindWindowsFunctions(SOCKET socket, GUID guid, LPVOID* fn)
 
 SOCKET SocketUtils::CreateSocket()
 {
-	return ::WSASocket(AF_INET, SOCK_STREAM, IPPROTO_TCP, nullptr, 0, WSA_FLAG_OVERLAPPED);
+	return SocketCreator<DefaultBackend>::Create();
 }
 
 void SocketUtils::Close(SOCKET& socket)
@@ -51,7 +51,7 @@ void SocketUtils::Close(SOCKET& socket)
 	socket = INVALID_SOCKET;
 }
 
-std::wstring SocketUtils::GetWinErrorString(DWORD errorCode)
+std::wstring SocketUtils::GetWinErrorToString(DWORD errorCode)
 {
 	LPWSTR buffer = nullptr;
 

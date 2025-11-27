@@ -1,4 +1,6 @@
 #pragma once
+#include <winsock2.h>
+#include "IoBackend.h"
 #include "NetworkAddress.h"
 
 /*----------------
@@ -11,6 +13,20 @@
 
 class SocketUtils
 {
+public:
+	enum class BackendType
+	{
+		IOCP,
+		RIO
+	};
+
+public:
+#ifdef USE_RIO
+	static constexpr BackendType	DefaultBackend = BackendType::RIO;
+#else
+	static constexpr BackendType	DefaultBackend = BackendType::IOCP;
+#endif
+
 public:
 	static LPFN_CONNECTEX			ConnectEx;
 	static LPFN_DISCONNECTEX		DisconnectEx;
@@ -31,7 +47,7 @@ public:
 
 // Windows Error
 public:
-	static std::wstring GetWinErrorString(DWORD errorCode);
+	static std::wstring GetWinErrorToString(DWORD errorCode);
 
 // 소켓 옵션 설정 함수들
 public:
@@ -62,5 +78,26 @@ public:
 	{
 		return (SOCKET_ERROR != ::setsockopt(socket, level, optionName, reinterpret_cast<const char*>(&optionValue), sizeof(T)));
 	}
+
+	template<BackendType B>
+	struct SocketCreator;
+
+	template<>
+	struct SocketCreator<BackendType::IOCP>
+	{
+		static SOCKET Create()
+		{
+			return ::WSASocket(AF_INET, SOCK_STREAM, IPPROTO_TCP, nullptr, 0, WSA_FLAG_OVERLAPPED);
+		}
+	};
+
+	template<>
+	struct SocketCreator<BackendType::RIO>
+	{
+		static SOCKET Create()
+		{
+			return ::WSASocket(AF_INET, SOCK_STREAM, IPPROTO_TCP, nullptr, 0, WSA_FLAG_REGISTERED_IO);
+		}
+	};
 
 };
