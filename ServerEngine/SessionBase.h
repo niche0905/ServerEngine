@@ -9,7 +9,7 @@
 // SessionBase는 세션의 기본 클래스입니다
 //
 
-class SessionBase : public IoObject, public std::enable_shared_from_this<SessionBase>
+class SessionBase : public IoObject
 {
 	enum
 	{
@@ -29,7 +29,8 @@ public:
 	// TODO: GetService()... Service부터 구현하고
 	//		 SetService()
 
-	virtual std::shared_ptr<SessionBase> GetSessionRef() = 0;
+	virtual std::shared_ptr<SessionBase> GetSessionRef()
+		{ return std::static_pointer_cast<SessionBase>(shared_from_this()); }
 
 // Network interface
 public:

@@ -168,6 +168,7 @@
     <ClInclude Include="IocpIoEvent.h" />
     <ClInclude Include="NetworkAddress.h" />
     <ClInclude Include="ExternalPool.h" />
+    <ClInclude Include="PacketSession.h" />
     <ClInclude Include="PoolObject.h" />
     <ClInclude Include="RecvBuffer.h" />
     <ClInclude Include="Container.h" />
@@ -198,6 +199,7 @@
     <ClCompile Include="IocpEvent.cpp" />
     <ClCompile Include="LinearBuffer.cpp" />
     <ClCompile Include="NetworkAddress.cpp" />
+    <ClCompile Include="PacketSession.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>

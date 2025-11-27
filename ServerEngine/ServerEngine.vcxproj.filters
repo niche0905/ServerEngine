@@ -52,6 +52,9 @@
     <Filter Include="Network\Address">
       <UniqueIdentifier>{762bbe81-aa11-4be7-9cfa-5a366636373f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Network\Session">
+      <UniqueIdentifier>{76b0d8dd-f8b4-4123-bf17-342c0f144a50}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp">
@@ -100,7 +103,10 @@
       <Filter>Network\Address</Filter>
     </ClCompile>
     <ClCompile Include="SessionBase.cpp">
-      <Filter>Network</Filter>
+      <Filter>Network\Session</Filter>
+    </ClCompile>
+    <ClCompile Include="PacketSession.cpp">
+      <Filter>Network\Session</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -195,7 +201,10 @@
       <Filter>Network</Filter>
     </ClInclude>
     <ClInclude Include="SessionBase.h">
-      <Filter>Network</Filter>
+      <Filter>Network\Session</Filter>
+    </ClInclude>
+    <ClInclude Include="PacketSession.h">
+      <Filter>Network\Session</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
