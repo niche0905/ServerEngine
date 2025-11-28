@@ -1,7 +1,7 @@
 #pragma once
 #include "IocpEvent.h"
 
-class Session;
+class SessionBase;
 
 /*--------------------
    IocpConnectEvent
@@ -47,6 +47,6 @@ public:
 	}
 
 public:
-	std::shared_ptr<Session> session_{ nullptr };
+	std::shared_ptr<SessionBase> session_{ nullptr };
 
 };
