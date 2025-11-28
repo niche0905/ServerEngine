@@ -1,5 +1,6 @@
 #pragma once
 #include "IoCore.h"
+#include "IoBackend.h"
 
 /*-------------
    IocpCore
@@ -11,7 +12,7 @@
 class IocpCore : public IoCore
 {
 public:
-	IoBackend Backend() const noexcept override { return IoBackend::IOCP; }
+	BackendType Backend() const noexcept override { return BackendType::IOCP; }
 
 	bool Initialize() override;
 	void Terminate() override;

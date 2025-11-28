@@ -12,8 +12,6 @@
 
 class IoObject;
 
-enum class IoBackend { IOCP, RIO };
-
 class IoCore
 {
 public:
@@ -21,7 +19,7 @@ public:
 	~IoCore();
 
 	// IoBackend를 반환하는 순수 가상 함수 (IOCP 또는 RIO)
-	virtual IoBackend Backend() const noexcept = 0;
+	virtual BackendType Backend() const noexcept = 0;
 
 	// 초기화 및 종료를 위한 순수 가상 함수
 	virtual bool Initialize() = 0;
