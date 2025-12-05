@@ -58,6 +58,9 @@
     <Filter Include="Core\Service">
       <UniqueIdentifier>{0a2e6cf6-c94b-42a6-a65a-8c0b64163fbf}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Core\Service\IOCP">
+      <UniqueIdentifier>{c48b89a2-25ea-4193-b0e0-da694b3f9642}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp">
@@ -113,6 +116,9 @@
     </ClCompile>
     <ClCompile Include="ServiceBase.cpp">
       <Filter>Core\Service</Filter>
+    </ClCompile>
+    <ClCompile Include="IocpService.cpp">
+      <Filter>Core\Service\IOCP</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -214,6 +220,9 @@
     </ClInclude>
     <ClInclude Include="ServiceBase.h">
       <Filter>Core\Service</Filter>
+    </ClInclude>
+    <ClInclude Include="IocpService.h">
+      <Filter>Core\Service\IOCP</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

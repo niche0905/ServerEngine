@@ -1,6 +1,7 @@
 #pragma once
 #include "IoObject.h"
 #include "NetworkAddress.h"
+#include "ServiceBase.h"
 
 /*---------------
    SessionBase
@@ -26,8 +27,8 @@ public:
 	virtual bool Connect(SOCKET socket) = 0;
 	void Disconnect(std::wstring_view cause);
 
-	// TODO: GetService()... Service부터 구현하고
-	//		 SetService()
+	std::shared_ptr<ServiceBase> GetService() { return service_.lock(); }
+	void SetService(std::shared_ptr<ServiceBase> service) { service_ = service; }
 
 	virtual std::shared_ptr<SessionBase> GetSessionRef()
 		{ return std::static_pointer_cast<SessionBase>(shared_from_this()); }
@@ -68,11 +69,11 @@ protected:
 	virtual void OnSend(int32 len) {}
 
 protected:
-	// std::weakptr<ServiceBase>	service_{};
-	SOCKET				socket_{ INVALID_SOCKET };
-	NetAddr				netAddr_{};
+	std::weak_ptr<ServiceBase>	service_{};
+	SOCKET						socket_{ INVALID_SOCKET };
+	NetAddr						netAddr_{};
 
-	std::atomic<bool>	connected_{ false };
+	std::atomic<bool>			connected_{ false };
 
 };
 

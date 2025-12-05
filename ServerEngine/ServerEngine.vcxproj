@@ -166,6 +166,7 @@
     <ClInclude Include="IocpConnectionEvent.h" />
     <ClInclude Include="IocpEvent.h" />
     <ClInclude Include="IocpIoEvent.h" />
+    <ClInclude Include="IocpService.h" />
     <ClInclude Include="NetworkAddress.h" />
     <ClInclude Include="ExternalPool.h" />
     <ClInclude Include="PacketSession.h" />
@@ -198,6 +199,7 @@
     <ClCompile Include="IoCore.cpp" />
     <ClCompile Include="IocpCore.cpp" />
     <ClCompile Include="IocpEvent.cpp" />
+    <ClCompile Include="IocpService.cpp" />
     <ClCompile Include="LinearBuffer.cpp" />
     <ClCompile Include="NetworkAddress.cpp" />
     <ClCompile Include="PacketSession.cpp" />

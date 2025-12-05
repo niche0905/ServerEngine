@@ -33,8 +33,8 @@ void ServiceBase::StopService()
 std::shared_ptr<SessionBase> ServiceBase::CreateSession()
 {
 	std::shared_ptr<SessionBase> session = sessionFactory_();
-	// TODO: Interface 설정 후 호출하기
-	//session->SetService(shared_from_this());
+
+	session->SetService(std::static_pointer_cast<ServiceBase>(shared_from_this()));
 	bool registerSuccess = RegisterSession(session);
 	if (not registerSuccess) {
 		return nullptr;
