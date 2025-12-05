@@ -31,6 +31,7 @@ public:
 	// Session Management
 	std::shared_ptr<SessionBase> CreateSession();
 	virtual bool RegisterSession(std::shared_ptr<SessionBase> session) = 0;
+	virtual bool RegisterIoObject(std::shared_ptr<IoObject> session) = 0;
 	void AddSession(std::shared_ptr<SessionBase> session);
 	void RemoveSession(std::shared_ptr<SessionBase> session);
 	int32 GetCurrentSessionCount() const { return sessionCount_; }

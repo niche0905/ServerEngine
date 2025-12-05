@@ -48,3 +48,8 @@ bool IocpService::RegisterSession(std::shared_ptr<SessionBase> session)
 	AddSession(session);
 	return true;
 }
+
+bool IocpService::RegisterIoObject(std::shared_ptr<IoObject> ioObject)
+{
+	return iocpCore_->AttachIoObject(ioObject);
+}

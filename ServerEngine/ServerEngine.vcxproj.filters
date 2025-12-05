@@ -120,6 +120,12 @@
     <ClCompile Include="IocpService.cpp">
       <Filter>Core\Service\IOCP</Filter>
     </ClCompile>
+    <ClCompile Include="IocpServerService.cpp">
+      <Filter>Core\Service\IOCP</Filter>
+    </ClCompile>
+    <ClCompile Include="Listener.cpp">
+      <Filter>Network\Session</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h">
@@ -136,9 +142,6 @@
     </ClInclude>
     <ClInclude Include="IocpCore.h">
       <Filter>Core\IoCore\IocpCore</Filter>
-    </ClInclude>
-    <ClInclude Include="IoObject.h">
-      <Filter>Core\IoCore</Filter>
     </ClInclude>
     <ClInclude Include="Types.h">
       <Filter>Utils</Filter>
@@ -223,6 +226,15 @@
     </ClInclude>
     <ClInclude Include="IocpService.h">
       <Filter>Core\Service\IOCP</Filter>
+    </ClInclude>
+    <ClInclude Include="IocpServerService.h">
+      <Filter>Core\Service\IOCP</Filter>
+    </ClInclude>
+    <ClInclude Include="IoObject.h">
+      <Filter>Network\Session</Filter>
+    </ClInclude>
+    <ClInclude Include="Listener.h">
+      <Filter>Network\Session</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

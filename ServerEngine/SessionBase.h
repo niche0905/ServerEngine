@@ -12,6 +12,8 @@
 
 class SessionBase : public IoObject
 {
+	friend class Listener;
+
 	enum
 	{
 		BUFFER_SIZE = 0x1000,	// 4KB
@@ -40,6 +42,8 @@ public:
 
 	SOCKET GetSocket() { return socket_; }
 	bool IsConnected() const { return connected_; }
+
+	virtual BYTE* GetRecvBuffer() = 0;
 
 // Event interface
 protected:
