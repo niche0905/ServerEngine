@@ -1,5 +1,6 @@
 #pragma once
 #include "IocpService.h"
+#include "Listener.h"
 
 /*---------------------
    IocpServerService
@@ -11,5 +12,16 @@
 
 class IocpServerService : public IocpService
 {
+public:
+	IocpServerService() = delete;
+	IocpServerService(NetAddr address, SessionFactory factory, int32 maxSessionCount = 1);
+	virtual ~IocpServerService();
+
+	// Service Start
+	virtual bool Start() override;
+
+private:
+	std::shared_ptr<Listener> listener_{ nullptr };
+
 };
 
