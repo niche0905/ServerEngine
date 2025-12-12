@@ -19,6 +19,7 @@ public:
 
 	// Service Start
 	virtual bool Start() override;
+	virtual void StopService() override;
 
 private:
 	std::shared_ptr<Listener> listener_{ nullptr };

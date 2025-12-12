@@ -31,3 +31,8 @@ bool IocpServerService::Start()
 
 	return true;
 }
+
+void IocpServerService::StopService()
+{
+	IocpService::StopService();
+}

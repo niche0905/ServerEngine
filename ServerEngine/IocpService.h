@@ -20,6 +20,8 @@ public:
 	virtual bool Start() override;
 	virtual bool CanStart() const override;
 
+	virtual void StopService() override;
+
 	// Session Management
 	virtual bool RegisterSession(std::shared_ptr<SessionBase> session) override;
 	virtual bool RegisterIoObject(std::shared_ptr<IoObject> ioObject) override;

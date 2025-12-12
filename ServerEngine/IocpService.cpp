@@ -38,6 +38,11 @@ bool IocpService::CanStart() const
 	return true;
 }
 
+void IocpService::StopService()
+{
+	ServiceBase::StopService();
+}
+
 bool IocpService::RegisterSession(std::shared_ptr<SessionBase> session)
 {
 	bool succ = iocpCore_->AttachIoObject(session);	// IOCP¿¡ session µî·Ï
