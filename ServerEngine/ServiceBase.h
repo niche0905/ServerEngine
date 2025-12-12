@@ -41,7 +41,6 @@ public:
 public:
 	ServiceType GetServiceType() const { return type_; }
 	NetAddr GetNetAddress() const { return netAddress_; }
-	virtual void DoWork() = 0;
 
 protected:
 	ServiceType type_;									// what kind of service

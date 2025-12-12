@@ -26,9 +26,6 @@ public:
 	virtual bool RegisterSession(std::shared_ptr<SessionBase> session) override;
 	virtual bool RegisterIoObject(std::shared_ptr<IoObject> ioObject) override;
 
-	// IOCP Work
-	virtual void DoWork() = 0;
-
 private:
 	std::shared_ptr<IocpCore> iocpCore_;
 

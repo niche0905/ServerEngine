@@ -14,10 +14,14 @@
 
 #include <Windows.h>
 #include <iostream>
+#include <string_view>
 #include <cassert>
 #include <mutex>
 #include <atomic>
 #include <functional>
+#include <memory>
+#include <thread>
+#include <chrono>
 
 /* ===================
     Windows / WinSock
