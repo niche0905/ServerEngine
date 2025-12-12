@@ -21,7 +21,7 @@ HANDLE Listener::GetHandle()
 
 void Listener::Dispatch(IIoEvent* ioEvent, int32 numOfBytes)
 {
-	assert(ioEvent->GetEventType() == IoEventType::Accept);
+	assert(ioEvent->GetType() == IoEventType::Accept);
 
 	AcceptEvent* acceptEvent = static_cast<AcceptEvent*>(ioEvent);
 	ProcessAccept(acceptEvent);

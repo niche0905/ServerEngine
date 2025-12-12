@@ -3,6 +3,8 @@
 #include "NetworkAddress.h"
 #include "ServiceBase.h"
 
+class ServiceBase;
+
 /*---------------
    SessionBase
 ---------------*/

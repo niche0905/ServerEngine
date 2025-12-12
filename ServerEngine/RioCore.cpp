@@ -1,6 +1,6 @@
 #include "pch.h"
 #include "RioCore.h"
-#include "IoEvent.h"
+#include "RioEvent.h"
 
 /*------------
    RioCore
@@ -70,10 +70,10 @@ bool RioCore::Dispatch(DWORD timeoutMs)
 
 	for (ULONG i = 0; i < numOfResults; ++i) {
 		RIORESULT& result = results[i];
-		IoEvent* ioEvent = reinterpret_cast<IoEvent*>(result.RequestContext);
+		RioEvent* ioEvent = reinterpret_cast<RioEvent*>(result.RequestContext);
 		
 		if (ioEvent) {
-			if (std::shared_ptr<IoObject> owner = ioEvent->owner_) {
+			if (std::shared_ptr<IoObject> owner = ioEvent->GetOwner()) {
 				owner->Dispatch(ioEvent, static_cast<int32>(result.BytesTransferred));
 			}
 		}

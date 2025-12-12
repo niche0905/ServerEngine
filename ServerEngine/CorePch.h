@@ -1,10 +1,16 @@
 #pragma once
 
-// TODO: 필요한 것들 추가
+/* =============
+	Engine Core
+   ============= */
+
 #include "Types.h"
 #include "Container.h"
 #include "ThreadLocalStorage.h"
-#include "SocketUtils.h"
+
+/* ======================
+	C++ Standard Library
+   ====================== */
 
 #include <Windows.h>
 #include <iostream>
@@ -13,7 +19,17 @@
 #include <atomic>
 #include <functional>
 
+/* ===================
+    Windows / WinSock
+   =================== */
+
 #include <WinSock2.h>
 #include <MSWSock.h>
 #include <WS2tcpip.h>
 #pragma comment(lib, "ws2_32.lib")
+
+/* ===========================
+	Platform-dependent Engine
+   =========================== */
+
+#include "SocketUtils.h"

@@ -1,5 +1,4 @@
 #pragma once
-#include <winsock2.h>
 #include "IoBackend.h"
 #include "NetworkAddress.h"
 

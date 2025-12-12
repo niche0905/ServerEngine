@@ -13,7 +13,7 @@ class IocpService : public ServiceBase
 {
 public:
 	IocpService() = delete;
-	IocpService(ServiceType type = ServiceType::IocpService, NetAddr address, SessionFactory factory, int32 maxSessionCount = 1);
+	IocpService(ServiceType type, NetAddr address, SessionFactory factory, int32 maxSessionCount = 1);
 	virtual ~IocpService();
 
 	// Service Start
