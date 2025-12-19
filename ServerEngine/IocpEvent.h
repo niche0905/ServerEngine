@@ -14,6 +14,11 @@ public:
 	IocpEvent(IoEventType type);
 	virtual ~IocpEvent() = default;
 
+	void ResetOverlapped() noexcept
+	{
+		ZeroMemory(this, sizeof(OVERLAPPED));
+	}
+
 	virtual IoEventType GetType() const noexcept override { return type_; }
 
 	virtual void SetOwner(std::shared_ptr<IoObject> owner) override { owner_ = owner; }

@@ -61,6 +61,9 @@
     <Filter Include="Core\Service\IOCP">
       <UniqueIdentifier>{c48b89a2-25ea-4193-b0e0-da694b3f9642}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Network\Session\IOCP">
+      <UniqueIdentifier>{1f2aa49e-2ac6-451c-91f6-cccbb8bce59d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp">
@@ -125,6 +128,9 @@
     </ClCompile>
     <ClCompile Include="Listener.cpp">
       <Filter>Network\Session</Filter>
+    </ClCompile>
+    <ClCompile Include="IocpSession.cpp">
+      <Filter>Network\Session\IOCP</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -235,6 +241,9 @@
     </ClInclude>
     <ClInclude Include="Listener.h">
       <Filter>Network\Session</Filter>
+    </ClInclude>
+    <ClInclude Include="IocpSession.h">
+      <Filter>Network\Session\IOCP</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
