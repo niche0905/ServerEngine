@@ -26,24 +26,6 @@ void SessionBase::Disconnect(std::wstring_view cause)
 	PostDisconnect();
 }
 
-void SessionBase::ProcessConnect()
-{
-	connected_.store(true);
-
-	// TODO: Service에 세션 등록
-
-	OnConnected();
-
-	// Recv waiting
-	PostRecv();
-}
-
-void SessionBase::ProcessDisconnect()
-{
-	OnDisconnected();
-	// TODO: Service에서 세션 해제
-}
-
 void SessionBase::HandleError(std::wstring_view functionName, int32 errorCode)
 {
     std::wstring message = SocketUtils::GetWinErrorToString(errorCode);

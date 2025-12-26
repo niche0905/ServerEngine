@@ -161,7 +161,30 @@ void IocpSession::PostSend()
 	}
 }
 
-// TODO: ProcessConnect, ProcessDisconnect thinking...
+void IocpSession::ProcessConnect()
+{
+	connectEvent_.SetOwner(nullptr);	// Release reference
+
+	connected_.store(true);
+
+	// Session registeration to Service
+	GetService()->AddSession(GetSessionRef());
+
+	// on connected event (content override)
+	OnConnected();
+
+	// Recv waiting
+	PostRecv();
+}
+
+void IocpSession::ProcessDisconnect()
+{
+	disconnectEvent_.SetOwner(nullptr);	// Release reference
+
+	// on disconnected event (content override)
+	OnDisconnected();
+	GetService()->RemoveSession(GetSessionRef());
+}
 
 void IocpSession::ProcessRecv(int32 numOfBytes)
 {

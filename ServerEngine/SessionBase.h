@@ -57,8 +57,8 @@ protected:
 	virtual void PostSend() = 0;
 
 	// process is to complete
-	void ProcessConnect();
-	void ProcessDisconnect();
+	virtual void ProcessConnect() = 0;
+	virtual void ProcessDisconnect() = 0;
 	virtual void ProcessRecv(int32 numOfBytes) = 0;
 	virtual void ProcessSend(int32 numOfBytes) = 0;
 

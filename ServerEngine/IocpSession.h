@@ -45,6 +45,8 @@ protected:
 	virtual void PostSend() override final;
 
 	// process is to complete
+	virtual void ProcessConnect() override;
+	virtual void ProcessDisconnect() override;
 	virtual void ProcessRecv(int32 numOfBytes) override	;
 	virtual void ProcessSend(int32 numOfBytes) override;
 
