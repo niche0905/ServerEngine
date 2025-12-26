@@ -5,7 +5,7 @@
    PacketSession
 -----------------*/
 
-int32 PacketSession::OnRecv(BYTE* buffer, int32 len)
+int32 PacketSession::OnRecv(byte* buffer, int32 len)
 {
 	int32 processLen = 0;
 

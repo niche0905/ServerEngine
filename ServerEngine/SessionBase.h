@@ -45,7 +45,7 @@ public:
 	SOCKET GetSocket() { return socket_; }
 	bool IsConnected() const { return connected_; }
 
-	virtual BYTE* GetRecvBuffer() = 0;
+	virtual byte* GetRecvBuffer() = 0;
 
 // Event interface
 protected:
@@ -71,7 +71,7 @@ protected:
 protected:
 	virtual void OnConnected() {};
 	virtual void OnDisconnected() {};
-	virtual int32 OnRecv(BYTE* buffer, int32 len) { return len; }
+	virtual int32 OnRecv(byte* buffer, int32 len) { return len; }
 	virtual void OnSend(int32 len) {}
 
 protected:

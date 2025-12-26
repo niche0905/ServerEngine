@@ -33,7 +33,7 @@ public:
 
 // Network interface
 public:
-	virtual BYTE* GetRecvBuffer() override;
+	virtual byte* GetRecvBuffer() override;
 
 // Event interface
 protected:
@@ -52,10 +52,10 @@ protected:
 
 // on event interface for content override
 protected:
-	virtual void OnConnected() override;
-	virtual void OnDisconnected() override;
-	virtual void OnRecvPacket(BYTE* buffer, int32 len) override;
-	virtual void OnSend(int32 len) override;
+	//virtual void OnConnected() override;
+	//virtual void OnDisconnected() override;
+	//virtual void OnRecvPacket(byte* buffer, int32 len) override;
+	//virtual void OnSend(int32 len) override;
 
 private:
 	RecvBuffer recvBuffer_;

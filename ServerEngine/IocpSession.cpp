@@ -42,7 +42,7 @@ void IocpSession::Send(std::shared_ptr<SendBuffer> sendBuffer)
 	}
 }
 
-BYTE* IocpSession::GetRecvBuffer()
+byte* IocpSession::GetRecvBuffer()
 {
     return nullptr;
 }
@@ -101,14 +101,15 @@ void IocpSession::PostRecv()
 	recvEvent_.ResetOverlapped();
 	recvEvent_.SetOwner(shared_from_this());
 
-	WSABUF wsaBuf;
-	wsaBuf.buf = reinterpret_cast<CHAR*>(GetRecvBuffer());
-	wsaBuf.len = 0; // TODO: recv buffer size (FreeSize())
+	WSABUF wsabuf[2];
+	recvBuffer_.PrepareRecv(wsabuf);
 
 	DWORD numOfBytes = 0;
 	DWORD flags = 0;
 
-	if (::WSARecv(socket_, &wsaBuf, 1, OUT & numOfBytes, OUT & flags, &recvEvent_, nullptr) == SOCKET_ERROR) {
+	// TODO: Polymorphic RecvBuffer support
+	//	     Currently, only LinearBuffer is supported (3 parameter is Problem)
+	if (::WSARecv(socket_, wsabuf, 1, OUT & numOfBytes, OUT & flags, &recvEvent_, nullptr) == SOCKET_ERROR) {
 		int32 errorCode = ::WSAGetLastError();
 		if (errorCode != ERROR_IO_PENDING) {
 			HandleError(L"IocpSession::PostRecv", errorCode);
@@ -195,8 +196,34 @@ void IocpSession::ProcessRecv(int32 numOfBytes)
 		return;
 	}
 
-	// TODO: recv buffer thinking (polymorphic buffer?)
+	if (recvBuffer_.Commit(numOfBytes) == false) {
+		Disconnect(L"ProcessRecv invalid Commit");
+		return;
+	}
+
+	int32 dataSize = recvBuffer_.DataSize();
 	
+	std::pair<const byte*, size_t> dataSet = recvBuffer_.Peek();
+
+	if (CanPacketProcess(dataSet.first, static_cast<int32>(dataSet.second)) == false) {
+		Disconnect(L"ProcessRecv invalid CanPacketProcess");
+		return;
+	}
+
+	std::vector<byte> processBuffer_;
+	recvBuffer_.PeekInto(processBuffer_.data(), dataSize);
+
+	int32 processedBytes = OnRecv(processBuffer_.data(), dataSize);
+	if (processedBytes < 0 or dataSize < processedBytes) {
+		Disconnect(L"ProcessRecv invalid processedBytes");
+		return;
+	}
+
+	// remove processed bytes from recv buffer
+	recvBuffer_.Consume(processedBytes);
+
+	// continue recv
+	PostRecv();
 }
 
 void IocpSession::ProcessSend(int32 numOfBytes)
@@ -218,20 +245,4 @@ void IocpSession::ProcessSend(int32 numOfBytes)
 	else {
 		PostSend();
 	}
-}
-
-void IocpSession::OnConnected()
-{
-}
-
-void IocpSession::OnDisconnected()
-{
-}
-
-void IocpSession::OnRecvPacket(BYTE* buffer, int32 len)
-{
-}
-
-void IocpSession::OnSend(int32 len)
-{
 }

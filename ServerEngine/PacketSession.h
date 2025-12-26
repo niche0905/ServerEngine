@@ -35,15 +35,17 @@ protected:
 	{
 		return sizeof(DefaultPacketHeader);
 	}
-	virtual int32 GetPacketSize(BYTE* packet) const
+	virtual int32 GetPacketSize(byte* packet) const
 	{
 		DefaultPacketHeader* header = reinterpret_cast<DefaultPacketHeader*>(packet);
 		return header->size;
 	}
 
 protected:
-	virtual int32 OnRecv(BYTE* buffer, int32 len) override final;
-	virtual void OnRecvPacket(BYTE* buffer, int32 len) = 0;
+	virtual int32 OnRecv(byte* buffer, int32 len) override final;
+	
+	virtual bool CanPacketProcess(const byte* buffer, int32 len) = 0;
+	virtual void OnRecvPacket(byte* buffer, int32 len) = 0;
 
 };
 
