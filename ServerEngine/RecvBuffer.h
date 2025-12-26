@@ -31,7 +31,7 @@ public:
 	virtual DWORD								PrepareRecv(WSABUF (&wsabuf)[2]) noexcept = 0;
 	
 	// WSABUF에서 사용된 만큼 데이터를 버퍼에 커밋합니다
-	virtual void								Commit(size_t nums) noexcept = 0;
+	virtual bool								Commit(size_t nums) noexcept = 0;
 
 	// 파서가 버퍼에 담긴 데이터를 제거하지 않고 읽기만 합니다
 	virtual ReadView							PeekView() const noexcept = 0;

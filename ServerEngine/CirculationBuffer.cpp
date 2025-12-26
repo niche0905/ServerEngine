@@ -78,10 +78,10 @@ DWORD CirculationBuffer::PrepareRecv(WSABUF(&wsabuf)[2]) noexcept
 	}
 }
 
-void CirculationBuffer::Commit(size_t nums) noexcept
+bool CirculationBuffer::Commit(size_t nums) noexcept
 {
 	if (nums > FreeSize())
-		return;		// 잘못된 요청
+		return false;		// 잘못된 요청
 
 	writePos_ += nums;
 	size_ += nums;
@@ -89,7 +89,7 @@ void CirculationBuffer::Commit(size_t nums) noexcept
 	// 환형 버퍼이므로 writePos_가 capacity_를 넘으면 writePos_를 0부터 다시 시작
 	writePos_ = (writePos_ >= capacity_) ? writePos_ - capacity_ : writePos_;
 
-	return;
+	return true;
 }
 
 ReadView CirculationBuffer::PeekView() const noexcept

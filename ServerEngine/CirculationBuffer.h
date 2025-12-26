@@ -25,7 +25,7 @@ public:
 
 public:
 	DWORD								PrepareRecv(WSABUF(&wsabuf)[2]) noexcept override;
-	void								Commit(size_t nums) noexcept override;
+	bool								Commit(size_t nums) noexcept override;
 	ReadView							PeekView() const noexcept override;
 	bool								PeekInto(void* dst, size_t need) const noexcept override;
 	void								Consume(size_t nums) noexcept override;

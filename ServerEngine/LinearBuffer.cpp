@@ -44,14 +44,14 @@ DWORD LinearBuffer::PrepareRecv(WSABUF(&wsabuf)[2]) noexcept
 	return 1;
 }
 
-void LinearBuffer::Commit(size_t nums) noexcept
+bool LinearBuffer::Commit(size_t nums) noexcept
 {
 	if (nums > FreeSize())
-		return;		// 肋给等 夸没
+		return false;		// 肋给等 夸没
 
 	writePos_ += nums;
 	size_ += nums;
-	return;
+	return true;
 }
 
 ReadView LinearBuffer::PeekView() const noexcept
