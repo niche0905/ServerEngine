@@ -20,6 +20,28 @@ bool IocpSession::Connect(SOCKET socket)
     return PostConnect();
 }
 
+void IocpSession::Send(std::shared_ptr<SendBuffer> sendBuffer)
+{
+	if (IsConnected() == false)
+		return;
+
+	bool postSend = false;
+
+	// not lock free, but simple and easy to maintain
+	// if not sending_, post send
+	{
+		std::lock_guard<std::mutex> lock(sendMutex_);
+
+		sendQueue_.push(sendBuffer);
+
+		if (sending_.exchange(true) == false)
+			postSend = true;
+
+		if (postSend == true)
+			PostSend();
+	}
+}
+
 BYTE* IocpSession::GetRecvBuffer()
 {
     return nullptr;
@@ -156,6 +178,23 @@ void IocpSession::ProcessRecv(int32 numOfBytes)
 
 void IocpSession::ProcessSend(int32 numOfBytes)
 {
+	sendEvent_.SetOwner(nullptr);	// Release reference
+	sendEvent_.sendBuffers_.clear();
+
+	if (numOfBytes == 0) {
+		Disconnect(L"Remote side disconnected(Send 0)");
+		return;
+	}
+
+	OnSend(numOfBytes);
+
+	std::lock_guard<std::mutex> lock(sendMutex_);
+	if (sendQueue_.empty()) {
+		sending_.store(false);
+	}
+	else {
+		PostSend();
+	}
 }
 
 void IocpSession::OnConnected()

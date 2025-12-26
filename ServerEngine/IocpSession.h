@@ -29,6 +29,7 @@ public:
 // Architecture interface
 public:
 	virtual bool Connect(SOCKET socket) override;
+	virtual void Send(std::shared_ptr<SendBuffer> sendBuffer) override;
 
 // Network interface
 public:
@@ -65,6 +66,8 @@ private:
 	DisconnectEvent disconnectEvent_;
 	RecvEvent recvEvent_;
 	SendEvent sendEvent_;
+
+	std::mutex sendMutex_;
 
 };
 

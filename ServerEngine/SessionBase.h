@@ -27,9 +27,9 @@ public:
 
 // Architecture interface
 public:
-	// TODO: void Send()... 어떻게 분리해야 옳지?
 	virtual bool Connect(SOCKET socket) = 0;
 	void Disconnect(std::wstring_view cause);
+	virtual void Send(std::shared_ptr<SendBuffer> sendBuffer) = 0;
 
 	std::shared_ptr<ServiceBase> GetService() { return service_.lock(); }
 	void SetService(std::shared_ptr<ServiceBase> service) { service_ = service; }
