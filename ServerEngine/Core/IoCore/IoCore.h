@@ -16,7 +16,7 @@ class IoCore
 {
 public:
 	IoCore();
-	~IoCore();
+	virtual ~IoCore();
 
 	// IoBackend를 반환하는 순수 가상 함수 (IOCP 또는 RIO)
 	virtual BackendType Backend() const noexcept = 0;

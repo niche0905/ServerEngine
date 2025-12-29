@@ -9,8 +9,15 @@
 // Windows의 IOCP 방식을 사용하는 Core 입니다
 //
 
+class IoObject;
+class IoCore;
+
 class IocpCore : public IoCore
 {
+public:
+	IocpCore();
+	~IocpCore() override;
+	
 public:
 	BackendType Backend() const noexcept override { return BackendType::IOCP; }
 

@@ -6,6 +6,19 @@
    IocpCore
 -------------*/
 
+class IIoEvent;
+
+IocpCore::IocpCore()
+{
+	const bool initSucc = Initialize();
+	assert(initSucc && "IocpCoreInitialize Failed");
+}
+
+IocpCore::~IocpCore()
+{
+	Terminate();
+}
+
 bool IocpCore::Initialize()
 {
 	iocpHandle_ = ::CreateIoCompletionPort(INVALID_HANDLE_VALUE, nullptr, 0, 0);

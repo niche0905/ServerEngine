@@ -5,13 +5,6 @@
    IoCore
 -----------*/
 
-IoCore::IoCore()
-{
-	bool initSucc = Initialize();
-	assert(initSucc && "IoCore Initialize Failed");
-}
+IoCore::IoCore() = default;
 
-IoCore::~IoCore()
-{
-	Terminate();
-}
+IoCore::~IoCore() = default;
