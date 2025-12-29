@@ -1,4 +1,4 @@
-#include "pch.h"
+﻿#include "pch.h"
 #include "LinearBuffer.h"
 
 LinearBuffer::LinearBuffer(size_t bufferSize)

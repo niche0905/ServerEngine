@@ -1,5 +1,5 @@
-#pragma once
-#include "RecvBuffer.h"
+﻿#pragma once
+#include "Network/Buffer/RecvBuffer.h"
 
 /*----------------
    LinearBuffer

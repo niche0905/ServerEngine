@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 enum class BackendType { IOCP, RIO };
 
@@ -24,10 +24,10 @@ using IoCoreType = class RioCore;
 /// IOCP USE ///
 ////////////////
 
-#include "IocpCore.h"
-#include "IocpEvent.h"
-#include "IocpConnectionEvent.h"
-#include "IocpIoEvent.h"
+#include "Core/IoCore/IocpCore/IocpCore.h"
+#include "Network/Event/IOCP/IocpEvent.h"
+#include "Network/Event/IOCP/IocpConnectionEvent.h"
+#include "Network/Event/IOCP/IocpIoEvent.h"
 
 //using SelectedService = ServiceType::IocpService;
 using IoCoreType = IocpCore;

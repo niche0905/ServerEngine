@@ -1,6 +1,6 @@
-#include "pch.h"
+﻿#include "pch.h"
 #include "RioCore.h"
-#include "RioEvent.h"
+#include "Network/Event/RIO/RioEvent.h"
 
 /*------------
    RioCore
@@ -60,7 +60,7 @@ void RioCore::Terminate()
 bool RioCore::Dispatch(DWORD timeoutMs)
 {
 	RIORESULT results[1024];	// 최대 한번에 받을 수 있는 이벤트 수 (Attach 할 때 설정한 값)
-	ULONG numOfResults = rio_.RIODequeueCompletion(rioCq_, results, std::size(results));
+	ULONG numOfResults = static_cast<ULONG>(rio_.RIODequeueCompletion(rioCq_, results, std::size(results)));
 
 	if (numOfResults == RIO_CORRUPT_CQ) {
 		// TODO: CQ가 손상된 경우에 대한 처리

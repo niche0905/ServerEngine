@@ -1,6 +1,6 @@
-#pragma once
+﻿#pragma once
 #include "IoBackend.h"
-#include "NetworkAddress.h"
+#include "Network/Address/NetworkAddress.h"
 
 /*----------------
    SocketUtils

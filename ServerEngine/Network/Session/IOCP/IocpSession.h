@@ -1,9 +1,9 @@
-#pragma once
-#include "PacketSession.h"
-#include "SendBuffer.h"
-#include "RecvBuffer.h"
-#include "LinearBuffer.h"
-#include "CirculationBuffer.h"
+﻿#pragma once
+#include "Network/Session/PacketSession.h"
+#include "Network/Buffer/SendBuffer.h"
+#include "Network/Buffer/RecvBuffer.h"
+#include "Network/Buffer/LinearBuffer/LinearBuffer.h"
+#include "Network/Buffer/CirculationBuffer/CirculationBuffer.h"
 
 /*---------------
    IocpSession
@@ -15,12 +15,12 @@
 class IocpSession : public PacketSession
 {
 private:
-	using ConnectEvent =		class IocpConnectEvent;
-	using DisconnectEvent =		class IocpDisconnectEvent;
-	using RecvEvent =			class IocpRecvEvent;
-	using SendEvent =			class IocpSendEvent;
+	using ConnectEvent =		IocpConnectEvent;
+	using DisconnectEvent =		IocpDisconnectEvent;
+	using RecvEvent =			IocpRecvEvent;
+	using SendEvent =			IocpSendEvent;
 
-	using RecvBuffer =			class LinearBuffer;
+	using RecvBuffer =			LinearBuffer;
 
 public:
 	IocpSession();

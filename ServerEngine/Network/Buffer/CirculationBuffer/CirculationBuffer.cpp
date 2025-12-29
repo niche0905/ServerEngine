@@ -1,4 +1,4 @@
-#include "pch.h"
+﻿#include "pch.h"
 #include "CirculationBuffer.h"
 
 CirculationBuffer::CirculationBuffer(size_t bufferSize)

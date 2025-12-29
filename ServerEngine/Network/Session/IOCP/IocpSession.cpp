@@ -66,7 +66,7 @@ bool IocpSession::PostConnect()
 
 	DWORD numOfBytes = 0;
 	SOCKADDR_IN sockAddr = GetService()->GetNetAddress().GetSockAddrIn();
-	if (SocketUtils::ConnectEx(socket_, (SOCKADDR*)&sockAddr, sizeof(SOCKADDR_IN), nullptr, 0, &numOfBytes, &connectEvent_) == false) {
+	if (SocketUtils::ConnectEx(socket_, reinterpret_cast<SOCKADDR*>(&sockAddr), sizeof(SOCKADDR_IN), nullptr, 0, &numOfBytes, &connectEvent_) == false) {
 		int32 errorCode = ::WSAGetLastError();
 		if (errorCode != ERROR_IO_PENDING) {
 			connectEvent_.SetOwner(nullptr);	// Release reference
@@ -141,7 +141,7 @@ void IocpSession::PostSend()
 
 	std::vector<WSABUF> wsabufs;
 	wsabufs.reserve(sendEvent_.sendBuffers_.size());
-	for (std::shared_ptr sendBuffer : sendEvent_.sendBuffers_) {
+	for (std::shared_ptr<SendBuffer> sendBuffer : sendEvent_.sendBuffers_) {
 	
 		WSABUF wsabuf;
 		wsabuf.buf = reinterpret_cast<char*>(sendBuffer->Data());

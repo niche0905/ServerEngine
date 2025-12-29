@@ -4,9 +4,9 @@
 	Engine Core
    ============= */
 
-#include "Types.h"
-#include "Container.h"
-#include "ThreadLocalStorage.h"
+#include "Utils/Types.h"
+#include "Utils/Container.h"
+#include "Core/Thread/ThreadLocalStorage.h"
 
 /* ======================
 	C++ Standard Library
@@ -36,4 +36,4 @@
 	Platform-dependent Engine
    =========================== */
 
-#include "SocketUtils.h"
+#include "Network/SocketUtils.h"
