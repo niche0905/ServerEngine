@@ -5,8 +5,8 @@
    PacketSession
 -----------------*/
 //
-// PacketSession´Â ÆĞÅ¶ ±â¹İ ¼¼¼ÇÀÇ ±âº» Å¬·¡½ºÀÔ´Ï´Ù
-// PacketÀÌ »ç¿ëµÉ °ÍÀ» ÀüÁ¦·Î PacketHeader¸¦ Ã³¸®ÇÏ±â À§ÇØ ÇÔ¼ö°¡ Á¦°øµË´Ï´Ù
+// PacketSessionëŠ” íŒ¨í‚· ê¸°ë°˜ ì„¸ì…˜ì˜ ê¸°ë³¸ í´ë˜ìŠ¤ì…ë‹ˆë‹¤
+// Packetì´ ì‚¬ìš©ë  ê²ƒì„ ì „ì œë¡œ PacketHeaderë¥¼ ì²˜ë¦¬í•˜ê¸° ìœ„í•´ í•¨ìˆ˜ê°€ ì œê³µë©ë‹ˆë‹¤
 //
 
 class PacketSession : public SessionBase
@@ -15,8 +15,8 @@ private:
 #pragma pack(push, 1)
 	struct DefaultPacketHeader
 	{
-		uint16 size;	// ÆĞÅ¶ ÀüÃ¼ Å©±â(Çì´õ Æ÷ÇÔ)
-		uint16 id;		// ÆĞÅ¶ ¾ÆÀÌµğ
+		uint16 size;	// íŒ¨í‚· ì „ì²´ í¬ê¸°(í—¤ë” í¬í•¨)
+		uint16 id;		// íŒ¨í‚· ì•„ì´ë””
 	};
 #pragma pack(pop)
 

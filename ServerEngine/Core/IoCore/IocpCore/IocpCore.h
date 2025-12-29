@@ -6,7 +6,7 @@
    IocpCore
 -------------*/
 //
-// WindowsÀÇ IOCP ¹æ½ÄÀ» »ç¿ëÇÏ´Â Core ÀÔ´Ï´Ù
+// Windowsì˜ IOCP ë°©ì‹ì„ ì‚¬ìš©í•˜ëŠ” Core ìž…ë‹ˆë‹¤
 //
 
 class IocpCore : public IoCore

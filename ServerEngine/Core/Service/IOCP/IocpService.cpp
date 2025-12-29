@@ -45,7 +45,7 @@ void IocpService::StopService()
 
 bool IocpService::RegisterSession(std::shared_ptr<SessionBase> session)
 {
-	bool succ = iocpCore_->AttachIoObject(session);	// IOCPø° session µÓ∑œ
+	bool succ = iocpCore_->AttachIoObject(session);	// IOCPÏóê session Îì±Î°ù
 	if (not succ) {
 		return false;
 	}

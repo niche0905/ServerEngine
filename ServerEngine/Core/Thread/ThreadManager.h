@@ -4,10 +4,10 @@
    ThreadManager
 -----------------*/
 //
-// ThreadManager´Â thread °ü¸®¸¦ ´ã´çÇÕ´Ï´Ù
+// ThreadManagerëŠ” thread ê´€ë¦¬ë¥¼ ë‹´ë‹¹í•©ë‹ˆë‹¤
 // 
-// »ç¿ë ¿¹½Ã
-// Àü¿ª º¯¼ö·Î Á¢±Ù
+// ì‚¬ìš© ì˜ˆì‹œ
+// ì „ì—­ ë³€ìˆ˜ë¡œ ì ‘ê·¼
 // GThreadManager.Launch([]()
 // {
 //    do something...
@@ -21,24 +21,24 @@ public:
 	~ThreadManager();
 
 public:
-	// »õ·Î¿î thread »ı¼º ¹× ½ÇÇà
+	// ìƒˆë¡œìš´ thread ìƒì„± ë° ì‹¤í–‰
 	void Launch(std::function<void()> func);
-	// ¸ğµç thread Á¾·á ´ë±â
+	// ëª¨ë“  thread ì¢…ë£Œ ëŒ€ê¸°
 	void Join();
 
-	// °¢ÀÚ thread¿¡¼­ Ã³¸®ÇÒ ÀÛ¾÷
+	// ê°ì threadì—ì„œ ì²˜ë¦¬í•  ì‘ì—…
 	static void DoReserveWork();
-	// ¸ğµç thread¿¡¼­ °øÅëÀ¸·Î Ã³¸®ÇÒ ÀÛ¾÷
+	// ëª¨ë“  threadì—ì„œ ê³µí†µìœ¼ë¡œ ì²˜ë¦¬í•  ì‘ì—…
 	static void DoGlobalWork();
 
 private:
-	// thread º°·Î TLS ÃÊ±âÈ­ ¹× Á¾·á
+	// thread ë³„ë¡œ TLS ì´ˆê¸°í™” ë° ì¢…ë£Œ
 	static void InitTLS();
 	static void DestroyTLS();
 
 private:
-	std::vector<std::thread>	threads_;	// °ü¸®ÇÏ´Â thread µé
-	std::mutex					mutex_;		// thread ¾ÈÀüÀ» À§ÇÑ mutex
+	std::vector<std::thread>	threads_;	// ê´€ë¦¬í•˜ëŠ” thread ë“¤
+	std::mutex					mutex_;		// thread ì•ˆì „ì„ ìœ„í•œ mutex
 
 };
 

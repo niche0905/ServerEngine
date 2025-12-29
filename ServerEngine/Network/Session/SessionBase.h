@@ -9,7 +9,7 @@ class ServiceBase;
    SessionBase
 ---------------*/
 //
-// SessionBase´Â ¼¼¼ÇÀÇ ±âº» Å¬·¡½ºÀÔ´Ï´Ù
+// SessionBaseëŠ” ì„¸ì…˜ì˜ ê¸°ë³¸ í´ë˜ìŠ¤ì…ë‹ˆë‹¤
 //
 
 class SessionBase : public IoObject

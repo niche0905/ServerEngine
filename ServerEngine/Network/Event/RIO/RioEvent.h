@@ -5,7 +5,7 @@
    RioEvent
 ------------*/
 //
-// RioEvent´Â Registered I/O¿¡¼­ »ç¿ëÇÏ´Â ÀÌº¥Æ® °´Ã¼ÀÔ´Ï´Ù.
+// RioEventëŠ” Registered I/Oì—ì„œ ì‚¬ìš©í•˜ëŠ” ì´ë²¤íŠ¸ ê°ì²´ì…ë‹ˆë‹¤.
 //
 
 class RioEvent : public IIoEvent

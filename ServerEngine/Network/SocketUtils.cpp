@@ -13,12 +13,12 @@ void SocketUtils::Initialize()
 {
 	WSADATA wsaData;
 	if (0 != ::WSAStartup(MAKEWORD(2, 2), &wsaData)) {
-		// TODO: 俊矾 贸府
+		// TODO: 鞐愲煬 觳橂Μ
 		// assert(false);
 	}
 
 	SOCKET dummySocket = SocketCreator<BackendType::IOCP>::Create();
-	// TODO: 俊矾 贸府 assert
+	// TODO: 鞐愲煬 觳橂Μ assert
 	BindWindowsFunctions(dummySocket, WSAID_CONNECTEX, reinterpret_cast<LPVOID*>(&ConnectEx));
 	BindWindowsFunctions(dummySocket, WSAID_DISCONNECTEX, reinterpret_cast<LPVOID*>(&DisconnectEx));
 	BindWindowsFunctions(dummySocket, WSAID_ACCEPTEX, reinterpret_cast<LPVOID*>(&AcceptEx));

@@ -6,8 +6,8 @@
    IocpServerService
 ---------------------*/
 //
-// IocpServerService´Â IOCP ±â¹İÀÇ ¼­¹ö ¼­ºñ½º ÀÎÅÍÆäÀÌ½ºÀÔ´Ï´Ù
-// Listener ¼¼¼ÇÀ» »ı¼ºÇÏ°í °ü¸®ÇÏ´Â ±â´ÉÀ» Æ÷ÇÔÇÕ´Ï´Ù
+// IocpServerServiceëŠ” IOCP ê¸°ë°˜ì˜ ì„œë²„ ì„œë¹„ìŠ¤ ì¸í„°í˜ì´ìŠ¤ì…ë‹ˆë‹¤
+// Listener ì„¸ì…˜ì„ ìƒì„±í•˜ê³  ê´€ë¦¬í•˜ëŠ” ê¸°ëŠ¥ì„ í¬í•¨í•©ë‹ˆë‹¤
 //
 
 class IocpServerService : public IocpService

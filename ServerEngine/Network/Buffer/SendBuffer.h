@@ -5,8 +5,8 @@
    SendBuffer
 --------------*/
 //
-// SendBuffer´Â BYTEÇü½ÄÀÇ µ¥ÀÌÅÍ¸¦ ´ã´Â ±×¸©ÀÔ´Ï´Ù
-// SendBuffer´Â µ¥ÀÌÅÍ¸¦ º¸³»±â À§ÇÑ ¿ëµµ·Î »ç¿ëÇÕ´Ï´Ù
+// SendBufferëŠ” BYTEí˜•ì‹ì˜ ë°ì´í„°ë¥¼ ë‹´ëŠ” ê·¸ë¦‡ì…ë‹ˆë‹¤
+// SendBufferëŠ” ë°ì´í„°ë¥¼ ë³´ë‚´ê¸° ìœ„í•œ ìš©ë„ë¡œ ì‚¬ìš©í•©ë‹ˆë‹¤
 // 
 
 class SendBuffer : public BaseBuffer<byte>, public std::enable_shared_from_this<SendBuffer>
@@ -29,7 +29,7 @@ public:
 
 private:
 	std::vector<byte>			buffer_;
-	size_t						writeSize_ = 0;			// ¹öÆÛ¿¡ ±â·ÏµÈ µ¥ÀÌÅÍ Å©±â
+	size_t						writeSize_ = 0;			// ë²„í¼ì— ê¸°ë¡ëœ ë°ì´í„° í¬ê¸°
 
 };
 

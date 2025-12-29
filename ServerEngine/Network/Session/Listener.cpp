@@ -79,7 +79,7 @@ void Listener::PostAccept(AcceptEvent* acceptEvent)
 {
 	std::shared_ptr<SessionBase> session = service_->CreateSession();
 
-	// acceptEvent->Init(); <- ÀÌ°Å Á¦´ë·Î ÇØ°áµÈ °Å ¸Â³ª?
+	// acceptEvent->Init(); <- ì´ê±° ì œëŒ€ë¡œ í•´ê²°ëœ ê±° ë§žë‚˜?
 	acceptEvent->session_ = session;
 
 	DWORD bytesReceived = 0;

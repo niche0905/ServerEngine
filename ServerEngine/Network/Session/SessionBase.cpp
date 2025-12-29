@@ -21,7 +21,7 @@ void SessionBase::Disconnect(std::wstring_view cause)
 	if (connected_.exchange(false) == false)
 		return;
 
-	// TODO: ·Î±× ³²±â±â(console logger ÀÌ¿ë)
+	// TODO: ë¡œê·¸ ë‚¨ê¸°ê¸°(console logger ì´ìš©)
 
 	PostDisconnect();
 }
@@ -30,11 +30,11 @@ void SessionBase::HandleError(std::wstring_view functionName, int32 errorCode)
 {
     std::wstring message = SocketUtils::GetWinErrorToString(errorCode);
 
-    // TODO: ¿©±â¼­ ³× Logger »ç¿ëÇÏ¸é µÊ
-    // ¿¹: ConsoleLogger::Error(L"[SessionBase] %s failed: (%d) %s",
+    // TODO: ì—¬ê¸°ì„œ ë„¤ Logger ì‚¬ìš©í•˜ë©´ ë¨
+    // ì˜ˆ: ConsoleLogger::Error(L"[SessionBase] %s failed: (%d) %s",
     //                           functionName.data(), errorCode, message.c_str());
 
-    // ÀÓ½Ã Ãâ·Â
+    // ì„ì‹œ ì¶œë ¥
     wprintf(L"[Session] ERROR in %s (code: %d): %s\n",
         functionName.data(), errorCode, message.c_str());
 

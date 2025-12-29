@@ -6,8 +6,8 @@
    SocketUtils
 ----------------*/
 //
-// SocketUtilsÀº ¼ÒÄÏ °ü·Ã À¯Æ¿¸®Æ¼ ÇÔ¼ö¸¦ Á¦°øÇÕ´Ï´Ù
-// ºñµ¿±â	 ¼ÒÄÏ ÀÛ¾÷¿¡ ÇÊ¿äÇÑ È®Àå ÇÔ¼ö Æ÷ÀÎÅÍ¸¦ °ü¸®ÇÕ´Ï´Ù
+// SocketUtilsì€ ì†Œì¼“ ê´€ë ¨ ìœ í‹¸ë¦¬í‹° í•¨ìˆ˜ë¥¼ ì œê³µí•©ë‹ˆë‹¤
+// ë¹„ë™ê¸°	 ì†Œì¼“ ì‘ì—…ì— í•„ìš”í•œ í™•ì¥ í•¨ìˆ˜ í¬ì¸í„°ë¥¼ ê´€ë¦¬í•©ë‹ˆë‹¤
 //
 
 class SocketUtils
@@ -32,47 +32,47 @@ public:
 	static LPFN_ACCEPTEX			AcceptEx;
 
 public:
-	// windows ¼ÒÄÏ ÃÊ±âÈ­ ¹× ÇÔ¼ö	¹ÙÀÎµù
+	// windows ì†Œì¼“ ì´ˆê¸°í™” ë° í•¨ìˆ˜	ë°”ì¸ë”©
 	static void Initialize();
-	// windows ¼ÒÄÏ Á¤¸®
+	// windows ì†Œì¼“ ì •ë¦¬
 	static void Clean();
 
-	// À©µµ¿ìÁî ¼ÒÄÏ È®Àå ÇÔ¼ö ¹ÙÀÎµù
+	// ìœˆë„ìš°ì¦ˆ ì†Œì¼“ í™•ì¥ í•¨ìˆ˜ ë°”ì¸ë”©
 	static bool BindWindowsFunctions(SOCKET socket, GUID guid, LPVOID* fn);
-	// ¼ÒÄÏ »ı¼º
+	// ì†Œì¼“ ìƒì„±
 	static SOCKET CreateSocket();
-	// ¼ÒÄÏ ´İ±â
+	// ì†Œì¼“ ë‹«ê¸°
 	static void Close(SOCKET& socket);
 
 // Windows Error
 public:
 	static std::wstring GetWinErrorToString(DWORD errorCode);
 
-// ¼ÒÄÏ ¿É¼Ç ¼³Á¤ ÇÔ¼öµé
+// ì†Œì¼“ ì˜µì…˜ ì„¤ì • í•¨ìˆ˜ë“¤
 public:
-	// Linger ¿É¼Ç ¼³Á¤ (¼ÒÄÏ ´İ±â ½Ã ´ë±â ½Ã°£)
+	// Linger ì˜µì…˜ ì„¤ì • (ì†Œì¼“ ë‹«ê¸° ì‹œ ëŒ€ê¸° ì‹œê°„)
 	static bool SetLinger(SOCKET socket, bool onOff, uint16 linger);
-	// ÁÖ¼Ò Àç»ç¿ë ¿É¼Ç ¼³Á¤ (Å×½ºÆ® ¿ëÀÌ)
+	// ì£¼ì†Œ ì¬ì‚¬ìš© ì˜µì…˜ ì„¤ì • (í…ŒìŠ¤íŠ¸ ìš©ì´)
 	static bool SetReuseAddress(SOCKET socket, bool flag);
-	// ¼ö½Å ¹öÆÛ Å©±â ¼³Á¤
+	// ìˆ˜ì‹  ë²„í¼ í¬ê¸° ì„¤ì •
 	static bool SetRecvBufferSize(SOCKET socket, int32 size);
-	// ¼Û½Å ¹öÆÛ Å©±â ¼³Á¤
+	// ì†¡ì‹  ë²„í¼ í¬ê¸° ì„¤ì •
 	static bool SetSendBufferSize(SOCKET socket, int32 size);
-	// TCP No Delay ¿É¼Ç ¼³Á¤ (Nagle ¾Ë°í¸®Áò ºñÈ°¼ºÈ­)
+	// TCP No Delay ì˜µì…˜ ì„¤ì • (Nagle ì•Œê³ ë¦¬ì¦˜ ë¹„í™œì„±í™”)
 	static bool SetTcpNoDelay(SOCKET socket, bool flag);
-	// AcceptEx ÇÔ¼ö »ç¿ëÀ» À§ÇÑ ¼ÒÄÏ ¼³Á¤
+	// AcceptEx í•¨ìˆ˜ ì‚¬ìš©ì„ ìœ„í•œ ì†Œì¼“ ì„¤ì •
 	static bool SetUpdateAcceptContext(SOCKET socket, SOCKET listenSocket);
 
-	// Æ¯Á¤ ÁÖ¼Ò¿¡ ¹ÙÀÎµù
+	// íŠ¹ì • ì£¼ì†Œì— ë°”ì¸ë”©
 	static bool Bind(SOCKET socket, const NetAddr& addr);
-	// ¸ğµç ÁÖ¼Ò¿¡ ¹ÙÀÎµù
+	// ëª¨ë“  ì£¼ì†Œì— ë°”ì¸ë”©
 	static bool BindAnyAddress(SOCKET socket, uint16 port);
-	// ¼ö½Å ´ë±â ¼³Á¤
+	// ìˆ˜ì‹  ëŒ€ê¸° ì„¤ì •
 	static bool Listen(SOCKET socket, int32 backlog = SOMAXCONN);
 
 public:
 	template<typename T>
-	// ¼ÒÄÏ ¿É¼ÇÀ» ¼³Á¤ÇÏ´Â ÅÛÇÃ¸´ ÇÔ¼ö
+	// ì†Œì¼“ ì˜µì…˜ì„ ì„¤ì •í•˜ëŠ” í…œí”Œë¦¿ í•¨ìˆ˜
 	static bool SetSocketOption(SOCKET socket, int32 level, int32 optionName, const T& optionValue)
 	{
 		return (SOCKET_ERROR != ::setsockopt(socket, level, optionName, reinterpret_cast<const char*>(&optionValue), sizeof(T)));

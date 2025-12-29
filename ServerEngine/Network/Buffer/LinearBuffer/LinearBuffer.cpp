@@ -26,7 +26,7 @@ bool LinearBuffer::OnWrite(byte* data, size_t nums)
 void LinearBuffer::OnRead(size_t nums)
 {
 	if (nums > Size())
-		return;		// Àß¸øµÈ ¿äÃ»
+		return;		// ì˜ëª»ëœ ìš”ì²­
 
 	readPos_ += nums;
 	size_ -= nums;
@@ -47,7 +47,7 @@ DWORD LinearBuffer::PrepareRecv(WSABUF(&wsabuf)[2]) noexcept
 bool LinearBuffer::Commit(size_t nums) noexcept
 {
 	if (nums > FreeSize())
-		return false;		// Àß¸øµÈ ¿äÃ»
+		return false;		// ì˜ëª»ëœ ìš”ì²­
 
 	writePos_ += nums;
 	size_ += nums;
@@ -73,7 +73,7 @@ bool LinearBuffer::PeekInto(void* dst, size_t need) const noexcept
 	auto v = PeekView();
 
 	if (need > v.seg1.length) {
-		// ¹®Á¦ »óÈ² ¹ß»ı
+		// ë¬¸ì œ ìƒí™© ë°œìƒ
 		assert(false);
 	}
 
@@ -92,7 +92,7 @@ void LinearBuffer::Clean()
 
 	if (dataSize == 0) {
 		if (size_ != 0) {
-			// ¹®Á¦ »óÈ²
+			// ë¬¸ì œ ìƒí™©
 			assert(false);
 		}
 
@@ -100,7 +100,7 @@ void LinearBuffer::Clean()
 		readPos_ = 0;
 	}
 	else {
-		// ³Ë³ËÇÏ°Ô ÀâÀº ¹öÆÛ°¡ °ÅÀÇ ´Ù Ã¡À» ¶§
+		// ë„‰ë„‰í•˜ê²Œ ì¡ì€ ë²„í¼ê°€ ê±°ì˜ ë‹¤ ì°¼ì„ ë•Œ
 		if (FreeSize() < bufferSize_) {
 			MoveData();
 		}

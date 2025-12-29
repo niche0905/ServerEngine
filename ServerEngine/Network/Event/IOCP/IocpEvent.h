@@ -5,7 +5,7 @@
    IocpEvent
 -------------*/
 //
-// IocpEvent´Â I/O Completion Port¿¡¼­ »ç¿ëÇÏ´Â ÀÌº¥Æ® °´Ã¼ÀÔ´Ï´Ù.
+// IocpEventëŠ” I/O Completion Portì—ì„œ ì‚¬ìš©í•˜ëŠ” ì´ë²¤íŠ¸ ê°ì²´ì…ë‹ˆë‹¤.
 //
 
 class IocpEvent : public OVERLAPPED, public IIoEvent

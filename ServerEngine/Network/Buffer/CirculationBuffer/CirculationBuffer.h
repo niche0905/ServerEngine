@@ -5,10 +5,10 @@
    CirculationBuffer
 ---------------------*/
 //
-// CirculationBuffer´Â È¯Çü ¹öÆÛÀÔ´Ï´Ù
-// CirculationBuffer´Â BaseBuffer¸¦ »ó¼Ó¹Ş¾Æ ±¸ÇöµË´Ï´Ù
-// CirculationBuffer´Â PrepareRecv¿¡¼­ Scatter-Gather ±â¹ıÀ» »ç¿ëÇÏ¿©, 
-// È¯Çü ¹öÆÛÀÇ ³¡°ú Ã³À½¿¡ ÀÌ¾î¼­ µ¥ÀÌÅÍ¸¦ ¹ŞÀ» ¼ö ÀÖµµ·Ï ÇÕ´Ï´Ù
+// CirculationBufferëŠ” í™˜í˜• ë²„í¼ì…ë‹ˆë‹¤
+// CirculationBufferëŠ” BaseBufferë¥¼ ìƒì†ë°›ì•„ êµ¬í˜„ë©ë‹ˆë‹¤
+// CirculationBufferëŠ” PrepareRecvì—ì„œ Scatter-Gather ê¸°ë²•ì„ ì‚¬ìš©í•˜ì—¬, 
+// í™˜í˜• ë²„í¼ì˜ ëê³¼ ì²˜ìŒì— ì´ì–´ì„œ ë°ì´í„°ë¥¼ ë°›ì„ ìˆ˜ ìˆë„ë¡ í•©ë‹ˆë‹¤
 // 
 
 class CirculationBuffer : public RecvBuffer

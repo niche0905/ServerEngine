@@ -9,8 +9,8 @@
    ExternalPool
 ----------------*/
 //
-// ExternalPoolÀº PoolObject °³³äÀ» µû¸£´Â °´Ã¼µéÀ» °ü¸®ÇÏ´Â °´Ã¼ Ç®ÀÔ´Ï´Ù
-// ¿ÜºÎ¿¡¼­ °´Ã¼ÀÇ »ı¸íÁÖ±â¸¦ °ü¸®ÇÏ¸ç, ÇÊ¿ä¿¡ µû¶ó °´Ã¼¸¦ È¹µæÇÏ°í ¹İÈ¯ÇÒ ¼ö ÀÖ½À´Ï´Ù
+// ExternalPoolì€ PoolObject ê°œë…ì„ ë”°ë¥´ëŠ” ê°ì²´ë“¤ì„ ê´€ë¦¬í•˜ëŠ” ê°ì²´ í’€ì…ë‹ˆë‹¤
+// ì™¸ë¶€ì—ì„œ ê°ì²´ì˜ ìƒëª…ì£¼ê¸°ë¥¼ ê´€ë¦¬í•˜ë©°, í•„ìš”ì— ë”°ë¼ ê°ì²´ë¥¼ íšë“í•˜ê³  ë°˜í™˜í•  ìˆ˜ ìˆìŠµë‹ˆë‹¤
 //
 
 template <typename T>
@@ -25,7 +25,7 @@ public:
             pool_.push(std::make_unique<T>());
     }
 
-    // °´Ã¼ ¾ò±â
+    // ê°ì²´ ì–»ê¸°
     std::unique_ptr<T> Acquire()
     {
         if (threadSafe_) mutex_.lock();
@@ -33,7 +33,7 @@ public:
         if (pool_.empty())
         {
             if (threadSafe_) mutex_.unlock();
-            return std::make_unique<T>();   // ÀÚµ¿ È®Àå
+            return std::make_unique<T>();   // ìë™ í™•ì¥
         }
 
         auto obj = std::move(pool_.front());
@@ -43,7 +43,7 @@ public:
         return obj;
     }
 
-    // °´Ã¼ ¹İÈ¯
+    // ê°ì²´ ë°˜í™˜
     void Release(std::unique_ptr<T> obj)
     {
         if (threadSafe_) mutex_.lock();

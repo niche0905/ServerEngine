@@ -5,9 +5,9 @@
    LinearBuffer
 ----------------*/
 //
-// LinearBuffer´Â ¼±Çü ¹öÆÛÀÔ´Ï´Ù
-// LinearBuffer´Â BaseBuffer¸¦ »ó¼Ó¹Ş¾Æ ±¸ÇöµË´Ï´Ù
-// LinearBuffer´Â ³¡¿¡ °ÅÀÇ ´Ù´Ù¶úÀ» ¶§ ¾ÕÂÊÀ¸·Î µ¥ÀÌÅÍ¸¦ ¿Å±â´Â ¹æ½ÄÀ¸·Î µ¿ÀÛÇÕ´Ï´Ù
+// LinearBufferëŠ” ì„ í˜• ë²„í¼ì…ë‹ˆë‹¤
+// LinearBufferëŠ” BaseBufferë¥¼ ìƒì†ë°›ì•„ êµ¬í˜„ë©ë‹ˆë‹¤
+// LinearBufferëŠ” ëì— ê±°ì˜ ë‹¤ë‹¤ëì„ ë•Œ ì•ìª½ìœ¼ë¡œ ë°ì´í„°ë¥¼ ì˜®ê¸°ëŠ” ë°©ì‹ìœ¼ë¡œ ë™ì‘í•©ë‹ˆë‹¤
 // 
 
 class LinearBuffer : public RecvBuffer

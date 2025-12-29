@@ -12,7 +12,7 @@ bool RioCore::Initialize()
 	if (tempSocket == INVALID_SOCKET)
 		return false;
 
-	// RIO ÇÔ¼ö Å×ÀÌºí ·Îµå
+	// RIO í•¨ìˆ˜ í…Œì´ë¸” ë¡œë“œ
 	GUID functionTableId = WSAID_MULTIPLE_RIO;
 	DWORD bytes = 0;
 	if (::WSAIoctl(tempSocket, SIO_GET_MULTIPLE_EXTENSION_FUNCTION_POINTER,
@@ -59,11 +59,11 @@ void RioCore::Terminate()
 
 bool RioCore::Dispatch(DWORD timeoutMs)
 {
-	RIORESULT results[1024];	// ÃÖ´ë ÇÑ¹ø¿¡ ¹ŞÀ» ¼ö ÀÖ´Â ÀÌº¥Æ® ¼ö (Attach ÇÒ ¶§ ¼³Á¤ÇÑ °ª)
+	RIORESULT results[1024];	// ìµœëŒ€ í•œë²ˆì— ë°›ì„ ìˆ˜ ìˆëŠ” ì´ë²¤íŠ¸ ìˆ˜ (Attach í•  ë•Œ ì„¤ì •í•œ ê°’)
 	ULONG numOfResults = rio_.RIODequeueCompletion(rioCq_, results, std::size(results));
 
 	if (numOfResults == RIO_CORRUPT_CQ) {
-		// TODO: CQ°¡ ¼Õ»óµÈ °æ¿ì¿¡ ´ëÇÑ Ã³¸®
+		// TODO: CQê°€ ì†ìƒëœ ê²½ìš°ì— ëŒ€í•œ ì²˜ë¦¬
 
 		return false;
 	}
@@ -79,7 +79,7 @@ bool RioCore::Dispatch(DWORD timeoutMs)
 		}
 	}
 
-	// °á°ú°¡ ¾øÀ¸¸é Completion Notify ÀÌº¥Æ® ´ë±â
+	// ê²°ê³¼ê°€ ì—†ìœ¼ë©´ Completion Notify ì´ë²¤íŠ¸ ëŒ€ê¸°
 	if (numOfResults == 0) {
 		::WaitForSingleObject(completionType_.Event.EventHandle, timeoutMs);
 	}
@@ -89,7 +89,7 @@ bool RioCore::Dispatch(DWORD timeoutMs)
 
 bool RioCore::AttachIoObject(std::shared_ptr<IoObject> ioObject)
 {
-	// ¿©±â¿¡ µé¾î¿Â IoObject´Â RIO ¼ÒÄÏÀÌ¾î¾ß ÇÕ´Ï´Ù (¹İµå½Ã!!)
+	// ì—¬ê¸°ì— ë“¤ì–´ì˜¨ IoObjectëŠ” RIO ì†Œì¼“ì´ì–´ì•¼ í•©ë‹ˆë‹¤ (ë°˜ë“œì‹œ!!)
 	SOCKET socket = reinterpret_cast<SOCKET>(ioObject->GetHandle());
 
 	RIO_RQ rq = rio_.RIOCreateRequestQueue(
@@ -104,7 +104,7 @@ bool RioCore::AttachIoObject(std::shared_ptr<IoObject> ioObject)
 	if (rq == RIO_INVALID_RQ)
 		return false;
 
-	// TODO: Rio SessionÀ¸·Î º¯È¯ ÈÄ rq ÀúÀå
+	// TODO: Rio Sessionìœ¼ë¡œ ë³€í™˜ í›„ rq ì €ì¥
 
 
 	return true;

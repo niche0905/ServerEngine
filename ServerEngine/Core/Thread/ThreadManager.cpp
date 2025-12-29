@@ -51,10 +51,10 @@ void ThreadManager::DestroyTLS()
 
 void ThreadManager::DoReserveWork()
 {
-	// TODO: reserve work ºĞ¹è (±Ùµ¥ »şµù »ı°¢ÇÏ¸é ºĞ¹è°¡ ¾Æ´Ï¶ó °¢ÀÚ Ã³¸®ÇÏ´Â°Ô ¸ÂÀ»Áöµµ?)
+	// TODO: reserve work ë¶„ë°° (ê·¼ë° ìƒ¤ë”© ìƒê°í•˜ë©´ ë¶„ë°°ê°€ ì•„ë‹ˆë¼ ê°ì ì²˜ë¦¬í•˜ëŠ”ê²Œ ë§ì„ì§€ë„?)
 }
 
 void ThreadManager::DoGlobalWork()
 {
-	// TODO: °øÅëµÈ ÀÛ¾÷ Ã³¸®
+	// TODO: ê³µí†µëœ ì‘ì—… ì²˜ë¦¬
 }

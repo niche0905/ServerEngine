@@ -6,7 +6,7 @@
    RioCore
 ------------*/
 //
-// WindowsÀÇ Registered I/O (RIO) ¹æ½ÄÀ» »ç¿ëÇÏ´Â Core ÀÔ´Ï´Ù
+// Windowsì˜ Registered I/O (RIO) ë°©ì‹ì„ ì‚¬ìš©í•˜ëŠ” Core ì…ë‹ˆë‹¤
 //
 
 class RioCore : public IoCore
@@ -22,23 +22,23 @@ public:
 	bool AttachIoObject(std::shared_ptr<IoObject> ioObject) override;
 
 public:
-	// RIO ÇÔ¼ö Å×ÀÌºí Á¢±ÙÀÚ
+	// RIO í•¨ìˆ˜ í…Œì´ë¸” ì ‘ê·¼ì
 	const RIO_EXTENSION_FUNCTION_TABLE& Rio() const noexcept { return rio_; }
 
-	// CQ ÇÚµé Á¢±ÙÀÚ
+	// CQ í•¸ë“¤ ì ‘ê·¼ì
 	RIO_CQ GetCompletionQueue() const noexcept { return rioCq_; }
 
 private:
 	bool LoadRioFunctions();
 
 private:
-	// RIO ÇÔ¼ö Å×ÀÌºí
+	// RIO í•¨ìˆ˜ í…Œì´ë¸”
 	RIO_EXTENSION_FUNCTION_TABLE rio_{};
 
-	// Completion Queue ÇÚµé
+	// Completion Queue í•¸ë“¤
 	RIO_CQ rioCq_{ RIO_INVALID_CQ };
 
-	// Completion ¾Ë¸²
+	// Completion ì•Œë¦¼
 	RIO_NOTIFICATION_COMPLETION completionType_{};
 
 };

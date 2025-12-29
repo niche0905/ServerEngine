@@ -6,8 +6,8 @@
    RecvBuffer
 --------------*/
 //
-// RecvBuffer�� BYTE������ �����͸� ��� �׸��Դϴ�
-// RecvBuffer�� �����͸� �ޱ� ���� �뵵�� ���˴ϴ�
+// RecvBuffer는 BYTE형식의 데이터를 담는 그릇입니다
+// RecvBuffer는 데이터를 받기 위한 용도로 사용됩니다
 // 
 
 class RecvBuffer : public BaseBuffer<byte>
@@ -26,25 +26,25 @@ public:
 	size_t										Capacity() const override { return capacity_; }
 
 public:
-	// ȣ���ڰ� �����ϴ� WSABUF[2]�� ä���ݴϴ�
-	// ��ȯ���� WSABUF�� ä���� �����Դϴ� (0 ~ 2)
+	// 호출자가 제공하는 WSABUF[2]를 채워줍니다
+	// 반환값은 WSABUF에 채워진 개수입니다 (0 ~ 2)
 	virtual DWORD								PrepareRecv(WSABUF (&wsabuf)[2]) noexcept = 0;
 	
-	// WSABUF���� ���� ��ŭ �����͸� ���ۿ� Ŀ���մϴ�
+	// WSABUF에서 사용된 만큼 데이터를 버퍼에 커밋합니다
 	virtual bool								Commit(size_t nums) noexcept = 0;
 
-	// �ļ��� ���ۿ� ��� �����͸� �������� �ʰ� �б⸸ �մϴ�
+	// 파서가 버퍼에 담긴 데이터를 제거하지 않고 읽기만 합니다
 	virtual ReadView							PeekView() const noexcept = 0;
 
-	// �ļ��� ���ۿ� ��� �����͸� �������� �ʰ� �б⸸ �մϴ�(�ִ� 1�� ���� <= ���� ����)
+	// 파서가 버퍼에 담긴 데이터를 제거하지 않고 읽기만 합니다(최대 1개 구간 <= 단일 구간)
 	virtual std::pair<const byte*, size_t>		Peek() const noexcept
 	{
-		// ���� ȣȯ: ù ���� ������ ����
+		// 하위 호환: 첫 연속 구간만 노출
 		ReadView v = PeekView();
 		return { v.seg1.buffer, v.seg1.length };
 	}
 
-	// �ļ��� ���ۿ� ��� �����͸� �������� �ʰ� �б⸸ �մϴ�(need ũ�� ��ŭ �б� �õ�, �Ұ����ϸ� false) dst�� ����
+	// 파서가 버퍼에 담긴 데이터를 제거하지 않고 읽기만 합니다(need 크기 만큼 읽기 시도, 불가능하면 false) dst에 복사
 	virtual bool								PeekInto(void* dst, size_t need) const noexcept = 0;
 
 	virtual size_t								PeekAll(void* dst) const noexcept
@@ -53,13 +53,13 @@ public:
 		return size_;
 	}
 
-	// �ļ��� ���ۿ� ��� �����͸� �����մϴ�
+	// 파서가 버퍼에 담긴 데이터를 제거합니다
 	virtual void								Consume(size_t nums) noexcept = 0;
 
-	// ���ۿ� ��� �������� ũ�⸦ ��ȯ�մϴ�
+	// 버퍼에 담긴 데이터의 크기를 반환합니다
 	virtual size_t								DataSize() const noexcept { return size_; }
 
-	// ���ۿ� ���� ���� ������ ũ�⸦ ��ȯ�մϴ�
+	// 버퍼에 남은 여유 공간의 크기를 반환합니다
 	virtual size_t								FreeSize() const noexcept { return (capacity_ - size_); }
 
 protected:

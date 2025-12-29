@@ -45,7 +45,7 @@ std::shared_ptr<SessionBase> ServiceBase::CreateSession()
 
 void ServiceBase::AddSession(std::shared_ptr<SessionBase> session)
 {
-	// TODO: lock free·Î È¿À²ÀûÀÎ ±¸ÇöÀÌ °¡´ÉÇÏ´Ù¸é º¯°æÇÏµµ·Ï
+	// TODO: lock freeë¡œ íš¨ìœ¨ì ì¸ êµ¬í˜„ì´ ê°€ëŠ¥í•˜ë‹¤ë©´ ë³€ê²½í•˜ë„ë¡
 	std::lock_guard<std::mutex> lock(sessionMutex_);
 
 	++sessionCount_;

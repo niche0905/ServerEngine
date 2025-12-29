@@ -4,7 +4,7 @@
    NetworkAddress
 ------------------*/
 //
-// NetworkAddressÀº ³×Æ®¿öÅ© ÁÖ¼Ò¸¦ ³ªÅ¸³À´Ï´Ù
+// NetworkAddressì€ ë„¤íŠ¸ì›Œí¬ ì£¼ì†Œë¥¼ ë‚˜íƒ€ëƒ…ë‹ˆë‹¤
 //
 
 class NetworkAddress

@@ -9,7 +9,7 @@ struct IoVec
 
 struct ReadView 
 {
-    IoVec seg1;   // Ã¹ ¿¬¼Ó ±¸°£
-    IoVec seg2;   // È¯Çü¿¡¼­ wrapÀÏ ¶§¸¸ Á¸Àç, ¾Æ´Ï¸é len=0
+    IoVec seg1;   // ì²« ì—°ì† êµ¬ê°„
+    IoVec seg2;   // í™˜í˜•ì—ì„œ wrapì¼ ë•Œë§Œ ì¡´ì¬, ì•„ë‹ˆë©´ len=0
     size_t Total() const noexcept { return seg1.length + seg2.length; }
 };

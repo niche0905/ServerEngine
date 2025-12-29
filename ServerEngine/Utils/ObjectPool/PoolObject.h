@@ -3,6 +3,6 @@
 
 template <typename T, typename... Args>
 concept PoolObject = requires(T a, Args... args) {
-	// PoolObject´Â Reset ¸Þ¼­µå¸¦ °¡Á®¾ß ÇÕ´Ï´Ù
+	// PoolObjectëŠ” Reset ë©”ì„œë“œë¥¼ ê°€ì ¸ì•¼ í•©ë‹ˆë‹¤
     { a.Reset(args...) } -> std::same_as<void>;
 };

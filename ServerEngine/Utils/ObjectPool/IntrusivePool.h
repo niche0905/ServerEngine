@@ -9,8 +9,8 @@
    IntrusivePool
 -----------------*/
 //
-// IntrusivePool´Â T Å¸ÀÔ °´Ã¼µéÀ» À§ÇÑ ¸Ş¸ğ¸® Ç®ÀÔ´Ï´Ù
-// T °´Ã¼ ³»ºÎ¿¡ º°µµÀÇ ¸Ş¸ğ¸® °ü¸®¿ë ÇÊµå¸¦ Ãß°¡ÇÏÁö ¾Ê°íµµ ¸Ş¸ğ¸® ÇÒ´ç°ú ÇØÁ¦¸¦ È¿À²ÀûÀ¸·Î Ã³¸®ÇÒ ¼ö ÀÖ½À´Ï´Ù
+// IntrusivePoolëŠ” T íƒ€ì… ê°ì²´ë“¤ì„ ìœ„í•œ ë©”ëª¨ë¦¬ í’€ì…ë‹ˆë‹¤
+// T ê°ì²´ ë‚´ë¶€ì— ë³„ë„ì˜ ë©”ëª¨ë¦¬ ê´€ë¦¬ìš© í•„ë“œë¥¼ ì¶”ê°€í•˜ì§€ ì•Šê³ ë„ ë©”ëª¨ë¦¬ í• ë‹¹ê³¼ í•´ì œë¥¼ íš¨ìœ¨ì ìœ¼ë¡œ ì²˜ë¦¬í•  ìˆ˜ ìˆìŠµë‹ˆë‹¤
 //
 
 template <typename T, std::size_t BlockSize = 256>
@@ -24,14 +24,14 @@ public:
     IntrusivePool& operator=(const IntrusivePool&) = delete;
 
     ~IntrusivePool() {
-        // ¾ÆÁ÷ »ì¾Æ ÀÖ´Â °´Ã¼´Â ¾ø´Ù´Â ÀüÁ¦(°ÔÀÓ ¼­¹ö ÆĞÅÏ¿¡¼± º¸Åë ÇÁ·Î¼¼½º Á¾·á ½ÃÁ¡)
+        // ì•„ì§ ì‚´ì•„ ìˆëŠ” ê°ì²´ëŠ” ì—†ë‹¤ëŠ” ì „ì œ(ê²Œì„ ì„œë²„ íŒ¨í„´ì—ì„  ë³´í†µ í”„ë¡œì„¸ìŠ¤ ì¢…ë£Œ ì‹œì )
         for (void* block : blocks_) {
             ::operator delete(block, std::align_val_t(alignof(T)));
         }
     }
 
 public:
-    // T °´Ã¼¸¦ »ı¼ºÇØ¼­ ¹İÈ¯ (placement new Æ÷ÇÔ)
+    // T ê°ì²´ë¥¼ ìƒì„±í•´ì„œ ë°˜í™˜ (placement new í¬í•¨)
     template <typename... Args>
     T* Acquire(Args&&... args) {
         void* mem = AllocateRaw();
@@ -39,7 +39,7 @@ public:
         return std::construct_at(static_cast<T*>(mem), std::forward<Args>(args)...);
     }
 
-    // T °´Ã¼¸¦ ÆÄ±«ÇÏ°í Ç®¿¡ ¹İÈ¯
+    // T ê°ì²´ë¥¼ íŒŒê´´í•˜ê³  í’€ì— ë°˜í™˜
     void Release(T* ptr) noexcept {
         if (!ptr) return;
         std::destroy_at(ptr);  // ptr->~T();
@@ -49,7 +49,7 @@ public:
     }
 
 public:
-    // »ı¼ºÀÚ/¼Ò¸êÀÚ ¾øÀÌ "¿ø½Ã ¸Ş¸ğ¸®"¸¸ ¾²°í ½ÍÀ» ¶§
+    // ìƒì„±ì/ì†Œë©¸ì ì—†ì´ "ì›ì‹œ ë©”ëª¨ë¦¬"ë§Œ ì“°ê³  ì‹¶ì„ ë•Œ
     T* AcquireUninitialized() {
         return static_cast<T*>(AllocateRaw());
     }
@@ -66,7 +66,7 @@ private:
     };
 
     FreeNode* freeList_ = nullptr;
-    std::vector<void*> blocks_;  // ºí·Ï ÁÖ¼Òµé º¸°ü (³ªÁß¿¡ ÀüÃ¼ free¿ë)
+    std::vector<void*> blocks_;  // ë¸”ë¡ ì£¼ì†Œë“¤ ë³´ê´€ (ë‚˜ì¤‘ì— ì „ì²´ freeìš©)
 
     void* AllocateRaw() {
         if (!freeList_) {
@@ -81,13 +81,13 @@ private:
         constexpr std::size_t sz = sizeof(T);
         constexpr std::size_t align = alignof(T);
 
-        // Á¤·Ä ¸ÂÃç¼­ Å« ºí·° ÇÏ³ª ÇÒ´ç
+        // ì •ë ¬ ë§ì¶°ì„œ í° ë¸”ëŸ­ í•˜ë‚˜ í• ë‹¹
         std::byte* block = static_cast<std::byte*>(
             ::operator new(sz * BlockSize, std::align_val_t(align))
             );
         blocks_.push_back(block);
 
-        // ÀÌ ºí·°À» free list ³ëµåµé·Î ÂÉ°³¼­ ¿¬°á
+        // ì´ ë¸”ëŸ­ì„ free list ë…¸ë“œë“¤ë¡œ ìª¼ê°œì„œ ì—°ê²°
         auto* first = reinterpret_cast<FreeNode*>(block);
         FreeNode* current = first;
 
@@ -97,7 +97,7 @@ private:
             current = next;
         }
 
-        // »õ ºí·Ï µÚ¿¡ ±âÁ¸ free list ¿¬°á
+        // ìƒˆ ë¸”ë¡ ë’¤ì— ê¸°ì¡´ free list ì—°ê²°
         current->next = freeList_;
         freeList_ = first;
     }

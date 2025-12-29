@@ -28,11 +28,11 @@ bool CirculationBuffer::OnWrite(byte* data, size_t nums)
 	remainSize -= moveSize;
 	data += moveSize;
 
-	// 2nd segment (non-wrapø°º≠∏∏ ≥≤¿Ω)
+	// 2nd segment (non-wrapÏóêÏÑúÎßå ÎÇ®Ïùå)
 	if (remainSize > 0) {
-		// seg2 == readPos_ (πˆ∆€ √≥¿Ω∫Œ≈Õ)
+		// seg2 == readPos_ (Î≤ÑÌçº Ï≤òÏùåÎ∂ÄÌÑ∞)
 		std::memcpy(buffer_.data(), data, remainSize);
-		writePos_ = remainSize; // 0ø°º≠ n∏∏≈≠ ¿Ãµø
+		writePos_ = remainSize; // 0ÏóêÏÑú nÎßåÌÅº Ïù¥Îèô
 		size_ += remainSize;
 	}
 
@@ -42,9 +42,9 @@ bool CirculationBuffer::OnWrite(byte* data, size_t nums)
 void CirculationBuffer::OnRead(size_t nums)
 {
 	if (nums > Size())
-		return;		// ¿ﬂ∏¯µ» ø‰√ª
+		return;		// ÏûòÎ™ªÎêú ÏöîÏ≤≠
 
-	// »Ø«¸ πˆ∆€¿Ãπ«∑Œ readPos_∞° capacity_∏¶ ≥—¿∏∏È readPos_∏¶ 0∫Œ≈Õ ¥ŸΩ√ Ω√¿€
+	// ÌôòÌòï Î≤ÑÌçºÏù¥ÎØÄÎ°ú readPos_Í∞Ä capacity_Î•º ÎÑòÏúºÎ©¥ readPos_Î•º 0Î∂ÄÌÑ∞ Îã§Ïãú ÏãúÏûë
 	readPos_ = ((readPos_ + nums) % capacity_);
 	size_ -= nums;
 	Clean();
@@ -57,7 +57,7 @@ DWORD CirculationBuffer::PrepareRecv(WSABUF(&wsabuf)[2]) noexcept
 	const size_t seg2 = FreeSeg2();
 
 	if (seg1 == 0 && seg2 == 0)
-		// πÆ¡¶∞° µ«¥¬ ªÛ»≤
+		// Î¨∏Ï†úÍ∞Ä ÎêòÎäî ÏÉÅÌô©
 		return 0;
 
 	if (seg1 > 0) {
@@ -81,12 +81,12 @@ DWORD CirculationBuffer::PrepareRecv(WSABUF(&wsabuf)[2]) noexcept
 bool CirculationBuffer::Commit(size_t nums) noexcept
 {
 	if (nums > FreeSize())
-		return false;		// ¿ﬂ∏¯µ» ø‰√ª
+		return false;		// ÏûòÎ™ªÎêú ÏöîÏ≤≠
 
 	writePos_ += nums;
 	size_ += nums;
 
-	// »Ø«¸ πˆ∆€¿Ãπ«∑Œ writePos_∞° capacity_∏¶ ≥—¿∏∏È writePos_∏¶ 0∫Œ≈Õ ¥ŸΩ√ Ω√¿€
+	// ÌôòÌòï Î≤ÑÌçºÏù¥ÎØÄÎ°ú writePos_Í∞Ä capacity_Î•º ÎÑòÏúºÎ©¥ writePos_Î•º 0Î∂ÄÌÑ∞ Îã§Ïãú ÏãúÏûë
 	writePos_ = (writePos_ >= capacity_) ? writePos_ - capacity_ : writePos_;
 
 	return true;
@@ -98,14 +98,14 @@ ReadView CirculationBuffer::PeekView() const noexcept
 	if (size_ == 0) return view;
 
 	if (HasWrapped()) {
-		// [read..end) ∞° seg1, [0..write) ∞° seg2
+		// [read..end) Í∞Ä seg1, [0..write) Í∞Ä seg2
 		view.seg1.buffer = buffer_.data() + readPos_;
 		view.seg1.length = capacity_ - readPos_;
 		view.seg2.buffer = buffer_.data();
 		view.seg2.length = writePos_;
 	}
 	else {
-		// [read..write)∏∏ ¡∏¿Á
+		// [read..write)Îßå Ï°¥Ïû¨
 		view.seg1.buffer = buffer_.data() + readPos_;
 		view.seg1.length = writePos_ - readPos_;
 		view.seg2.buffer = nullptr;
@@ -127,7 +127,7 @@ bool CirculationBuffer::PeekInto(void* dst, size_t need) const noexcept
 		std::memcpy(dst, v.seg1.buffer, need);
 		return true;
 	}
-	// µŒ ¡∂∞¢
+	// Îëê Ï°∞Í∞Å
 	const size_t n1 = v.seg1.length;
 	const size_t n2 = need - n1;
 	std::memcpy(dst, v.seg1.buffer, n1);

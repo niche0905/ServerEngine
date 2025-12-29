@@ -6,8 +6,8 @@
    ServiceBase
 ----------------*/
 //
-// ServiceBase´Â ServiceÀÇ ±âº» ÀÎÅÍÆäÀÌ½ºÀÔ´Ï´Ù
-// ´Ù¾çÇÑ Á¾·ùÀÇ Service°¡ ÀÌ Å¬·¡½º¸¦ »ó¼Ó¹Þ¾Æ ±¸ÇöµË´Ï´Ù
+// ServiceBaseëŠ” Serviceì˜ ê¸°ë³¸ ì¸í„°íŽ˜ì´ìŠ¤ìž…ë‹ˆë‹¤
+// ë‹¤ì–‘í•œ ì¢…ë¥˜ì˜ Serviceê°€ ì´ í´ëž˜ìŠ¤ë¥¼ ìƒì†ë°›ì•„ êµ¬í˜„ë©ë‹ˆë‹¤
 //
 
 using SessionFactory = std::function<std::shared_ptr<SessionBase>(void)>;

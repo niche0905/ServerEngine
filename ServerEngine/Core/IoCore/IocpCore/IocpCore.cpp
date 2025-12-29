@@ -38,7 +38,7 @@ bool IocpCore::Dispatch(DWORD timeoutMs)
 		case WAIT_TIMEOUT:
 			return false;
 		default:
-			// TODO: Error ·Î±× ³²±â±â
+			// TODO: Error ë¡œê·¸ ë‚¨ê¸°ê¸°
 			if (std::shared_ptr<IoObject> owner = ioEvent->GetOwner()) {
 				owner->Dispatch(ioEvent, static_cast<int32>(numOfBytes));
 			}

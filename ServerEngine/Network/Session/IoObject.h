@@ -5,8 +5,8 @@
    IoObject
 -------------*/
 //
-// IoObject´Â ºñµ¿±â ÀÔÃâ·ÂÀÇ ÁÖÃ¼ÀÔ´Ï´Ù
-// ÀÎÅÍÆäÀÌ½º ÇüÅÂ·Î GetHandle()°ú Dipatch()¸¦ Á¦°øÇØ¾ß ÇÕ´Ï´Ù
+// IoObjectëŠ” ë¹„ë™ê¸° ì…ì¶œë ¥ì˜ ì£¼ì²´ì…ë‹ˆë‹¤
+// ì¸í„°í˜ì´ìŠ¤ í˜•íƒœë¡œ GetHandle()ê³¼ Dipatch()ë¥¼ ì œê³µí•´ì•¼ í•©ë‹ˆë‹¤
 //
 
 class IoObject : public std::enable_shared_from_this<IoObject>

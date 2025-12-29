@@ -9,7 +9,7 @@
    IocpSession
 ---------------*/
 //
-// IocpSessionÀº IOCP ±â¹İ ¼¼¼ÇÀÇ ±âº» Å¬·¡½ºÀÔ´Ï´Ù
+// IocpSessionì€ IOCP ê¸°ë°˜ ì„¸ì…˜ì˜ ê¸°ë³¸ í´ë˜ìŠ¤ì…ë‹ˆë‹¤
 //
 
 class IocpSession : public PacketSession

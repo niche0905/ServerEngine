@@ -6,7 +6,7 @@
    IocpService
 ----------------*/
 //
-// IocpService´Â IOCP ±â¹İÀÇ Service ÀÎÅÍÆäÀÌ½ºÀÔ´Ï´Ù
+// IocpServiceëŠ” IOCP ê¸°ë°˜ì˜ Service ì¸í„°í˜ì´ìŠ¤ì…ë‹ˆë‹¤
 //
 
 class IocpService : public ServiceBase

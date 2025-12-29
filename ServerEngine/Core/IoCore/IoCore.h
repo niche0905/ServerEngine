@@ -5,9 +5,9 @@
    IoCore
 -----------*/
 //
-// IoCore·Î Åë½Å ±¸Á¶¸¦ ´ã´çÇÏ´Â Handle°ú °ü·ÃµÈ °ÍµéÀ» ´ã´çÇÏ´Â classÀÔ´Ï´Ù
-// ÀÌ class¸¦ »ó¼ÓÇÏ¿© IocpCore¿Í RioCore¸¦ ±¸¼ºÇÒ °ÍÀÔ´Ï´Ù
-// °øÅëµÈ ÇÊ¼ö ÇÔ¼ö¸¦ °¡»óÇÔ¼ö·Î ¼³Á¤ÇÏ¿´½À´Ï´Ù
+// IoCoreë¡œ í†µì‹  êµ¬ì¡°ë¥¼ ë‹´ë‹¹í•˜ëŠ” Handleê³¼ ê´€ë ¨ëœ ê²ƒë“¤ì„ ë‹´ë‹¹í•˜ëŠ” classìž…ë‹ˆë‹¤
+// ì´ classë¥¼ ìƒì†í•˜ì—¬ IocpCoreì™€ RioCoreë¥¼ êµ¬ì„±í•  ê²ƒìž…ë‹ˆë‹¤
+// ê³µí†µëœ í•„ìˆ˜ í•¨ìˆ˜ë¥¼ ê°€ìƒí•¨ìˆ˜ë¡œ ì„¤ì •í•˜ì˜€ìŠµë‹ˆë‹¤
 //
 
 class IoObject;
@@ -18,19 +18,19 @@ public:
 	IoCore();
 	~IoCore();
 
-	// IoBackend¸¦ ¹ÝÈ¯ÇÏ´Â ¼ø¼ö °¡»ó ÇÔ¼ö (IOCP ¶Ç´Â RIO)
+	// IoBackendë¥¼ ë°˜í™˜í•˜ëŠ” ìˆœìˆ˜ ê°€ìƒ í•¨ìˆ˜ (IOCP ë˜ëŠ” RIO)
 	virtual BackendType Backend() const noexcept = 0;
 
-	// ÃÊ±âÈ­ ¹× Á¾·á¸¦ À§ÇÑ ¼ø¼ö °¡»ó ÇÔ¼ö
+	// ì´ˆê¸°í™” ë° ì¢…ë£Œë¥¼ ìœ„í•œ ìˆœìˆ˜ ê°€ìƒ í•¨ìˆ˜
 	virtual bool Initialize() = 0;
 	virtual void Terminate() = 0;
 
-	// ÀÌº¥Æ® µð½ºÆÐÄ¡¸¦ À§ÇÑ ¼ø¼ö °¡»ó ÇÔ¼ö (IO ÀÌº¥Æ® Ã³¸®)
+	// ì´ë²¤íŠ¸ ë””ìŠ¤íŒ¨ì¹˜ë¥¼ ìœ„í•œ ìˆœìˆ˜ ê°€ìƒ í•¨ìˆ˜ (IO ì´ë²¤íŠ¸ ì²˜ë¦¬)
 	virtual bool Dispatch(DWORD timeoutMs = INFINITE) = 0;
 	
-	// ¼¼¼ÇÀ» IoCore¿¡ ¿¬°á ¹× ÇØÁ¦ÇÏ´Â ¼ø¼ö °¡»ó ÇÔ¼ö
+	// ì„¸ì…˜ì„ IoCoreì— ì—°ê²° ë° í•´ì œí•˜ëŠ” ìˆœìˆ˜ ê°€ìƒ í•¨ìˆ˜
 	virtual bool AttachIoObject(std::shared_ptr<IoObject> ioObject) = 0;
-	//virtual void DetachIoObject(std::shared_ptr<IoObject> ioObject) = 0;	// µî·ÏµÈ ÇÚµéÀ» ÇØÁ¦ÇÏ´Â °Ç ¾ø´Ù´õ¶ó
+	//virtual void DetachIoObject(std::shared_ptr<IoObject> ioObject) = 0;	// ë“±ë¡ëœ í•¸ë“¤ì„ í•´ì œí•˜ëŠ” ê±´ ì—†ë‹¤ë”ë¼
 
 private:
 

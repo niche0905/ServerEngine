@@ -5,14 +5,14 @@
    ThreadContext
 -----------------*/
 //
-// ThreadContext´Â thread º°·Î °ü¸®µÇ´Â ÄÁÅØ½ºÆ®ÀÔ´Ï´Ù
-// TLS¿Í ¿¬µ¿µÇ¾î °¢ thread°¡ ÀÚ½ÅÀÇ Context(»óÅÂ)¸¦ °¡Áú ¼ö ÀÖµµ·Ï ÇÕ´Ï´Ù
+// ThreadContextëŠ” thread ë³„ë¡œ ê´€ë¦¬ë˜ëŠ” ì»¨í…ìŠ¤íŠ¸ì…ë‹ˆë‹¤
+// TLSì™€ ì—°ë™ë˜ì–´ ê° threadê°€ ìì‹ ì˜ Context(ìƒíƒœ)ë¥¼ ê°€ì§ˆ ìˆ˜ ìˆë„ë¡ í•©ë‹ˆë‹¤
 //
 
 struct ThreadContext
 {
-	uint32 thread_id;		// thread °íÀ¯ id
+	uint32 thread_id;		// thread ê³ ìœ  id
 
-	// TODO: thread º°·Î °ü¸®ÇÒ »óÅÂµé Ãß°¡
+	// TODO: thread ë³„ë¡œ ê´€ë¦¬í•  ìƒíƒœë“¤ ì¶”ê°€
 };
 
