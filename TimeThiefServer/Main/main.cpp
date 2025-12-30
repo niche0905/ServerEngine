@@ -12,6 +12,6 @@ int main()
 		std::make_shared<PacketSession>,
 		1000
 	);
-
+	
 	assert(service->Start() == true);
 }
