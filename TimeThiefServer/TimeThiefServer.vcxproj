@@ -71,19 +71,19 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>$(SolutionDir)ServerEngine\;$(SolutionDir)Libraries\Include\;$(IncludePath);$(ProjectDir);</IncludePath>
+    <IncludePath>$(SolutionDir)ServerEngine\;$(SolutionDir)Libraries\Include\;$(IncludePath);$(ProjectDir);$(ProjectDir)Utils;</IncludePath>
     <LibraryPath>$(SolutionDir)Libraries\Libs\;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <IncludePath>$(SolutionDir)ServerEngine\;$(SolutionDir)Libraries\Include\;$(IncludePath);$(ProjectDir);</IncludePath>
+    <IncludePath>$(SolutionDir)ServerEngine\;$(SolutionDir)Libraries\Include\;$(IncludePath);$(ProjectDir);$(ProjectDir)Utils;</IncludePath>
     <LibraryPath>$(SolutionDir)Libraries\Libs\;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>$(SolutionDir)ServerEngine\;$(SolutionDir)Libraries\Include\;$(IncludePath);$(ProjectDir);</IncludePath>
+    <IncludePath>$(SolutionDir)ServerEngine\;$(SolutionDir)Libraries\Include\;$(IncludePath);$(ProjectDir);$(ProjectDir)Utils;</IncludePath>
     <LibraryPath>$(SolutionDir)Libraries\Libs\;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IncludePath>$(SolutionDir)ServerEngine\;$(SolutionDir)Libraries\Include\;$(IncludePath);$(ProjectDir);</IncludePath>
+    <IncludePath>$(SolutionDir)ServerEngine\;$(SolutionDir)Libraries\Include\;$(IncludePath);$(ProjectDir);$(ProjectDir)Utils;</IncludePath>
     <LibraryPath>$(SolutionDir)Libraries\Libs\;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -93,7 +93,7 @@
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Create</PrecompiledHeader>
-      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile>Utils/pch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
@@ -110,7 +110,7 @@
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Create</PrecompiledHeader>
-      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile>Utils/pch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
@@ -125,7 +125,7 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Create</PrecompiledHeader>
-      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile>Utils/pch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
@@ -142,7 +142,7 @@
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Create</PrecompiledHeader>
-      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile>Utils/pch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
@@ -229,6 +229,7 @@
       <AdditionalIncludeDirectories>;C:\Users\yudle\vcpkg\installed\x64-windows\include</AdditionalIncludeDirectories>
     </ClCompile>
     <ClCompile Include="Network\Session\PlayerSession.cpp" />
+    <ClCompile Include="Network\Session\SessionManager\SessionManager.cpp" />
     <ClCompile Include="Utils\pch.cpp">
       <RuntimeLibrary>MultiThreadedDebugDll</RuntimeLibrary>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -309,6 +310,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Network\Session\PlayerSession.h" />
+    <ClInclude Include="Network\Session\SessionManager\SessionManager.h" />
     <ClInclude Include="Utils\pch.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
