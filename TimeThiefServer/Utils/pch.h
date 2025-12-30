@@ -10,4 +10,5 @@
 
 #include "CorePch.h"
 
+// TODO: 다형성을 위해 수정이 필요하다
 using ServiceRef = std::shared_ptr<class IocpServerService>;

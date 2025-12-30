@@ -16,7 +16,7 @@ public:
 	IocpServerService() = delete;
 	IocpServerService(NetAddr address, SessionFactory factory, int32 maxSessionCount = 1);
 	virtual ~IocpServerService();
-
+	
 	// Service Start
 	virtual bool Start() override;
 	virtual void StopService() override;
