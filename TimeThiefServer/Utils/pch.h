@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #define WIN32_LEAN_AND_MEAN		// Exclude rarely-used stuff from Windows headers
 
@@ -8,7 +8,7 @@
 #pragma comment(lib, "ServerEngine\\Release\\ServerEngine.lib")
 #endif
 
-#include "CorePch.h"
+#include "Core/PCH/CorePch.h"
 
 // TODO: 다형성을 위해 수정이 필요하다
 using ServiceRef = std::shared_ptr<class IocpServerService>;

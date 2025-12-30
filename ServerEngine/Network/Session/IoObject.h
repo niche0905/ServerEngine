@@ -14,6 +14,12 @@ class IoObject : public std::enable_shared_from_this<IoObject>
 public:
 	virtual HANDLE GetHandle() = 0;
 	virtual void Dispatch(class IIoEvent* ioEvent, int32 numOfBytes = 0) = 0;
+	
+	template <typename T>
+	std::shared_ptr<T> AsShared()
+	{
+		return std::static_pointer_cast<T>(shared_from_this());
+	}
 
 };
 

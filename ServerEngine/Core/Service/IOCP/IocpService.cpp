@@ -45,7 +45,7 @@ void IocpService::StopService()
 
 bool IocpService::Dispatch(uint32 timeoutMs)
 {
-	iocpCore_->Dispatch(static_cast<DWORD>(timeoutMs));
+	return iocpCore_->Dispatch(static_cast<DWORD>(timeoutMs));
 }
 
 bool IocpService::RegisterSession(std::shared_ptr<SessionBase> session)
