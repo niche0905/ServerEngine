@@ -46,3 +46,18 @@ void PlayerSession::OnRecvPacket(byte* buffer, int32 len)
    std::string message(reinterpret_cast<char*>(buffer) + 1, len - 1);
    wprintf(L"[PlayerSession] Received Packet: %S\n", message.c_str());
 }
+
+void PlayerSession::OnConnected()
+{
+   // TODO: Session 매니저를 생성해서 관리해야 한다 (Backend 코어가 아닌 게임컨텐츠(서비스)에서 사용할 용도)
+}
+
+void PlayerSession::OnDisconnected()
+{
+   // TODO: Session 매니저에서 제거 처리
+}
+
+void PlayerSession::OnSend(int32 len)
+{
+   // nothing to do now
+}

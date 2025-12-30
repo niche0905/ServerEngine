@@ -30,6 +30,13 @@ public:
    bool CanPacketProcess(const byte* buffer, int32 len) override;
    void OnRecvPacket(byte* buffer, int32 len) override;
    
+// on event interface for content override
+protected:
+   void OnConnected() override;
+   void OnDisconnected() override;
+   // int32 OnRecv(byte* buffer, int32 len) override; // OnRecv is already writed in PacketSession, to write only OnRecvPacket
+   void OnSend(int32 len) override;
+   
 private:
    // TODO: 플레이어 세션 관련 멤버 변수 추가 예정
     
