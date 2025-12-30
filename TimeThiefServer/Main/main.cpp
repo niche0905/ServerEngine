@@ -9,6 +9,7 @@
 #include "PacketSession.h"
 #include "Core/Thread/ThreadManager.h"
 #include "Network/Session/PlayerSession.h"
+#include "Network/Session/SessionManager/SessionManager.h"
 
 class PlayerSession;
 
@@ -58,10 +59,11 @@ int main()
 		std::string message = testStrings[testIndex];
 		testIndex = (testIndex + 1) % testStrings.size();
 		
-		SendBufferRef sendBuffer = std::make_shared<SendBuffer>(message.size() + 1);
+		std::shared_ptr<SendBuffer> sendBuffer = std::make_shared<SendBuffer>(message.size() + 1);
 		sendBuffer->OnWrite(reinterpret_cast<byte*>(message.size()), 1);
 		sendBuffer->OnWrite(reinterpret_cast<byte*>(const_cast<char*>(message.c_str())), message.size());
-		service->BroadcastMessage();
+		
+		g_SessionManager.Broadcast(sendBuffer);
 	}
 	
 	threadManager.Join();

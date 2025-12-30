@@ -43,17 +43,6 @@ public:
 	ServiceType GetServiceType() const { return type_; }
 	NetAddr GetNetAddress() const { return netAddress_; }
 
-// Test
-public:
-	void Broadcast(SendBufferRef sendBuffer)
-	{
-		std::lock_guard<std::mutex> lock(sessionMutex_);
-
-		for (auto& session : sessions_) {
-			session->Send(sendBuffer);
-		}
-	}
-
 protected:
 	ServiceType type_;									// what kind of service
 	NetAddr netAddress_;								// network address info
