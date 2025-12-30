@@ -19,6 +19,7 @@ public:
 	ServiceBase(ServiceType type, NetAddr address, SessionFactory factory, int32 maxSessionCount = 1);
 	virtual ~ServiceBase();
 
+public:
 	// Service Start
 	virtual bool Start() = 0;
 	virtual bool CanStart() const;
@@ -41,6 +42,17 @@ public:
 public:
 	ServiceType GetServiceType() const { return type_; }
 	NetAddr GetNetAddress() const { return netAddress_; }
+
+// Test
+public:
+	void Broadcast(SendBufferRef sendBuffer)
+	{
+		std::lock_guard<std::mutex> lock(sessionMutex_);
+
+		for (auto& session : sessions_) {
+			session->Send(sendBuffer);
+		}
+	}
 
 protected:
 	ServiceType type_;									// what kind of service

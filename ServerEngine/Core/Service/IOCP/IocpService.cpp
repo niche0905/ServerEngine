@@ -43,6 +43,11 @@ void IocpService::StopService()
 	ServiceBase::StopService();
 }
 
+bool IocpService::Dispatch(uint32 timeoutMs)
+{
+	iocpCore_->Dispatch(static_cast<DWORD>(timeoutMs));
+}
+
 bool IocpService::RegisterSession(std::shared_ptr<SessionBase> session)
 {
 	bool succ = iocpCore_->AttachIoObject(session);	// IOCP에 session 등록

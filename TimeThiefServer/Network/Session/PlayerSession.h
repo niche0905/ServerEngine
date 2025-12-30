@@ -15,6 +15,21 @@ public:
    PlayerSession();
    virtual ~PlayerSession();
    
+   void Dispatch(class IIoEvent* ioEvent, int32 numOfBytes) override;
+   
+   // TEMP: 간단한 문자열 통신 테스트
+   int32 GetPacketHeaderSize() const override
+   {
+      return 1;
+   }
+   int32 GetPacketSize(byte* packet) const override
+   {
+      return reinterpret_cast<uint8*>(packet)[0];
+   }
+   
+   bool CanPacketProcess(const byte* buffer, int32 len) override;
+   void OnRecvPacket(byte* buffer, int32 len) override;
+   
 private:
    // TODO: 플레이어 세션 관련 멤버 변수 추가 예정
     

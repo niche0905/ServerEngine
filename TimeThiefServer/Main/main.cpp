@@ -1,17 +1,68 @@
 #include "pch.h"
+
+#include <chrono>
+#include <thread>
+#include <vector>
+
 #include "IocpServerService.h"
 #include "IocpCore.h"
 #include "PacketSession.h"
+#include "Core/Thread/ThreadManager.h"
+#include "Network/Session/PlayerSession.h"
+
+class PlayerSession;
 
 constexpr int SERVER_PORT = 8252;	// TEMP
+
+
+ThreadManager threadManager;
+
+std::vector<std::string> testStrings = {
+	"Hello, World!",
+	"TimeThiefServer is running.",
+	"This is a test packet.",
+	"Networking with IOCP is powerful.",
+	"Have a great day!"
+};
+
+void WorkerJob(ServiceRef& service)
+{
+	while (true) {
+
+		service->Dispatch(1000);
+	}
+}
 
 int main()
 {
 	ServiceRef service = std::make_shared<IocpServerService>(
 		NetAddr(L"127.0.0.1", SERVER_PORT),
-		std::make_shared<PacketSession>,
+		std::make_shared<PlayerSession>,
 		1000
 	);
 	
 	assert(service->Start() == true);
+	
+	int32 workerCount = std::thread::hardware_concurrency() - 1;
+	for (int32 i = 0; i <  workerCount; ++i) {
+		threadManager.Launch([&service]()
+		{
+			WorkerJob(service);
+		});
+	}
+
+	int32 testIndex = 0;
+	while (true) {
+		std::this_thread::sleep_for(std::chrono::seconds(1));
+		
+		std::string message = testStrings[testIndex];
+		testIndex = (testIndex + 1) % testStrings.size();
+		
+		SendBufferRef sendBuffer = std::make_shared<SendBuffer>(message.size() + 1);
+		sendBuffer->OnWrite(reinterpret_cast<byte*>(message.size()), 1);
+		sendBuffer->OnWrite(reinterpret_cast<byte*>(const_cast<char*>(message.c_str())), message.size());
+		service->BroadcastMessage();
+	}
+	
+	threadManager.Join();
 }

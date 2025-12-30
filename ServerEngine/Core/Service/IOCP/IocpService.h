@@ -21,12 +21,14 @@ public:
 	virtual bool CanStart() const override;
 
 	virtual void StopService() override;
+	
+	bool Dispatch(uint32 timeoutMs);
 
 	// Session Management
 	virtual bool RegisterSession(std::shared_ptr<SessionBase> session) override;
 	virtual bool RegisterIoObject(std::shared_ptr<IoObject> ioObject) override;
 
-private:
+protected:
 	std::shared_ptr<IocpCore> iocpCore_;
 
 };
