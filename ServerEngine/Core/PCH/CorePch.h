@@ -7,6 +7,7 @@
 #include "Utils/Types.h"
 #include "Utils/Container.h"
 #include "Core/Thread/ThreadLocalStorage.h"
+#include "Core/Global/CoreGlobal.h"
 
 /* ======================
 	C++ Standard Library
