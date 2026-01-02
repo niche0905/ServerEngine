@@ -1,5 +1,6 @@
 ﻿#include "pch.h"
 #include "ThreadManager.h"
+#include "ThreadLocalStorage.h"
 
 /*-----------------
    ThreadManager

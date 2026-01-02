@@ -13,6 +13,7 @@
 class LinearBuffer : public RecvBuffer
 {
 public:
+	LinearBuffer() = delete;
 	LinearBuffer(size_t bufferSize = 1024);
 	~LinearBuffer();
 

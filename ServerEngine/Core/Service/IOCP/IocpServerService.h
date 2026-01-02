@@ -10,6 +10,8 @@
 // Listener 세션을 생성하고 관리하는 기능을 포함합니다
 //
 
+class Listener;
+
 class IocpServerService : public IocpService
 {
 public:
