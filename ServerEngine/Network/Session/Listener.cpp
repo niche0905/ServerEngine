@@ -86,13 +86,15 @@ void Listener::CloseListener()
 
 void Listener::PostAccept(AcceptEvent* acceptEvent)
 {
+	acceptEvent->ResetOverlapped();
+	
 	std::shared_ptr<SessionBase> session = service_->CreateSession();
 
 	// acceptEvent->Init(); <- 이거 제대로 해결된 거 맞나?
 	acceptEvent->session_ = session;
 
 	DWORD bytesReceived = 0;
-	if (false == SocketUtils::AcceptEx(listenSocket_, session->GetSocket(), session->GetRecvBuffer(), 0, sizeof(SOCKADDR_IN) + 16, sizeof(SOCKADDR_IN), OUT & bytesReceived, static_cast<LPOVERLAPPED>(acceptEvent))) {
+	if (false == SocketUtils::AcceptEx(listenSocket_, session->GetSocket(), session->GetRecvBuffer(), 0, sizeof(SOCKADDR_IN) + 16, sizeof(SOCKADDR_IN) + 16, OUT & bytesReceived, static_cast<LPOVERLAPPED>(acceptEvent))) {
 		const int32 errorCode = WSAGetLastError();
 		
 		if (errorCode != WSA_IO_PENDING) {
