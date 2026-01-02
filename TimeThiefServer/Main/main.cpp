@@ -59,8 +59,10 @@ int main()
 		testIndex = (testIndex + 1) % testStrings.size();
 		
 		std::shared_ptr<SendBuffer> sendBuffer = std::make_shared<SendBuffer>(message.size() + 1);
-		sendBuffer->OnWrite(reinterpret_cast<byte*>(message.size()), 1);
-		sendBuffer->OnWrite(reinterpret_cast<byte*>(const_cast<char*>(message.c_str())), message.size());
+		
+		uint8 size = static_cast<uint8>(message.size() + 1);
+		sendBuffer->OnWrite(reinterpret_cast<byte*>(&size), 1);
+		sendBuffer->OnWrite(reinterpret_cast<byte*>(message.data()), message.size());
 		
 		g_SessionManager.Broadcast(sendBuffer);
 	}
