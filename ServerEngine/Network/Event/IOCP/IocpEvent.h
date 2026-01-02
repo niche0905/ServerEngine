@@ -16,7 +16,7 @@ public:
 
 	void ResetOverlapped() noexcept
 	{
-		ZeroMemory(this, sizeof(OVERLAPPED));
+		ZeroMemory(static_cast<OVERLAPPED*>(this), sizeof(OVERLAPPED));
 	}
 
 	virtual IoEventType GetType() const noexcept override { return type_; }
