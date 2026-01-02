@@ -44,7 +44,7 @@ void IocpSession::Send(std::shared_ptr<SendBuffer> sendBuffer)
 
 byte* IocpSession::GetRecvBuffer()
 {
-    return nullptr;
+    return recvBuffer_.Data();
 }
 
 bool IocpSession::PostConnect()
