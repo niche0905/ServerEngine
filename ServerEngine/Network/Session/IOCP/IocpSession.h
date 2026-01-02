@@ -58,7 +58,7 @@ protected:
 	//virtual void OnSend(int32 len) override;
 
 private:
-	RecvBuffer recvBuffer_;
+	RecvBuffer recvBuffer_{4096};
 
 	std::queue<std::shared_ptr<SendBuffer>> sendQueue_;
 	std::atomic<bool> sending_ = false;

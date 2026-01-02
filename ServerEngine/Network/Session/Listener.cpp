@@ -1,5 +1,7 @@
 ﻿#include "pch.h"
 #include "Listener.h"
+#include "Core/Global/CoreGlobal.h"
+#include "Utils/Log/ConsoleLogger.h"
 
 /*------------
    Listener
@@ -33,9 +35,16 @@ bool Listener::StartListening(std::shared_ptr<ServiceBase> service)
 	if (nullptr == service_) {
 		return false;
 	}
+	
+	consoleLogger->Log(L"Listeing Start");
 
 	listenSocket_ = SocketUtils::CreateSocket();
 	if (INVALID_SOCKET == listenSocket_) {
+		int errorCode = WSAGetLastError();
+		std::wstring errMsg = SocketUtils::GetWinErrorToString(errorCode);
+		
+		consoleLogger->Log(errMsg.c_str());
+		
 		return false;
 	}
 
@@ -85,9 +94,13 @@ void Listener::PostAccept(AcceptEvent* acceptEvent)
 	DWORD bytesReceived = 0;
 	if (false == SocketUtils::AcceptEx(listenSocket_, session->GetSocket(), session->GetRecvBuffer(), 0, sizeof(SOCKADDR_IN) + 16, sizeof(SOCKADDR_IN), OUT & bytesReceived, static_cast<LPOVERLAPPED>(acceptEvent))) {
 		const int32 errorCode = WSAGetLastError();
+		
 		if (errorCode != WSA_IO_PENDING) {
 
-			PostAccept(acceptEvent);
+			std::wstring errMsg = SocketUtils::GetWinErrorToString(errorCode);
+			consoleLogger->Log(errMsg.c_str());
+			
+			assert(false);
 		}
 	}
 }

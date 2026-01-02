@@ -13,11 +13,22 @@ void SocketUtils::Initialize()
 {
 	WSADATA wsaData;
 	if (0 != ::WSAStartup(MAKEWORD(2, 2), &wsaData)) {
-		// TODO: 에러 처리
-		// assert(false);
+		// TODO: 로그로 출력
+		int errorCode = WSAGetLastError();
+		std::wstring errMsg = SocketUtils::GetWinErrorToString(errorCode);
+		std::wcout << errMsg << std::endl;
+		assert(false);
 	}
 
 	SOCKET dummySocket = SocketCreator<BackendType::IOCP>::Create();
+	if (dummySocket == INVALID_SOCKET) {
+		// TODO: 로그로 출력
+		int errorCode = WSAGetLastError();
+		std::wstring errMsg = SocketUtils::GetWinErrorToString(errorCode);
+		std::wcout << errMsg << std::endl;
+		assert(false);
+	}
+	
 	// TODO: 에러 처리 assert
 	BindWindowsFunctions(dummySocket, WSAID_CONNECTEX, reinterpret_cast<LPVOID*>(&ConnectEx));
 	BindWindowsFunctions(dummySocket, WSAID_DISCONNECTEX, reinterpret_cast<LPVOID*>(&DisconnectEx));

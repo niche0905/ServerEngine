@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "IocpServerService.h"
+#include "Utils/Log/ConsoleLogger.h"
 
 /*---------------------
    IocpServerService
@@ -28,6 +29,8 @@ bool IocpServerService::Start()
 	if (false == listener_->StartListening(shared_from_this())) {
 		return false;
 	}
+	
+	consoleLogger->Log(L"IocpServerService started.");
 
 	return true;
 }
