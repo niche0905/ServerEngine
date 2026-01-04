@@ -36,7 +36,7 @@ bool Listener::StartListening(std::shared_ptr<ServiceBase> service)
 		return false;
 	}
 	
-	consoleLogger->Log(L"Listeing Start");
+	consoleLogger->Log(L"Listeing Start\n");
 
 	listenSocket_ = SocketUtils::CreateSocket();
 	if (INVALID_SOCKET == listenSocket_) {

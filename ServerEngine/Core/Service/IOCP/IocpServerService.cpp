@@ -30,7 +30,7 @@ bool IocpServerService::Start()
 		return false;
 	}
 	
-	consoleLogger->Log(L"IocpServerService started.");
+	consoleLogger->Log(L"IocpServerService started.\n");
 
 	return true;
 }
