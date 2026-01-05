@@ -31,13 +31,13 @@ void Listener::Dispatch(IIoEvent* ioEvent, int32 numOfBytes)
 
 bool Listener::StartListening(std::shared_ptr<ServiceBase> service)
 {
+	consoleLogger->Log(Color::Green, L"[Listener] Listening Start\n");
+	
 	service_ = service;
 	if (nullptr == service_) {
 		return false;
 	}
 	
-	consoleLogger->Log(L"Listeing Start\n");
-
 	listenSocket_ = SocketUtils::CreateSocket();
 	if (INVALID_SOCKET == listenSocket_) {
 		int errorCode = WSAGetLastError();

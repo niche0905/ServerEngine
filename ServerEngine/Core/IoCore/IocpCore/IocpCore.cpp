@@ -45,7 +45,7 @@ bool IocpCore::Dispatch(DWORD timeoutMs)
 	}
 	else {
 
-		int32 errorCode = ::WSAGetLastError();
+		int32 errorCode = ::GetLastError();
 		switch (errorCode)
 		{
 		case WAIT_TIMEOUT:

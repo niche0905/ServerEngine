@@ -35,21 +35,35 @@ void WorkerJob(ServiceRef& service)
 
 int main()
 {
+	consoleLogger->Log(Color::Green, L"[main] entered main\n");
+	
 	ServiceRef service = std::make_shared<IocpServerService>(
 		NetAddr(L"127.0.0.1", SERVER_PORT),
 		std::make_shared<PlayerSession>,
 		1000
 	);
+
+	consoleLogger->Log(Color::Green, L"[main] made service\n");
 	
-	assert(service->Start() == true);
-	
-	int32 workerCount = std::thread::hardware_concurrency() - 1;
+	// assert(service->Start() == true);
+	bool ok = service->Start();
+	if (!ok) {
+		consoleLogger->Log(Color::Red, L"[main] Start FAIL\n");
+		return 0;	
+	}
+	consoleLogger->Log(Color::Green, L"[main] Start OK\n");
+
+	consoleLogger->Log(Color::Green, L"[main] before launching workers\n");
+	int32 hc = (int32)std::thread::hardware_concurrency();
+	int32 workerCount = (hc > 1) ? (hc - 1) : 1;
 	for (int32 i = 0; i <  workerCount; ++i) {
 		threadManager.Launch([&service]()
 		{
 			WorkerJob(service);
 		});
 	}
+	
+	consoleLogger->Log(Color::Green, L"[main] launched workers\n");
 
 	int32 testIndex = 0;
 	while (true) {
