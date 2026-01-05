@@ -34,31 +34,25 @@ bool IocpCore::Dispatch(DWORD timeoutMs)
 {
 	DWORD numOfBytes = 0;
 	ULONG_PTR completionKey = 0;
-	IIoEvent* ioEvent = nullptr;
+	LPOVERLAPPED overlapped = nullptr;
 
-	if (::GetQueuedCompletionStatus(iocpHandle_, OUT &numOfBytes, OUT &completionKey, OUT reinterpret_cast<LPOVERLAPPED*>(&ioEvent), timeoutMs)) {
-		if (ioEvent) {
-			if (std::shared_ptr<IoObject> owner = ioEvent->GetOwner()) {
-				owner->Dispatch(ioEvent, static_cast<int32>(numOfBytes));
-			}
-		}
-	}
-	else {
-
-		int32 errorCode = ::GetLastError();
-		switch (errorCode)
-		{
-		case WAIT_TIMEOUT:
+	BOOL ok = ::GetQueuedCompletionStatus(iocpHandle_, OUT &numOfBytes, OUT &completionKey, OUT &overlapped, timeoutMs);
+	
+	if (overlapped == nullptr) {
+		DWORD error = ::GetLastError();
+		if (not ok and error == WAIT_TIMEOUT)
 			return false;
-		default:
-			// TODO: Error 로그 남기기
-			if (std::shared_ptr<IoObject> owner = ioEvent->GetOwner()) {
-				owner->Dispatch(ioEvent, static_cast<int32>(numOfBytes));
-			}
-			break;
-		}
+		
+		// TODO: Error 로그 남기기 (이상 상황)
+		return false;
 	}
-
+	
+	IocpEvent* ev = reinterpret_cast<IocpEvent*>(overlapped);
+	
+	if (auto owner = ev->GetOwner()) {
+		owner->Dispatch(ev, static_cast<int32>(numOfBytes));
+	}
+	
 	return true;
 }
 
