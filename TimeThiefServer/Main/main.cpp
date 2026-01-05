@@ -40,7 +40,7 @@ int main()
 	ServiceRef service = std::make_shared<IocpServerService>(
 		NetAddr(L"127.0.0.1", SERVER_PORT),
 		std::make_shared<PlayerSession>,
-		1000
+		5
 	);
 
 	consoleLogger->Log(Color::Green, L"[main] made service\n");

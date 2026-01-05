@@ -1,6 +1,7 @@
 ﻿#include "pch.h"
 #include "Core/IoCore/IocpCore/IocpCore.h"
 #include "Network/Event/IIoEvent.h"
+#include "Utils/Log/ConsoleLogger.h"
 
 /*-------------
    IocpCore
@@ -47,8 +48,11 @@ bool IocpCore::Dispatch(DWORD timeoutMs)
 		return false;
 	}
 	
-	IocpEvent* ev = reinterpret_cast<IocpEvent*>(overlapped);
+	IocpEvent* ev = static_cast<IocpEvent*>(overlapped);
 	
+	consoleLogger->Log(Color::Yellow, L"[IOCP] overlapped=%p bytes=%u ok=%d\n", overlapped, numOfBytes, ok);
+	consoleLogger->Log(Color::Yellow, L"[IOCP] ev=%p\n", ev);
+
 	if (auto owner = ev->GetOwner()) {
 		owner->Dispatch(ev, static_cast<int32>(numOfBytes));
 	}

@@ -9,6 +9,8 @@
 
 Listener::~Listener()
 {
+	consoleLogger->Log(Color::Yellow, L"[Listener] ~Listener\n");
+	
 	CloseListener();
 
 	for (AcceptEvent* acceptEvent : acceptEvents_) {
@@ -69,11 +71,14 @@ bool Listener::StartListening(std::shared_ptr<ServiceBase> service)
 	}
 
 	const int32 acceptCount = service_->GetMaxSessionCount();
+	acceptEvents_.resize(acceptCount);
 	for (int32 i = 0; i < acceptCount; ++i) {
 		AcceptEvent* acceptEvent = new AcceptEvent();
 		acceptEvent->SetOwner(shared_from_this());
 		acceptEvents_.push_back(acceptEvent);
 		PostAccept(acceptEvent);
+		
+		consoleLogger->Log(Color::Blue, L"[Listener] acceptEvent%d=%p\n", i + 1, acceptEvent);
 	}
 
 	return true;
@@ -90,7 +95,6 @@ void Listener::PostAccept(AcceptEvent* acceptEvent)
 	
 	std::shared_ptr<SessionBase> session = service_->CreateSession();
 
-	// acceptEvent->Init(); <- 이거 제대로 해결된 거 맞나?
 	acceptEvent->session_ = session;
 
 	DWORD bytesReceived = 0;
@@ -109,7 +113,7 @@ void Listener::PostAccept(AcceptEvent* acceptEvent)
 
 void Listener::ProcessAccept(AcceptEvent* acceptEvent)
 {
-	std::shared_ptr<SessionBase> session = acceptEvent->session_;
+	auto session = acceptEvent->session_;
 
 	if (false == SocketUtils::SetUpdateAcceptContext(session->GetSocket(), listenSocket_)) {
 		PostAccept(acceptEvent);
