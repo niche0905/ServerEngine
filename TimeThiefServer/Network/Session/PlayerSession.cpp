@@ -46,7 +46,7 @@ void PlayerSession::OnRecvPacket(byte* buffer, int32 len)
 {
    // TEMP: 간단한 문자열 통신 테스트
    std::string message(reinterpret_cast<char*>(buffer) + 1, len - 1);
-   wprintf(L"[PlayerSession] Received Packet: %S\n", message.c_str());
+   consoleLogger->Log(Color::Blue, L"[PlayerSession] Received Packet: %S\n", message.c_str());
 }
 
 void PlayerSession::OnConnected()

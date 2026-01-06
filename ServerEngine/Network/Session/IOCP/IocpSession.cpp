@@ -211,6 +211,7 @@ void IocpSession::ProcessRecv(int32 numOfBytes)
 	}
 
 	std::vector<byte> processBuffer_;
+	processBuffer_.reserve(dataSize);
 	recvBuffer_.PeekInto(processBuffer_.data(), dataSize);
 
 	int32 processedBytes = OnRecv(processBuffer_.data(), dataSize);
