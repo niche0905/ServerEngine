@@ -77,8 +77,6 @@ bool Listener::StartListening(std::shared_ptr<ServiceBase> service)
 		acceptEvent->SetOwner(shared_from_this());
 		acceptEvents_.push_back(acceptEvent);
 		PostAccept(acceptEvent);
-		
-		consoleLogger->Log(Color::Blue, L"[Listener] acceptEvent%d=%p\n", i + 1, acceptEvent);
 	}
 
 	return true;
