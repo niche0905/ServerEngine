@@ -18,6 +18,8 @@ public:
     CoreGlobal()
     {
         std::wcout << L"CoreGlobal Initial" << std::endl;
+        std::wcout << L"Test Dependency" << std::endl;
+        std::wcout << L"Test Dependency2222" << std::endl;
         
         consoleLogger = new ConsoleLogger();      // 콘솔 로거 초기화(생성)
       
