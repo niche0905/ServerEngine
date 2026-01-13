@@ -3,9 +3,9 @@
 #define WIN32_LEAN_AND_MEAN		// Exclude rarely-used stuff from Windows headers
 
 #ifdef _DEBUG
-#pragma comment(lib, "ServerEngine\\Debug\\ServerEngine.lib")
+#pragma comment(lib, "ServerEngineLib\\Debug\\ServerEngineLib.lib")
 #else
-#pragma comment(lib, "ServerEngine\\Release\\ServerEngine.lib")
+#pragma comment(lib, "ServerEngineLib\\Release\\ServerEngineLib.lib")
 #endif
 
 #include "Core/PCH/CorePch.h"

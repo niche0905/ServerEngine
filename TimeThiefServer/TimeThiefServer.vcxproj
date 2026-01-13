@@ -71,19 +71,19 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>$(SolutionDir)ServerEngine\;$(SolutionDir)Libraries\Include\;$(IncludePath);$(ProjectDir);$(ProjectDir)Utils;</IncludePath>
+    <IncludePath>$(SolutionDir)ServerEngineLib\;$(SolutionDir)Libraries\Include\;$(IncludePath);$(ProjectDir);$(ProjectDir)Utils;</IncludePath>
     <LibraryPath>$(SolutionDir)Libraries\Libs\;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <IncludePath>$(SolutionDir)ServerEngine\;$(SolutionDir)Libraries\Include\;$(IncludePath);$(ProjectDir);$(ProjectDir)Utils;</IncludePath>
+    <IncludePath>$(SolutionDir)ServerEngineLib\;$(SolutionDir)Libraries\Include\;$(IncludePath);$(ProjectDir);$(ProjectDir)Utils;</IncludePath>
     <LibraryPath>$(SolutionDir)Libraries\Libs\;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>$(SolutionDir)ServerEngine\;$(SolutionDir)Libraries\Include\;$(IncludePath);$(ProjectDir);$(ProjectDir)Utils;</IncludePath>
+    <IncludePath>$(SolutionDir)ServerEngineLib\;$(SolutionDir)Libraries\Include\;$(IncludePath);$(ProjectDir);$(ProjectDir)Utils;</IncludePath>
     <LibraryPath>$(SolutionDir)Libraries\Libs\;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IncludePath>$(SolutionDir)ServerEngine\;$(SolutionDir)Libraries\Include\;$(IncludePath);$(ProjectDir);$(ProjectDir)Utils;</IncludePath>
+    <IncludePath>$(SolutionDir)ServerEngineLib\;$(SolutionDir)Libraries\Include\;$(IncludePath);$(ProjectDir);$(ProjectDir)Utils;</IncludePath>
     <LibraryPath>$(SolutionDir)Libraries\Libs\;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -226,7 +226,7 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;_UNICODE;UNICODE;</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
       <LinkCompiled>true</LinkCompiled>
-      <AdditionalIncludeDirectories>;C:\Users\yudle\vcpkg\installed\x64-windows\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>;C:\Users\yudle\vcpkg\installed\x64-windows\include;$(SolutionDir)Libraries\Libs\ServerEngineLib\;</AdditionalIncludeDirectories>
     </ClCompile>
     <ClCompile Include="Network\Session\PlayerSession.cpp" />
     <ClCompile Include="Network\Session\SessionManager\SessionManager.cpp" />
@@ -305,13 +305,16 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;_UNICODE;UNICODE;</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
       <LinkCompiled>true</LinkCompiled>
-      <AdditionalIncludeDirectories>;C:\Users\yudle\vcpkg\installed\x64-windows\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>;C:\Users\yudle\vcpkg\installed\x64-windows\include;$(SolutionDir)Libraries\Libs\ServerEngineLib\;</AdditionalIncludeDirectories>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Network\Session\PlayerSession.h" />
     <ClInclude Include="Network\Session\SessionManager\SessionManager.h" />
     <ClInclude Include="Utils\pch.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="CMakeLists.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
