@@ -402,3 +402,6 @@ FodyWeavers.xsd
 
 # vcpkg
 /vcpkg_installed
+
+# Protobuf CMake build output (local-only)
+External/protobuf_build/

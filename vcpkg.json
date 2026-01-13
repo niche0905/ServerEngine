@@ -4,7 +4,6 @@
   "dependencies": [
     "jsoncpp",
     "boost",
-    "protobuf",
     "behaviortree-cpp",
     "glm",
     "tbb"
