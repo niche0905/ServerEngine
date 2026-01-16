@@ -15,8 +15,8 @@ namespace SE::Physics
     struct CollisionResult
     {
         bool hit = false;
-        Vector3 point;
-        Vector3 normal;
+        Vector3 point;          // 대표점 (간섭이 일어나는 부피의 중간 즈음)
+        Vector3 normal;         // A를 밀어내는 방향 벡터
         float penetration;
     };
     
