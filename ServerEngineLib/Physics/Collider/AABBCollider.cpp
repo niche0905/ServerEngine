@@ -10,6 +10,9 @@ namespace SE::Physics
    static inline float MinF(float a, float b) { return a < b ? a : b; }
    static inline float MaxF(float a, float b) { return a > b ? a : b; }
    
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+   
    AABBCollider::AABBCollider(const Vector3& minPoint, const Vector3& maxPoint)
    {
       SetMinMax(minPoint, maxPoint);

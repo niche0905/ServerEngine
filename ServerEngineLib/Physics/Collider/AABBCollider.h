@@ -23,7 +23,7 @@ namespace SE::Physics
         AABBCollider(const Vector3& minPoint, const Vector3& maxPoint);
     
         virtual ColliderType GetType() const override;
-        virtual Collider * Clone() const;
+        virtual Collider* Clone() const;
         
         virtual bool Intersect(const Collider& other, CollisionResult& out) const override;
         
