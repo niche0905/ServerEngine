@@ -31,5 +31,31 @@ namespace SE::Math
         {
             return { x * s, y * s, z * s };
         }
+        
+        // QUES: Dot을 따로 뺄 순 없을까? Dot(a, b);
+        float Dot(const Vector3& other) const
+        {
+            return x * other.x + y * other.y + z * other.z;
+        }
+        
+        float LengthSq() const
+        {
+            return x * x + y * y + z * z;
+        }
+        
+        float Length() const
+        {
+            return std::sqrt(LengthSq());
+        }
+        
+        Vector3 Normalized(const Vector3& fallback = {0, 0, 0}) const
+        {
+            float lenSq = LengthSq();
+            if (lenSq <= 1e-12f)
+                return fallback;    // 값이 너무 작으면 무시 (0으로 생각), 인자가 있다면 해당 값으로 반환
+            
+            float invLen = 1.0f / lenSq;
+            return { x * invLen, y * invLen, z * invLen };
+        }
     };
 }
