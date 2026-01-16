@@ -223,6 +223,7 @@
     <ClInclude Include="Network\Session\PacketSession.h" />
     <ClInclude Include="Network\Session\SessionBase.h" />
     <ClInclude Include="Network\SocketUtils.h" />
+    <ClInclude Include="Physics\Collider\CollsionResult.h" />
     <ClInclude Include="Utils\Container.h" />
     <ClInclude Include="Utils\Log\ConsoleColor.h" />
     <ClInclude Include="Utils\Log\ConsoleLogger.h" />
