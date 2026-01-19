@@ -8,6 +8,7 @@
 namespace SE::Physics
 {
    static inline float AbsF(float v) { return (v < 0.0f) ? -v : v; }
+   static inline bool NearlyZero(float v, float eps = 1e-4f) { return AbsF(v) < eps; }
    
    //-----------------------------------------------------------------------------
    //-----------------------------------------------------------------------------
@@ -36,6 +37,11 @@ namespace SE::Physics
 
    void SphereCollider::Set(const Vector3& center, float radius)
    {
+      // TODO: 디버그 일 때만 아래를 실행하도록 설정
+      {
+         assert(NearlyZero(radius) and "OBB axes must be orthogonal");
+      }
+      
       center_ = center;
       radius_ = AbsF(radius);
       
@@ -49,7 +55,7 @@ namespace SE::Physics
 
    bool SphereCollider::Contains(const Vector3& point) const
    {
-      const float dist = (center_ - point).LengthSq();
+      const float dist = (point - center_).LengthSq();
       return dist <= RadiusSq();
    }
 
