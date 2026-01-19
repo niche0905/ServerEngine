@@ -1,7 +1,6 @@
 ﻿#pragma once
 #include "AABBCollider.h"
 #include "Collider.h"
-#include "Math/Vector.h"
 
 /*------------------
    SphereCollider

@@ -7,6 +7,7 @@
 #include "Utils/Types.h"
 #include "Utils/Container.h"
 #include "Math/Math.h"
+#include "Math/Vector.h"
 #include "Core/Thread/ThreadLocalStorage.h"
 #include "Core/Global/CoreGlobal.h"
 

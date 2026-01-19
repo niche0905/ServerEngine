@@ -1,6 +1,5 @@
 ﻿#pragma once
 #include "Collider.h"
-#include "Math/Vector.h"
 
 /*----------------
    AABBCollider
