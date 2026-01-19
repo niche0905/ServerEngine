@@ -54,7 +54,7 @@ namespace SE::Math
             if (lenSq <= 1e-12f)
                 return fallback;    // 값이 너무 작으면 무시 (0으로 생각), 인자가 있다면 해당 값으로 반환
             
-            float invLen = 1.0f / lenSq;
+            float invLen = 1.0f / std::sqrt(lenSq);
             return { x * invLen, y * invLen, z * invLen };
         }
     };
