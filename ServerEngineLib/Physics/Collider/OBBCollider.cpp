@@ -7,15 +7,6 @@
 
 namespace SE::Physics
 {
-   static inline float AbsF(float v) { return (v < 0.0f) ? -v : v; }
-   static inline float MinF(float a, float b) { return (a < b) ? a : b; }
-   static inline float MaxF(float a, float b) { return (a > b) ? a : b; }
-   
-   static inline bool NearlyZero(float v, float eps = 1e-4f) { return AbsF(v) < eps; }
-   
-   //-----------------------------------------------------------------------------
-   //-----------------------------------------------------------------------------
-   
    OBBCollider::OBBCollider(const Vector3& center, const Vector3& halfExtent, 
       const Vector3& axisX, const Vector3& axisY, const Vector3& axisZ)
    {
@@ -44,9 +35,9 @@ namespace SE::Physics
    {
       center_ = center;
       
-      half_.x = AbsF(halfExtent.x);
-      half_.y = AbsF(halfExtent.y);
-      half_.z = AbsF(halfExtent.z);
+      half_.x = SE::Math::Abs(halfExtent.x);
+      half_.y = SE::Math::Abs(halfExtent.y);
+      half_.z = SE::Math::Abs(halfExtent.z);
       
       axis_[0] = axisX.Normalized(Vector3{1, 0, 0});
       axis_[1] = axisY.Normalized(Vector3{0, 1, 0});
@@ -54,9 +45,9 @@ namespace SE::Physics
       
       // TODO: 디버그 일 때만 아래를 실행하도록 설정
       {
-         assert(NearlyZero(axis_[0].Dot(axis_[1])) and "OBB axes must be orthogonal");
-         assert(NearlyZero(axis_[0].Dot(axis_[2])) and "OBB axes must be orthogonal");
-         assert(NearlyZero(axis_[1].Dot(axis_[2])) and "OBB axes must be orthogonal");
+         assert(SE::Math::NearlyZero(axis_[0].Dot(axis_[1])) and "OBB axes must be orthogonal");
+         assert(SE::Math::NearlyZero(axis_[0].Dot(axis_[2])) and "OBB axes must be orthogonal");
+         assert(SE::Math::NearlyZero(axis_[1].Dot(axis_[2])) and "OBB axes must be orthogonal");
       }
       
       RecalcWorldAABB();
@@ -74,15 +65,15 @@ namespace SE::Physics
       Vector3 q = center_;
       
       float dist = d.Dot(axis_[0]);
-      dist = MaxF(-half_.x, MinF(dist , half_.x));
+      dist = SE::Math::Max(-half_.x, SE::Math::Min(dist , half_.x));
       q = q + (axis_[0] * dist);
       
       dist = d.Dot(axis_[1]);
-      dist = MaxF(-half_.y, MinF(dist , half_.y));
+      dist = SE::Math::Max(-half_.y, SE::Math::Min(dist , half_.y));
       q = q + (axis_[1] * dist);
       
       dist = d.Dot(axis_[2]);
-      dist = MaxF(-half_.z, MinF(dist , half_.z));
+      dist = SE::Math::Max(-half_.z, SE::Math::Min(dist , half_.z));
       q = q + (axis_[2] * dist);
       
       return q;
@@ -91,9 +82,9 @@ namespace SE::Physics
    void OBBCollider::RecalcWorldAABB()
    {
       Vector3 r;
-      r.x = AbsF(axis_[0].x) * half_.x + AbsF(axis_[1].x) * half_.y + AbsF(axis_[2].x) * half_.z;
-      r.y = AbsF(axis_[0].y) * half_.x + AbsF(axis_[1].y) * half_.y + AbsF(axis_[2].y) * half_.z;
-      r.z = AbsF(axis_[0].z) * half_.x + AbsF(axis_[1].z) * half_.y + AbsF(axis_[2].z) * half_.z;
+      r.x = SE::Math::Abs(axis_[0].x) * half_.x + SE::Math::Abs(axis_[1].x) * half_.y + SE::Math::Abs(axis_[2].x) * half_.z;
+      r.y = SE::Math::Abs(axis_[0].y) * half_.x + SE::Math::Abs(axis_[1].y) * half_.y + SE::Math::Abs(axis_[2].y) * half_.z;
+      r.z = SE::Math::Abs(axis_[0].z) * half_.x + SE::Math::Abs(axis_[1].z) * half_.y + SE::Math::Abs(axis_[2].z) * half_.z;
       
       const Vector3 mn = center_ - r;
       const Vector3 mx = center_ + r;

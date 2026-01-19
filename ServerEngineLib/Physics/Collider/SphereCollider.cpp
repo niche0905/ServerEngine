@@ -7,12 +7,6 @@
 
 namespace SE::Physics
 {
-   static inline float AbsF(float v) { return (v < 0.0f) ? -v : v; }
-   static inline bool NearlyZero(float v, float eps = 1e-4f) { return AbsF(v) < eps; }
-   
-   //-----------------------------------------------------------------------------
-   //-----------------------------------------------------------------------------
-   
    SphereCollider::SphereCollider(const Vector3& center, float radius)
    {
       Set(center, radius);
@@ -39,11 +33,11 @@ namespace SE::Physics
    {
       // TODO: 디버그 일 때만 아래를 실행하도록 설정
       {
-         assert(NearlyZero(radius) and "OBB axes must be orthogonal");
+         assert(SE::Math::NearlyZero(radius) and "OBB axes must be orthogonal");
       }
       
       center_ = center;
-      radius_ = AbsF(radius);
+      radius_ = SE::Math::Abs(radius);
       
       RecalcWorldAABB();
    }

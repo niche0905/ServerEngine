@@ -7,12 +7,6 @@
 
 namespace SE::Physics
 {
-   static inline float MinF(float a, float b) { return a < b ? a : b; }
-   static inline float MaxF(float a, float b) { return a > b ? a : b; }
-   
-//-----------------------------------------------------------------------------
-//-----------------------------------------------------------------------------
-   
    AABBCollider::AABBCollider(const Vector3& minPoint, const Vector3& maxPoint)
    {
       SetMinMax(minPoint, maxPoint);
@@ -52,13 +46,13 @@ namespace SE::Physics
 
    void AABBCollider::SetMinMax(const Vector3& minPoint, const Vector3& maxPoint)
    {
-      min_.x = MinF(minPoint.x, maxPoint.x);
-      min_.y = MinF(minPoint.y, maxPoint.y);
-      min_.z = MinF(minPoint.z, maxPoint.z);
+      min_.x = SE::Math::Min(minPoint.x, maxPoint.x);
+      min_.y = SE::Math::Min(minPoint.y, maxPoint.y);
+      min_.z = SE::Math::Min(minPoint.z, maxPoint.z);
       
-      max_.x = MaxF(minPoint.x, maxPoint.x);
-      max_.y = MaxF(minPoint.y, maxPoint.y);
-      max_.z = MaxF(minPoint.z, maxPoint.z);
+      max_.x = SE::Math::Max(minPoint.x, maxPoint.x);
+      max_.y = SE::Math::Max(minPoint.y, maxPoint.y);
+      max_.z = SE::Math::Max(minPoint.z, maxPoint.z);
       
       RecalcCache();
    }
@@ -91,14 +85,14 @@ namespace SE::Physics
    {
       AABBCollider result;
       Vector3 mn{
-         MinF(a.min_.x, b.min_.x),
-         MinF(a.min_.y, b.min_.y),
-         MinF(a.min_.z, b.min_.z)
+         SE::Math::Min(a.min_.x, b.min_.x),
+         SE::Math::Min(a.min_.y, b.min_.y),
+         SE::Math::Min(a.min_.z, b.min_.z)
       };
       Vector3 mx{
-         MaxF(a.max_.x, b.max_.x),
-         MaxF(a.max_.y, b.max_.y),
-         MaxF(a.max_.z, b.max_.z)
+         SE::Math::Max(a.max_.x, b.max_.x),
+         SE::Math::Max(a.max_.y, b.max_.y),
+         SE::Math::Max(a.max_.z, b.max_.z)
       };
       result.SetMinMax(mn, mx);
       
