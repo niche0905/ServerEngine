@@ -1871,6 +1871,7 @@
   <ItemGroup>
     <Content Include="CMakeLists.txt" />
     <Content Include="Math\Vector.h" />
+    <Content Include="Physics\Hitbox\HitGroup.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
