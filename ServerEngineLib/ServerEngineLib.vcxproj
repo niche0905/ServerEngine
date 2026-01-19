@@ -204,6 +204,7 @@
     <ClInclude Include="Core\Thread\ThreadContext.h" />
     <ClInclude Include="Core\Thread\ThreadLocalStorage.h" />
     <ClInclude Include="Core\Thread\ThreadManager.h" />
+    <ClInclude Include="Math\Math.h" />
     <ClInclude Include="Network\Address\NetworkAddress.h" />
     <ClInclude Include="Network\Buffer\BaseBuffer.h" />
     <ClInclude Include="Network\Buffer\CirculationBuffer\CirculationBuffer.h" />
