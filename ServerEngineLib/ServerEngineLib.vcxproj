@@ -227,6 +227,7 @@
     <ClInclude Include="Physics\Collider\Collider.h" />
     <ClInclude Include="Physics\Collider\CollsionResult.h" />
     <ClInclude Include="Physics\Collider\OBBCollider.h" />
+    <ClInclude Include="Physics\Collider\SphereCollider.h" />
     <ClInclude Include="Utils\Container.h" />
     <ClInclude Include="Utils\Log\ConsoleColor.h" />
     <ClInclude Include="Utils\Log\ConsoleLogger.h" />
@@ -1780,6 +1781,7 @@
     </ClCompile>
     <ClCompile Include="Physics\Collider\AABBCollider.cpp" />
     <ClCompile Include="Physics\Collider\OBBCollider.cpp" />
+    <ClCompile Include="Physics\Collider\SphereCollider.cpp" />
     <ClCompile Include="Utils\Log\ConsoleLogger.cpp">
       <RuntimeLibrary>MultiThreadedDebugDll</RuntimeLibrary>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
