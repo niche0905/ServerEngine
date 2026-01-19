@@ -19,6 +19,7 @@
 #include <iostream>
 #include <string_view>
 #include <cassert>
+#include <cmath>
 #include <mutex>
 #include <atomic>
 #include <functional>

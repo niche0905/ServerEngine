@@ -225,6 +225,7 @@
     <ClInclude Include="Network\Session\SessionBase.h" />
     <ClInclude Include="Network\SocketUtils.h" />
     <ClInclude Include="Physics\Collider\AABBCollider.h" />
+    <ClInclude Include="Physics\Collider\CapsuleCollider.h" />
     <ClInclude Include="Physics\Collider\Collider.h" />
     <ClInclude Include="Physics\Collider\CollsionResult.h" />
     <ClInclude Include="Physics\Collider\OBBCollider.h" />
@@ -1781,6 +1782,7 @@
       <AdditionalIncludeDirectories>;..\vcpkg_installed\x64-windows-static\include</AdditionalIncludeDirectories>
     </ClCompile>
     <ClCompile Include="Physics\Collider\AABBCollider.cpp" />
+    <ClCompile Include="Physics\Collider\CapsuleCollider.cpp" />
     <ClCompile Include="Physics\Collider\OBBCollider.cpp" />
     <ClCompile Include="Physics\Collider\SphereCollider.cpp" />
     <ClCompile Include="Utils\Log\ConsoleLogger.cpp">
