@@ -33,7 +33,7 @@ namespace SE::Physics
    {
       // TODO: 디버그 일 때만 아래를 실행하도록 설정
       {
-         assert(radius >= 0.0f and "Capsule Radius must be > 0");
+         assert(radius >= 0.0f && "Capsule Radius must be > 0");
       }
       
       pointA_ = pointA;
