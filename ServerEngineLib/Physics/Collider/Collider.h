@@ -18,6 +18,7 @@ namespace SE::Physics
         OBB,
         Sphere,
         Capsule,
+        CharacterCapsule,
     };
     
     class Collider
