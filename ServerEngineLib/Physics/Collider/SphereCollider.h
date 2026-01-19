@@ -42,8 +42,8 @@ namespace SE::Physics
         void RecalcWorldAABB();
         
     private:
-        Vector3 center_;
-        float radius_;
+        Vector3 center_{};
+        float radius_{};
         
         AABBCollider worldAABB_;
     
