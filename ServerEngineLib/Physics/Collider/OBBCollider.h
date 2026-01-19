@@ -50,7 +50,7 @@ namespace SE::Physics
       Vector3 ClosestPoint(const Vector3& point) const;
       
    private:
-      void RecaleWorldAABB();
+      void RecalcWorldAABB();
       
    private:
       Vector3 center_{};

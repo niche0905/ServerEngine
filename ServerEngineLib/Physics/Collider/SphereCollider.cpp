@@ -39,7 +39,7 @@ namespace SE::Physics
       center_ = center;
       radius_ = AbsF(radius);
       
-      RecaleWorldAABB();
+      RecalcWorldAABB();
    }
 
    const AABBCollider& SphereCollider::GetWorldAABB() const
@@ -53,7 +53,7 @@ namespace SE::Physics
       return dist <= RadiusSq();
    }
 
-   void SphereCollider::RecaleWorldAABB()
+   void SphereCollider::RecalcWorldAABB()
    {
       const Vector3 r{radius_, radius_, radius_};
       

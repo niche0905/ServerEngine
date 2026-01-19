@@ -60,7 +60,7 @@ namespace SE::Physics
       max_.y = MaxF(minPoint.y, maxPoint.y);
       max_.z = MaxF(minPoint.z, maxPoint.z);
       
-      RecaleCache();
+      RecalcCache();
    }
 
    bool AABBCollider::Contains(const Vector3& point) const
@@ -84,7 +84,7 @@ namespace SE::Physics
       min_.x -= margin; min_.y -= margin; min_.z -= margin;
       max_.x += margin; max_.y += margin; max_.z += margin;
       
-      RecaleCache();
+      RecalcCache();
    }
 
    AABBCollider AABBCollider::Union(const AABBCollider& a, const AABBCollider& b)
@@ -105,7 +105,7 @@ namespace SE::Physics
       return result;
    }
 
-   void AABBCollider::RecaleCache()
+   void AABBCollider::RecalcCache()
    {
       center_ = (min_ + max_) * 0.5f;
       extent_ = (max_ - min_) * 0.5f;

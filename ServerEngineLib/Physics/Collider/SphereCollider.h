@@ -40,7 +40,7 @@ namespace SE::Physics
         float RadiusSq() const { return radius_ * radius_; }
         
     private:
-        void RecaleWorldAABB();
+        void RecalcWorldAABB();
         
     private:
         Vector3 center_;

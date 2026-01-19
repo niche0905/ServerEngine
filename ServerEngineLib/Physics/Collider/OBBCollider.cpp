@@ -59,7 +59,7 @@ namespace SE::Physics
          assert(NearlyZero(axis_[1].Dot(axis_[2])) and "OBB axes must be orthogonal");
       }
       
-      RecaleWorldAABB();
+      RecalcWorldAABB();
    }
 
    const AABBCollider& OBBCollider::GetWorldAABB() const
@@ -88,7 +88,7 @@ namespace SE::Physics
       return q;
    }
 
-   void OBBCollider::RecaleWorldAABB()
+   void OBBCollider::RecalcWorldAABB()
    {
       Vector3 r;
       r.x = AbsF(axis_[0].x) * half_.x + AbsF(axis_[1].x) * half_.y + AbsF(axis_[2].x) * half_.z;

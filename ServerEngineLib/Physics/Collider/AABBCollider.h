@@ -41,7 +41,7 @@ namespace SE::Physics
         static AABBCollider Union(const AABBCollider& a, const AABBCollider& b);
         
     private:
-        void RecaleCache();
+        void RecalcCache();
         
     private:
         Vector3 min_{};
