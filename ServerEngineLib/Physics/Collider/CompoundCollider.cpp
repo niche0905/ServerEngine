@@ -21,7 +21,6 @@ namespace SE::Physics
          c->Add(std::unique_ptr<Collider>(child->Clone()));
       
       c->dirtyAABB_ = true;
-      c->RecalcWorldAABB();
       
       return c;
    }
@@ -86,9 +85,9 @@ namespace SE::Physics
          const Vector3& cmn = aabb.GetMin();
          const Vector3& cmx = aabb.GetMax();
          
-         mn.x =SE::Math::Min(mn.x, cmx.x);
-         mn.y =SE::Math::Min(mn.y, cmx.y);
-         mn.z =SE::Math::Min(mn.z, cmx.z);
+         mn.x =SE::Math::Min(mn.x, cmn.x);
+         mn.y =SE::Math::Min(mn.y, cmn.y);
+         mn.z =SE::Math::Min(mn.z, cmn.z);
          
          mx.x =SE::Math::Max(mx.x, cmx.x);
          mx.y =SE::Math::Max(mx.y, cmx.y);
