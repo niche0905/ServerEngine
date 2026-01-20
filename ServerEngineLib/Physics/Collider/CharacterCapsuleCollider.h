@@ -24,7 +24,7 @@ namespace SE::Physics
       CharacterCapsuleCollider(const Vector3& base, float height, float radius);
       
       virtual ColliderType GetType() const override;
-      virtual CharacterCapsuleCollider* Clone() const;
+      virtual Collider* Clone() const;   // 이거 맞나?
       
       virtual bool Intersect(const Collider& other, CollisionResult& out) const override;
       

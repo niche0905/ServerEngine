@@ -17,7 +17,7 @@ namespace SE::Physics
       return ColliderType::CharacterCapsule;
    }
 
-   CharacterCapsuleCollider* CharacterCapsuleCollider::Clone() const
+   Collider* CharacterCapsuleCollider::Clone() const
    {
       return new CharacterCapsuleCollider(*this);
    }
