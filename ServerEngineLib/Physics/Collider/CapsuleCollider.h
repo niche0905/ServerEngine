@@ -23,7 +23,7 @@ namespace SE::Physics
         CapsuleCollider(const Vector3& pointA, const Vector3& pointB, float radius);
         
         virtual ColliderType GetType() const override;
-        virtual Collider* Clone() const;
+        virtual Collider* Clone() const override;
         
         virtual bool Intersect(const Collider& other, CollisionResult& out) const override;
         

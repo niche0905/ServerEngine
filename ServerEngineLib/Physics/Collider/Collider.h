@@ -19,6 +19,8 @@ namespace SE::Physics
         Sphere,
         Capsule,
         CharacterCapsule,
+        
+        Compound,
     };
     
     class Collider
@@ -27,7 +29,12 @@ namespace SE::Physics
         virtual ~Collider() = default;
         
         virtual ColliderType GetType() const = 0;
+        virtual Collider* Clone() const = 0;
+        
         virtual bool Intersect(const Collider& other, CollisionResult& out) const = 0;
+        
+        // TODO: Ray 부터 만들고 아래 구성
+        // virtual bool Raycast(const class Ray& ray, class RayHit& out) const;
     };
     
 }
