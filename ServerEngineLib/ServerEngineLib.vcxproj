@@ -229,6 +229,7 @@
     <ClInclude Include="Physics\Collider\CharacterCapsuleCollider.h" />
     <ClInclude Include="Physics\Collider\Collider.h" />
     <ClInclude Include="Physics\Collider\CollsionResult.h" />
+    <ClInclude Include="Physics\Collider\CompoundCollider.h" />
     <ClInclude Include="Physics\Collider\OBBCollider.h" />
     <ClInclude Include="Physics\Collider\SphereCollider.h" />
     <ClInclude Include="Physics\Hitbox\HitboxInstance.h" />
@@ -1787,6 +1788,7 @@
     <ClCompile Include="Physics\Collider\AABBCollider.cpp" />
     <ClCompile Include="Physics\Collider\CapsuleCollider.cpp" />
     <ClCompile Include="Physics\Collider\CharacterCapsuleCollider.cpp" />
+    <ClCompile Include="Physics\Collider\CompoundCollider.cpp" />
     <ClCompile Include="Physics\Collider\OBBCollider.cpp" />
     <ClCompile Include="Physics\Collider\SphereCollider.cpp" />
     <ClCompile Include="Physics\Hitbox\HitboxInstance.cpp" />
