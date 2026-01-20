@@ -33,7 +33,7 @@ namespace SE::Physics
         const Vector3& GetCenter() const { return center_; }
         float GetRadius() const { return radius_; }
         
-        const AABBCollider& GetWorldAABB() const;
+        const AABBCollider& GetWorldAABB() const override;
         
         bool Contains(const Vector3& point) const;
         float RadiusSq() const { return radius_ * radius_; }

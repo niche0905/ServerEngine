@@ -41,12 +41,12 @@ namespace SE::Physics
         float GetHalfLen() const { return halfLen_; }
         float GetSegmentLen() const { return halfLen_ * 2; }
         
-        const AABBCollider& GetWorldAABB() const;
+        const AABBCollider& GetWorldAABB() const override;
         
         Vector3 ClosestPointOnSegment(const Vector3& point) const;
         Vector3 ClosestPoint(const Vector3& point) const;
         float DistanceSqToSegment(const Vector3& point) const;
-        
+
     private:
         void RecalcWorldAABB();
         void RecalcDerived();

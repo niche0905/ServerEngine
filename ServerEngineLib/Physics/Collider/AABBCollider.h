@@ -39,6 +39,8 @@ namespace SE::Physics
         void Expand(float margin);
         static AABBCollider Union(const AABBCollider& a, const AABBCollider& b);
         
+        const AABBCollider& GetWorldAABB() const override;
+        
     private:
         void RecalcCache();
         

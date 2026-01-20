@@ -99,6 +99,11 @@ namespace SE::Physics
       return result;
    }
 
+   const AABBCollider& AABBCollider::GetWorldAABB() const
+   {
+      return *this;
+   }
+
    void AABBCollider::RecalcCache()
    {
       center_ = (min_ + max_) * 0.5f;

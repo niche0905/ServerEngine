@@ -44,7 +44,7 @@ namespace SE::Physics
       const Vector3& GetAxisY() const { return  axis_[1]; }
       const Vector3& GetAxisZ() const { return  axis_[2]; }
       
-      const AABBCollider& GetWorldAABB() const;
+      const AABBCollider& GetWorldAABB() const override;
       
       Vector3 ClosestPoint(const Vector3& point) const;
       

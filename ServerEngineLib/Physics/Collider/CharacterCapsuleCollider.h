@@ -44,7 +44,7 @@ namespace SE::Physics
       float GetBottomY() const { return base_.y; }
       float GetTopY() const { return base_.y + height_; }
       
-      const AABBCollider& GetWorldAABB() const;
+      const AABBCollider& GetWorldAABB() const override;
       
       Vector3 ClosestPointOnSegment(const Vector3& point) const;
       Vector3 ClosestPoint(const Vector3& point) const;
