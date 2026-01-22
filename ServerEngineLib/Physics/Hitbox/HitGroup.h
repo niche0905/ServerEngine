@@ -15,6 +15,8 @@ namespace SE::Physics::Hit
         Torso,  // 몸통
         Arms,   // 팔
         Legs,   // 다리
+        
+        Unknown // 알 수 없음...
     };
    
 }
