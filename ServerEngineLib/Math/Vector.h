@@ -32,6 +32,11 @@ namespace SE::Math
             return { x * s, y * s, z * s };
         }
         
+        bool operator==(const Vector3& rhs) const
+        {
+            return (x == rhs.x) && (y == rhs.y) && (z == rhs.z);
+        }
+        
         // QUES: Dot을 따로 뺄 순 없을까? Dot(a, b);
         float Dot(const Vector3& other) const
         {

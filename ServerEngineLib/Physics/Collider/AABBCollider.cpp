@@ -1,6 +1,8 @@
 ﻿#include "pch.h"
 #include "AABBCollider.h"
 #include "CollisionResult.h"
+#include "Physics/Ray/Ray.h"
+#include "Physics/Ray/RaycastHit.h"
 
 /*----------------
    AABBCollider
@@ -107,7 +109,80 @@ namespace SE::Physics
 
    bool AABBCollider::Raycast(const Ray& ray, RaycastHit& out) const
    {
-      return false;
+      const Vector3& mn = GetMin();
+      const Vector3& mx = GetMax();
+      
+      float tMin = ray.tMin;
+      float tMax = ray.tMax;
+      
+      Vector3 enterNormal = Vector3(0.0f, 0.0f, 0.0f);
+      Vector3 exitNormal = Vector3(0.0f, 0.0f, 0.0f);
+      
+      auto slab = [&](float origin, float dir, float minB, float maxB, const Vector3& nEnter, const Vector3& nExit) -> bool
+      {
+         // Ray가 이 축에 평행한 경우
+         if (std::fabs(dir) <= 1e-12f) {
+            return (origin >= minB and origin <= maxB);
+         }
+         
+         const float invD = 1.0f / dir;
+         float t1 = (minB - origin) * invD;
+         float t2 = (maxB - origin) * invD;
+         
+         Vector3 n1 = nEnter;
+         Vector3 n2 = nExit;
+         
+         if (t1 > t2) {
+            std::swap(t1, t2);
+            std::swap(n1, n2);
+         }
+         
+         // 구간 교집합
+         if (t1 > tMin) {
+            tMin = t1;
+            enterNormal = n1;   // 가장 늦게 들어오는 면이 충돌한 것
+         }
+         if (t2 < tMax) {
+            tMax = t2;
+            exitNormal = n2;
+         }
+         
+         // 교집합이 없으면 false
+         return (tMin <= tMax);
+      };
+      
+      // X slab
+      if (not slab(ray.origin.x, ray.direction.x, mn.x, mx.x, Vector3(-1,0,0), Vector3(1,0,0)))
+         return false;
+      
+      // Y slab
+      if (not slab(ray.origin.y, ray.direction.y, mn.y, mx.y, Vector3(0,-1,0), Vector3(0,1,0)))
+         return false;
+      
+      // Z slab
+      if (not slab(ray.origin.z, ray.direction.z, mn.z, mx.z, Vector3(0,0,-1), Vector3(0,0,1)))
+         return false;
+      
+      // 충돌 발생
+      float tHit = tMin;
+      Vector3 nHit = enterNormal;
+      
+      
+      if (tHit < ray.tMin) {  // 내부 시작이면 exit를 사용
+         tHit = tMax;
+         nHit = exitNormal;
+      }
+
+      if (tHit < ray.tMin or tHit > ray.tMax)
+         return false;
+   
+      out.hit = true;
+      out.t = tHit;
+      out.point = ray.At(tHit);
+      out.normal = nHit;
+      out.collider = this;
+      
+      return true;
    }
 
    void AABBCollider::RecalcCache()
