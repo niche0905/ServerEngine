@@ -234,6 +234,7 @@
     <ClInclude Include="Physics\Collider\SphereCollider.h" />
     <ClInclude Include="Physics\Hitbox\HitboxInstance.h" />
     <ClInclude Include="Physics\Hitbox\HitboxPart.h" />
+    <ClInclude Include="Physics\Ray\Ray.h" />
     <ClInclude Include="Utils\Container.h" />
     <ClInclude Include="Utils\Log\ConsoleColor.h" />
     <ClInclude Include="Utils\Log\ConsoleLogger.h" />
