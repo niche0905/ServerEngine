@@ -1,6 +1,6 @@
 ﻿#include "pch.h"
 #include "AABBCollider.h"
-#include "CollsionResult.h"
+#include "CollisionResult.h"
 
 /*----------------
    AABBCollider

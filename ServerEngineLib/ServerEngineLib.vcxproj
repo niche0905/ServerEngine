@@ -228,7 +228,7 @@
     <ClInclude Include="Physics\Collider\CapsuleCollider.h" />
     <ClInclude Include="Physics\Collider\CharacterCapsuleCollider.h" />
     <ClInclude Include="Physics\Collider\Collider.h" />
-    <ClInclude Include="Physics\Collider\CollsionResult.h" />
+    <ClInclude Include="Physics\Collider\CollisionResult.h" />
     <ClInclude Include="Physics\Collider\CompoundCollider.h" />
     <ClInclude Include="Physics\Collider\OBBCollider.h" />
     <ClInclude Include="Physics\Collider\SphereCollider.h" />
