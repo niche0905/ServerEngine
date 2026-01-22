@@ -49,6 +49,11 @@ namespace SE::Physics
       return worldAABB_;
    }
 
+   bool CapsuleCollider::Raycast(const Ray& ray, RaycastHit& out) const
+   {
+      return false;
+   }
+
    Vector3 CapsuleCollider::ClosestPointOnSegment(const Vector3& point) const
    {
       const Vector3 ab = pointB_ - pointA_;

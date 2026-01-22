@@ -58,6 +58,11 @@ namespace SE::Physics
       return worldAABB_;
    }
 
+   bool OBBCollider::Raycast(const Ray& ray, RaycastHit& out) const
+   {
+      return false;
+   }
+
    Vector3 OBBCollider::ClosestPoint(const Vector3& point) const
    {
       const Vector3 d = point - center_;

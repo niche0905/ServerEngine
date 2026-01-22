@@ -51,6 +51,11 @@ namespace SE::Physics
       return worldAABB_;
    }
 
+   bool CharacterCapsuleCollider::Raycast(const Ray& ray, RaycastHit& out) const
+   {
+      return false;
+   }
+
    Vector3 CharacterCapsuleCollider::ClosestPointOnSegment(const Vector3& point) const
    {
       const float yA = base_.y + radius_;

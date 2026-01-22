@@ -1,5 +1,6 @@
 ﻿#include "pch.h"
 #include "AABBCollider.h"
+#include "CollsionResult.h"
 
 /*----------------
    AABBCollider
@@ -102,6 +103,11 @@ namespace SE::Physics
    const AABBCollider& AABBCollider::GetWorldAABB() const
    {
       return *this;
+   }
+
+   bool AABBCollider::Raycast(const Ray& ray, RaycastHit& out) const
+   {
+      return false;
    }
 
    void AABBCollider::RecalcCache()

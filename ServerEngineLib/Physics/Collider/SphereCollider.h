@@ -35,6 +35,8 @@ namespace SE::Physics
         
         const AABBCollider& GetWorldAABB() const override;
         
+        virtual bool Raycast(const Ray& ray, RaycastHit& out) const override;
+        
         bool Contains(const Vector3& point) const;
         float RadiusSq() const { return radius_ * radius_; }
         
@@ -45,7 +47,7 @@ namespace SE::Physics
         Vector3 center_{};
         float radius_{};
         
-        AABBCollider worldAABB_;
+        AABBCollider worldAABB_{};
     
     };
     

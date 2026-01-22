@@ -1,5 +1,4 @@
 ﻿#pragma once
-#include "CollsionResult.h"
 
 /*------------
    Collider
@@ -13,6 +12,8 @@ namespace SE::Physics
 {
     struct CollisionResult;
     class AABBCollider;
+    struct Ray;
+    struct RaycastHit;
     
     enum class ColliderType : uint8
     {
@@ -37,8 +38,7 @@ namespace SE::Physics
         
         virtual const AABBCollider& GetWorldAABB() const = 0;
         
-        // TODO: Ray 부터 만들고 아래 구성
-        // virtual bool Raycast(const class Ray& ray, class RayHit& out) const;
+        virtual bool Raycast(const Ray& ray, RaycastHit& out) const = 0;
     };
     
 }

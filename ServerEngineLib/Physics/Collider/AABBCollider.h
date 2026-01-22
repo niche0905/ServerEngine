@@ -41,6 +41,8 @@ namespace SE::Physics
         
         const AABBCollider& GetWorldAABB() const override;
         
+        virtual bool Raycast(const Ray& ray, RaycastHit& out) const override;
+        
     private:
         void RecalcCache();
         

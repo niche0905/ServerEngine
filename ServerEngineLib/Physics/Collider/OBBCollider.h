@@ -46,6 +46,8 @@ namespace SE::Physics
       
       const AABBCollider& GetWorldAABB() const override;
       
+      virtual bool Raycast(const Ray& ray, RaycastHit& out) const override;
+      
       Vector3 ClosestPoint(const Vector3& point) const;
       
    private:
@@ -56,7 +58,7 @@ namespace SE::Physics
       Vector3 half_{};
       Vector3 axis_[3]{};
       
-      AABBCollider worldAABB_;
+      AABBCollider worldAABB_{};
     
    };
    

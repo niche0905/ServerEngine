@@ -44,6 +44,8 @@ namespace SE::Physics
         
         const AABBCollider& GetWorldAABB() const override;
         
+        virtual bool Raycast(const Ray& ray, RaycastHit& out) const override;
+        
     private:
         void RecalcWorldAABB() const;
         
@@ -51,7 +53,7 @@ namespace SE::Physics
         std::vector<ColliderRef> colliders_;
         
         mutable bool dirtyAABB_{true};
-        mutable AABBCollider worldAABB_;
+        mutable AABBCollider worldAABB_{};
     
     };
    

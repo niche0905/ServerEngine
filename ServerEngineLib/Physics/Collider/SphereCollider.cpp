@@ -47,6 +47,11 @@ namespace SE::Physics
       return worldAABB_;
    }
 
+   bool SphereCollider::Raycast(const Ray& ray, RaycastHit& out) const
+   {
+      return false;
+   }
+
    bool SphereCollider::Contains(const Vector3& point) const
    {
       const float dist = (point - center_).LengthSq();

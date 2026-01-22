@@ -63,6 +63,11 @@ namespace SE::Physics
       return worldAABB_;
    }
 
+   bool CompoundCollider::Raycast(const Ray& ray, RaycastHit& out) const
+   {
+      return false;
+   }
+
    void CompoundCollider::RecalcWorldAABB() const
    {
       dirtyAABB_ = false;

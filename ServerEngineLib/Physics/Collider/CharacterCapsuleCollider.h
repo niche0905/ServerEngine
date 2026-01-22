@@ -46,6 +46,8 @@ namespace SE::Physics
       
       const AABBCollider& GetWorldAABB() const override;
       
+      virtual bool Raycast(const Ray& ray, RaycastHit& out) const override;
+      
       Vector3 ClosestPointOnSegment(const Vector3& point) const;
       Vector3 ClosestPoint(const Vector3& point) const;
       float DistanceSqToSegment(const Vector3& point) const;
@@ -58,7 +60,7 @@ namespace SE::Physics
       float height_{};
       float radius_{};
       
-      AABBCollider worldAABB_;
+      AABBCollider worldAABB_{};
     
    };
    
