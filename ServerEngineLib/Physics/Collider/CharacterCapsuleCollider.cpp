@@ -1,5 +1,7 @@
 ﻿#include "pch.h"
 #include "CharacterCapsuleCollider.h"
+#include "Physics/Ray/Ray.h"
+#include "Physics/Ray/RaycastHit.h"
 
 /*----------------------------
    CharacterCapsuleCollider
@@ -7,6 +9,39 @@
 
 namespace SE::Physics
 {
+   static bool RaycastSphereLocal(const Ray& ray,
+                               const SE::Math::Vector3& center,
+                               float radius,
+                               float& outT,
+                               SE::Math::Vector3& outNormal)
+   {
+      using Vector3 = SE::Math::Vector3;
+
+      const Vector3 m = ray.origin - center;
+      const float halfB = m.Dot(ray.direction);
+      const float c = m.LengthSq() - radius * radius;
+
+      const float disc = halfB * halfB - c;
+      if (disc < 0.0f) return false;
+
+      const float sqrtDisc = std::sqrt(disc);
+
+      float t = -halfB - sqrtDisc;              // 가까운 교차점
+      if (t < ray.tMin || t > ray.tMax) {
+         t = -halfB + sqrtDisc;                // 먼 교차점
+         if (t < ray.tMin || t > ray.tMax)
+            return false;
+      }
+
+      outT = t;
+      const Vector3 p = ray.At(t);
+      outNormal = (p - center).Normalized(Vector3(0,1,0));
+      return true;
+   }
+
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+   
    CharacterCapsuleCollider::CharacterCapsuleCollider(const Vector3& base, float height, float radius)
    {
       Set(base, height, radius);
@@ -53,7 +88,101 @@ namespace SE::Physics
 
    bool CharacterCapsuleCollider::Raycast(const Ray& ray, RaycastHit& out) const
    {
-      return false;
+      // TODO: 디버그 일 때만 아래를 실행하도록 설정
+      {
+         assert(SE::Math::NearlyZero(ray.direction.LengthSq() - 1.0f, 1e-3f) && "Ray direction must be normalized");
+      }
+      
+      const float r = radius_;
+      if (r <= 0.0f)
+         return false;
+      
+      const float yA = base_.y + r;
+      const float yB = base_.y + (height_ - r);
+      
+      const Vector3 capA{ base_.x, yA, base_.z };
+      const Vector3 capB{ base_.x, yB, base_.z };
+      
+      bool hit = false;
+      float bestT = ray.tMax;
+      Vector3 bestN{0, 0, 0};
+      
+      const float ox = ray.origin.x - base_.x;
+      const float oz = ray.origin.z - base_.z;
+      const float dx = ray.direction.x;
+      const float dz = ray.direction.z;
+      
+      const float a = dx * dx + dz * dz;
+      
+      if (a > 1e-12f) {
+         const float b = 2.0f * (ox * dx + oz * dz);
+         const float c = (ox * ox + oz * oz) - r * r;
+         
+         const float disc = b * b - 4.0f * a * c;
+         if (disc >= 0.0f) {
+            const float sqrtDisc = std::sqrt(disc);
+            float t0 = (-b - sqrtDisc) / (2.0f * a);
+            float t1 = (-b + sqrtDisc) / (2.0f * a);
+            if (t0 > t1) std::swap(t0, t1);
+            
+            auto tryBody = [&](float tCand)
+            {
+               if (tCand < ray.tMin or tCand > ray.tMax)
+                  return;
+               
+               const float y = ray.origin.y + ray.direction.y * tCand;
+               if (y < yA or y > yB)
+                  return;  // 실린더 몸통 밖
+               
+               const Vector3 p = ray.At(tCand);
+               
+               Vector3 n{p.x-base_.x, 0.0f, p.z - base_.z};
+               n = n.Normalized(Vector3{1.0f, 0.0f, 0.0f});
+               
+               if (!hit or tCand < bestT) {
+                  hit = true;
+                  bestT = tCand;
+                  bestN = n;
+               }
+            };
+            
+            tryBody(t0);
+            tryBody(t1);
+         }
+      }
+      
+      // 캡슐 머리, 꼬리 구면 검사
+      {
+         float tS;
+         Vector3 nS;
+         
+         if (RaycastSphereLocal(ray, capA, r, tS, nS)) {
+            if (!hit || tS < bestT) {
+               hit = true;
+               bestT = tS;
+               bestN = nS;
+            }
+         }
+         
+         if (RaycastSphereLocal(ray, capB, r, tS, nS)) {
+            if (!hit || tS < bestT) {
+               hit = true;
+               bestT = tS;
+               bestN = nS;
+            }
+         }
+      }
+      
+      if (not hit)
+         return false;
+      
+      out.hit = true;
+      out.t = bestT;
+      out.point = ray.At(bestT);
+      out.normal = bestN;
+      out.collider = this;
+      
+      return true;
    }
 
    SE::Math::Vector3 CharacterCapsuleCollider::ClosestPointOnSegment(const Vector3& point) const
