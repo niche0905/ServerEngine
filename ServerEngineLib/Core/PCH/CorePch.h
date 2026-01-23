@@ -26,6 +26,7 @@
 #include <memory>
 #include <thread>
 #include <chrono>
+#include <algorithm>
 
 /* ===================
     Windows / WinSock
