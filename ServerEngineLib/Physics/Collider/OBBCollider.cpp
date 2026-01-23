@@ -134,6 +134,8 @@ namespace SE::Physics
       if (tHit < ray.tMin) {
          tHit = tMax;
          nL = exitN;
+         if (nL.LengthSq() < 1e-12f)
+            nL = enterN;   // 극단적 상황 대비 (최소 fallback)
       }
       
       if (tHit < ray.tMin or tHit > ray.tMax)
