@@ -24,7 +24,7 @@ namespace SE::Physics
       const float sqrtDisc = std::sqrt(disc);
       
       float t = -halfB - sqrtDisc;
-      if (t < ray.tMax or t > ray.tMax) {
+      if (t < ray.tMin or t > ray.tMax) {
          t = -halfB + sqrtDisc;
          if (t < ray.tMin or t > ray.tMax)
             // 교차 없음 (유효하지  않은교차점)         
@@ -37,6 +37,9 @@ namespace SE::Physics
       
       return true;
    }
+   
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
    
    CapsuleCollider::CapsuleCollider(const Vector3& pointA, const Vector3& pointB, float radius)
    {
@@ -170,6 +173,10 @@ namespace SE::Physics
                if (tEnter > tExit) std::swap(tEnter, tExit);
                
                float tCand = tEnter;
+               if (tCand < ray.tMin or tCand > ray.tMax) {
+                  tCand = tExit;
+               }
+               
                if (tCand >= ray.tMin and tCand <= ray.tMax) {
                   const Vector3 hitP = ray.At(tCand);
                   float s = pAxis + tCand * dAxis;
