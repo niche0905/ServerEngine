@@ -56,7 +56,7 @@ namespace SE::Physics
       return false;
    }
 
-   Vector3 CharacterCapsuleCollider::ClosestPointOnSegment(const Vector3& point) const
+   SE::Math::Vector3 CharacterCapsuleCollider::ClosestPointOnSegment(const Vector3& point) const
    {
       const float yA = base_.y + radius_;
       const float yB = base_.y + (height_ - radius_);
@@ -68,7 +68,7 @@ namespace SE::Physics
       return Vector3{ base_.x, y, base_.z };
    }
 
-   Vector3 CharacterCapsuleCollider::ClosestPoint(const Vector3& point) const
+   SE::Math::Vector3 CharacterCapsuleCollider::ClosestPoint(const Vector3& point) const
    {
       const Vector3 c = ClosestPointOnSegment(point);
       

@@ -225,7 +225,7 @@ namespace SE::Physics
       return true;
    }
 
-   Vector3 CapsuleCollider::ClosestPointOnSegment(const Vector3& point) const
+   SE::Math::Vector3 CapsuleCollider::ClosestPointOnSegment(const Vector3& point) const
    {
       const Vector3 ab = pointB_ - pointA_;
       const float abLenSq = ab.LengthSq();
@@ -237,7 +237,7 @@ namespace SE::Physics
       return pointA_ + (ab * t);
    }
 
-   Vector3 CapsuleCollider::ClosestPoint(const Vector3& point) const
+   SE::Math::Vector3 CapsuleCollider::ClosestPoint(const Vector3& point) const
    {
       const Vector3 c = ClosestPointOnSegment(point);   // 중심선 위 최근접점
       const Vector3 v = point - c;

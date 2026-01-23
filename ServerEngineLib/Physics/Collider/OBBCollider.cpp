@@ -63,7 +63,7 @@ namespace SE::Physics
       return false;
    }
 
-   Vector3 OBBCollider::ClosestPoint(const Vector3& point) const
+   SE::Math::Vector3 OBBCollider::ClosestPoint(const Vector3& point) const
    {
       const Vector3 d = point - center_;
       
