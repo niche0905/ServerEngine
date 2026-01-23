@@ -1,5 +1,7 @@
 ﻿#include "pch.h"
 #include "CompoundCollider.h"
+#include "Physics/Ray/Ray.h"
+#include "Physics/Ray/RaycastHit.h"
 
 /*--------------------
    CompoundCollider
@@ -65,7 +67,50 @@ namespace SE::Physics
 
    bool CompoundCollider::Raycast(const Ray& ray, RaycastHit& out) const
    {
-      return false;
+      // 충돌체가 없다면... 무조건 실패
+      if (colliders_.empty())
+         return false;
+      
+      // Broadphase - Compound AABB와 충돌 검사
+      RaycastHit tempAABB;
+      const AABBCollider& world = GetWorldAABB();
+      if (not world.Raycast(ray, tempAABB))
+         return false;
+      
+      bool hit = false;
+      RaycastHit bestHit;
+      float bestT = ray.tMax;
+      
+      for (const auto& child : colliders_) {
+         
+         if (not child) continue;
+         
+         // QUES: Broadphase - 자식 충돌체 AABB와 충돌 검사를 먼저 할까?
+         RaycastHit tempChildAABB;
+         if (not child->GetWorldAABB().Raycast(ray, tempChildAABB))
+            continue;
+         
+         Ray localRay = ray;
+         localRay.tMax = bestT;
+         
+         RaycastHit h;
+         if (child->Raycast(localRay, h)) {
+            if (not hit or h.t < bestT) {
+               hit = true;
+               bestT = h.t;
+               bestHit = h;
+            }
+         }
+      }
+      
+      if (not hit)
+         return false;
+      
+      out = bestHit;
+      // QUES: out.collider를 자식 Collider를 가리키게 하는 것이 유리하다
+      // out.collider = this; <- nono
+      
+      return true;
    }
 
    void CompoundCollider::RecalcWorldAABB() const
