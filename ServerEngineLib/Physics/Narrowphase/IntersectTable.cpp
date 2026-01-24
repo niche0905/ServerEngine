@@ -12,6 +12,8 @@ namespace SE::Physics::Narrowphase
    
    static IntersectFn gTable[kTypeCount][kTypeCount];
    
+   static bool gInited = false;
+   
    // 구현이 없는 충돌 판정 함수
    static bool NotSupported(const Collider&, const Collider&, CollisionResult&)
    {
@@ -33,10 +35,13 @@ namespace SE::Physics::Narrowphase
       
       // TODO: 충돌 판정 함수 구현 후 등록
       gTable[static_cast<int>(ColliderType::AABB)][static_cast<int>(ColliderType::AABB)] = &Intersect_AABB_AABB;
+      
+      gInited = true;
    }
    
    IntersectFn GetIntersectFn(ColliderType a, ColliderType b)
    {
+      assert(gInited && "InitIntersectTable must be called before GetIntersectFn()");
       return gTable[static_cast<int>(a)][static_cast<int>(b)];
    }
    
