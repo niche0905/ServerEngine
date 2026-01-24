@@ -1,5 +1,6 @@
 ﻿#include "pch.h"
 #include "IntersectTable.h"
+#include "IntersectFns.h"
 
 /*---------------
    Narrowphase
@@ -22,7 +23,7 @@ namespace SE::Physics::Narrowphase
       // 모든 조합을 NotSupported로 초기화
       for (int i = 0; i < kTypeCount; ++i) {
          for (int j = 0; j < kTypeCount; ++j) {
-            gTable[i][j] = NotSupported;
+            gTable[i][j] = &NotSupported;
          }
       }
       
@@ -31,6 +32,7 @@ namespace SE::Physics::Narrowphase
       // 실제 구현된 함수로 교체 필요
       
       // TODO: 충돌 판정 함수 구현 후 등록
+      gTable[static_cast<int>(ColliderType::AABB)][static_cast<int>(ColliderType::AABB)] = &Intersect_AABB_AABB;
    }
    
    IntersectFn GetIntersectFn(ColliderType a, ColliderType b)
