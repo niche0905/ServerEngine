@@ -18,6 +18,8 @@ namespace SE::Physics::Narrowphase
       const Vector3& bMax = B.GetMax();
       
       // 축별로 겹침 검사
+      // if (not A.Overlaps(B))  <- 이걸로 대체 가능하지 않나?
+      //    return false;
       if (aMax.x < bMin.x or aMin.x > bMax.x) return false; // X축 겹침 없음
       if (aMax.y < bMin.y or aMin.y > bMax.y) return false; // Y축 겹침 없음
       if (aMax.z < bMin.z or aMin.z > bMax.z) return false; // Z축 겹침 없음
