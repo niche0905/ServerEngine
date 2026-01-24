@@ -234,6 +234,7 @@
     <ClInclude Include="Physics\Collider\SphereCollider.h" />
     <ClInclude Include="Physics\Hitbox\HitboxInstance.h" />
     <ClInclude Include="Physics\Hitbox\HitboxPart.h" />
+    <ClInclude Include="Physics\Narrowphase\IntersectTable.h" />
     <ClInclude Include="Physics\Ray\Ray.h" />
     <ClInclude Include="Physics\Ray\RaycastHit.h" />
     <ClInclude Include="Utils\Container.h" />
@@ -1795,6 +1796,7 @@
     <ClCompile Include="Physics\Collider\SphereCollider.cpp" />
     <ClCompile Include="Physics\Hitbox\HitboxInstance.cpp" />
     <ClCompile Include="Physics\Hitbox\HitboxPart.cpp" />
+    <ClCompile Include="Physics\Narrowphase\IntersectTable.cpp" />
     <ClCompile Include="Utils\Log\ConsoleLogger.cpp">
       <RuntimeLibrary>MultiThreadedDebugDll</RuntimeLibrary>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
