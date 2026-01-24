@@ -34,11 +34,20 @@ namespace SE::Physics
       CollisionResult bestResult;
       float bestPen = -1.0f;
       
+      const AABBCollider& otherAabb = other.GetWorldAABB();
+
       for (const auto& child : colliders_) {
          if (not child) continue;
          
+         CollisionResult tmpAabb;
+         if (!child->GetWorldAABB().Intersect(otherAabb, tmpAabb))
+            continue;
+         
          CollisionResult tempResult;
          if (child->Intersect(other, tempResult)) {
+            
+            if (tempResult.penetration < 0.0f) continue; // 방어
+
             // 정책: penetration이 가장 큰 충돌 결과를 선택
             if (not hit or tempResult.penetration > bestPen) {
                hit = true;
