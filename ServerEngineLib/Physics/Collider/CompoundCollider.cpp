@@ -1,5 +1,6 @@
 ﻿#include "pch.h"
 #include "CompoundCollider.h"
+#include "CollisionResult.h"
 #include "Physics/Ray/Ray.h"
 #include "Physics/Ray/RaycastHit.h"
 
@@ -29,8 +30,28 @@ namespace SE::Physics
 
    bool CompoundCollider::Intersect(const Collider& other, CollisionResult& out) const
    {
-      // TODO: 구현해야 한다
-      return false;
+      bool hit = false;
+      CollisionResult bestResult;
+      float bestPen = -1.0f;
+      
+      for (const auto& child : colliders_) {
+         if (not child) continue;
+         
+         CollisionResult tempResult;
+         if (child->Intersect(other, tempResult)) {
+            // 정책: penetration이 가장 큰 충돌 결과를 선택
+            if (not hit or tempResult.penetration > bestPen) {
+               hit = true;
+               bestPen = tempResult.penetration;
+               bestResult = tempResult;
+            }
+         }
+      }
+      
+      if (not hit) return false;
+      
+      out = bestResult;
+      return true;
    }
 
    void CompoundCollider::Reserve(size_t n)
