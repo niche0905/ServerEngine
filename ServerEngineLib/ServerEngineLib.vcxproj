@@ -234,6 +234,7 @@
     <ClInclude Include="Physics\Collider\SphereCollider.h" />
     <ClInclude Include="Physics\Hitbox\HitboxInstance.h" />
     <ClInclude Include="Physics\Hitbox\HitboxPart.h" />
+    <ClInclude Include="Physics\Narrowphase\IntersectFns.h" />
     <ClInclude Include="Physics\Narrowphase\IntersectTable.h" />
     <ClInclude Include="Physics\Narrowphase\IntersectUtil.h" />
     <ClInclude Include="Physics\Ray\Ray.h" />
