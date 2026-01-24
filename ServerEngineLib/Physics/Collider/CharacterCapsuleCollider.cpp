@@ -57,13 +57,6 @@ namespace SE::Physics
       return new CharacterCapsuleCollider(*this);
    }
 
-   bool CharacterCapsuleCollider::Intersect(const Collider& other, CollisionResult& out) const
-   {
-      // TODO: 나중에 채우길
-      
-      return false;
-   }
-
    void CharacterCapsuleCollider::Set(const Vector3& base, float height, float radius)
    {
       // TODO: 디버그 일 때만 아래를 실행하도록 설정

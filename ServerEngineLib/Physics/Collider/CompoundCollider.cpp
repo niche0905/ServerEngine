@@ -29,7 +29,7 @@ namespace SE::Physics
 
    bool CompoundCollider::Intersect(const Collider& other, CollisionResult& out) const
    {
-      // TODO: 나중에
+      // TODO: 구현해야 한다
       return false;
    }
 

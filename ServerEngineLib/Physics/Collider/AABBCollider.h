@@ -24,8 +24,6 @@ namespace SE::Physics
         virtual ColliderType GetType() const override;
         virtual Collider* Clone() const override;
         
-        virtual bool Intersect(const Collider& other, CollisionResult& out) const override;
-        
     public:
         void SetMinMax(const Vector3& minPoint, const Vector3& maxPoint);
         

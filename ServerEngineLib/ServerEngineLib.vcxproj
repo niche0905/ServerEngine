@@ -1793,6 +1793,7 @@
     <ClCompile Include="Physics\Collider\AABBCollider.cpp" />
     <ClCompile Include="Physics\Collider\CapsuleCollider.cpp" />
     <ClCompile Include="Physics\Collider\CharacterCapsuleCollider.cpp" />
+    <ClCompile Include="Physics\Collider\Collider.cpp" />
     <ClCompile Include="Physics\Collider\CompoundCollider.cpp" />
     <ClCompile Include="Physics\Collider\OBBCollider.cpp" />
     <ClCompile Include="Physics\Collider\SphereCollider.cpp" />

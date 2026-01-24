@@ -26,13 +26,6 @@ namespace SE::Physics
       return new OBBCollider(*this);
    }
 
-   bool OBBCollider::Intersect(const Collider& other, CollisionResult& out) const
-   {
-      // TODO: 충돌체 끼리 충돌 검사 방법 찾기 Switch Case는 별로인거 같다
-      
-      return false;
-   }
-
    void OBBCollider::Set(const Vector3& center, const Vector3& halfExtent, 
       const Vector3& axisX, const Vector3& axisY, const Vector3& axisZ)
    {

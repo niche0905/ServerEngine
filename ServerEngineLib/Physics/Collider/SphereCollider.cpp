@@ -24,13 +24,6 @@ namespace SE::Physics
       return new SphereCollider(*this);
    }
 
-   bool SphereCollider::Intersect(const Collider& other, CollisionResult& out) const
-   {
-      // TODO: 충돌체 충돌 판정 방식 우선 개발
-      
-      return false;
-   }
-
    void SphereCollider::Set(const Vector3& center, float radius)
    {
       // TODO: 디버그 일 때만 아래를 실행하도록 설정

@@ -56,13 +56,6 @@ namespace SE::Physics
       return new CapsuleCollider(*this);
    }
 
-   bool CapsuleCollider::Intersect(const Collider& other, CollisionResult& out) const
-   {
-      // TODO: 충돌 판정
-      
-      return false;
-   }
-
    void CapsuleCollider::Set(const Vector3& pointA, const Vector3& pointB, float radius)
    {
       // TODO: 디버그 일 때만 아래를 실행하도록 설정

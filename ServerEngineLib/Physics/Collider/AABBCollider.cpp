@@ -25,28 +25,6 @@ namespace SE::Physics
       return new AABBCollider(*this);
    }
 
-   bool AABBCollider::Intersect(const Collider& other, CollisionResult& out) const
-   {
-      switch (other.GetType())
-      {
-      case ColliderType::AABB:
-         {
-            const auto& b = static_cast<const AABBCollider&>(other);
-            const bool hit = Overlaps(b);
-            
-            // TODO: 정확한 CollisionResult가 필요하면 여기에서 채워넣어야 한다
-            
-            out.hit = hit;
-            return hit;
-         }
-         
-         // TODO: 충돌체 들 구현 되면 여기에 추가
-      default:
-         out.hit = false;
-         return false;
-      }
-   }
-
    void AABBCollider::SetMinMax(const Vector3& minPoint, const Vector3& maxPoint)
    {
       min_.x = SE::Math::Min(minPoint.x, maxPoint.x);

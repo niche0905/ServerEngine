@@ -26,8 +26,6 @@ namespace SE::Physics
       virtual ColliderType GetType() const override;
       virtual Collider* Clone() const override;
       
-      virtual bool Intersect(const Collider& other, CollisionResult& out) const override;
-      
    public:
       void Set(const Vector3& base, float height, float radius);
       
