@@ -192,6 +192,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Core\Core.h" />
     <ClInclude Include="Core\Global\CoreGlobal.h" />
     <ClInclude Include="Core\IoCore\IoCore.h" />
     <ClInclude Include="Core\IoCore\IocpCore\IocpCore.h" />
@@ -248,6 +249,7 @@
     <ClInclude Include="Utils\Types.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Core\Core.cpp" />
     <ClCompile Include="Core\Global\CoreGlobal.cpp" />
     <ClCompile Include="Core\IoCore\IoCore.cpp">
       <RuntimeLibrary>MultiThreadedDebugDll</RuntimeLibrary>

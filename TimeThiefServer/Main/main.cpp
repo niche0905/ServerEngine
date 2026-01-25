@@ -35,6 +35,8 @@ void WorkerJob(ServiceRef& service)
 
 int main()
 {
+	SE::Init();
+	
 	consoleLogger->Log(Color::Green, L"[main] entered main\n");
 	
 	ServiceRef service = std::make_shared<IocpServerService>(

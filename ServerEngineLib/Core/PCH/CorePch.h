@@ -10,6 +10,7 @@
 #include "Math/Vector.h"
 #include "Core/Thread/ThreadLocalStorage.h"
 #include "Core/Global/CoreGlobal.h"
+#include "Core/Core.h"
 
 /* ======================
 	C++ Standard Library

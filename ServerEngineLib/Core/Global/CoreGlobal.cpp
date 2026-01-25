@@ -23,7 +23,6 @@ public:
         
         consoleLogger = new ConsoleLogger();      // 콘솔 로거 초기화(생성)
       
-        SocketUtils::Initialize();                // 소켓 유틸리티 초기화
     }
    
     ~CoreGlobal()
@@ -33,7 +32,6 @@ public:
         delete consoleLogger;                     // 콘솔 로거 해제(삭제)
         consoleLogger = nullptr;
         
-        SocketUtils::Clean();                   // 소켓 유틸리티 정리(종료)
     }
     
 } coreGlobalInstance;  // 전역 인스턴스 생성
