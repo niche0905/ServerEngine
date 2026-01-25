@@ -1891,6 +1891,7 @@
     <Content Include="Math\Vector.h" />
     <Content Include="Physics\Hitbox\HitGroup.h" />
     <Content Include="Physics\Hitbox\HitResult.h" />
+    <Content Include="Physics\Narrowphase\AABB_Sphere.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
