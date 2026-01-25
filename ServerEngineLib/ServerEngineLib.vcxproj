@@ -1803,6 +1803,7 @@
     <ClCompile Include="Physics\Hitbox\HitboxPart.cpp" />
     <ClCompile Include="Physics\Narrowphase\AABB_AABB.cpp" />
     <ClCompile Include="Physics\Narrowphase\AABB_OBB.cpp" />
+    <ClCompile Include="Physics\Narrowphase\AABB_Sphere.cpp" />
     <ClCompile Include="Physics\Narrowphase\IntersectTable.cpp" />
     <ClCompile Include="Physics\Narrowphase\IntersectUtil.cpp" />
     <ClCompile Include="Utils\Log\ConsoleLogger.cpp">
@@ -1891,7 +1892,6 @@
     <Content Include="Math\Vector.h" />
     <Content Include="Physics\Hitbox\HitGroup.h" />
     <Content Include="Physics\Hitbox\HitResult.h" />
-    <Content Include="Physics\Narrowphase\AABB_Sphere.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
