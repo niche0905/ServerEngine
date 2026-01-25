@@ -12,6 +12,7 @@ namespace SE::Physics::Narrowphase
 {
    
    bool Intersect_AABB_AABB(const Collider& a, const Collider& b, CollisionResult& out);
-   
+   bool Intersect_AABB_OBB(const Collider& a, const Collider& b, CollisionResult& out);
+   bool Intersect_OBB_AABB(const Collider& a, const Collider& b, CollisionResult& out);
    
 }

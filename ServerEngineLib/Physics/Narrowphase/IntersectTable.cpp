@@ -35,6 +35,8 @@ namespace SE::Physics::Narrowphase
       
       // TODO: 충돌 판정 함수 구현 후 등록
       gTable[static_cast<int>(ColliderType::AABB)][static_cast<int>(ColliderType::AABB)] = &Intersect_AABB_AABB;
+      gTable[static_cast<int>(ColliderType::AABB)][static_cast<int>(ColliderType::OBB)] = &Intersect_AABB_OBB;
+      gTable[static_cast<int>(ColliderType::OBB)][static_cast<int>(ColliderType::AABB)] = &Intersect_OBB_AABB;
       
       gInited = true;
    }

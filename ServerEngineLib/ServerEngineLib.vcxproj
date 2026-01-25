@@ -1800,6 +1800,7 @@
     <ClCompile Include="Physics\Hitbox\HitboxInstance.cpp" />
     <ClCompile Include="Physics\Hitbox\HitboxPart.cpp" />
     <ClCompile Include="Physics\Narrowphase\AABB_AABB.cpp" />
+    <ClCompile Include="Physics\Narrowphase\AABB_OBB.cpp" />
     <ClCompile Include="Physics\Narrowphase\IntersectTable.cpp" />
     <ClCompile Include="Physics\Narrowphase\IntersectUtil.cpp" />
     <ClCompile Include="Utils\Log\ConsoleLogger.cpp">
