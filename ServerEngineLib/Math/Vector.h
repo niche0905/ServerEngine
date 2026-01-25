@@ -32,6 +32,11 @@ namespace SE::Math
             return { x * s, y * s, z * s };
         }
         
+        Vector3 operator-() const
+        {
+            return { -x, -y, -z };
+        }
+        
         bool operator==(const Vector3& rhs) const
         {
             return (x == rhs.x) && (y == rhs.y) && (z == rhs.z);
