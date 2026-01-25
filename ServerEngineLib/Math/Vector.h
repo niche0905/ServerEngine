@@ -43,6 +43,15 @@ namespace SE::Math
             return x * other.x + y * other.y + z * other.z;
         }
         
+        Vector3 Cross(const Vector3& rhs) const
+        {
+            return {
+                y * rhs.z - z * rhs.y,
+                z * rhs.x - x * rhs.z,
+                x * rhs.y - y * rhs.x
+            };
+        }
+        
         float LengthSq() const
         {
             return x * x + y * y + z * z;
