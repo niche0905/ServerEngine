@@ -1803,6 +1803,7 @@
     <ClCompile Include="Physics\Hitbox\HitboxPart.cpp" />
     <ClCompile Include="Physics\Narrowphase\AABB_AABB.cpp" />
     <ClCompile Include="Physics\Narrowphase\AABB_Capsule.cpp" />
+    <ClCompile Include="Physics\Narrowphase\AABB_CharacterCapsule.cpp" />
     <ClCompile Include="Physics\Narrowphase\AABB_OBB.cpp" />
     <ClCompile Include="Physics\Narrowphase\AABB_Sphere.cpp" />
     <ClCompile Include="Physics\Narrowphase\IntersectTable.cpp" />
