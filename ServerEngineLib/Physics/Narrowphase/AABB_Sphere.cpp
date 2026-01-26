@@ -51,46 +51,14 @@ namespace SE::Physics::Narrowphase
       
       // distSq == 0이면 구의 중심이 AABB 내부에 있음
       // 가장 가까운 면을 찾아서 법선 벡터를 결정
-      const Vector3 aC = A.GetCenter();
+      Vector3 nFace, pFace;
+      float faceDist = 0.0f;
       
-      const float dx = SE::Math::Min(SE::Math::Abs(c.x - mn.x), SE::Math::Abs(mx.x - c.x));
-      const float dy = SE::Math::Min(SE::Math::Abs(c.y - mn.y), SE::Math::Abs(mx.y - c.y));
-      const float dz = SE::Math::Min(SE::Math::Abs(c.z - mn.z), SE::Math::Abs(mx.z - c.z));
+      ResolveInsideAABBPointNormal(c, mn, mx, nFace, pFace, faceDist);
       
-      if (dx <= dy && dx <= dz) {
-         // x축이 가장 가까움
-         if (SE::Math::Abs(c.x - mn.x) <= SE::Math::Abs(mx.x - c.x))
-            n = Vector3{-1.0f, 0.0f, 0.0f};
-         else
-            n = Vector3{1.0f, 0.0f, 0.0f};
-         
-         out.penetration = r + dx;
-      }
-      else if (dy <= dx && dy <= dz) {
-         // y축이 가장 가까움
-         if (SE::Math::Abs(c.y - mn.y) <= SE::Math::Abs(mx.y - c.y))
-            n = Vector3{0.0f, -1.0f, 0.0f};
-         else
-            n = Vector3{0.0f, 1.0f, 0.0f};
-         
-         out.penetration = r + dy;
-      }
-      else {
-         // z축이 가장 가까움
-         if (SE::Math::Abs(c.z - mn.z) <= SE::Math::Abs(mx.z - c.z))
-            n = Vector3{0.0f, 0.0f, -1.0f};
-         else
-            n = Vector3{0.0f, 0.0f, 1.0f};
-         
-         out.penetration = r + dz;
-      }
-      
-      out.point = Vector3{
-         SE::Math::Clamp(c.x, mn.x, mx.x),
-         SE::Math::Clamp(c.y, mn.y, mx.y),
-         SE::Math::Clamp(c.z, mn.z, mx.z)
-      };
-      out.normal = n;
+      out.normal = nFace;
+      out.point = pFace;
+      out.penetration = r + faceDist;
       
       return true;
    }

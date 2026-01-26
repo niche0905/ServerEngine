@@ -51,45 +51,14 @@ namespace SE::Physics::Narrowphase
          return true;
       } 
       
-      const Vector3 c = P;
-      const float dx = SE::Math::Min(SE::Math::Abs(c.x - boxMin.x), SE::Math::Abs(boxMax.x - c.x));
-      const float dy = SE::Math::Min(SE::Math::Abs(c.y - boxMin.y), SE::Math::Abs(boxMax.y - c.y));
-      const float dz = SE::Math::Min(SE::Math::Abs(c.z - boxMin.z), SE::Math::Abs(boxMax.z - c.z));
+      Vector3 nFace, pFace;
+      float faceDist = 0.0f;
       
-      Vector3 n(0, 0, 0);
-      Vector3 pt = c;
+      ResolveInsideAABBPointNormal(P, boxMin, boxMax, nFace, pFace, faceDist);
       
-      if (dx <= dy and dx <= dz) {
-         if (SE::Math::Abs(c.x - boxMin.x) <= SE::Math::Abs(boxMax.x - c.x)) {
-            n = Vector3(-1, 0, 0);
-            pt.x = boxMin.x;
-         } else {
-            n = Vector3(1, 0, 0);
-            pt.x = boxMax.x;
-         }
-         out.penetration = r + dx;
-      } else if (dy <= dx and dy <= dz) {
-         if (SE::Math::Abs(c.y - boxMin.y) <= SE::Math::Abs(boxMax.y - c.y)) {
-            n = Vector3(0, -1, 0);
-            pt.y = boxMin.y;
-         } else {
-            n = Vector3(0, 1, 0);
-            pt.y = boxMax.y;
-         }
-         out.penetration = r + dy;
-      } else {
-         if (SE::Math::Abs(c.z - boxMin.z) <= SE::Math::Abs(boxMax.z - c.z)) {
-            n = Vector3(0, 0, -1);
-            pt.z = boxMin.z;
-         } else {
-            n = Vector3(0, 0, 1);
-            pt.z = boxMax.z;
-         }
-         out.penetration = r + dz;
-      }
-      
-      out.normal = n;
-      out.point = pt;
+      out.normal = nFace;
+      out.point = pFace;
+      out.penetration = r + faceDist;
       
       return true;
    }
