@@ -1808,6 +1808,7 @@
     <ClCompile Include="Physics\Narrowphase\AABB_Sphere.cpp" />
     <ClCompile Include="Physics\Narrowphase\IntersectTable.cpp" />
     <ClCompile Include="Physics\Narrowphase\IntersectUtil.cpp" />
+    <ClCompile Include="Physics\Narrowphase\OBB_OBB.cpp" />
     <ClCompile Include="Utils\Log\ConsoleLogger.cpp">
       <RuntimeLibrary>MultiThreadedDebugDll</RuntimeLibrary>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>

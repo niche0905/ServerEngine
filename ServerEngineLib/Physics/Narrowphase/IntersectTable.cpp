@@ -44,6 +44,8 @@ namespace SE::Physics::Narrowphase
       gTable[static_cast<int>(ColliderType::AABB)][static_cast<int>(ColliderType::CharacterCapsule)] = &Intersect_AABB_CharacterCapsule;
       gTable[static_cast<int>(ColliderType::CharacterCapsule)][static_cast<int>(ColliderType::AABB)] = &Intersect_CharacterCapsule_AABB;
       
+      gTable[static_cast<int>(ColliderType::OBB)][static_cast<int>(ColliderType::OBB)] = &Intersect_OBB_OBB;
+      
       gInited = true;
    }
    
