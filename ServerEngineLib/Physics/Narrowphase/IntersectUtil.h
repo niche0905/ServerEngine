@@ -16,6 +16,8 @@ namespace SE::Physics::Narrowphase
     
     bool SwapWrapper(const Collider& a, const Collider& b, CollisionResult& out, IntersectFn fn);
     
+    void ResolveInsideAABBPointNormal(const Vector3& c, const Vector3& boxMin, const Vector3& boxMax, Vector3& outNormal, Vector3& outPoint, float& outFaceDist);
+    
     Vector3 ClampPointAABB(const Vector3& p, const Vector3& mn, const Vector3& mx);
     // AABB와 선분의 교차 검사 (슬랩 방법)
     bool IntersectSegmentAABB(const Vector3& A, const Vector3& B, const Vector3& mn, const Vector3& mx, float& outTEnter);
