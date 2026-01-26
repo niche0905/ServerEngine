@@ -1,5 +1,6 @@
 ﻿#include "pch.h"
 #include "Physics/Narrowphase/IntersectFns.h"
+#include "Physics/Narrowphase/IntersectUtil.h"
 #include "Physics/Collider/CollisionResult.h"
 #include "Physics/Collider/AABBCollider.h"
 #include "Physics/Collider/SphereCollider.h"
@@ -96,13 +97,6 @@ namespace SE::Physics::Narrowphase
 
    bool Intersect_Sphere_AABB(const Collider& a, const Collider& b, CollisionResult& out)
    {
-      CollisionResult tmp;
-      if (not Intersect_AABB_Sphere(b, a, tmp))
-         return false;
-      
-      tmp.normal = -tmp.normal;
-      out = tmp;
-
-      return true;
+      return SwapWrapper(a, b, out, &Intersect_AABB_Sphere);
    }
 }
