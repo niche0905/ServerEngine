@@ -8,13 +8,13 @@
 
 namespace SE::Physics::Narrowphase
 {
-   bool SwapWrapper(const Collider& a, const Collider& b, CollisionResult& out, IntersectFn fn)
+   bool SwapWrapper(const Collider& a, const Collider& b, CollisionResult& out, IntersectFn fnBA)
    {
       CollisionResult tmp;
-      if (not fn(b, a, tmp))
+      if (not fnBA(b, a, tmp))
          return false;
       
-      tmp.normal = tmp.normal;
+      tmp.normal = -tmp.normal;
       out = tmp;
       return true;
    }
