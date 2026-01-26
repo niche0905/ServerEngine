@@ -20,7 +20,9 @@ namespace SE::Physics::Narrowphase
    bool Intersect_Capsule_AABB(const Collider& a, const Collider& b, CollisionResult& out);
    bool Intersect_AABB_CharacterCapsule(const Collider& a, const Collider& b, CollisionResult& out);
    bool Intersect_CharacterCapsule_AABB(const Collider& a, const Collider& b, CollisionResult& out);
-   bool Intersect_OBB_OBB(const Collider& a, const Collider& b, CollisionResult& out);
    
+   bool Intersect_OBB_OBB(const Collider& a, const Collider& b, CollisionResult& out);
+   bool Intersect_OBB_Sphere(const Collider& a, const Collider& b, CollisionResult& out);
+   bool Intersect_Sphere_OBB(const Collider& a, const Collider& b, CollisionResult& out);
    
 }

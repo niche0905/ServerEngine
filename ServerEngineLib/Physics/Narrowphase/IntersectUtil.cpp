@@ -14,68 +14,14 @@ namespace SE::Physics::Narrowphase
       if (not fnBA(b, a, tmp))
          return false;
       
+      // TODO: 디버그 일 때만 아래를 실행하도록 설정
+      {
+         assert(tmp.normal.LengthSq() > 1e-12f && "SwapWrapper: tmp.normal is zero");
+      }
+      
       tmp.normal = -tmp.normal;
       out = tmp;
       return true;
-   }
-
-   void ResolveInsideAABBPointNormal(const Vector3& c, const Vector3& boxMin, const Vector3& boxMax, Vector3& outNormal,
-      Vector3& outPoint, float& outFaceDist)
-   {
-      const float dxMin = SE::Math::Abs(c.x - boxMin.x);
-      const float dxMax = SE::Math::Abs(boxMax.x - c.x);
-      const float dyMin = SE::Math::Abs(c.y - boxMin.y);
-      const float dyMax = SE::Math::Abs(boxMax.y - c.y);
-      const float dzMin = SE::Math::Abs(c.z - boxMin.z);
-      const float dzMax = SE::Math::Abs(boxMax.z - c.z);
-      
-      const float dx = SE::Math::Min(dxMin, dxMax);
-      const float dy = SE::Math::Min(dyMin, dyMax);
-      const float dz = SE::Math::Min(dzMin, dzMax);
-      
-      outPoint = c;
-      outNormal = Vector3{0, 0, 0};
-      outFaceDist = 0.0f;
-      
-      if (dx <= dy and dx <= dz) {
-         // X축 면이 가장 가까움
-         if (dxMin <= dxMax) {
-            outNormal = Vector3{-1, 0, 0};
-            outPoint.x = boxMin.x;
-            outFaceDist = dxMin;
-         }
-         else {
-            outNormal = Vector3{1, 0, 0};
-            outPoint.x = boxMax.x;
-            outFaceDist = dxMax;
-         }
-      }
-      else if (dy <= dx and dy <= dz) {
-         // Y축 면이 가장 가까움
-         if (dyMin <= dyMax) {
-            outNormal = Vector3{0, -1, 0};
-            outPoint.y = boxMin.y;
-            outFaceDist = dyMin;
-         }
-         else {
-            outNormal = Vector3{0, 1, 0};
-            outPoint.y = boxMax.y;
-            outFaceDist = dyMax;
-         }
-      }
-      else {
-         // Z축 면이 가장 가까움
-         if (dzMin <= dzMax) {
-            outNormal = Vector3{0, 0, -1};
-            outPoint.z = boxMin.z;
-            outFaceDist = dzMin;
-         }
-         else {
-            outNormal = Vector3{0, 0, 1};
-            outPoint.z = boxMax.z;
-            outFaceDist = dzMax;
-         }
-      }
    }
 
    Vector3 ClampPointAABB(const Vector3& p, const Vector3& mn, const Vector3& mx)
