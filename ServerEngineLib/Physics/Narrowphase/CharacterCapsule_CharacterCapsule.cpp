@@ -34,13 +34,13 @@ namespace SE::Physics::Narrowphase
         float yA = 0.0f, yB = 0.0f;
         
         if (Ay1 < By0) {
-            // A above B
+            // B above A
             vert = By0 - Ay1;
             yA = Ay1;
             yB = By0;
         }
         else if (By1 < Ay0) {
-            // B above A
+            // A above B
             vert = Ay0 - By1;
             yA = Ay0;
             yB = By1;
