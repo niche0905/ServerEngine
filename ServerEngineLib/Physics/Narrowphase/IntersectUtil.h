@@ -118,4 +118,12 @@ namespace SE::Physics::Narrowphase
         outPointW = ToWorld_OBB(pL, O);
     }
     
+    inline Vector3 OBBLocalDirToWorld(const Vector3& vL, const OBBCollider& O)
+    {
+        return 
+            O.GetAxisX() * vL.x +
+            O.GetAxisY() * vL.y +
+            O.GetAxisZ() * vL.z;
+    }
+    
 }

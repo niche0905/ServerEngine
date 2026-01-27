@@ -6,6 +6,7 @@
 ---------------*/
 //
 // Narrowphase 네임스페이스는 충돌 판정의 세부 구현을 담당합니다
+// CollisionResult의 normal은 a를 b에서 밀어내는 방향으로 통일하였습니다
 //
 
 namespace SE::Physics::Narrowphase
