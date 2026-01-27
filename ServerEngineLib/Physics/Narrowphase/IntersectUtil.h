@@ -126,4 +126,73 @@ namespace SE::Physics::Narrowphase
             O.GetAxisZ() * vL.z;
     }
     
+    inline void ClosestPtSegmentSegment(const Vector3& P0, const Vector3& P1, const Vector3& Q0, const Vector3& Q1, float& outS, float& outT, Vector3& outPa, Vector3& outPb)
+    {
+        const Vector3 u = P1 - P0;
+        const Vector3 v = Q1 - Q0;
+        const Vector3 w = P0 - Q0;
+        
+        const float a = u.Dot(u);
+        const float b = u.Dot(v);
+        const float c = v.Dot(v);
+        const float d = u.Dot(w);
+        const float e = v.Dot(w);
+        
+        constexpr float EPS = 1e-12f;
+        float sN, sD = a;
+        float tN, tD = c;
+        
+        const float D = a * c - b * b;
+        
+        if (D < EPS) {
+            // 선분이 거의 평행함
+            sN = 0.0f;
+            sD = 1.0f;
+            tN = e;
+            tD = c;
+        }
+        else {
+            sN = b * e - c * d;
+            tN = a * e - b * d;
+            
+            if (sN < 0.0f) {
+                sN = 0.0f;
+                tN = e;
+                tD = c;
+            }
+            else if (sN > sD) {
+                sN = sD;
+                tN = e + b;
+                tD = c;
+            }
+        }
+        
+        if (tN < 0.0f) {
+            tN = 0.0f;
+            if (-d < 0.0f) sN = 0.0f;
+            else if (-d > a) sN = sD;
+            else {
+                sN = -d;
+                sD = a;
+            }
+        }
+        else if (tN > tD) {
+            tN = tD;
+            if ((-d + b) < 0.0f) sN = 0.0f;
+            else if ((-d + b) > a) sN = sD;
+            else {
+                sN = -d + b;
+                sD = a;
+            }
+        }
+        
+        const float s = (SE::Math::Abs(sN) < EPS) ? 0.0f : sN / sD;
+        const float t = (SE::Math::Abs(tN) < EPS) ? 0.0f : tN / tD;
+        
+        outS = s;
+        outT = t;
+        outPa = P0 + u * s;
+        outPb = Q0 + v * t;
+    }
+    
 }
