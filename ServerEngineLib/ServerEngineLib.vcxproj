@@ -1813,6 +1813,7 @@
     <ClCompile Include="Physics\Narrowphase\OBB_OBB.cpp" />
     <ClCompile Include="Physics\Narrowphase\OBB_Sphere.cpp" />
     <ClCompile Include="Physics\Narrowphase\Sphere_Capsule.cpp" />
+    <ClCompile Include="Physics\Narrowphase\Sphere_CharacterCapsule.cpp" />
     <ClCompile Include="Physics\Narrowphase\Sphere_Sphere.cpp" />
     <ClCompile Include="Utils\Log\ConsoleLogger.cpp">
       <RuntimeLibrary>MultiThreadedDebugDll</RuntimeLibrary>
