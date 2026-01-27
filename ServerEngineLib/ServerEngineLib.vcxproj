@@ -1807,6 +1807,7 @@
     <ClCompile Include="Physics\Narrowphase\AABB_OBB.cpp" />
     <ClCompile Include="Physics\Narrowphase\AABB_Sphere.cpp" />
     <ClCompile Include="Physics\Narrowphase\Capsule_Capsule.cpp" />
+    <ClCompile Include="Physics\Narrowphase\Capsule_CharacterCapsule.cpp" />
     <ClCompile Include="Physics\Narrowphase\IntersectTable.cpp" />
     <ClCompile Include="Physics\Narrowphase\IntersectUtil.cpp" />
     <ClCompile Include="Physics\Narrowphase\OBB_Capsule.cpp" />
