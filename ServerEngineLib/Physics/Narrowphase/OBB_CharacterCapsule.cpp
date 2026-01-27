@@ -3,27 +3,27 @@
 #include "Physics/Narrowphase/IntersectUtil.h"
 #include "Physics/Collider/CollisionResult.h"
 #include "Physics/Collider/OBBCollider.h"
-#include "Physics/Collider/CapsuleCollider.h"
+#include "Physics/Collider/CharacterCapsuleCollider.h"
 
 
 namespace SE::Physics::Narrowphase
 {
     using Vector3 = SE::Math::Vector3;
    
-    bool Intersect_OBB_Capsule(const Collider& a, const Collider& b, CollisionResult& out)
+    bool Intersect_OBB_CharacterCapsule(const Collider& a, const Collider& b, CollisionResult& out)
     {
         const auto& O = static_cast<const OBBCollider&>(a);
-        const auto& C = static_cast<const CapsuleCollider&>(b);
+        const auto& Cap = static_cast<const CharacterCapsuleCollider&>(b);
         
-        const float r = C.GetRadius();
+        const float r = Cap.GetRadius();
         const float rSq = r * r;
         
         const Vector3 half = O.GetHalfExtent();
         const Vector3 mn{-half.x, -half.y, -half.z};
         const Vector3 mx{ half.x,  half.y,  half.z};
         
-        const Vector3 A0 = ToLocal_OBB(C.GetPointA(), O);
-        const Vector3 B0 = ToLocal_OBB(C.GetPointB(), O);
+        const Vector3 A0 = ToLocal_OBB(Cap.GetPointA(), O);
+        const Vector3 B0 = ToLocal_OBB(Cap.GetPointB(), O);
         
         const Vector3 inflMn = mn - Vector3{r, r, r};
         const Vector3 inflMx = mx + Vector3{r, r, r};
@@ -76,8 +76,8 @@ namespace SE::Physics::Narrowphase
         return true;
     }
 
-    bool Intersect_Capsule_OBB(const Collider& a, const Collider& b, CollisionResult& out)
+    bool Intersect_CharacterCapsule_OBB(const Collider& a, const Collider& b, CollisionResult& out)
     {
-        return SwapWrapper(a, b, out, &Intersect_OBB_Capsule);
+        return SwapWrapper(a, b, out, &Intersect_OBB_CharacterCapsule);
     }
 }
