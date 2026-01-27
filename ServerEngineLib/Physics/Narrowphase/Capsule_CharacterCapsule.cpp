@@ -38,13 +38,9 @@ namespace SE::Physics::Narrowphase
         out.hit = true;
       
         if (distSq <= 1e-12f) {
-            Vector3 n = A.GetAxis().Cross(Vector3{0.0f, 1.0f, 0.0f});
-            if (n.LengthSq() <= 1e-12f) {
-                n = Vector3(0.0f, 1.0f, 0.0f);
-            }
-            else {
-                n = n.Normalized(Vector3(0.0f, 1.0f, 0.0f));
-            }
+            Vector3 ca = (A0 + A1) * 0.5f;
+            Vector3 cb = (B0 + B1) * 0.5f;
+            Vector3 n = (ca - cb).Normalized(Vector3{0.0f, 1.0f, 0.0f});
          
             out.normal = n;
             out.penetration = radiusSum;
