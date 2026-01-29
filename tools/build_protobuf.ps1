@@ -1,4 +1,4 @@
-# tools/build_protobuf.ps1
+# Tools/build_protobuf.ps1
 param(
   [ValidateSet("Release","Debug")]
   [string]$Config = "Release"
