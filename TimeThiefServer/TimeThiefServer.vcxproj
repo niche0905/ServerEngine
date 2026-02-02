@@ -311,6 +311,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Content\Component\BaseComponent.h" />
+    <ClInclude Include="Content\Component\HealthComponent.h" />
     <ClInclude Include="Content\Object\BaseObject.h" />
     <ClInclude Include="Content\Object\ObjectEnum.h" />
     <ClInclude Include="Content\Object\ObjectHandle.h" />
