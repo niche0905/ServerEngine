@@ -9,7 +9,8 @@ class BaseObject;
    ObjectManager
 -----------------*/
 //
-
+// ObjectManager는 오브젝트의 생성, 조회, 파괴를 관리합니다.
+// 한 Room 혹은 World에서 가진채로 사용됩니다.
 //
 
 class ObjectManager
