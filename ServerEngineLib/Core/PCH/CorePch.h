@@ -16,6 +16,7 @@
 	C++ Standard Library
    ====================== */
 
+#define NOMINMAX
 #include <Windows.h>
 #include <iostream>
 #include <string_view>
