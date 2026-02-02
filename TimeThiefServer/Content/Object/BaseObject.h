@@ -1,0 +1,84 @@
+﻿#pragma once
+#include "ObjectId.h"
+#include "ObjectEnum.h"
+
+struct ObjectId;
+
+/*--------------
+   BaseObject
+--------------*/
+//
+// BaseObject는 모든 게임 오브젝트의 기본 클래스입니다.
+//
+
+class BaseObject
+{
+public:
+    using RoomId = uint32;
+    
+public:
+    BaseObject() = default;
+    virtual ~BaseObject() = default;
+    
+    BaseObject(const BaseObject&) = delete;
+    BaseObject& operator=(const BaseObject&) = delete;
+    
+    ObjectId GetId() const { return id_; }
+    RoomId GetRoomId() const { return roomId_; }
+    
+    ObjectState GetState() const { return state_; }
+    bool IsAlive() const { return state_ == ObjectState::Alive; }
+    bool IsPendingDestory() const { return state_ == ObjectState::PendingDestroy; }
+    
+    ObjectFlags GetFlags() const { return flags_; }
+    bool IsTickable() const { return HasFlag(flags_, ObjectFlags::Tickable); }
+    
+// Lifecycle (Room에서만 호출)
+public:
+    void __Spwan(ObjectId id, RoomId roomId, ObjectFlags flags)
+    {
+        id_ = id;
+        roomId_ = roomId;
+        flags_ = flags;
+        state_ = ObjectState::Alive;
+        
+        OnSpawn();
+    }
+    
+    void __RequestDestroy()
+    {
+        if (state_ != ObjectState::Alive)
+            return;
+        state_ = ObjectState::PendingDestroy;
+        OnPreDestroy();
+    }
+    
+    void __DestroyFinalize()
+    {
+        if (state_ == ObjectState::Destroyed)
+            return;
+        OnDestroy();
+        state_ = ObjectState::Destroyed;
+    }
+    
+    // TODO: Tick 기준을 float로 할지 int로 할지 고민 필요
+    void __Tick(float dt)
+    {
+        if (state_ != ObjectState::Alive)
+            return;
+        Tick(dt);
+    }
+    
+protected:
+    virtual void OnSpawn() {}
+    virtual void OnPreDestroy() {}
+    virtual void OnDestroy() {}
+    virtual void Tick(float dt) {}
+    
+private:
+    ObjectId        id_{};
+    RoomId          roomId_{ 0 };
+    ObjectFlags     flags_{ ObjectFlags::None };
+    ObjectState     state_{ ObjectState::Destroyed };
+    
+};
