@@ -35,7 +35,7 @@ public:
     
 // Lifecycle (Room에서만 호출)
 public:
-    void __Spwan(ObjectId id, RoomId roomId, ObjectFlags flags)
+    void __Spawn(ObjectId id, RoomId roomId, ObjectFlags flags)
     {
         id_ = id;
         roomId_ = roomId;
