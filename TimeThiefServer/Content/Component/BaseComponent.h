@@ -19,7 +19,7 @@ public:
     ObjectId GetOwner() const { return owner_; }
     bool HasOwner() const { return static_cast<bool>(owner_); }
     
-private:
+protected:
     ObjectId owner_{};
     
 };
