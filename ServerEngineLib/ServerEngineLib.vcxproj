@@ -240,6 +240,7 @@
     <ClInclude Include="Physics\Narrowphase\IntersectUtil.h" />
     <ClInclude Include="Physics\Ray\Ray.h" />
     <ClInclude Include="Physics\Ray\RaycastHit.h" />
+    <ClInclude Include="Runtime\Config\IConfigLoader.h" />
     <ClInclude Include="Utils\Container.h" />
     <ClInclude Include="Utils\Log\ConsoleColor.h" />
     <ClInclude Include="Utils\Log\ConsoleLogger.h" />
