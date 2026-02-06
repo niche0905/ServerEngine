@@ -1,5 +1,6 @@
 ﻿#pragma once
 #include <string>
+#include <json/json.h>
 
 /*-----------------
    IConfigLoader
@@ -14,12 +15,28 @@ namespace SE::Config
     {
     public:
         ConfigDocument() = default;
+        
         bool IsValid() const { return valid_; }
+        const Json::Value& Root() const { return root_; }
         
         void _SetValid(bool v) { valid_ = v; }
+        Json::Value& _MutableRoot() { return root_; }
+        
+        void _SetError(std::string msg) { error_ = std::move(msg); }
+        const std::string& GetError() const { return error_; }
+        
+        void Clear()
+        {
+            valid_ = false;
+            root_.clear();
+            error_.clear();
+        }
         
     private:
         bool valid_{ false };
+        Json::Value root_;
+        std::string error_;
+        
     };
     
     class IConfigLoader
