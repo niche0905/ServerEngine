@@ -316,6 +316,7 @@
     <ClInclude Include="Content\Component\WalletComponent.h" />
     <ClInclude Include="Content\Enum\DamageTypes.h" />
     <ClInclude Include="Content\Enum\InteractTypes.h" />
+    <ClInclude Include="Content\Enum\ItemTypes.h" />
     <ClInclude Include="Content\Enum\WalletTypes.h" />
     <ClInclude Include="Content\Interface\IDamageable.h" />
     <ClInclude Include="Content\Interface\IInteractable.h" />
