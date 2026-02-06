@@ -247,6 +247,7 @@
     <ClInclude Include="Utils\ObjectPool\ExternalPool.h" />
     <ClInclude Include="Utils\ObjectPool\IntrusivePool.h" />
     <ClInclude Include="Utils\ObjectPool\PoolObject.h" />
+    <ClInclude Include="Utils\Random\WeightedRandom.h" />
     <ClInclude Include="Utils\Types.h" />
   </ItemGroup>
   <ItemGroup>
