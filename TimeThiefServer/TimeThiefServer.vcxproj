@@ -330,6 +330,7 @@
     <ClInclude Include="Content\Object\ObjectHandle.h" />
     <ClInclude Include="Content\Object\ObjectId.h" />
     <ClInclude Include="Content\Object\ObjectManager.h" />
+    <ClInclude Include="Content\Service\LootTableSchema.h" />
     <ClInclude Include="Content\Service\LootTableService.h" />
     <ClInclude Include="Network\Session\PlayerSession.h" />
     <ClInclude Include="Network\Session\SessionManager\SessionManager.h" />

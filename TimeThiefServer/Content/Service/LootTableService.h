@@ -1,13 +1,9 @@
 ﻿#pragma once
 #include "Content/Enum/LootTypes.h"
 #include "Runtime/Config/IConfigLoader.h"
+#include "LootTableSchema.h"
 #include <string>
 #include <unordered_map>
-
-struct LootTableDef
-{
-    int32 tableId{0};
-};
 
 /*--------------------
    LootTableService
