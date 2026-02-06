@@ -9,16 +9,37 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="main.cpp">
-      <Filter>Main</Filter>
-    </ClCompile>
-    <ClCompile Include="pch.cpp">
-      <Filter>Utils</Filter>
-    </ClCompile>
+    <ClCompile Include="Content\Object\BaseObject.cpp" />
+    <ClCompile Include="Content\Service\LootTableService.cpp" />
+    <ClCompile Include="Main\main.cpp" />
+    <ClCompile Include="Network\Session\PlayerSession.cpp" />
+    <ClCompile Include="Network\Session\SessionManager\SessionManager.cpp" />
+    <ClCompile Include="Utils\pch.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="pch.h">
-      <Filter>Utils</Filter>
-    </ClInclude>
+    <ClInclude Include="Content\Component\BaseComponent.h" />
+    <ClInclude Include="Content\Component\HealthComponent.h" />
+    <ClInclude Include="Content\Component\InteractComponent.h" />
+    <ClInclude Include="Content\Component\InventoryComponent.h" />
+    <ClInclude Include="Content\Component\WalletComponent.h" />
+    <ClInclude Include="Content\Enum\DamageTypes.h" />
+    <ClInclude Include="Content\Enum\InteractTypes.h" />
+    <ClInclude Include="Content\Enum\ItemTypes.h" />
+    <ClInclude Include="Content\Enum\LootTypes.h" />
+    <ClInclude Include="Content\Enum\WalletTypes.h" />
+    <ClInclude Include="Content\Interface\IDamageable.h" />
+    <ClInclude Include="Content\Interface\IInteractable.h" />
+    <ClInclude Include="Content\Interface\IInventoryOwner.h" />
+    <ClInclude Include="Content\Interface\IWalletOwner.h" />
+    <ClInclude Include="Content\Object\BaseObject.h" />
+    <ClInclude Include="Content\Object\ObjectEnum.h" />
+    <ClInclude Include="Content\Object\ObjectHandle.h" />
+    <ClInclude Include="Content\Object\ObjectId.h" />
+    <ClInclude Include="Content\Object\ObjectManager.h" />
+    <ClInclude Include="Content\Service\LootTableSchema.h" />
+    <ClInclude Include="Content\Service\LootTableService.h" />
+    <ClInclude Include="Network\Session\PlayerSession.h" />
+    <ClInclude Include="Network\Session\SessionManager\SessionManager.h" />
+    <ClInclude Include="Utils\pch.h" />
   </ItemGroup>
 </Project>
