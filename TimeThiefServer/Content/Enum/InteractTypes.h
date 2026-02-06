@@ -23,6 +23,8 @@ enum class InteractResultCode : uint8
 struct InteractContext
 {
     ObjectId interactor{}; // 상호작용 주체(플레이어 등)
+    
+    uint64 nowMs{}; // 현재 시간(밀리초)
     // 필요시 확장:
     // ObjectId itemUsed{};
     // int32_t skillId{};
