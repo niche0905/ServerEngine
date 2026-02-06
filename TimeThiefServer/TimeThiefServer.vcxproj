@@ -313,6 +313,7 @@
     <ClInclude Include="Content\Component\BaseComponent.h" />
     <ClInclude Include="Content\Component\HealthComponent.h" />
     <ClInclude Include="Content\Component\InteractComponent.h" />
+    <ClInclude Include="Content\Component\InventoryComponent.h" />
     <ClInclude Include="Content\Component\WalletComponent.h" />
     <ClInclude Include="Content\Enum\DamageTypes.h" />
     <ClInclude Include="Content\Enum\InteractTypes.h" />
