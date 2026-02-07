@@ -1,5 +1,5 @@
 ﻿#pragma once
-#include "Content/Enum/DamageTypes.h"
+#include "DamageTypes.h"
 
 class ObjectManager;
 

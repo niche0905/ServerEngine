@@ -1,7 +1,7 @@
 ﻿#pragma once
-#include "BaseComponent.h"
+#include "Content/Shared/BaseComponent.h"
 #include "Content/Object/ObjectId.h"
-#include "Content/Enum/ItemTypes.h"
+#include "ItemTypes.h"
 
 class ObjectManager;
 struct ItemStack;

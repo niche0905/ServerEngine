@@ -1,5 +1,5 @@
 ﻿#pragma once
-#include "Content/Enum/InteractTypes.h"
+#include "InteractTypes.h"
 
 class ObjectManager;
 

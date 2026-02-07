@@ -1,5 +1,5 @@
 ﻿#pragma once
-#include "Content/Enum/WalletTypes.h"
+#include "WalletTypes.h"
 
 class ObjectManager;
 

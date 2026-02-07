@@ -1,7 +1,7 @@
 ﻿#pragma once
-#include "BaseComponent.h"
+#include "Content/Shared/BaseComponent.h"
 #include "Content/Object/ObjectId.h"
-#include "Content/Enum/DamageTypes.h"
+#include "DamageTypes.h"
 #include <algorithm>
 
 class ObjectManager;

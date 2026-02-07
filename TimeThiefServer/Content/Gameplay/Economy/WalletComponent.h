@@ -1,7 +1,7 @@
 ﻿#pragma once
-#include "BaseComponent.h"
+#include "Content/Shared/BaseComponent.h"
 #include "Content/Object/ObjectId.h"
-#include "Content/Enum/WalletTypes.h"
+#include "WalletTypes.h"
 #include <unordered_map>
 
 class ObjectManager;

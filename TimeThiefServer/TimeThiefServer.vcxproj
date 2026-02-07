@@ -167,8 +167,84 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Content\Gameplay\Loot\LootTableService.cpp">
+      <RuntimeLibrary>MultiThreadedDebugDll</RuntimeLibrary>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <Optimization>Disabled</Optimization>
+      <SupportJustMyCode>true</SupportJustMyCode>
+      <AssemblerOutput>NoListing</AssemblerOutput>
+      <AssemblerListingLocation>D:\GitHub\ServerEngine\_out\obj\TimeThiefServer\</AssemblerListingLocation>
+      <UndefineAllPreprocessorDefinitions>false</UndefineAllPreprocessorDefinitions>
+      <BrowseInformation>false</BrowseInformation>
+      <BrowseInformationFile>D:\GitHub\ServerEngine\_out\obj\TimeThiefServer\</BrowseInformationFile>
+      <CompileAs>Default</CompileAs>
+      <UseDynamicDebugging>false</UseDynamicDebugging>
+      <ConformanceMode>true</ConformanceMode>
+      <DiagnosticsFormat>Column</DiagnosticsFormat>
+      <DisableLanguageExtensions>false</DisableLanguageExtensions>
+      <ErrorReporting>Prompt</ErrorReporting>
+      <ExpandAttributedSource>false</ExpandAttributedSource>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <EnableASAN>false</EnableASAN>
+      <EnableFuzzer>false</EnableFuzzer>
+      <EnableFiberSafeOptimizations>false</EnableFiberSafeOptimizations>
+      <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
+      <EnableVectorLength>NotSet</EnableVectorLength>
+      <FloatingPointModel>Precise</FloatingPointModel>
+      <ForceConformanceInForLoopScope>true</ForceConformanceInForLoopScope>
+      <GenerateModuleDependencies>false</GenerateModuleDependencies>
+      <GenerateSourceDependencies>false</GenerateSourceDependencies>
+      <GenerateXMLDocumentationFiles>false</GenerateXMLDocumentationFiles>
+      <InlineFunctionExpansion>Default</InlineFunctionExpansion>
+      <IntrinsicFunctions>false</IntrinsicFunctions>
+      <IgnoreStandardIncludePath>false</IgnoreStandardIncludePath>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <LanguageStandard_C>Default</LanguageStandard_C>
+      <MinimalRebuild>false</MinimalRebuild>
+      <ModuleDependenciesFile>D:\GitHub\ServerEngine\_out\obj\TimeThiefServer\</ModuleDependenciesFile>
+      <ModuleOutputFile>D:\GitHub\ServerEngine\_out\obj\TimeThiefServer\</ModuleOutputFile>
+      <OmitDefaultLibName>false</OmitDefaultLibName>
+      <FavorSizeOrSpeed>Neither</FavorSizeOrSpeed>
+      <WholeProgramOptimization>false</WholeProgramOptimization>
+      <ObjectFileName>D:\GitHub\ServerEngine\_out\obj\TimeThiefServer\</ObjectFileName>
+      <CallingConvention>Cdecl</CallingConvention>
+      <ProgramDataBaseFileName>D:\GitHub\ServerEngine\_out\obj\TimeThiefServer\vc143.pdb</ProgramDataBaseFileName>
+      <PrecompiledHeader>Create</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderOutputFile>D:\GitHub\ServerEngine\_out\obj\TimeThiefServer\TimeThiefServer.pch</PrecompiledHeaderOutputFile>
+      <PreprocessToFile>false</PreprocessToFile>
+      <PreprocessKeepComments>false</PreprocessKeepComments>
+      <PreprocessSuppressLineNumbers>false</PreprocessSuppressLineNumbers>
+      <RemoveUnreferencedCodeData>true</RemoveUnreferencedCodeData>
+      <ScanSourceForModuleDependencies>false</ScanSourceForModuleDependencies>
+      <ShowIncludes>false</ShowIncludes>
+      <SourceDependenciesFile>D:\GitHub\ServerEngine\_out\obj\TimeThiefServer\</SourceDependenciesFile>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <BufferSecurityCheck>true</BufferSecurityCheck>
+      <SmallerTypeCheck>false</SmallerTypeCheck>
+      <SpectreMitigation>false</SpectreMitigation>
+      <StructMemberAlignment>Default</StructMemberAlignment>
+      <TrackerLogDirectory>D:\GitHub\ServerEngine\_out\obj\TimeThiefServer\TimeThiefServer.tlog\</TrackerLogDirectory>
+      <TranslateIncludes>false</TranslateIncludes>
+      <MinimalRebuildFromTracking>true</MinimalRebuildFromTracking>
+      <TreatWarningAsError>false</TreatWarningAsError>
+      <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
+      <UseFullPaths>true</UseFullPaths>
+      <WarningLevel>Level3</WarningLevel>
+      <XMLDocumentationFileName>D:\GitHub\ServerEngine\_out\obj\TimeThiefServer\</XMLDocumentationFileName>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+      <IntelJCCErratum>false</IntelJCCErratum>
+      <BuildStlModules>false</BuildStlModules>
+      <TreatAngleIncludeAsExternal>false</TreatAngleIncludeAsExternal>
+      <ExternalWarningLevel>InheritWarningLevel</ExternalWarningLevel>
+      <TreatExternalTemplatesAsInternal>true</TreatExternalTemplatesAsInternal>
+      <DisableAnalyzeExternal>false</DisableAnalyzeExternal>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;_UNICODE;UNICODE;</PreprocessorDefinitions>
+      <SDLCheck>true</SDLCheck>
+      <LinkCompiled>true</LinkCompiled>
+      <AdditionalIncludeDirectories>;D:\GitHub\ServerEngine\vcpkg_installed;\x64-windows\include</AdditionalIncludeDirectories>
+    </ClCompile>
     <ClCompile Include="Content\Object\BaseObject.cpp" />
-    <ClCompile Include="Content\Service\LootTableService.cpp" />
     <ClCompile Include="Main\main.cpp">
       <RuntimeLibrary>MultiThreadedDebugDll</RuntimeLibrary>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -327,27 +403,27 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Content\Component\BaseComponent.h" />
-    <ClInclude Include="Content\Component\HealthComponent.h" />
-    <ClInclude Include="Content\Component\InteractComponent.h" />
-    <ClInclude Include="Content\Component\InventoryComponent.h" />
-    <ClInclude Include="Content\Component\WalletComponent.h" />
-    <ClInclude Include="Content\Enum\DamageTypes.h" />
-    <ClInclude Include="Content\Enum\InteractTypes.h" />
-    <ClInclude Include="Content\Enum\ItemTypes.h" />
-    <ClInclude Include="Content\Enum\LootTypes.h" />
-    <ClInclude Include="Content\Enum\WalletTypes.h" />
-    <ClInclude Include="Content\Interface\IDamageable.h" />
-    <ClInclude Include="Content\Interface\IInteractable.h" />
-    <ClInclude Include="Content\Interface\IInventoryOwner.h" />
-    <ClInclude Include="Content\Interface\IWalletOwner.h" />
+    <ClInclude Include="Content\Gameplay\Combat\DamageTypes.h" />
+    <ClInclude Include="Content\Gameplay\Combat\HealthComponent.h" />
+    <ClInclude Include="Content\Gameplay\Combat\IDamageable.h" />
+    <ClInclude Include="Content\Gameplay\Economy\IWalletOwner.h" />
+    <ClInclude Include="Content\Gameplay\Economy\WalletComponent.h" />
+    <ClInclude Include="Content\Gameplay\Economy\WalletTypes.h" />
+    <ClInclude Include="Content\Gameplay\Interaction\IInteractable.h" />
+    <ClInclude Include="Content\Gameplay\Interaction\InteractComponent.h" />
+    <ClInclude Include="Content\Gameplay\Interaction\InteractTypes.h" />
+    <ClInclude Include="Content\Gameplay\Inventory\IInventoryOwner.h" />
+    <ClInclude Include="Content\Gameplay\Inventory\InventoryComponent.h" />
+    <ClInclude Include="Content\Gameplay\Inventory\ItemTypes.h" />
+    <ClInclude Include="Content\Gameplay\Loot\LootTableSchema.h" />
+    <ClInclude Include="Content\Gameplay\Loot\LootTableService.h" />
+    <ClInclude Include="Content\Gameplay\Loot\LootTypes.h" />
     <ClInclude Include="Content\Object\BaseObject.h" />
     <ClInclude Include="Content\Object\ObjectEnum.h" />
     <ClInclude Include="Content\Object\ObjectHandle.h" />
     <ClInclude Include="Content\Object\ObjectId.h" />
     <ClInclude Include="Content\Object\ObjectManager.h" />
-    <ClInclude Include="Content\Service\LootTableSchema.h" />
-    <ClInclude Include="Content\Service\LootTableService.h" />
+    <ClInclude Include="Content\Shared\BaseComponent.h" />
     <ClInclude Include="Network\Session\PlayerSession.h" />
     <ClInclude Include="Network\Session\SessionManager\SessionManager.h" />
     <ClInclude Include="Utils\pch.h" />

@@ -1,6 +1,6 @@
 ﻿#pragma once
-#include "Content/Enum/ItemTypes.h"
-#include "Content/Enum/WalletTypes.h"
+#include "Content/Gameplay/Inventory/ItemTypes.h"
+#include "Content/Gameplay/Economy/WalletTypes.h"
 #include <vector>
 
 struct ItemStack;

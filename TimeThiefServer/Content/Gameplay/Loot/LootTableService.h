@@ -1,5 +1,5 @@
 ﻿#pragma once
-#include "Content/Enum/LootTypes.h"
+#include "Content/Gameplay/Loot/LootTypes.h"
 #include "Runtime/Config/IConfigLoader.h"
 #include "LootTableSchema.h"
 #include <string>

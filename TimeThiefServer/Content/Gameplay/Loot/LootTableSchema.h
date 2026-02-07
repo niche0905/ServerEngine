@@ -1,7 +1,7 @@
 ﻿#pragma once
-#include "Content/Enum/ItemTypes.h"
-#include "Content/Enum/WalletTypes.h"
-#include "Content/Enum/LootTypes.h"
+#include "Content/Gameplay/Inventory/ItemTypes.h"
+#include "Content/Gameplay/Economy/WalletTypes.h"
+#include "Content/Gameplay/Loot/LootTypes.h"
 #include <string>
 #include <vector>
 
