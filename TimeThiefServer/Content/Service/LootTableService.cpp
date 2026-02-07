@@ -27,7 +27,15 @@ namespace
    
    inline double AsF64(const Json::Value& v, double def = 0.0)
    {
-      return v.isDouble() ? v.asDouble() : (v.isInt64() ? static_cast<double>(v.asInt()) : def);
+      return v.isDouble() ? v.asDouble() : (v.isInt() ? static_cast<double>(v.asInt()) : def);
+      
+      // THINK: 아래로 변경...??
+      // if (v.isDouble()) return v.asDouble();
+      // if (v.isInt()) return static_cast<double>(v.asInt());
+      // if (v.isInt64()) return static_cast<double>(v.asInt64());
+      // if (v.isUInt()) return static_cast<double>(v.asUInt());
+      // if (v.isUInt64()) return static_cast<double>(v.asUInt64());
+      // return def;
    }
    
    inline std::string AsString(const Json::Value& v, std::string def = {})
@@ -69,8 +77,9 @@ namespace
          
          if (Has(rr, "max"))
             range.max = AsI64(rr["max"], range.max);
-         
       }
+      
+      return range;
    }
    
    inline Chance ReadChance(const Json::Value& obj, const char* key, double def = 1.0)
@@ -247,6 +256,7 @@ LootBundle LootTableService::Roll(int32 tableId, uint32 rngSeed, const LootRollC
    
    Random32 rng{rngSeed};
    
+   std::vector<int32> picked;
    for (const auto& group : table.groups) {
       
       if (not rng.Chance(group.chance.value))
@@ -256,9 +266,9 @@ LootBundle LootTableService::Roll(int32 tableId, uint32 rngSeed, const LootRollC
       if (k <= 0)
          continue;   // 선택 개수 없음
       
-      std::vector<int32> picked;
+      picked.clear();
       ChooseManyIndicesByWeight(static_cast<int32>(group.entries.size()), k, group.allowDuplicates, 
-         [&](int32 i) { return group.entries[static_cast<int32>(i)].weight; },
+         [&](int32 i) { return group.entries[static_cast<size_t>(i)].weight; },
          rng, picked);
       
       for (int32 idx : picked) {
