@@ -14,5 +14,5 @@ struct LootSourceContext
 struct LootSourceResult
 {
    bool generated{false};
-   LootBundle bundles;
+   LootBundle bundle;
 };
