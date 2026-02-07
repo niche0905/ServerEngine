@@ -415,6 +415,7 @@
     <ClInclude Include="Content\Gameplay\Inventory\IInventoryOwner.h" />
     <ClInclude Include="Content\Gameplay\Inventory\InventoryComponent.h" />
     <ClInclude Include="Content\Gameplay\Inventory\ItemTypes.h" />
+    <ClInclude Include="Content\Gameplay\Loot\ILootSource.h" />
     <ClInclude Include="Content\Gameplay\Loot\LootSourceTypes.h" />
     <ClInclude Include="Content\Gameplay\Loot\LootTableSchema.h" />
     <ClInclude Include="Content\Gameplay\Loot\LootTableService.h" />
