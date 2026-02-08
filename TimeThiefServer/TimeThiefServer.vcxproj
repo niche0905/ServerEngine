@@ -407,6 +407,7 @@
     <ClInclude Include="Content\Gameplay\Combat\HealthComponent.h" />
     <ClInclude Include="Content\Gameplay\Combat\IDamageable.h" />
     <ClInclude Include="Content\Gameplay\Drop\DropTypes.h" />
+    <ClInclude Include="Content\Gameplay\Drop\IDropOnDeathOwner.h" />
     <ClInclude Include="Content\Gameplay\Economy\IWalletOwner.h" />
     <ClInclude Include="Content\Gameplay\Economy\WalletComponent.h" />
     <ClInclude Include="Content\Gameplay\Economy\WalletTypes.h" />
