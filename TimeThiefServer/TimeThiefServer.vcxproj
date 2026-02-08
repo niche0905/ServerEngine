@@ -415,6 +415,7 @@
     <ClInclude Include="Content\Gameplay\Economy\WalletTypes.h" />
     <ClInclude Include="Content\Gameplay\Effects\EffectTypes.h" />
     <ClInclude Include="Content\Gameplay\Effects\IEffect.h" />
+    <ClInclude Include="Content\Gameplay\Effects\IEffectOwner.h" />
     <ClInclude Include="Content\Gameplay\Interaction\IInteractable.h" />
     <ClInclude Include="Content\Gameplay\Interaction\InteractComponent.h" />
     <ClInclude Include="Content\Gameplay\Interaction\InteractTypes.h" />
