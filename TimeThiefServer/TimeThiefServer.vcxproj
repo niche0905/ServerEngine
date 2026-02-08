@@ -406,6 +406,7 @@
     <ClInclude Include="Content\Gameplay\Combat\DamageTypes.h" />
     <ClInclude Include="Content\Gameplay\Combat\HealthComponent.h" />
     <ClInclude Include="Content\Gameplay\Combat\IDamageable.h" />
+    <ClInclude Include="Content\Gameplay\Cooldown\CooldownComponent.h" />
     <ClInclude Include="Content\Gameplay\Cooldown\CooldownTypes.h" />
     <ClInclude Include="Content\Gameplay\Drop\DropOnDeathComponent.h" />
     <ClInclude Include="Content\Gameplay\Drop\DropSpawnService.h" />
