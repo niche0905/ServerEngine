@@ -14,7 +14,7 @@ enum class DropReason : uint8
     Script,
 };
 
-struct DropPolicy
+struct DropOnDeathPolicy
 {
     DropMode mode{DropMode::CorpseBox};     // 드롭 모드: 기본은 시체 상자
     

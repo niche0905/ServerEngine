@@ -4,7 +4,7 @@
 #include "Content/Gameplay/Loot/LootTypes.h"
 
 class ObjectManager;
-class InvectoryComponent;
+class InventoryComponent;
 class WalletComponent;
 
 /*---------------------
@@ -19,7 +19,7 @@ class IDropOnDeathOwner
 public:
    virtual ~IDropOnDeathOwner() = default;
    
-   virtual InvectoryComponent& GetInventory() = 0;
+   virtual InventoryComponent& GetInventory() = 0;
    virtual WalletComponent& GetWallet() = 0;
    
    virtual bool IsConsumable(ItemId itemId) const = 0;
