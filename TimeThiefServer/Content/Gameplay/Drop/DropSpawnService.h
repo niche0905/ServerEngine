@@ -24,7 +24,8 @@ struct DropSpawnResult
    DropSpawnService
 ---------------------*/
 //
-// DropSpawnService
+// DropSpawnService는 드롭 생성 처리를 담당하는 서비스 클래스입니다.
+// DropSpawnPolicy에 따라 드롭을 생성합니다. (CorpseBox, Scatter 등)
 //
 
 class DropSpawnService
