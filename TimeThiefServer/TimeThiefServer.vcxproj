@@ -433,6 +433,7 @@
     <ClInclude Include="Content\Gameplay\Loot\LootTableService.h" />
     <ClInclude Include="Content\Gameplay\Loot\LootTypes.h" />
     <ClInclude Include="Content\Gameplay\Replication\ReplicatedState.h" />
+    <ClInclude Include="Content\Gameplay\Replication\ReplicationEvent.h" />
     <ClInclude Include="Content\Gameplay\Replication\ReplicationMask.h" />
     <ClInclude Include="Content\Gameplay\Replication\ReplicationTypes.h" />
     <ClInclude Include="Content\Gameplay\Spawn\IRespawnOwner.h" />
