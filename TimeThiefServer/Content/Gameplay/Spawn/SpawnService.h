@@ -2,7 +2,6 @@
 #include "SpawnTypes.h"
 #include "RespawnTypes.h"
 #include <unordered_map>
-#include <vector>
 
 class ObjectManager;
 struct SE::Math::Vector3;
@@ -52,5 +51,7 @@ private:
 private:
    ISpawnFactory& factory_;
    std::unordered_map<int32, SpawnPoint> spawnPoints_;      // 스폰 포인트 ID별 정의
+   
+   // TODO: 정적 데이터를 가리키는 것은 추후 생각
     
 };

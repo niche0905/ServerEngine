@@ -32,7 +32,6 @@ struct SpawnPoint
 {
     using Vector3 = SE::Math::Vector3;
     
-    int32 id{0};
     SpawnKind kind{SpawnKind::None};
     
     int32 templateId{0};
@@ -41,8 +40,6 @@ struct SpawnPoint
     
     SpawnMode mode{SpawnMode::FixedPoint};
     float radius{0.0f};             // SpawnMode가 Radius일 때 유효
-    
-    uint32 respawnDelayMs{0};       // 리스폰 지연 시간 (밀리초), 0이면 리스폰 안 함
     
     uint32 lifetimeMs{0};           // 생존 시간 (밀리초), 0이면 무한
     // float despawnDistance{0.0f};    // (미사용) 플레이어로부터 멀어지면 소멸 거리, 0이면 비활성화
