@@ -432,6 +432,7 @@
     <ClInclude Include="Content\Gameplay\Loot\LootTableSchema.h" />
     <ClInclude Include="Content\Gameplay\Loot\LootTableService.h" />
     <ClInclude Include="Content\Gameplay\Loot\LootTypes.h" />
+    <ClInclude Include="Content\Gameplay\Replication\InterestManager.h" />
     <ClInclude Include="Content\Gameplay\Replication\ReplicatedState.h" />
     <ClInclude Include="Content\Gameplay\Replication\ReplicationEvent.h" />
     <ClInclude Include="Content\Gameplay\Replication\ReplicationMask.h" />
