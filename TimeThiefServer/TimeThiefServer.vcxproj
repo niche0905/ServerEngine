@@ -244,6 +244,7 @@
       <LinkCompiled>true</LinkCompiled>
       <AdditionalIncludeDirectories>;D:\GitHub\ServerEngine\vcpkg_installed;\x64-windows\include</AdditionalIncludeDirectories>
     </ClCompile>
+    <ClCompile Include="Content\Gameplay\Replication\ReplicationSystem.cpp" />
     <ClCompile Include="Content\Gameplay\Spawn\SpawnService.cpp" />
     <ClCompile Include="Content\Object\BaseObject.cpp" />
     <ClCompile Include="Main\main.cpp">
@@ -436,6 +437,7 @@
     <ClInclude Include="Content\Gameplay\Replication\ReplicatedState.h" />
     <ClInclude Include="Content\Gameplay\Replication\ReplicationEvent.h" />
     <ClInclude Include="Content\Gameplay\Replication\ReplicationMask.h" />
+    <ClInclude Include="Content\Gameplay\Replication\ReplicationSystem.h" />
     <ClInclude Include="Content\Gameplay\Replication\ReplicationTypes.h" />
     <ClInclude Include="Content\Gameplay\Spawn\IRespawnOwner.h" />
     <ClInclude Include="Content\Gameplay\Spawn\ISpawnable.h" />

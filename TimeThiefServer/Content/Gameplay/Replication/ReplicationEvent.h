@@ -34,7 +34,7 @@ public:
     void Clear() { events_.clear(); }
     bool Empty() const { return events_.empty(); }
     
-    const std::vector<RepEvent>& GetEvents() const { return events_; }
+    const std::vector<RepEvent>& Events() const { return events_; }
     
 private:
     std::vector<RepEvent> events_;

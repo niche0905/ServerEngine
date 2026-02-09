@@ -12,5 +12,5 @@ struct ReplicatedState
     bool IsDirty() const { return dirtyMask != 0; }
     
     void MarkDirty(RepField f) { RepMaskSet(dirtyMask, f); }
-    void ClearDirty(RepField f) { dirtyMask = 0; }  // 전체 초기화
+    void ClearDirty() { dirtyMask = 0; }  // 전체 초기화
 };
