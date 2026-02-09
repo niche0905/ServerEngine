@@ -1,57 +1,48 @@
 ﻿#pragma once
 #include "SpawnTypes.h"
-#include "RespawnTypes.h"
 #include <unordered_map>
 
 class ObjectManager;
 struct SE::Math::Vector3;
-class ISpawnFactory;
 
 /*-----------------
    SpawnService
 -----------------*/
 //
-// SpawnService는 스폰 관련 기능을 제공하는 서비스입니다.
+// SpawnService는 Lifetime Despawn을 전담합니다
 //
 
 class SpawnService
 {
 public:
-   using Vector3 = SE::Math::Vector3;
+   using RoomId = uint32;
    
 public:
-   explicit SpawnService(ISpawnFactory& factory)
-      : factory_(factory)
+   explicit SpawnService(RoomId roomId)
+      : roomId_(roomId)
    {
    }
    
-   void AddSpawnPoint(const SpawnPoint& sp)
-   {
-      spawnPoints_[sp.id] = sp;
-   }
+   // 만료 상대 시간 기준 등록
+   void RegisterLifetimeMs(ObjectId obj, uint64 nowMs, uint32 lifetimeMs);
    
-   bool HasSpawnPoint(int32 id) const
-   {
-      return spawnPoints_.find(id) != spawnPoints_.end();
-   }
+   // 절대 시간 기준 등록
+   void RegisterLifetime(ObjectId obj, uint64 expireAtMs);
    
-   int32 InitialSpawn(ObjectManager& om, uint64 nowMs);
+   // OnDestroy(혹 OnPreDestroy) 시 호출
+   void Unregister(ObjectId obj);
    
+   // Room tick에서 호출
    void Update(ObjectManager& om, uint64 nowMs);
    
-   void NotifyDead(int32 spawnPointId, ObjectId obj, uint64 nowMs);
-   
-   int32 DespawnAll(ObjectManager& om, DespawnReason reason, uint64 nowMs);
+   // Room Reset 시 호출
+   void Clear();
    
 private:
-   bool TrySpawnOne(ObjectManager& om, const SpawnPoint& sp, uint64 nowMs);
-   void UpdateRespawn(ObjectManager& om, uint64 nowMs);
    void UpdateDespawn(ObjectManager& om, uint64 nowMs);
    
 private:
-   ISpawnFactory& factory_;
-   std::unordered_map<int32, SpawnPoint> spawnPoints_;      // 스폰 포인트 ID별 정의
+   RoomId roomId_;
+   std::unordered_map<ObjectId, SpawnMeta> meta_;
    
-   // TODO: 정적 데이터를 가리키는 것은 추후 생각
-    
 };
