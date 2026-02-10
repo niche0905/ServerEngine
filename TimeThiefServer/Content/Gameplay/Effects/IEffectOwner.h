@@ -19,14 +19,12 @@ class IEffectOwner
 public:
     virtual ~IEffectOwner() = default;
     
-    virtual ObjectId GetId() const = 0;
-    
     virtual EffectComponent& GetEffectComponent() = 0;
     
     virtual HealthComponent* TryGetHealth() = 0;        // 체력 컴포넌트 (있을 수도 있고 없을 수도 있음)
     
     // MEMO: 필요해지면 점진적으로 추가
     
-    virtual void OnEffectChanged() {};
+    virtual void OnEffectChanged() {}
     
 };
