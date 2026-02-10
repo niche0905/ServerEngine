@@ -13,7 +13,7 @@ class ObjectManager;
 // HeathComponent는 객체의 체력을 관리하는 컴포넌트입니다.
 //
 
-class HeathComponent : public BaseComponent
+class HealthComponent : public BaseComponent
 {
 public:
     void Init(ObjectId owner, int32 maxHp, int32 startHp = -1)
