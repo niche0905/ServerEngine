@@ -72,7 +72,7 @@ void MonsterPawn::OnPreDestroy()
    // ex) brain detach, 드랍 정리 등
 }
 
-void MonsterPawn::OnDeath(const DamageResult& dmgResult)
+void MonsterPawn::OnDeath(ObjectManager& om, const DamageResult& dmgResult)
 {
    (void)dmgResult;
    // 죽음 상태로 전환

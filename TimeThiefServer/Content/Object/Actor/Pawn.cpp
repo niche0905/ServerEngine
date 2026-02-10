@@ -83,8 +83,9 @@ void Pawn::Tick(float dt)
    IntergrateMove(dt);
 }
 
-void Pawn::OnDeath(const DamageResult& dmgResult)
+void Pawn::OnDeath(ObjectManager& om, const DamageResult& dmgResult)
 {
+   (void)om;
    (void)dmgResult;
    // 기본적으로 아무 작업도 하지 않음
    // 파생 클래스에서 필요에 따라 재정의 (DropOnDeath, RespawnSchedule 등)

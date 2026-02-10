@@ -66,7 +66,7 @@ protected:
    virtual void OnPreDestroy() override;
    
 protected:
-   virtual void OnDeath(const DamageResult& dmgResult) override;
+   virtual void OnDeath(ObjectManager& om, const DamageResult& dmgResult) override;
    virtual bool ShouldRequestDestroyOnDeath() const override { return false; }
    // 죽은 상태 유지 후 리스폰 하도록 (Destroy 요청하지 않음)
    
