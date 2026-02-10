@@ -1,6 +1,7 @@
 ﻿#pragma once
 #include "Pawn.h"
-#include "Content/Gameplay/Drop/DropOnDeathComponent.h"
+#include "Content/Gameplay/Loot/ILootSource.h"
+#include "Content/Gameplay/Loot/LootSourceComponent.h"
 #include "Content/Gameplay/Spawn/RespawnComponent.h"
 
 class ObjectManager;
@@ -19,7 +20,7 @@ class BTBrain;
 
 class MonsterPawn : public Pawn
                   , public IRespawnOwner
-                  , public IDropOnDeathOwner
+                  , public ILootSource
 {
 public:
    MonsterPawn() = default;
@@ -49,12 +50,9 @@ public:
    virtual void ApplyRespawnToWorld(ObjectManager& om, const Vector3& pos) override;
    virtual void GrantSpawnInvulnerability(ObjectManager& om, uint32 durationMs) override;
    
-// TODO: Drop 시스템을 손봐야 할 듯 싶다 (Inventory 기반 vs Loot 기반 정리 필요)
 public:
-   virtual InventoryComponent& GetInventory() override;
-   virtual WalletComponent& GetWallet() override;
-   
-   virtual bool IsConsumable(ItemId itemId) const = 0;
+   virtual bool CanGenerateLoot() const override { return loot_.CanGenerateLoot(); }
+   virtual LootSourceResult GenerateLoot(ObjectManager& om, LootTableService& service, const LootSourceContext& ctx) override;
    
 public:
    // Update 룰에 따라 처리 (룸 Tick, 혹은 Pawn Tick)
@@ -81,6 +79,6 @@ private:
    BTBrain* brain_{ nullptr };
    
    RespawnComponent respawn_;
-   DropOnDeathComponent drop_;
+   LootSourceComponent loot_;
     
 };

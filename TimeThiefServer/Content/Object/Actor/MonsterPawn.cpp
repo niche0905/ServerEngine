@@ -37,6 +37,11 @@ void MonsterPawn::GrantSpawnInvulnerability(ObjectManager& om, uint32 durationMs
    (void)durationMs;
 }
 
+LootSourceResult MonsterPawn::GenerateLoot(ObjectManager& om, LootTableService& service, const LootSourceContext& ctx)
+{
+   return loot_.GenerateLoot(om, service, ctx);
+}
+
 void MonsterPawn::UpdateAI(ObjectManager& om, float dt)
 {
    if (IsDead())
@@ -52,7 +57,7 @@ void MonsterPawn::OnSpawn()
    Pawn::OnSpawn();
 
    respawn_.Init(GetId(), RespawnPolicy{});
-   drop_.Init(GetId(), DropOnDeathPolicy{});
+   loot_.Init(GetId(), 0);
    
    SetDead(false);
 }
@@ -86,8 +91,8 @@ void MonsterPawn::StartDeadState(ObjectManager& om, const DamageResult& dmgResul
    // 죽음 처리
    SetVelocity(Vector3{}); // 정지
    
-   // TODO: Drop 시스템 개편 후 처리
-   drop_.Generate(om, *this, DropOnDeathContext{});
+   // TODO: Service를 받아오고, ctx 채우기... 여러가지 정보를 더 얻어와야 함
+   // GenerateLoot(om, service, ctx);
    
    // TODO: om에 GetTimeMs 필요 or 인자로 nowMs 전달 필요
    // ScheduleRespawn(om, om.GetTimeMs());
