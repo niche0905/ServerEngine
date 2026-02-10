@@ -249,6 +249,7 @@
     <ClCompile Include="Content\Object\Actor\Actor.cpp" />
     <ClCompile Include="Content\Object\Actor\MonsterPawn.cpp" />
     <ClCompile Include="Content\Object\Actor\Pawn.cpp" />
+    <ClCompile Include="Content\Object\Actor\PlayerPawn.cpp" />
     <ClCompile Include="Content\Object\Actor\StaticActor.cpp" />
     <ClCompile Include="Content\Object\BaseObject.cpp" />
     <ClCompile Include="Main\main.cpp">
@@ -454,6 +455,7 @@
     <ClInclude Include="Content\Object\Actor\Actor.h" />
     <ClInclude Include="Content\Object\Actor\MonsterPawn.h" />
     <ClInclude Include="Content\Object\Actor\Pawn.h" />
+    <ClInclude Include="Content\Object\Actor\PlayerPawn.h" />
     <ClInclude Include="Content\Object\Actor\StaticActor.h" />
     <ClInclude Include="Content\Object\BaseObject.h" />
     <ClInclude Include="Content\Object\ObjectEnum.h" />
