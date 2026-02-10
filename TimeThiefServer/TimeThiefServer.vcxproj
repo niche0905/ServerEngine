@@ -254,6 +254,7 @@
     <ClCompile Include="Content\Object\Actor\PlayerPawn.cpp" />
     <ClCompile Include="Content\Object\Actor\ProjectileActor.cpp" />
     <ClCompile Include="Content\Object\Actor\StaticActor.cpp" />
+    <ClCompile Include="Content\Object\Actor\WorldItemActor.cpp" />
     <ClCompile Include="Content\Object\BaseObject.cpp" />
     <ClCompile Include="Main\main.cpp">
       <RuntimeLibrary>MultiThreadedDebugDll</RuntimeLibrary>
@@ -464,6 +465,7 @@
     <ClInclude Include="Content\Object\Actor\PlayerPawn.h" />
     <ClInclude Include="Content\Object\Actor\ProjectileActor.h" />
     <ClInclude Include="Content\Object\Actor\StaticActor.h" />
+    <ClInclude Include="Content\Object\Actor\WorldItemActor.h" />
     <ClInclude Include="Content\Object\BaseObject.h" />
     <ClInclude Include="Content\Object\ObjectEnum.h" />
     <ClInclude Include="Content\Object\ObjectHandle.h" />
