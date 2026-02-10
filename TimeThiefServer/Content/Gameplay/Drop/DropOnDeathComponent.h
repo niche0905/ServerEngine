@@ -105,7 +105,7 @@ public:
       
       if (not totals.empty()) {
          ItemChangeContext ictx{};
-         ictx = ItemChangeReason::DropOnDeath;
+         ictx.reason = ItemChangeReason::DropOnDeath;
          
          for (auto& [itemId, count] : totals) {
             if (itemId == 0 or count <= 0) continue;
