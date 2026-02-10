@@ -141,6 +141,36 @@ public:
       return RemoveItem(om, itemId, count, ctx);
    }
    
+   InventoryOpResult RemoveItemSlot(ObjectManager& om, int32 slotIndex, int32 count, const ItemChangeContext& ctx)
+   {
+      InventoryOpResult result;
+      if (slotIndex < 0 or slotIndex >= capacity_) { result.code = InventoryOpCode::InvalidItem; return result; }
+      if (count <= 0) { result.code = InventoryOpCode::InvalidCount; return result; }
+      
+      auto& slot = slots_[static_cast<size_t>(slotIndex)];
+      if (not slot.IsValid()) {
+         result.code = InventoryOpCode::NotFound;
+         return result;
+      }
+      
+      if (slot.count < count) {
+         result.code = InventoryOpCode::NotEnough;
+         return result;
+      }
+      
+      slot.count -= count;
+      if (slot.count == 0) {
+         slot.id = 0;
+      }
+      
+      result.code = InventoryOpCode::Ok;
+      result.delta = ItemStack{ slot.id, -count };
+      
+      result.accepted = true;
+      
+      return result;
+   }
+   
    void Clear()
    {
       for (auto& slot : slots_) {
