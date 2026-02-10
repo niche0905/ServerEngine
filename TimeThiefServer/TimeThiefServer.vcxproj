@@ -248,6 +248,7 @@
     <ClCompile Include="Content\Gameplay\Spawn\SpawnService.cpp" />
     <ClCompile Include="Content\Object\Actor\Actor.cpp" />
     <ClCompile Include="Content\Object\Actor\Pawn.cpp" />
+    <ClCompile Include="Content\Object\Actor\StaticActor.cpp" />
     <ClCompile Include="Content\Object\BaseObject.cpp" />
     <ClCompile Include="Main\main.cpp">
       <RuntimeLibrary>MultiThreadedDebugDll</RuntimeLibrary>
@@ -451,6 +452,7 @@
     <ClInclude Include="Content\Gameplay\Spawn\SpawnTypes.h" />
     <ClInclude Include="Content\Object\Actor\Actor.h" />
     <ClInclude Include="Content\Object\Actor\Pawn.h" />
+    <ClInclude Include="Content\Object\Actor\StaticActor.h" />
     <ClInclude Include="Content\Object\BaseObject.h" />
     <ClInclude Include="Content\Object\ObjectEnum.h" />
     <ClInclude Include="Content\Object\ObjectHandle.h" />
