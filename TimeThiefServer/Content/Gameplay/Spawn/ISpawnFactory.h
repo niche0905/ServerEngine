@@ -19,6 +19,7 @@ public:
 public:
     virtual ~ISpawnFactory() = default;
     
-    virtual SpawnResult Spawn(ObjectManager& om, const SpawnRequest& req, const Vector3& position, uint64 nowMs) = 0;
+    // TODO: fix
+    // virtual SpawnResult Spawn(ObjectManager& om, const SpawnRequest& req, const Vector3& position, uint64 nowMs) = 0;
     
 };

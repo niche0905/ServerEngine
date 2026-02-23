@@ -44,7 +44,7 @@ private:
    void IntegratePhysics(float dt);
    float QueryGroundHeight(ObjectManager& om, const Vector3& pos) const;
    
-   void TrySleep(float dt;
+   void TrySleep(float dt);
    
 private:
    ItemStack stack_{};

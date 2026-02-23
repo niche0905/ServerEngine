@@ -78,7 +78,7 @@ void SpawnService::UpdateDespawn(ObjectManager& om, uint64 nowMs)
       const ObjectId obj = it->first;
       const uint64 expireAt = it->second.expireAtMs;
       
-      if (not IsValidObject(om, obj) {
+      if (not IsValidObject(om, obj)) {
          it = meta_.erase(it);
          continue;
       }

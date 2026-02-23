@@ -14,12 +14,9 @@ struct SE::Math::Vector3;
 class IRespawnOwner
 {
 public:
-   using Vector3 = SE::Math::Vector3;
-   
-public:
    virtual ~IRespawnOwner() = default;
    
-   virtual Vector3 ResolveRespawnPosition(ObjectManager& om) = 0;
+   virtual SE::Math::Vector3 ResolveRespawnPosition(ObjectManager& om) = 0;
    
    // 리스폰 직전에 호출됩니다.
    virtual void OnPreRespawn(ObjectManager& om) = 0;
@@ -28,7 +25,7 @@ public:
    virtual void OnPostRespawn(ObjectManager& om) = 0;
    
    // 월드 반영
-   virtual void ApplyRespawnToWorld(ObjectManager& om, const Vector3& pos) = 0;
+   virtual void ApplyRespawnToWorld(ObjectManager& om, const SE::Math::Vector3& pos) = 0;
    
    // 리스폰 무적 부여
    virtual void GrantSpawnInvulnerability(ObjectManager& om, uint32 durationMs) = 0;

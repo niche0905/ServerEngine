@@ -33,7 +33,7 @@ DamageResult Pawn::ApplyDamage(ObjectManager& om, int32 amount, const DamageCont
    
    if (not health_.IsAlive() and not isDead_) {
       isDead_ = true;
-      OnDeath(result);
+      OnDeath(om, result);
       
       if (ShouldRequestDestroyOnDeath())
       {

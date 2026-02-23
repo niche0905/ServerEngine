@@ -29,3 +29,15 @@ struct ObjectId
     bool operator==(const ObjectId& other) const { return value == other.value; }
     bool operator!=(const ObjectId& other) const { return value != other.value; }
 };
+
+namespace std
+{
+    template <>
+    struct hash<ObjectId>
+    {
+        size_t operator()(const ObjectId& id) const noexcept
+        {
+            return std::hash<uint32>{}(id.value);
+        }
+    };
+}

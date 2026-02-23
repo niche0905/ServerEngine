@@ -23,7 +23,7 @@ struct LootBundle
     std::vector<MoneyDrop> money;
     
     bool Empty() const { return items.empty() and money.empty(); }
-    void Clear() { items.clear() and money.clear(); }
+    void Clear() { items.clear(); money.clear(); }
     
     void AddItem(ItemId id, int32 count)
     {
