@@ -239,8 +239,8 @@
     <ClInclude Include="Runtime\Config\IConfigLoader.h" />
     <ClInclude Include="Runtime\Config\JsonConfigLoader.h" />
     <ClInclude Include="Utils\Container.h" />
-    <ClInclude Include="Utils\Log\ConsoleColor.h" />
-    <ClInclude Include="Utils\Log\ConsoleLogger.h" />
+    <ClInclude Include="Utils\Logger\ConsoleColor.h" />
+    <ClInclude Include="Utils\Logger\ConsoleLogger.h" />
     <ClInclude Include="Utils\ObjectPool\ExternalPool.h" />
     <ClInclude Include="Utils\ObjectPool\IntrusivePool.h" />
     <ClInclude Include="Utils\ObjectPool\PoolObject.h" />
@@ -1818,7 +1818,7 @@
     <ClCompile Include="Physics\Narrowphase\Sphere_CharacterCapsule.cpp" />
     <ClCompile Include="Physics\Narrowphase\Sphere_Sphere.cpp" />
     <ClCompile Include="Runtime\Config\JsonConfigLoader.cpp" />
-    <ClCompile Include="Utils\Log\ConsoleLogger.cpp">
+    <ClCompile Include="Utils\Logger\ConsoleLogger.cpp">
       <RuntimeLibrary>MultiThreadedDebugDll</RuntimeLibrary>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <Optimization>Disabled</Optimization>
