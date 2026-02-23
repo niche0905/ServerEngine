@@ -72,43 +72,38 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <OutDir>$(SolutionDir)Libraries\Libs\ServerEngineLib\$(Configuration)\</OutDir>
-    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);$(ProjectDir);$(ProjectDir)Core\PCH;$(SolutionDir)vcpkg_installed\x64-windows-static\include</IncludePath>
+    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);$(ProjectDir);$(ProjectDir)Core\PCH;$(SolutionDir)vcpkg_installed\x64-windows\include</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <OutDir>$(SolutionDir)Libraries\Libs\ServerEngineLib\$(Configuration)\</OutDir>
-    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);$(ProjectDir);$(ProjectDir)Core\PCH;$(SolutionDir)vcpkg_installed\x64-windows-static\include</IncludePath>
+    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);$(ProjectDir);$(ProjectDir)Core\PCH;$(SolutionDir)vcpkg_installed\x64-windows\include</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <OutDir>$(SolutionDir)Libraries\Libs\ServerEngineLib\$(Configuration)\</OutDir>
-    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);$(ProjectDir);$(ProjectDir)Core\PCH;$(SolutionDir)vcpkg_installed\x64-windows-static\include</IncludePath>
+    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);$(ProjectDir);$(ProjectDir)Core\PCH;$(SolutionDir)vcpkg_installed\x64-windows\include</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <OutDir>$(SolutionDir)Libraries\Libs\ServerEngineLib\$(Configuration)\</OutDir>
-    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);$(ProjectDir);$(ProjectDir)Core\PCH;$(SolutionDir)vcpkg_installed\x64-windows-static\include</IncludePath>
+    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);$(ProjectDir);$(ProjectDir)Core\PCH;$(SolutionDir)vcpkg_installed\x64-windows\include</IncludePath>
   </PropertyGroup>
   <PropertyGroup Label="Vcpkg" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <VcpkgInstalledDir>$(SolutionDir)vcpkg_installed</VcpkgInstalledDir>
     <VcpkgTriplet>x64-windows-static</VcpkgTriplet>
-    <VcpkgConfiguration>Release</VcpkgConfiguration>
   </PropertyGroup>
   <PropertyGroup Label="Vcpkg" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <VcpkgInstalledDir>$(SolutionDir)vcpkg_installed</VcpkgInstalledDir>
-    <VcpkgTriplet>x64-windows-static</VcpkgTriplet>
+    <VcpkgTriplet>x64-windows</VcpkgTriplet>
   </PropertyGroup>
   <PropertyGroup Label="Vcpkg" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <VcpkgInstalledDir>$(SolutionDir)vcpkg_installed</VcpkgInstalledDir>
     <VcpkgTriplet>x64-windows-static</VcpkgTriplet>
-    <VcpkgConfiguration>Release</VcpkgConfiguration>
   </PropertyGroup>
   <PropertyGroup Label="Vcpkg" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <VcpkgInstalledDir>$(SolutionDir)vcpkg_installed</VcpkgInstalledDir>
-    <VcpkgTriplet>x64-windows-static</VcpkgTriplet>
+    <VcpkgTriplet>x64-windows</VcpkgTriplet>
   </PropertyGroup>
   <PropertyGroup>
     <RootNamespace>ServerEngineLib</RootNamespace>
-  </PropertyGroup>
-  <PropertyGroup Label="Vcpkg">
-    <VcpkgEnableManifest>true</VcpkgEnableManifest>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -328,7 +323,6 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;_UNICODE;UNICODE;</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
       <LibCompiled>true</LibCompiled>
-      <AdditionalIncludeDirectories>;..\vcpkg_installed\x64-windows-static\include</AdditionalIncludeDirectories>
     </ClCompile>
     <ClCompile Include="Core\IoCore\IocpCore\IocpCore.cpp">
       <RuntimeLibrary>MultiThreadedDebugDll</RuntimeLibrary>
@@ -405,7 +399,6 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;_UNICODE;UNICODE;</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
       <LibCompiled>true</LibCompiled>
-      <AdditionalIncludeDirectories>;..\vcpkg_installed\x64-windows-static\include</AdditionalIncludeDirectories>
     </ClCompile>
     <ClCompile Include="Core\IoCore\RioCore\RioCore.cpp">
       <RuntimeLibrary>MultiThreadedDebugDll</RuntimeLibrary>
@@ -482,7 +475,6 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;_UNICODE;UNICODE;</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
       <LibCompiled>true</LibCompiled>
-      <AdditionalIncludeDirectories>;..\vcpkg_installed\x64-windows-static\include</AdditionalIncludeDirectories>
     </ClCompile>
     <ClCompile Include="Core\PCH\CorePch.cpp">
       <RuntimeLibrary>MultiThreadedDebugDll</RuntimeLibrary>
@@ -559,7 +551,6 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;_UNICODE;UNICODE;</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
       <LibCompiled>true</LibCompiled>
-      <AdditionalIncludeDirectories>;..\vcpkg_installed\x64-windows-static\include</AdditionalIncludeDirectories>
     </ClCompile>
     <ClCompile Include="Core\PCH\pch.cpp">
       <RuntimeLibrary>MultiThreadedDebugDll</RuntimeLibrary>
@@ -636,7 +627,6 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;_UNICODE;UNICODE;</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
       <LibCompiled>true</LibCompiled>
-      <AdditionalIncludeDirectories>;..\vcpkg_installed\x64-windows-static\include</AdditionalIncludeDirectories>
     </ClCompile>
     <ClCompile Include="Core\Service\IOCP\IocpServerService.cpp">
       <RuntimeLibrary>MultiThreadedDebugDll</RuntimeLibrary>
@@ -713,7 +703,6 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;_UNICODE;UNICODE;</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
       <LibCompiled>true</LibCompiled>
-      <AdditionalIncludeDirectories>;..\vcpkg_installed\x64-windows-static\include</AdditionalIncludeDirectories>
     </ClCompile>
     <ClCompile Include="Core\Service\IOCP\IocpService.cpp">
       <RuntimeLibrary>MultiThreadedDebugDll</RuntimeLibrary>
@@ -790,7 +779,6 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;_UNICODE;UNICODE;</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
       <LibCompiled>true</LibCompiled>
-      <AdditionalIncludeDirectories>;..\vcpkg_installed\x64-windows-static\include</AdditionalIncludeDirectories>
     </ClCompile>
     <ClCompile Include="Core\Service\ServiceBase.cpp">
       <RuntimeLibrary>MultiThreadedDebugDll</RuntimeLibrary>
@@ -867,7 +855,6 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;_UNICODE;UNICODE;</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
       <LibCompiled>true</LibCompiled>
-      <AdditionalIncludeDirectories>;..\vcpkg_installed\x64-windows-static\include</AdditionalIncludeDirectories>
     </ClCompile>
     <ClCompile Include="Core\Thread\ThreadLocalStorage.cpp" />
     <ClCompile Include="Core\Thread\ThreadManager.cpp">
@@ -945,7 +932,6 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;_UNICODE;UNICODE;</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
       <LibCompiled>true</LibCompiled>
-      <AdditionalIncludeDirectories>;..\vcpkg_installed\x64-windows-static\include</AdditionalIncludeDirectories>
     </ClCompile>
     <ClCompile Include="Network\Address\NetworkAddress.cpp">
       <RuntimeLibrary>MultiThreadedDebugDll</RuntimeLibrary>
@@ -1022,7 +1008,6 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;_UNICODE;UNICODE;</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
       <LibCompiled>true</LibCompiled>
-      <AdditionalIncludeDirectories>;..\vcpkg_installed\x64-windows-static\include</AdditionalIncludeDirectories>
     </ClCompile>
     <ClCompile Include="Network\Buffer\CirculationBuffer\CirculationBuffer.cpp">
       <RuntimeLibrary>MultiThreadedDebugDll</RuntimeLibrary>
@@ -1099,7 +1084,6 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;_UNICODE;UNICODE;</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
       <LibCompiled>true</LibCompiled>
-      <AdditionalIncludeDirectories>;..\vcpkg_installed\x64-windows-static\include</AdditionalIncludeDirectories>
     </ClCompile>
     <ClCompile Include="Network\Buffer\LinearBuffer\LinearBuffer.cpp">
       <RuntimeLibrary>MultiThreadedDebugDll</RuntimeLibrary>
@@ -1176,7 +1160,6 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;_UNICODE;UNICODE;</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
       <LibCompiled>true</LibCompiled>
-      <AdditionalIncludeDirectories>;..\vcpkg_installed\x64-windows-static\include</AdditionalIncludeDirectories>
     </ClCompile>
     <ClCompile Include="Network\Buffer\SendBuffer.cpp">
       <RuntimeLibrary>MultiThreadedDebugDll</RuntimeLibrary>
@@ -1253,7 +1236,6 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;_UNICODE;UNICODE;</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
       <LibCompiled>true</LibCompiled>
-      <AdditionalIncludeDirectories>;..\vcpkg_installed\x64-windows-static\include</AdditionalIncludeDirectories>
     </ClCompile>
     <ClCompile Include="Network\Event\IOCP\IocpEvent.cpp">
       <RuntimeLibrary>MultiThreadedDebugDll</RuntimeLibrary>
@@ -1330,7 +1312,6 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;_UNICODE;UNICODE;</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
       <LibCompiled>true</LibCompiled>
-      <AdditionalIncludeDirectories>;..\vcpkg_installed\x64-windows-static\include</AdditionalIncludeDirectories>
     </ClCompile>
     <ClCompile Include="Network\Event\RIO\RioEvent.cpp">
       <RuntimeLibrary>MultiThreadedDebugDll</RuntimeLibrary>
@@ -1407,7 +1388,6 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;_UNICODE;UNICODE;</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
       <LibCompiled>true</LibCompiled>
-      <AdditionalIncludeDirectories>;..\vcpkg_installed\x64-windows-static\include</AdditionalIncludeDirectories>
     </ClCompile>
     <ClCompile Include="Network\Session\IOCP\IocpSession.cpp">
       <RuntimeLibrary>MultiThreadedDebugDll</RuntimeLibrary>
@@ -1484,7 +1464,6 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;_UNICODE;UNICODE;</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
       <LibCompiled>true</LibCompiled>
-      <AdditionalIncludeDirectories>;..\vcpkg_installed\x64-windows-static\include</AdditionalIncludeDirectories>
     </ClCompile>
     <ClCompile Include="Network\Session\Listener.cpp">
       <RuntimeLibrary>MultiThreadedDebugDll</RuntimeLibrary>
@@ -1561,7 +1540,6 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;_UNICODE;UNICODE;</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
       <LibCompiled>true</LibCompiled>
-      <AdditionalIncludeDirectories>;..\vcpkg_installed\x64-windows-static\include</AdditionalIncludeDirectories>
     </ClCompile>
     <ClCompile Include="Network\Session\PacketSession.cpp">
       <RuntimeLibrary>MultiThreadedDebugDll</RuntimeLibrary>
@@ -1638,7 +1616,6 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;_UNICODE;UNICODE;</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
       <LibCompiled>true</LibCompiled>
-      <AdditionalIncludeDirectories>;..\vcpkg_installed\x64-windows-static\include</AdditionalIncludeDirectories>
     </ClCompile>
     <ClCompile Include="Network\Session\SessionBase.cpp">
       <RuntimeLibrary>MultiThreadedDebugDll</RuntimeLibrary>
@@ -1715,7 +1692,6 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;_UNICODE;UNICODE;</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
       <LibCompiled>true</LibCompiled>
-      <AdditionalIncludeDirectories>;..\vcpkg_installed\x64-windows-static\include</AdditionalIncludeDirectories>
     </ClCompile>
     <ClCompile Include="Network\SocketUtils.cpp">
       <RuntimeLibrary>MultiThreadedDebugDll</RuntimeLibrary>
@@ -1792,7 +1768,6 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;_UNICODE;UNICODE;</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
       <LibCompiled>true</LibCompiled>
-      <AdditionalIncludeDirectories>;..\vcpkg_installed\x64-windows-static\include</AdditionalIncludeDirectories>
     </ClCompile>
     <ClCompile Include="Physics\Collider\AABBCollider.cpp" />
     <ClCompile Include="Physics\Collider\CapsuleCollider.cpp" />
@@ -1896,7 +1871,6 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;_UNICODE;UNICODE;</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
       <LibCompiled>true</LibCompiled>
-      <AdditionalIncludeDirectories>;..\vcpkg_installed\x64-windows-static\include</AdditionalIncludeDirectories>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1911,4 +1885,5 @@
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
+  <PropertyGroup Label="Vcpkg" />
 </Project>
