@@ -87,25 +87,28 @@
     <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);$(ProjectDir);$(ProjectDir)Core\PCH;$(SolutionDir)vcpkg_installed\x64-windows-static\include</IncludePath>
   </PropertyGroup>
   <PropertyGroup Label="Vcpkg" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <VcpkgInstalledDir>$(SolutionDir)vcpkg_installed;</VcpkgInstalledDir>
+    <VcpkgInstalledDir>$(SolutionDir)vcpkg_installed</VcpkgInstalledDir>
     <VcpkgTriplet>x64-windows-static</VcpkgTriplet>
     <VcpkgConfiguration>Release</VcpkgConfiguration>
   </PropertyGroup>
   <PropertyGroup Label="Vcpkg" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <VcpkgInstalledDir>$(SolutionDir)vcpkg_installed;</VcpkgInstalledDir>
+    <VcpkgInstalledDir>$(SolutionDir)vcpkg_installed</VcpkgInstalledDir>
     <VcpkgTriplet>x64-windows-static</VcpkgTriplet>
   </PropertyGroup>
   <PropertyGroup Label="Vcpkg" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <VcpkgInstalledDir>$(SolutionDir)vcpkg_installed;</VcpkgInstalledDir>
+    <VcpkgInstalledDir>$(SolutionDir)vcpkg_installed</VcpkgInstalledDir>
     <VcpkgTriplet>x64-windows-static</VcpkgTriplet>
     <VcpkgConfiguration>Release</VcpkgConfiguration>
   </PropertyGroup>
   <PropertyGroup Label="Vcpkg" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <VcpkgInstalledDir>$(SolutionDir)vcpkg_installed;</VcpkgInstalledDir>
+    <VcpkgInstalledDir>$(SolutionDir)vcpkg_installed</VcpkgInstalledDir>
     <VcpkgTriplet>x64-windows-static</VcpkgTriplet>
   </PropertyGroup>
   <PropertyGroup>
     <RootNamespace>ServerEngineLib</RootNamespace>
+  </PropertyGroup>
+  <PropertyGroup Label="Vcpkg">
+    <VcpkgEnableManifest>true</VcpkgEnableManifest>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>

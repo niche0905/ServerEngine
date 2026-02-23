@@ -10,7 +10,7 @@
 
 #include "Core/PCH/CorePch.h"
 #include "Core/Global/CoreGlobal.h"
-#include "Utils/Log/ConsoleLogger.h"
+#include "Utils/Logger/ConsoleLogger.h"
 
 // TODO: 다형성을 위해 수정이 필요하다
 using ServiceRef = std::shared_ptr<class IocpServerService>;

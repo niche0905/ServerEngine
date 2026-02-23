@@ -1,6 +1,6 @@
 ﻿#include "pch.h"
 #include "CoreGlobal.h"
-#include "Utils/Log/ConsoleLogger.h"
+#include "Utils/Logger/ConsoleLogger.h"
 
 /*--------------
    CoreGlobal

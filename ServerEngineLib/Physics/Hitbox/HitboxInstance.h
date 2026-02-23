@@ -30,7 +30,7 @@ namespace SE::Physics::Hit
         const AABBCollider& GetWorldAABB() const;
         
         // TODO: Ray 먼저 작성하기 SE::Physics의 영역이다
-        bool Raycast(class Ray& ray, class RaycastHit& out) const;
+        bool Raycast(Ray& ray, RaycastHit& out) const;
 
     private:
         const HitboxAsset* asset_ = nullptr;
