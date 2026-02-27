@@ -263,6 +263,7 @@
     <ClCompile Include="Content\Object\Actor\StaticActor.cpp" />
     <ClCompile Include="Content\Object\Actor\WorldItemActor.cpp" />
     <ClCompile Include="Content\Object\BaseObject.cpp" />
+    <ClCompile Include="Content\Player\Player.cpp" />
     <ClCompile Include="Content\Room\Room.cpp" />
     <ClCompile Include="Main\main.cpp">
       <RuntimeLibrary>MultiThreadedDebugDll</RuntimeLibrary>
@@ -479,6 +480,8 @@
     <ClInclude Include="Content\Object\ObjectHandle.h" />
     <ClInclude Include="Content\Object\ObjectId.h" />
     <ClInclude Include="Content\Object\ObjectManager.h" />
+    <ClInclude Include="Content\Player\Player.h" />
+    <ClInclude Include="Content\Player\PlayerState.h" />
     <ClInclude Include="Content\Room\Room.h" />
     <ClInclude Include="Content\Shared\BaseComponent.h" />
     <ClInclude Include="Network\Session\PlayerSession.h" />
