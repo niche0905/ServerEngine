@@ -20,9 +20,6 @@ private:
    using SessionRef = std::shared_ptr<PlayerSession>;
    using SendBufferRef = std::shared_ptr<SendBuffer>;
    
-   using SessionId = uint64;
-   using Playerid = uint64;
-   
 public:
    void Add(SessionId sessionId, const SessionRef& session);   // 연결 생성
    // void Remove(SessionRef session);
@@ -52,6 +49,7 @@ private:
    
    std::unordered_map<SessionId, SessionRef> sessionsById_;       // 세션 ID -> 세션 참조
    std::unordered_map<PlayerId, SessionId> sessionIdByPlayerId_;  // 플레이어 ID -> 세션 ID (바인딩 정보)
+   std::unordered_map<SessionId, PlayerId> playerIdBySessionId_;  // 세션 ID -> 플레이어 ID (바인딩 정보)
     
 };
 

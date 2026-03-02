@@ -23,12 +23,13 @@ void SessionManager::RemoveBySessionId(SessionId sessionId)
    
    sessionsById_.erase(it);
    
-   for (auto it = sessionIdByPlayerId_.begin(); it != sessionIdByPlayerId_.end(); )
-   {
-      if (it->second == sessionId)
-         it = sessionIdByPlayerId_.erase(it);
-      else
-         ++it;
+   auto rit = playerIdBySessionId_.find(sessionId);
+   if (rit != playerIdBySessionId_.end()) {
+      const PlayerId playerId = rit->second;
+      
+      // 양쪽 맵에서 모두 제거
+      playerIdBySessionId_.erase(rit);
+      sessionIdByPlayerId_.erase(playerId);
    }
 }
 
@@ -37,6 +38,7 @@ void SessionManager::Clear()
    std::lock_guard<std::mutex> lock(mutex_);
    sessionsById_.clear();
    sessionIdByPlayerId_.clear();
+   playerIdBySessionId_.clear();
 }
 
 SessionManager::SessionRef SessionManager::FindBySessionId(SessionId sessionId) const
@@ -70,23 +72,43 @@ bool SessionManager::BindPlayer(SessionId sessionId, PlayerId playerId)
    
    if (sessionsById_.find(sessionId) == sessionsById_.end()) return false;
    
-   auto pit= sessionIdByPlayerId_.find(playerId);
-   if (pit != sessionIdByPlayerId_.end()) {
-      // 중복 로그인/중복 바인딩 방지
-      if (pit->second == sessionId) 
+   auto p2s = sessionIdByPlayerId_.find(playerId);
+   if (p2s != sessionIdByPlayerId_.end()) {
+      // 이미 바인딩된 플레이어 ID가 존재하는 경우
+      
+      if (p2s->second == sessionId) // 같은 세션에 재 바인딩이면 OK
          return true;
       
-      return false;
+      return false;  // 정책: 중복 로그인/바인딩 허용 안 함
    }
    
+   auto s2p = playerIdBySessionId_.find(sessionId);
+   if (s2p != playerIdBySessionId_.end()) {
+      // 이미 바인딩된 세션 ID가 존재하는 경우
+      
+      if (s2p->second == playerId) // 같은 플레이어에 재 바인딩이면 OK
+         return true;
+      
+      return false;  // 정책: 중복 로그인/바인딩 허용 안 함
+   }
+   
+   // 정상 바인딩 처리
+   // 양쪽 맵에 바인딩 정보 추가
    sessionIdByPlayerId_[playerId] = sessionId;
-   return true;
+   playerIdBySessionId_[sessionId] = playerId;
 }
 
 void SessionManager::UnbindPlayer(PlayerId playerId)
 {
    std::lock_guard<std::mutex> lock(mutex_);
-   sessionIdByPlayerId_.erase(playerId);
+   
+   auto it = sessionIdByPlayerId_.find(playerId);
+   if (it == sessionIdByPlayerId_.end()) return;
+   
+   const SessionId sessionId = it->second;
+   
+   sessionIdByPlayerId_.erase(it);
+   playerIdBySessionId_.erase(sessionId);
 }
 
 size_t SessionManager::GetSessionCount() const
