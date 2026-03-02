@@ -1,5 +1,6 @@
 ﻿#pragma once
 #include "Content/Object/ObjectManager.h"
+#include "Content/Player/Player.h"
 
 class BaseObject;
 class ObjectManager;
@@ -17,32 +18,59 @@ class Player;
 class Room : public std::enable_shared_from_this<Room>
 {
 public:
-   explicit Room(uint32 roomId);
+   explicit Room(RoomId roomId);
    ~Room();
    
 public:
-   bool EnterRoom(std::shared_ptr<BaseObject> object);
-   bool LeaveRoom(std::shared_ptr<BaseObject> object);
+   bool Join(PlayerId playerId, SessionId sessionId);
+   bool Leave(PlayerId playerId);
    
-   // TODO: Player 객체 만들기
-   bool HandleEnterPlayer(std::shared_ptr<Player> player);
-   bool HandleLeavePlayer(std::shared_ptr<Player> player);
+   bool UpdateSession(PlayerId playerId, SessionId newSessionId);
    
+public:
+   // TODO: OM을 보고 구현체 구현하기
+   bool SpawnObject(std::shared_ptr<BaseObject> object);
+   bool DespawnObject(ObjectId objectId);
+
 public:
    void UpdateTick();
    
-   std::shared_ptr<Room> GetRoomRef();
+public:
+   std::shared_ptr<Room> GetRoomRef() { return shared_from_this(); }
+   RoomId GetRoomId() const { return roomId_; }
+   
+   bool HasPlayer(PlayerId playerId) const;
+   SessionId GetSessionId(PlayerId playerId) const;
+   ObjectId GetObjectId(PlayerId playerId) const;
    
 private:
-   bool AddObject(std::shared_ptr<BaseObject> object);
-   bool RemoveObject(ObjectId objectId);
+   void Broadcast(std::shared_ptr<SendBuffer> sendBuffer, PlayerId exceptPlayerId = 0);
    
 private:
-   void Broadcast(std::shared_ptr<SendBuffer>, uint32 exceptId = 0);
+   void IndexObject_OnAdd(const std::shared_ptr<BaseObject>& object);
+   void IndexObject_OnRemove(ObjectId objectId);
    
 private:
-   uint32 roomId_;
-   ObjectManager objectManager_;
+   struct RoomPlayer
+   {
+      PlayerId playerId = 0;
+      SessionId sessionId = 0;
+      
+      ObjectId pawnObjectId{};
+      
+      // TODO: Room 로직에서 필요한 추가 정보 (예: 플레이어 상태, 위치, 이동 동기화 시간 등) 캐싱
+   };
+   
+private:
+   RoomId roomId_;
+   
+   ObjectManager objectManager_;                            // Room 내의 모든 오브젝트를 관리하는 ObjectManager (정본 컨테이너)
+   
+   std::unordered_map<PlayerId, RoomPlayer> roomPlayers_;   // Room Membership cache (플레이어 ID -> RoomPlayer 정보)
+   
+   std::unordered_set<ObjectId> pawnObjects_;               // Pawn들
+   std::vector<ObjectId> npcTickList_;                      // 매 틱마다 업데이트가 필요한 NPC들의 ID 리스트
+   
     
 };
 

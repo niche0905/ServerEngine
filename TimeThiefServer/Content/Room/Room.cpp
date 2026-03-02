@@ -1,6 +1,9 @@
 ﻿#include "pch.h"
 #include "Room.h"
 #include "Content/Object/BaseObject.h"
+#include "Content/Object/Actor/MonsterPawn.h"
+#include "Content/Object/Actor/Pawn.h"
+#include "Network/Session/SessionManager/SessionManager.h"
 
 /*---------
    Room
@@ -9,7 +12,7 @@
 // TEMP: 임시로 전역으로 생성, 추후 Service와 Thread와 맞게 구조 변경 필요
 std::shared_ptr<Room> GRoom = std::make_shared<Room>(1);
 
-Room::Room(uint32 roomId)
+Room::Room(RoomId roomId)
    : roomId_(roomId)
    , objectManager_(roomId)
 {
@@ -17,30 +20,158 @@ Room::Room(uint32 roomId)
 
 Room::~Room()
 {
+   objectManager_.ClearAll();
+   
+   roomPlayers_.clear();
+   pawnObjects_.clear();
+   npcTickList_.clear();
 }
 
-bool Room::EnterRoom(std::shared_ptr<BaseObject> object)
+bool Room::Join(PlayerId playerId, SessionId sessionId)
 {
-   bool success = AddObject(object);
+   if (playerId == 0 or sessionId == 0)      // 유효하지 않은 playerId 또는 sessionId
+      return false;
    
-   // TODO: Player 먼저
+   auto it = roomPlayers_.find(playerId);
+   if (it != roomPlayers_.end()) {
+      it->second.sessionId = sessionId;
+      return true;   // 이미 방에 존재하는 플레이어, 세션 정보만 업데이트
+   }
+   
+   RoomPlayer newPlayer;
+   newPlayer.playerId = playerId;
+   newPlayer.sessionId = sessionId;
+   newPlayer.pawnObjectId = ObjectId{};   // 아직 Pawn이 연결되지 않은 상태
+   // TODO: OM을 통해서 PlayerPawn 만들고 Object ID 연결하기
+   
+   roomPlayers_.emplace(playerId, std::move(newPlayer));
+   return true;
 }
 
-bool Room::LeaveRoom(std::shared_ptr<BaseObject> object)
+bool Room::Leave(PlayerId playerId)
 {
-   if (object == nullptr) return false;
+   auto it = roomPlayers_.find(playerId);
+   if (it == roomPlayers_.end())
+      return false;   // 방에 존재하지 않는 플레이어
    
-   const ObjectId id = object->GetId();
-   bool success = RemoveObject(id);
+   const ObjectId pawnId = it->second.pawnObjectId;
+   if (pawnId != ObjectId{}) {
+      DespawnObject(pawnId);   // 플레이어의 Pawn이 존재하면 제거
+   }
    
-   // TODO: Player 먼저
+   roomPlayers_.erase(it);
+   return true;
+}
+
+bool Room::UpdateSession(PlayerId playerId, SessionId newSessionId)
+{
+   if (newSessionId == 0)
+      return false;   // 유효하지 않은 sessionId
+   
+   auto it = roomPlayers_.find(playerId);
+   if (it == roomPlayers_.end())
+      return false;   // 방에 존재하지 않는 플레이어
+   
+   it->second.sessionId = newSessionId;
+   return true;
 }
 
 void Room::UpdateTick()
 {
+   // Room 정책
+   // NPC만 Tick 진행
+   
+   // NPC Tick
+   for (size_t i = 0; i < npcTickList_.size();) {
+       
+      const ObjectId npcId = npcTickList_[i];
+      
+      BaseObject* npc = objectManager_.Find(npcId);
+      
+      if (not npc) {
+         // NPC가 사라졌는데 Tick 리스트에 남아있는 경우, 리스트에서 제거
+         npcTickList_[i] = npcTickList_.back();
+         npcTickList_.pop_back();
+         continue;
+      }
+      
+      // TODO: NPC 업데이트 로직 구현하기 (예: AI 행동, 이동, 상태 변화 등)
+      // npc->Update();
+      
+      ++i;
+   }
 }
 
-std::shared_ptr<Room> Room::GetRoomRef()
+bool Room::HasPlayer(PlayerId playerId) const
 {
-   return static_pointer_cast<Room>(shared_from_this());
+   return roomPlayers_.contains(playerId);
+}
+
+SessionId Room::GetSessionId(PlayerId playerId) const
+{
+   auto it = roomPlayers_.find(playerId);
+   if (it == roomPlayers_.end())
+      return 0;   // 방에 존재하지 않는 플레이어
+   
+   return it->second.sessionId;
+}
+
+ObjectId Room::GetObjectId(PlayerId playerId) const
+{
+   auto it = roomPlayers_.find(playerId);
+   if (it == roomPlayers_.end())
+      return ObjectId{};   // 방에 존재하지 않는 플레이어
+   
+   return it->second.pawnObjectId;
+}
+
+void Room::Broadcast(std::shared_ptr<SendBuffer> sendBuffer, PlayerId exceptPlayerId)
+{
+   if (not sendBuffer)
+      return;   // 유효하지 않은 SendBuffer
+   
+   for (const auto& [playerId, roomPlayer] : roomPlayers_) {
+      if (playerId == exceptPlayerId)
+         continue;   // 제외할 플레이어는 건너뛰기
+      
+      if (roomPlayer.sessionId == 0)
+         continue;   // 유효하지 않은 세션 ID인 플레이어는 건너뛰기
+      
+      // TODO: 더 좋게 변경할 수 있다면 하기,,,
+      //       현재는 Lock도 걸고 우아하지 않아 보임...
+      g_SessionManager.FindBySessionId(roomPlayer.sessionId)->Send(sendBuffer);   // 세션을 찾아서 메시지 전송
+   }
+}
+
+void Room::IndexObject_OnAdd(const std::shared_ptr<BaseObject>& object)
+{
+   if (not object)
+      return;   // 유효하지 않은 오브젝트
+   
+   const ObjectId objectId = object->GetId();
+   
+   if (std::dynamic_pointer_cast<Pawn>(object)) {
+      pawnObjects_.insert(objectId);
+   }
+   
+   if (std::dynamic_pointer_cast<MonsterPawn>(object)) {
+      npcTickList_.push_back(objectId);
+   }
+}
+
+void Room::IndexObject_OnRemove(ObjectId objectId)
+{
+   pawnObjects_.erase(objectId);
+   
+   auto it = std::find(npcTickList_.begin(), npcTickList_.end(), objectId);
+   if (it != npcTickList_.end()) {
+      *it = npcTickList_.back();
+      npcTickList_.pop_back();
+   }
+   
+   for (auto& [playerId, roomPlayer] : roomPlayers_) {
+      if (roomPlayer.pawnObjectId == objectId) {
+         roomPlayer.pawnObjectId = ObjectId{};   // Pawn이 제거된 경우, RoomPlayer의 Pawn Object ID 초기화
+      }
+   }
 }
