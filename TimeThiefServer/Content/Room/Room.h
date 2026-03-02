@@ -28,9 +28,25 @@ public:
    bool UpdateSession(PlayerId playerId, SessionId newSessionId);
    
 public:
-   // TODO: OM을 보고 구현체 구현하기
-   bool SpawnObject(std::shared_ptr<BaseObject> object);
-   bool DespawnObject(ObjectId objectId);
+   template<typename T, typename... Args>
+   T* SpawnObject(ObjectFlags flags, Args&&... args)
+   {
+      T* obj = objectManager_.Create<T>(flags, std::forward<Args>(args)...);
+      if (not obj) return nullptr;  // 오브젝트 생성 실패
+      
+      IndexObject_OnAdd(obj);
+      return obj;
+   }
+   
+   bool DespawnObject(ObjectId objectId)
+   {
+      BaseObject* obj = objectManager_.Find(objectId);
+      if (not obj) return false;  // 오브젝트가 존재하지 않음
+      
+      IndexObject_OnRemove(objectId);
+      
+      return objectManager_.RequestDestroy(objectId);
+   }
 
 public:
    void UpdateTick();
@@ -47,7 +63,7 @@ private:
    void Broadcast(std::shared_ptr<SendBuffer> sendBuffer, PlayerId exceptPlayerId = 0);
    
 private:
-   void IndexObject_OnAdd(const std::shared_ptr<BaseObject>& object);
+   void IndexObject_OnAdd(BaseObject* object);
    void IndexObject_OnRemove(ObjectId objectId);
    
 private:

@@ -100,6 +100,8 @@ void Room::UpdateTick()
       
       ++i;
    }
+   
+   // objectManager_.SweepDestroy();   // 오브젝트 제거 처리
 }
 
 bool Room::HasPlayer(PlayerId playerId) const
@@ -143,18 +145,18 @@ void Room::Broadcast(std::shared_ptr<SendBuffer> sendBuffer, PlayerId exceptPlay
    }
 }
 
-void Room::IndexObject_OnAdd(const std::shared_ptr<BaseObject>& object)
+void Room::IndexObject_OnAdd(BaseObject* object)
 {
    if (not object)
       return;   // 유효하지 않은 오브젝트
    
    const ObjectId objectId = object->GetId();
    
-   if (std::dynamic_pointer_cast<Pawn>(object)) {
+   if (dynamic_cast<Pawn*>(object)) {
       pawnObjects_.insert(objectId);
    }
    
-   if (std::dynamic_pointer_cast<MonsterPawn>(object)) {
+   if (dynamic_cast<MonsterPawn*>(object)) {
       npcTickList_.push_back(objectId);
    }
 }
