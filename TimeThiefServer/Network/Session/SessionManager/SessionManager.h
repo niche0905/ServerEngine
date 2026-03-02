@@ -1,6 +1,10 @@
 ﻿#pragma once
+#include "Content/Player/Player.h"
 #include "Network/Session/PlayerSession.h"
 #include "Network/Buffer/SendBuffer.h"
+
+class PlayerSession;
+class SendBuffer;
 
 /*------------------
    SessionManager
@@ -10,27 +14,44 @@
 // 컨텐츠(게임 서버) 코드에서 사용하기 위한 세션 관리 기능을 제공합니다.
 //
 
-class PlayerSession;
-class SendBuffer;
-
 class SessionManager
 {
 private:
    using SessionRef = std::shared_ptr<PlayerSession>;
    using SendBufferRef = std::shared_ptr<SendBuffer>;
    
+   using SessionId = uint64;
+   using Playerid = uint64;
+   
 public:
-   void Add(SessionRef session);
-   void Remove(SessionRef session);
+   void Add(SessionId sessionId, const SessionRef& session);   // 연결 생성
+   // void Remove(SessionRef session);
+   void RemoveBySessionId(SessionId sessionId);                // 연결 종료
    
    void Clear();
    
-   void Broadcast(SendBufferRef sendBuffer);
+   SessionRef FindBySessionId(SessionId sessionId) const;
+   SessionRef FindByPlayerId(PlayerId playerId) const;
+   
+   // 로그인/인증 이후 바인딩
+   bool BindPlayer(SessionId sessionId, PlayerId playerId);
+   void UnbindPlayer(PlayerId playerId);
+   
+   // 유틸리티
    size_t GetSessionCount() const;
+   size_t GetBoundPlayerCount() const;
+   
+   // 송신
+   void Broadcast(SendBufferRef sendBuffer);
+   
+   // 스냅샷 (lock을 오래 잡지 않으려고)
+   std::vector<SessionRef> SnapshotSessions() const;
    
 private:
-   std::mutex mutex_;   // 세션 리스트 보호용 뮤텍스
-   std::unordered_set<SessionRef> sessions_; // 활성 세션 리스트
+   mutable std::mutex mutex_;   // 세션 리스트 보호용 뮤텍스
+   
+   std::unordered_map<SessionId, SessionRef> sessionsById_;       // 세션 ID -> 세션 참조
+   std::unordered_map<PlayerId, SessionId> sessionIdByPlayerId_;  // 플레이어 ID -> 세션 ID (바인딩 정보)
     
 };
 
