@@ -51,12 +51,14 @@ void PlayerSession::OnRecvPacket(byte* buffer, int32 len)
 
 void PlayerSession::OnConnected()
 {
-   g_SessionManager.Add(AsShared<PlayerSession>());
+   // TODO: fixEE!!!!
+   g_SessionManager.Add(1, AsShared<PlayerSession>());
 }
 
 void PlayerSession::OnDisconnected()
 {
-   g_SessionManager.Remove(AsShared<PlayerSession>());
+   // TODO: fixEE!!!!
+   g_SessionManager.RemoveBySessionId(1);
 }
 
 void PlayerSession::OnSend(int32 len)

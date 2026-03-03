@@ -71,20 +71,20 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>$(SolutionDir)ServerEngineLib\;$(SolutionDir)Libraries\Include\;$(IncludePath);$(ProjectDir);$(ProjectDir)Utils;$(SolutionDir)vcpkg_installed\x64-windows\include</IncludePath>
-    <LibraryPath>$(SolutionDir)Libraries\Libs\;$(SolutionDir)vcpkg_installed\x64-windows;$(LibraryPath);</LibraryPath>
+    <IncludePath>$(SolutionDir)External\ProtocolShared\cpp\;$(SolutionDir)External\protobuf\src\;$(SolutionDir)External\ProtocolShared\include\;$(SolutionDir)ServerEngineLib\;$(SolutionDir)Libraries\Include\;$(IncludePath);$(ProjectDir);$(ProjectDir)Utils;$(SolutionDir)vcpkg_installed\x64-windows\include</IncludePath>
+    <LibraryPath>$(SolutionDir)External\protobuf_build\Release\;$(SolutionDir)Libraries\Libs\;$(SolutionDir)vcpkg_installed\x64-windows;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <IncludePath>$(SolutionDir)ServerEngineLib\;$(SolutionDir)Libraries\Include\;$(IncludePath);$(ProjectDir);$(ProjectDir)Utils;$(SolutionDir)vcpkg_installed\x64-windows\include</IncludePath>
-    <LibraryPath>$(SolutionDir)Libraries\Libs\;$(SolutionDir)vcpkg_installed\x64-windows;$(LibraryPath);</LibraryPath>
+    <IncludePath>$(SolutionDir)External\ProtocolShared\cpp\;$(SolutionDir)External\protobuf\src\;$(SolutionDir)External\ProtocolShared\include\;$(SolutionDir)ServerEngineLib\;$(SolutionDir)Libraries\Include\;$(IncludePath);$(ProjectDir);$(ProjectDir)Utils;$(SolutionDir)vcpkg_installed\x64-windows\include</IncludePath>
+    <LibraryPath>$(SolutionDir)External\protobuf_build\Release\;$(SolutionDir)Libraries\Libs\;$(SolutionDir)vcpkg_installed\x64-windows;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>$(SolutionDir)ServerEngineLib\;$(SolutionDir)Libraries\Include\;$(IncludePath);$(ProjectDir);$(ProjectDir)Utils;$(SolutionDir)vcpkg_installed\x64-windows\include</IncludePath>
-    <LibraryPath>$(SolutionDir)Libraries\Libs\;$(SolutionDir)vcpkg_installed\x64-windows;$(LibraryPath);</LibraryPath>
+    <IncludePath>$(SolutionDir)External\ProtocolShared\cpp\;$(SolutionDir)External\protobuf\src\;$(SolutionDir)External\ProtocolShared\include\;$(SolutionDir)ServerEngineLib\;$(SolutionDir)Libraries\Include\;$(IncludePath);$(ProjectDir);$(ProjectDir)Utils;$(SolutionDir)vcpkg_installed\x64-windows\include</IncludePath>
+    <LibraryPath>$(SolutionDir)External\protobuf_build\Release\;$(SolutionDir)Libraries\Libs\;$(SolutionDir)vcpkg_installed\x64-windows;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IncludePath>$(SolutionDir)ServerEngineLib\;$(SolutionDir)Libraries\Include\;$(IncludePath);$(ProjectDir);$(ProjectDir)Utils;$(SolutionDir)vcpkg_installed\x64-windows\include</IncludePath>
-    <LibraryPath>$(SolutionDir)Libraries\Libs\;$(SolutionDir)vcpkg_installed\x64-windows;$(LibraryPath);</LibraryPath>
+    <IncludePath>$(SolutionDir)External\ProtocolShared\cpp\;$(SolutionDir)External\protobuf\src\;$(SolutionDir)External\ProtocolShared\include\;$(SolutionDir)ServerEngineLib\;$(SolutionDir)Libraries\Include\;$(IncludePath);$(ProjectDir);$(ProjectDir)Utils;$(SolutionDir)vcpkg_installed\x64-windows\include</IncludePath>
+    <LibraryPath>$(SolutionDir)External\protobuf_build\Release\;$(SolutionDir)Libraries\Libs\;$(SolutionDir)vcpkg_installed\x64-windows;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Label="Vcpkg" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <VcpkgInstalledDir>$(SolutionDir)vcpkg_installed</VcpkgInstalledDir>
@@ -99,7 +99,7 @@
     <VcpkgInstalledDir>$(SolutionDir)vcpkg_installed</VcpkgInstalledDir>
   </PropertyGroup>
   <PropertyGroup Label="Vcpkg">
-    <VcpkgEnableManifest>true</VcpkgEnableManifest>
+    <VcpkgEnableManifest>false</VcpkgEnableManifest>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -343,6 +343,7 @@
       <LinkCompiled>true</LinkCompiled>
       <AdditionalIncludeDirectories>;C:\Users\yudle\vcpkg\installed\x64-windows\include;$(SolutionDir)Libraries\Libs\ServerEngineLib\;</AdditionalIncludeDirectories>
     </ClCompile>
+    <ClCompile Include="Network\ServerPacketHandler.cpp" />
     <ClCompile Include="Network\Session\PlayerSession.cpp" />
     <ClCompile Include="Network\Session\SessionManager\SessionManager.cpp" />
     <ClCompile Include="Utils\pch.cpp">

@@ -16,6 +16,8 @@ public:
 	virtual ~SendBuffer() {}
 
 	SendBuffer(size_t bufferSize) : buffer_(bufferSize) {}
+	
+	byte*			Buffer() { return buffer_.data(); }
 
 	byte*			Data() override { return buffer_.data(); }
 	const byte*		Data() const override { return buffer_.data(); }
