@@ -96,6 +96,8 @@ bool SessionManager::BindPlayer(SessionId sessionId, PlayerId playerId)
    // 양쪽 맵에 바인딩 정보 추가
    sessionIdByPlayerId_[playerId] = sessionId;
    playerIdBySessionId_[sessionId] = playerId;
+   
+   return true;
 }
 
 void SessionManager::UnbindPlayer(PlayerId playerId)
