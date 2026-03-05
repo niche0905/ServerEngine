@@ -4,6 +4,7 @@
 #include "Content/Object/Actor/MonsterPawn.h"
 #include "Content/Object/Actor/Pawn.h"
 #include "Network/Session/SessionManager/SessionManager.h"
+#include "Content/Object/Actor/PlayerPawn.h"
 
 /*---------
    Room
@@ -44,8 +45,9 @@ bool Room::Join(PlayerId playerId, SessionId sessionId)
    RoomPlayer newPlayer;
    newPlayer.playerId = playerId;
    newPlayer.sessionId = sessionId;
-   newPlayer.pawnObjectId = ObjectId{};   // 아직 Pawn이 연결되지 않은 상태
-   // TODO: OM을 통해서 PlayerPawn 만들고 Object ID 연결하기
+   
+   auto playerPawn = SpawnObject<PlayerPawn>(ObjectFlags::Replicable | ObjectFlags::Tickable);
+   newPlayer.pawnObjectId = playerPawn->GetId();
    
    roomPlayers_.emplace(playerId, std::move(newPlayer));
    return true;
