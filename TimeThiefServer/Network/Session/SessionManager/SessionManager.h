@@ -34,6 +34,10 @@ public:
    bool BindPlayer(SessionId sessionId, PlayerId playerId);
    void UnbindPlayer(PlayerId playerId);
    
+   // 바인딩 조회
+   bool TryGetSessionId(PlayerId plaeyrId, SessionId& outSessionId) const;
+   bool TryGetPlayerId(SessionId sessionId, PlayerId& outPlayerId) const;
+   
    // 유틸리티
    size_t GetSessionCount() const;
    size_t GetBoundPlayerCount() const;

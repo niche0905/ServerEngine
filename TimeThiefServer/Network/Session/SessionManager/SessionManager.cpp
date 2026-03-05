@@ -111,6 +111,28 @@ void SessionManager::UnbindPlayer(PlayerId playerId)
    playerIdBySessionId_.erase(sessionId);
 }
 
+bool SessionManager::TryGetSessionId(PlayerId plaeyrId, SessionId& outSessionId) const
+{
+   std::lock_guard<std::mutex> lock(mutex_);
+   
+   auto it = sessionIdByPlayerId_.find(plaeyrId);
+   if (it == sessionIdByPlayerId_.end()) return false;
+   
+   outSessionId = it->second;
+   return true;
+}
+
+bool SessionManager::TryGetPlayerId(SessionId sessionId, PlayerId& outPlayerId) const
+{
+   std::lock_guard<std::mutex> lock(mutex_);
+   
+   auto it = playerIdBySessionId_.find(sessionId);
+   if (it == playerIdBySessionId_.end()) return false;
+   
+   outPlayerId = it->second;
+   return true;
+}
+
 size_t SessionManager::GetSessionCount() const
 {
    std::lock_guard<std::mutex> lock(mutex_);
