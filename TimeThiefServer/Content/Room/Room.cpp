@@ -29,6 +29,9 @@ Room::~Room()
 
 bool Room::Join(PlayerId playerId, SessionId sessionId)
 {
+   // TEMP
+   std::lock_guard<std::mutex> lock(mutex_);   // 방에 플레이어가 입장/퇴장할 때마다 Lock을 잡는 구조 (샤딩 도입 전까지는 이 구조로 유지)
+   
    if (playerId == 0 or sessionId == 0)      // 유효하지 않은 playerId 또는 sessionId
       return false;
    
@@ -50,6 +53,9 @@ bool Room::Join(PlayerId playerId, SessionId sessionId)
 
 bool Room::Leave(PlayerId playerId)
 {
+   // TEMP
+   std::lock_guard<std::mutex> lock(mutex_);
+   
    auto it = roomPlayers_.find(playerId);
    if (it == roomPlayers_.end())
       return false;   // 방에 존재하지 않는 플레이어
@@ -65,6 +71,9 @@ bool Room::Leave(PlayerId playerId)
 
 bool Room::UpdateSession(PlayerId playerId, SessionId newSessionId)
 {
+   // TEMP
+   std::lock_guard<std::mutex> lock(mutex_);
+   
    if (newSessionId == 0)
       return false;   // 유효하지 않은 sessionId
    
@@ -78,6 +87,9 @@ bool Room::UpdateSession(PlayerId playerId, SessionId newSessionId)
 
 void Room::UpdateTick()
 {
+   // TEMP
+   std::lock_guard<std::mutex> lock(mutex_);
+   
    // Room 정책
    // NPC만 Tick 진행
    
@@ -106,11 +118,17 @@ void Room::UpdateTick()
 
 bool Room::HasPlayer(PlayerId playerId) const
 {
+   // TEMP
+   std::lock_guard<std::mutex> lock(mutex_);
+   
    return roomPlayers_.contains(playerId);
 }
 
 SessionId Room::GetSessionId(PlayerId playerId) const
 {
+   // TEMP
+   std::lock_guard<std::mutex> lock(mutex_);
+   
    auto it = roomPlayers_.find(playerId);
    if (it == roomPlayers_.end())
       return 0;   // 방에 존재하지 않는 플레이어
@@ -120,6 +138,9 @@ SessionId Room::GetSessionId(PlayerId playerId) const
 
 ObjectId Room::GetObjectId(PlayerId playerId) const
 {
+   // TEMP
+   std::lock_guard<std::mutex> lock(mutex_);
+   
    auto it = roomPlayers_.find(playerId);
    if (it == roomPlayers_.end())
       return ObjectId{};   // 방에 존재하지 않는 플레이어
@@ -129,6 +150,9 @@ ObjectId Room::GetObjectId(PlayerId playerId) const
 
 void Room::Broadcast(std::shared_ptr<SendBuffer> sendBuffer, PlayerId exceptPlayerId)
 {
+   // TEMP
+   std::lock_guard<std::mutex> lock(mutex_);
+   
    if (not sendBuffer)
       return;   // 유효하지 않은 SendBuffer
    
