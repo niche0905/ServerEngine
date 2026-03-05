@@ -2,6 +2,7 @@
 #include <mutex>
 #include "Content/Object/ObjectManager.h"
 #include "Content/Player/Player.h"
+#include "Generated/ServerPacketHandler.h"
 
 class BaseObject;
 class ObjectManager;
@@ -19,6 +20,9 @@ class Player;
 class Room : public std::enable_shared_from_this<Room>
 {
 public:
+   using Vector3 = SE::Math::Vector3;
+
+public:
    explicit Room(RoomId roomId);
    ~Room();
    
@@ -27,6 +31,10 @@ public:
    bool Leave(PlayerId playerId);
    
    bool UpdateSession(PlayerId playerId, SessionId newSessionId);
+   
+// Handle Packet
+public:
+   bool HandleMove(PlayerId playerId, const se::room::C_MoveInput& pkt);
    
 public:
    template<typename T, typename... Args>

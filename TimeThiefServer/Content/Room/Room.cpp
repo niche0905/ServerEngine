@@ -50,6 +50,31 @@ bool Room::Join(PlayerId playerId, SessionId sessionId)
    newPlayer.pawnObjectId = playerPawn->GetId();
    
    roomPlayers_.emplace(playerId, std::move(newPlayer));
+   
+   // TODO: 여기서 생성 Broadcast를 해야한다... (mutex 변경이 필요할지도? <- recursive_mutex로)
+   
+   {
+      se::room::N_EntitySpawn spawnPkt;
+      {
+         se::room::EntityState* entityState = spawnPkt.mutable_entity();
+         
+         se::common::EntityId* entityId = entityState->mutable_entity_id();
+         entityId->set_value(playerPawn->GetId().value);
+         se::common::MovementState* movementState = entityState->mutable_movement();
+         se::common::Vector3* postion = movementState->mutable_position();
+         postion->set_x(playerPawn->GetPosition().x);
+         postion->set_y(playerPawn->GetPosition().y);
+         postion->set_z(playerPawn->GetPosition().z);
+         movementState->set_yaw(playerPawn->GetYaw());
+         movementState->set_speed(0.0f);
+         se::common::AimRotation* aimRotation = entityState->mutable_aim();
+         aimRotation->set_pitch(playerPawn->GetPitch());
+      }
+      
+      SendBufferRef sendBuffer = ServerPacketHandler::MakeSendBuffer(spawnPkt);
+      Broadcast(sendBuffer);
+   }
+   
    return true;
 }
 
@@ -84,6 +109,45 @@ bool Room::UpdateSession(PlayerId playerId, SessionId newSessionId)
       return false;   // 방에 존재하지 않는 플레이어
    
    it->second.sessionId = newSessionId;
+   return true;
+}
+
+bool Room::HandleMove(PlayerId playerId, const se::room::C_MoveInput& pkt)
+{
+   ObjectId playerPawnId = GetObjectId(playerId);
+   
+   // TEMP
+   std::lock_guard<std::mutex> lock(mutex_);
+   
+   auto* obj = objectManager_.Find(playerPawnId);
+   if (not obj)
+      return false;   // 플레이어의 Pawn이 존재하지 않음
+   
+   auto* playerPawn = dynamic_cast<PlayerPawn*>(obj);
+   if (not playerPawn)
+      return false;   // 플레이어의 Pawn이 PlayerPawn이 아님 (이 경우은 발생하지 않아야 함)
+
+   const auto& entity = pkt.entity_state();
+   const auto& movement = entity.movement();
+   const auto& newPos = movement.position();
+   playerPawn->SetPosition(Vector3{ newPos.x(), newPos.y(), newPos.z() });
+   playerPawn->SetYaw(movement.yaw());
+   playerPawn->SetPitch(entity.aim().pitch());
+   
+   {
+      // TODO: 나중엔 Replicated에서 Dirty 체크해서 필요한 정보만 보내도록 변경하기 (한 틱에 한번에) <- repeated 키워드를 적극 활용 하기 위해
+      se::room::S_EntityState entityStatePkt;
+      {
+         auto moveEntity = entityStatePkt.add_entities();
+      
+         moveEntity->CopyFrom(entity);
+      }
+      
+      SendBufferRef sendBuffer = ServerPacketHandler::MakeSendBuffer(entityStatePkt);
+      Broadcast(sendBuffer, playerId);   // 이동한 플레이어를 제외한 나머지 플레이어들에게 이동 정보 Broadcast
+      // TODO: 만약 잘못된 이동 판정을 한다면 여기서 플레이어의 위치를 원래대로 되돌리는 패킷을 보내야할지도? (클라이언트와 서버의 위치가 달라지는 경우 보정 패킷을 보내는 구조로)
+   }
+   
    return true;
 }
 
@@ -152,8 +216,8 @@ ObjectId Room::GetObjectId(PlayerId playerId) const
 
 void Room::Broadcast(std::shared_ptr<SendBuffer> sendBuffer, PlayerId exceptPlayerId)
 {
-   // TEMP
-   std::lock_guard<std::mutex> lock(mutex_);
+   // // TEMP
+   // std::lock_guard<std::mutex> lock(mutex_);
    
    if (not sendBuffer)
       return;   // 유효하지 않은 SendBuffer
