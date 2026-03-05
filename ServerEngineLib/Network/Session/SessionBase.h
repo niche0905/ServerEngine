@@ -4,6 +4,7 @@
 #include "Core/Service/ServiceBase.h"
 
 class ServiceBase;
+using SessionId = uint64;
 
 /*---------------
    SessionBase
@@ -24,6 +25,13 @@ class SessionBase : public IoObject
 public:
 	SessionBase();
 	virtual ~SessionBase();
+	
+// Session interface
+public:
+	SessionId Id() const noexcept { return sessionId_; }
+	
+protected:
+	void AssignId(SessionId sessionId) noexcept { sessionId_ = sessionId; }
 
 // Architecture interface
 public:
@@ -77,6 +85,8 @@ protected:
 	virtual void OnSend(int32 len) {}
 
 protected:
+	SessionId					sessionId_ = 0;	// 0 = invalid session id, 1 ~ max = valid session id
+	
 	std::weak_ptr<ServiceBase>	service_{};
 	SOCKET						socket_{ INVALID_SOCKET };
 	NetAddr						netAddr_{};
