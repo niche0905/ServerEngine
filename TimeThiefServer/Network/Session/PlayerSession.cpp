@@ -2,6 +2,7 @@
 #include "PlayerSession.h"
 
 #include "SessionManager/SessionManager.h"
+#include "SessionIdMaker.h"
 
 /*-----------------
    PlayerSession
@@ -51,14 +52,14 @@ void PlayerSession::OnRecvPacket(byte* buffer, int32 len)
 
 void PlayerSession::OnConnected()
 {
-   // TODO: fixEE!!!!
-   g_SessionManager.Add(1, AsShared<PlayerSession>());
+   SessionId newSessionId = SessionIdMaker::Next();
+   AssignId(newSessionId);
+   g_SessionManager.Add(newSessionId, AsShared<PlayerSession>());
 }
 
 void PlayerSession::OnDisconnected()
 {
-   // TODO: fixEE!!!!
-   g_SessionManager.RemoveBySessionId(1);
+   g_SessionManager.RemoveBySessionId(Id());
 }
 
 void PlayerSession::OnSend(int32 len)
