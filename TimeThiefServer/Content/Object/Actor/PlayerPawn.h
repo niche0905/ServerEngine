@@ -37,6 +37,11 @@ public:
     uint32 GetPlayerId() const { return playerId_; }
     void SetPlayerId(uint32 playerId) { playerId_ = playerId; }
     
+// pitch
+public:
+    float GetPitch() const { return pitch_; }
+    void SetPitch(float pitch) { pitch_ = pitch; }
+    
 // Component
 public:
     DropOnDeathComponent& GetDropOnDeath() { return dropOnDeath_; }
@@ -106,6 +111,8 @@ private:
     
 private:
     uint32 playerId_;
+    
+    float pitch_{0.0f};
     
     DropOnDeathComponent dropOnDeath_{};
     InventoryComponent inventory_{};
