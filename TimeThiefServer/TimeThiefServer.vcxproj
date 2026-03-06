@@ -403,6 +403,7 @@
       <LinkCompiled>true</LinkCompiled>
       <AdditionalIncludeDirectories>;C:\Users\yudle\vcpkg\installed\x64-windows\include;$(SolutionDir)Libraries\Libs\ServerEngineLib\;</AdditionalIncludeDirectories>
     </ClCompile>
+    <ClCompile Include="Network\ServerConfigReader.cpp" />
     <ClCompile Include="Network\ServerPacketHandler.cpp" />
     <ClCompile Include="Network\Session\PlayerSession.cpp" />
     <ClCompile Include="Network\Session\SessionManager\SessionManager.cpp" />
@@ -547,6 +548,7 @@
     <ClInclude Include="Content\Player\PlayerState.h" />
     <ClInclude Include="Content\Room\Room.h" />
     <ClInclude Include="Content\Shared\BaseComponent.h" />
+    <ClInclude Include="Network\ServerConfigReader.h" />
     <ClInclude Include="Network\ServerConfig.h" />
     <ClInclude Include="Network\Session\PlayerSession.h" />
     <ClInclude Include="Network\Session\SessionIdMaker.h" />
