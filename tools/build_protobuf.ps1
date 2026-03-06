@@ -33,7 +33,9 @@ cmake -S $SrcDir -B $BuildDir -G $Generator -A x64 `
   -Dprotobuf_BUILD_TESTS=OFF `
   -Dprotobuf_BUILD_EXAMPLES=OFF `
   -Dprotobuf_WITH_ZLIB=OFF `
-  -Dprotobuf_BUILD_SHARED_LIBS=OFF
+  -Dprotobuf_BUILD_SHARED_LIBS=OFF `
+  -Dprotobuf_MSVC_STATIC_RUNTIME=OFF `
+  -DCMAKE_MSVC_RUNTIME_LIBRARY="MultiThreaded`$<`$<CONFIG:Debug>:Debug>DLL"
 
 Write-Host "[protobuf] build ($Config)..."
 cmake --build $BuildDir --config $Config --target protoc libprotobuf

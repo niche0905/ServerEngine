@@ -30,6 +30,16 @@
     <ClCompile Include="Content\Player\PlayerManager\PlayerManager.cpp" />
     <ClCompile Include="Content\Room\Room.cpp" />
     <ClCompile Include="Network\ServerPacketHandler.cpp" />
+    <ClCompile Include="..\External\ProtocolShared\cpp\Protocol.pb.cc" />
+    <ClCompile Include="..\External\ProtocolShared\cpp\auth\auth_messages.pb.cc" />
+    <ClCompile Include="..\External\ProtocolShared\cpp\auth\auth_types.pb.cc" />
+    <ClCompile Include="..\External\ProtocolShared\cpp\common\common_enums.pb.cc" />
+    <ClCompile Include="..\External\ProtocolShared\cpp\common\common_types.pb.cc" />
+    <ClCompile Include="..\External\ProtocolShared\cpp\lobby\lobby_messages.pb.cc" />
+    <ClCompile Include="..\External\ProtocolShared\cpp\lobby\lobby_types.pb.cc" />
+    <ClCompile Include="..\External\ProtocolShared\cpp\options\packet_options.pb.cc" />
+    <ClCompile Include="..\External\ProtocolShared\cpp\room\room_messages.pb.cc" />
+    <ClCompile Include="..\External\ProtocolShared\cpp\room\room_types.pb.cc" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Content\Object\BaseObject.h" />
@@ -97,5 +107,6 @@
     <ClInclude Include="Content\Player\PlayerManager\PlayerManager.h" />
     <ClInclude Include="Content\Player\PlayerState.h" />
     <ClInclude Include="Content\Room\Room.h" />
+    <ClInclude Include="Network\Session\SessionIdMaker.h" />
   </ItemGroup>
 </Project>
