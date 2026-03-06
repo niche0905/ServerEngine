@@ -4,7 +4,7 @@
 #include <sstream>
 #include <iostream>
 #include <json/json.h>
-#include <room/room_messages.pb.h>
+#include <filesystem>
 
 /*-----------------------
    ServerConfigReader
@@ -14,6 +14,10 @@ ServerConfigReader g_ConfigReader;
 
 bool ServerConfigReader::LoadFromFile(const std::string& filePath)
 {
+   // debug log
+   std::filesystem::path p = std::filesystem::absolute(filePath);
+	consoleLogger->Log(Color::Blue, L"[Config] Try to access: %S\n", p.string().c_str());
+   
    std::ifstream file{filePath};
    if (not file.is_open())
    {
@@ -69,5 +73,7 @@ bool ServerConfigReader::ParseJsonText(const std::string& jsonText)
       if (network.isMember("login_port"))
          config_.network.loginPort = network["login_port"].asInt();
    }
+   
+   return true;
 }
 

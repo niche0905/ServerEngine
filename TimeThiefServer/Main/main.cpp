@@ -9,10 +9,9 @@
 #include "Core/Thread/ThreadManager.h"
 #include "Network/Session/PlayerSession.h"
 #include "Network/Session/SessionManager/SessionManager.h"
+#include "Network/ServerConfigReader.h"
 
 class PlayerSession;
-
-constexpr int SERVER_PORT = 8252;	// TEMP
 
 
 ThreadManager threadManager;
@@ -31,8 +30,18 @@ int main()
 	
 	consoleLogger->Log(Color::Green, L"[main] entered main\n");
 	
+	bool configLoadSucc = g_ConfigReader.LoadFromFile("..\\External\\ProtocolShared\\config\\server.dev.json");
+	if (not configLoadSucc) {
+		consoleLogger->Log(Color::Red, L"[main] config load fail\n");
+		return 0;
+	}
+	
+	std::string serverIPStr = g_ConfigReader.Get().network.bindIp;
+	std::wstring serverIP(serverIPStr.begin(), serverIPStr.end());
+	int16 SERVER_PORT = g_ConfigReader.Get().network.gamePort;
+	
 	ServiceRef service = std::make_shared<IocpServerService>(
-		NetAddr(L"127.0.0.1", SERVER_PORT),
+		NetAddr(serverIP, SERVER_PORT),
 		std::make_shared<PlayerSession>,
 		5
 	);
