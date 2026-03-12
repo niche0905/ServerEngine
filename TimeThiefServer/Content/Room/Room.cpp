@@ -51,14 +51,32 @@ bool Room::Join(PlayerId playerId, SessionId sessionId)
    
    roomPlayers_.emplace(playerId, std::move(newPlayer));
    
-   // TODO: 여기서 생성 Broadcast를 해야한다... (mutex 변경이 필요할지도? <- recursive_mutex로)
-   
+   // TEMP
+   {
+      se::lobby::S_LobbyEnterRes enterResPkt;
+      {
+         se::common::Result* result = enterResPkt.mutable_result();
+         result->set_code(se::common::ERR_NONE);
+         result->set_message("success");
+         
+         se::lobby::PlayerProfile* profile = enterResPkt.mutable_profile();
+         se::common::PlayerId* playerIdPtr = profile->mutable_player_id();
+         playerIdPtr->set_value(playerId);
+         profile->set_nickname("Player" + std::to_string(playerId));   // TEMP
+         profile->set_level(1);  // TEMP
+      }
+      
+      SendBufferRef sendBuffer = ServerPacketHandler::MakeSendBuffer(enterResPkt);
+      g_SessionManager.FindBySessionId(sessionId)->Send(sendBuffer);
+   }
    {
       se::room::N_EntitySpawn spawnPkt;
       {
+         spawnPkt.set_entity_type(se::common::OBJ_PLAYER);
+         
          se::room::EntityState* entityState = spawnPkt.mutable_entity();
          
-         se::common::EntityId* entityId = entityState->mutable_entity_id();
+         se::common::ObjectId* entityId = entityState->mutable_entity_id();
          entityId->set_value(playerPawn->GetId().value);
          se::common::MovementState* movementState = entityState->mutable_movement();
          se::common::Vector3* postion = movementState->mutable_position();
@@ -66,9 +84,7 @@ bool Room::Join(PlayerId playerId, SessionId sessionId)
          postion->set_y(playerPawn->GetPosition().y);
          postion->set_z(playerPawn->GetPosition().z);
          movementState->set_yaw(playerPawn->GetYaw());
-         movementState->set_speed(0.0f);
-         se::common::AimRotation* aimRotation = entityState->mutable_aim();
-         aimRotation->set_pitch(playerPawn->GetPitch());
+         movementState->set_pitch(playerPawn->GetPitch());
       }
       
       SendBufferRef sendBuffer = ServerPacketHandler::MakeSendBuffer(spawnPkt);
@@ -132,7 +148,7 @@ bool Room::HandleMove(PlayerId playerId, const se::room::C_MoveInput& pkt)
    const auto& newPos = movement.position();
    playerPawn->SetPosition(Vector3{ newPos.x(), newPos.y(), newPos.z() });
    playerPawn->SetYaw(movement.yaw());
-   playerPawn->SetPitch(entity.aim().pitch());
+   playerPawn->SetPitch(movement.pitch());
    
    {
       // TODO: 나중엔 Replicated에서 Dirty 체크해서 필요한 정보만 보내도록 변경하기 (한 틱에 한번에) <- repeated 키워드를 적극 활용 하기 위해
