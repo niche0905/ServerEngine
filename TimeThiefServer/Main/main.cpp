@@ -10,6 +10,7 @@
 #include "Network/Session/PlayerSession.h"
 #include "Network/Session/SessionManager/SessionManager.h"
 #include "Network/ServerConfigReader.h"
+#include "Generated/ServerPacketHandler.h"
 
 class PlayerSession;
 
@@ -27,6 +28,7 @@ void WorkerJob(ServiceRef& service)
 int main()
 {
 	SE::Init();
+	ServerPacketHandler::Init();
 	
 	consoleLogger->Log(Color::Green, L"[main] entered main\n");
 	

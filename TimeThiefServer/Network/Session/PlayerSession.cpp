@@ -4,6 +4,7 @@
 #include "SessionManager/SessionManager.h"
 #include "SessionIdMaker.h"
 #include "Content/Player/PlayerManager/PlayerManager.h"
+#include "Generated/ServerPacketHandler.h"
 
 /*-----------------
    PlayerSession
@@ -46,9 +47,10 @@ bool PlayerSession::CanPacketProcess(const byte* buffer, int32 len)
 
 void PlayerSession::OnRecvPacket(byte* buffer, int32 len)
 {
-   // TEMP: 간단한 문자열 통신 테스트
-   std::string message(reinterpret_cast<char*>(buffer) + 1, len - 1);
-   consoleLogger->Log(Color::Blue, L"[PlayerSession] Received Packet: %S\n", message.c_str());
+   auto ioObject = shared_from_this();
+   auto session = std::static_pointer_cast<PacketSession>(ioObject);
+   
+   ServerPacketHandler::Dispatch(session, buffer, len);
 }
 
 void PlayerSession::OnConnected()
@@ -74,5 +76,4 @@ void PlayerSession::OnDisconnected()
 
 void PlayerSession::OnSend(int32 len)
 {
-   // nothing to do now
 }

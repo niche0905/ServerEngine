@@ -131,7 +131,7 @@ void IocpSession::PostSend()
 		while (sendQueue_.empty() == false) {
 			std::shared_ptr<SendBuffer> sendBuffer = sendQueue_.front();
 
-			writeSize += sendBuffer->Size();
+			writeSize += static_cast<int32>(sendBuffer->Size());
 			// TODO: check max write size (+ exception check)
 
 			sendQueue_.pop();
@@ -201,7 +201,7 @@ void IocpSession::ProcessRecv(int32 numOfBytes)
 		return;
 	}
 
-	int32 dataSize = recvBuffer_.DataSize();
+	int32 dataSize = static_cast<int32>(recvBuffer_.DataSize());
 	
 	std::pair<const byte*, size_t> dataSet = recvBuffer_.Peek();
 

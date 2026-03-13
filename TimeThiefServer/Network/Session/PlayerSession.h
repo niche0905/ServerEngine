@@ -1,5 +1,6 @@
 ﻿#pragma once
 #include "Network/Session/IOCP/IocpSession.h"
+#include "Protocol/Framing/PacketHeader.h"
 
 /*-----------------
    PlayerSession
@@ -20,11 +21,11 @@ public:
    // TEMP: 간단한 문자열 통신 테스트
    int32 GetPacketHeaderSize() const override
    {
-      return 1;
+      return sizeof(Protocol::Framing::PacketHeader);
    }
    int32 GetPacketSize(byte* packet) const override
    {
-      return reinterpret_cast<uint8*>(packet)[0];
+      return reinterpret_cast<uint16*>(packet)[0];
    }
    
    bool CanPacketProcess(const byte* buffer, int32 len) override;

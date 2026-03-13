@@ -6,6 +6,11 @@
 
 PacketHandlerFunc GPacketHandler[kMaxMessageId + 1];
 
+bool Handle_INVALID(PacketSessionRef& session, BYTE* buffer, int32 len)
+{
+    return false;
+}
+
 bool Handle_C_HandshakeReq(PacketSessionRef& session, const se::auth::C_HandshakeReq& pkt)
 {
     return false;
