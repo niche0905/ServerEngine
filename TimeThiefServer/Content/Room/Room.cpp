@@ -61,6 +61,7 @@ bool Room::Join(PlayerId playerId, SessionId sessionId)
          
          se::lobby::PlayerProfile* profile = enterResPkt.mutable_profile();
          se::common::PlayerId* playerIdPtr = profile->mutable_player_id();
+         
          playerIdPtr->set_value(playerId);
          profile->set_nickname("Player" + std::to_string(playerId));   // TEMP
          profile->set_level(1);  // TEMP
@@ -76,15 +77,15 @@ bool Room::Join(PlayerId playerId, SessionId sessionId)
          playerIdPtr->set_value(playerId);
          
          se::room::RoomSnapshot* snapshot = joinRoomPkt.mutable_snapshot();
+         snapshot->set_room_id(roomId_);
          for (const auto& [otherPlayerId, otherPlayer] : roomPlayers_) {
-            snapshot->set_room_id(roomId_);
-            
+
             se::room::RoomPlayer* roomPlayer = snapshot->add_players();
             se::common::PlayerId* playerIdPtr2 = roomPlayer->mutable_player_id();
             playerIdPtr2->set_value(otherPlayerId);
             se::common::ObjectId* entityIdPtr = roomPlayer->mutable_entity_id();
             entityIdPtr->set_value(otherPlayer.pawnObjectId.value);
-            roomPlayer->set_nickname("Player" + std::to_string(playerId));   // TEMP
+            roomPlayer->set_nickname("Player" + std::to_string(otherPlayerId));   // TEMP
             
             se::room::N_EntitySpawn* entitySpawn = joinRoomPkt.add_existing_entities();
             entitySpawn->set_entity_type(se::common::OBJ_PLAYER);
@@ -127,7 +128,7 @@ bool Room::Join(PlayerId playerId, SessionId sessionId)
       }
       
       SendBufferRef sendBuffer = ServerPacketHandler::MakeSendBuffer(spawnPkt);
-      Broadcast(sendBuffer);
+      Broadcast(sendBuffer, playerId);
    }
    
    return true;
