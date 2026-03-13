@@ -70,6 +70,45 @@ bool Room::Join(PlayerId playerId, SessionId sessionId)
       g_SessionManager.FindBySessionId(sessionId)->Send(sendBuffer);
    }
    {
+      se::room::S_JoinRoom joinRoomPkt;
+      {
+         auto* playerIdPtr = joinRoomPkt.mutable_player_id();
+         playerIdPtr->set_value(playerId);
+         
+         se::room::RoomSnapshot* snapshot = joinRoomPkt.mutable_snapshot();
+         for (const auto& [otherPlayerId, otherPlayer] : roomPlayers_) {
+            snapshot->set_room_id(roomId_);
+            
+            se::room::RoomPlayer* roomPlayer = snapshot->add_players();
+            se::common::PlayerId* playerIdPtr2 = roomPlayer->mutable_player_id();
+            playerIdPtr2->set_value(otherPlayerId);
+            se::common::ObjectId* entityIdPtr = roomPlayer->mutable_entity_id();
+            entityIdPtr->set_value(otherPlayer.pawnObjectId.value);
+            roomPlayer->set_nickname("Player" + std::to_string(playerId));   // TEMP
+            
+            se::room::N_EntitySpawn* entitySpawn = joinRoomPkt.add_existing_entities();
+            entitySpawn->set_entity_type(se::common::OBJ_PLAYER);
+            se::room::EntityState* entityState = entitySpawn->mutable_entity();
+            
+            BaseObject* otherPawn = objectManager_.Find(otherPlayer.pawnObjectId);
+            PlayerPawn* otherPlayerPawn = static_cast<PlayerPawn*>(otherPawn);
+            
+            se::common::ObjectId* entityIdPtr2 = entityState->mutable_entity_id();
+            entityIdPtr2->set_value(otherPlayer.pawnObjectId.value);
+            se::common::MovementState* movementState = entityState->mutable_movement();
+            se::common::Vector3* postion = movementState->mutable_position();
+            postion->set_x(otherPlayerPawn->GetPosition().x);
+            postion->set_y(otherPlayerPawn->GetPosition().y);
+            postion->set_z(otherPlayerPawn->GetPosition().z);
+            movementState->set_yaw(otherPlayerPawn->GetYaw());
+            movementState->set_pitch(otherPlayerPawn->GetPitch());
+         }
+      }
+      
+      SendBufferRef sendBuffer = ServerPacketHandler::MakeSendBuffer(joinRoomPkt);
+      g_SessionManager.FindBySessionId(sessionId)->Send(sendBuffer);
+   }
+   {
       se::room::N_EntitySpawn spawnPkt;
       {
          spawnPkt.set_entity_type(se::common::OBJ_PLAYER);

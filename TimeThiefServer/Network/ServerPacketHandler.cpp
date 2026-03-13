@@ -37,11 +37,6 @@ bool Handle_C_MatchQueueCancelReq(PacketSessionRef& session, const se::lobby::C_
     return false;
 }
 
-bool Handle_C_RoomReadyReq(PacketSessionRef& session, const se::room::C_RoomReadyReq& pkt)
-{
-    return false;
-}
-
 bool Handle_C_MoveInput(PacketSessionRef& session, const se::room::C_MoveInput& pkt)
 {
     return GRoom->HandleMove(session->Id(), pkt);
