@@ -40,6 +40,11 @@
     <ClCompile Include="..\External\ProtocolShared\cpp\options\packet_options.pb.cc" />
     <ClCompile Include="..\External\ProtocolShared\cpp\room\room_messages.pb.cc" />
     <ClCompile Include="..\External\ProtocolShared\cpp\room\room_types.pb.cc" />
+    <ClCompile Include="Network\ServerConfigReader.cpp" />
+    <ClCompile Include="..\External\ProtocolShared\cpp\room\room_enums.pb.cc" />
+    <ClCompile Include="..\External\ProtocolShared\cpp\game\game_enums.pb.cc" />
+    <ClCompile Include="..\External\ProtocolShared\cpp\game\game_messages.pb.cc" />
+    <ClCompile Include="..\External\ProtocolShared\cpp\game\game_types.pb.cc" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Content\Object\BaseObject.h" />
@@ -108,5 +113,8 @@
     <ClInclude Include="Content\Player\PlayerState.h" />
     <ClInclude Include="Content\Room\Room.h" />
     <ClInclude Include="Network\Session\SessionIdMaker.h" />
+    <ClInclude Include="Network\ServerConfigReader.h" />
+    <ClInclude Include="Network\ServerConfig.h" />
+    <ClInclude Include="..\External\ProtocolShared\cpp\Protocol.pb.h" />
   </ItemGroup>
 </Project>

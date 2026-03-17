@@ -34,7 +34,7 @@ public:
    
 // Handle Packet
 public:
-   bool HandleMove(PlayerId playerId, const se::room::C_MoveInput& pkt);
+   // bool HandleMove(PlayerId playerId, const se::room::C_MoveInput& pkt);
    
 public:
    template<typename T, typename... Args>
