@@ -236,6 +236,98 @@ bool Room::UpdateSession(PlayerId playerId, SessionId newSessionId)
    return true;
 }
 
+bool Room::HandleLoadingComplete(PlayerId playerId)
+{
+   std::shared_ptr<PlayerSession> sessionRef = g_SessionManager.FindByPlayerId(playerId);
+   
+   if (!sessionRef) return false;   // 세션이 존재하지 않음 (정상적이지 않은 상황)
+   
+   {
+      // TEMP
+      std::lock_guard<std::mutex> lock(mutex_);
+      
+      if (playerId == 0) 
+         return false;   // 유효하지 않은 playerId
+      
+      auto it = roomPlayers_.find(playerId);
+      if (it == roomPlayers_.end())
+         return false;
+      
+      if (it->second.loadingComplete)
+         return true;   // 이미 로딩 완료 처리된 플레이어
+      
+      it->second.loadingComplete = true;
+   }
+   
+   return true;
+}
+
+bool Room::HandleMove(PlayerId playerId, const se::game::C_MoveReq& pkt)
+{
+   SendBufferRef moveBroadcastBuffer;
+   std::shared_ptr<PlayerSession> sessionRef = g_SessionManager.FindByPlayerId(playerId);
+   
+   if (!sessionRef) return false;   // 세션이 존재하지 않음 (정상적이지 않은 상황)
+   // TODO: 기본적으로 본인 Player에겐 예외, 다만 유효성 판정 실패 시 보정 패킷을 보내야 한다
+   
+   {
+      // TEMP
+      std::lock_guard<std::mutex> lock(mutex_);
+      
+      if (playerId == 0)
+         return false;
+      
+      auto it = roomPlayers_.find(playerId);
+      if (it == roomPlayers_.end())
+         return false;   // 방에 존재하지 않는 플레이어
+      
+      if (not it->second.loadingComplete)
+         return false;
+      
+      auto* obj = objectManager_.Find(it->second.pawnObjectId);
+      if (!obj)
+         return false;
+      
+      auto* playerPawn = dynamic_cast<PlayerPawn*>(obj);
+      if (!playerPawn)
+         return false;
+      
+      const auto& move = pkt.movement();
+      const auto& pos = move.position();
+      
+      // TODO: 유효성 판정은 여기서
+      //       bool 값으로 유효성 판정 결과를 받고, 유효하지 않은 경우 보정 패킷을 보내는 구조로 변경하기 (클라이언트와 서버의 위치가 달라지는 경우 보정 패킷을 보내는 구조로)
+      
+      playerPawn->SetPosition(Vector3{pos.x(), pos.y(), pos.z()});
+      playerPawn->SetYaw(move.yaw());
+      playerPawn->SetPitch(move.pitch());
+      
+      se::game::N_Move noti;
+      {
+         auto* entityIdPtr = noti.mutable_entity_id();
+         entityIdPtr->set_value(it->second.pawnObjectId.value);
+         
+         auto* movementPtr = noti.mutable_movement();
+         auto* positionPtr = movementPtr->mutable_position();
+         
+         const auto& newPos = playerPawn->GetPosition();
+         positionPtr->set_x(newPos.x);
+         positionPtr->set_y(newPos.y);
+         positionPtr->set_z(newPos.z);
+         
+         movementPtr->set_yaw(playerPawn->GetYaw());
+         movementPtr->set_pitch(playerPawn->GetPitch());
+      }
+      
+      moveBroadcastBuffer = ServerPacketHandler::MakeSendBuffer(noti);
+   }
+   
+   if (moveBroadcastBuffer)
+      Broadcast(moveBroadcastBuffer, playerId);   // 이동한 플레이어를 제외한 나머지 플레이어들에게 이동 정보 Broadcast
+   
+   return true;
+}
+
 // bool Room::HandleMove(PlayerId playerId, const se::room::C_MoveInput& pkt)
 // {
 //    ObjectId playerPawnId = GetObjectId(playerId);

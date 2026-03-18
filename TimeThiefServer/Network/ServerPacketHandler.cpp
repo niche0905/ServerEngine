@@ -80,12 +80,36 @@ bool Handle_C_RoomLeaveReq(PacketSessionRef& session, const se::room::C_RoomLeav
     
 bool Handle_C_LoadingCompleteReq(PacketSessionRef& session, const se::game::C_LoadingCompleteReq& pkt)
 {
-    return false;
+    if (!session) return false;
+    
+    SessionId sessionId = session->Id();
+    
+    PlayerId playerId = 0;
+    if (!g_SessionManager.TryGetPlayerId(sessionId, playerId)) return false;
+    
+    if (playerId == 0 or sessionId == 0) return false;
+    
+    auto room = GRoom;  // TEMP
+    if (!room) return false;
+    
+    return room->HandleLoadingComplete(playerId);
 }
     
 bool Handle_C_MoveReq(PacketSessionRef& session, const se::game::C_MoveReq& pkt)
 {
-    return false;
+    if (!session) return false;
+    
+    SessionId sessionId = session->Id();
+    
+    PlayerId playerId = 0;
+    if (!g_SessionManager.TryGetPlayerId(sessionId, playerId)) return false;
+    
+    if (playerId == 0 or sessionId == 0) return false;
+    
+    auto room = GRoom;  // TEMP
+    if (!room) return false;
+    
+    return room->HandleMove(playerId, pkt);
 }
     
 bool Handle_C_FireReq(PacketSessionRef& session, const se::game::C_FireReq& pkt)

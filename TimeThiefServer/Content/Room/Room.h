@@ -34,7 +34,8 @@ public:
    
 // Handle Packet
 public:
-   // bool HandleMove(PlayerId playerId, const se::room::C_MoveInput& pkt);
+   bool HandleLoadingComplete(PlayerId playerId);
+   bool HandleMove(PlayerId playerId, const se::game::C_MoveReq& pkt);
    
 public:
    template<typename T, typename... Args>
@@ -82,6 +83,7 @@ private:
       SessionId sessionId = 0;
       
       ObjectId pawnObjectId{};
+      bool loadingComplete = false;
       
       // TODO: Room 로직에서 필요한 추가 정보 (예: 플레이어 상태, 위치, 이동 동기화 시간 등) 캐싱
    };
