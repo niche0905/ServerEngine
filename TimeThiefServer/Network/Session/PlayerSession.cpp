@@ -4,6 +4,7 @@
 #include "SessionManager/SessionManager.h"
 #include "SessionIdMaker.h"
 #include "Content/Player/PlayerManager/PlayerManager.h"
+#include "Content/Room/Room.h"
 #include "Generated/ServerPacketHandler.h"
 
 /*-----------------
@@ -66,10 +67,19 @@ void PlayerSession::OnDisconnected()
    PlayerId playerId = 0;
    bool binding = g_SessionManager.TryGetPlayerId(Id(), playerId);
    if (binding) {
+      // TODO: 플레이어가 방에 입장해 있는 상태라면 방에서도 제거하기 (방 정보는 Player 객체에 캐싱되어 있으므로 PlayerManager에서 제거할 때 RoomManager에도 알려주는 방식으로 구현할 수 있을 듯)
+      auto playerRef = g_PlayerManager.Find(playerId);
+      if (playerRef) {
+         RoomId roomId = playerRef->roomId_;
+         // TODO: RoomManager에서 방 정보를 찾아서 플레이어 제거 요청하기 (방 정보는 Player 객체에 캐싱되어 있으므로 PlayerManager에서 제거할 때 RoomManager에도 알려주는 방식으로 구현할 수 있을 듯)
+         auto roomRef = GRoom;   // TEMP
+         if (roomRef) {
+            roomRef->Leave(playerId);
+         }
+      }
+      
       // TODO: 지금은 Player 정보를 아예 지워 버리지만, 재 로그인을 예상하여 SessionId만 invalid 처리하는 것도 방법일듯 싶다
       g_PlayerManager.Remove(playerId);
-      
-      // TODO: 플레이어가 방에 입장해 있는 상태라면 방에서도 제거하기 (방 정보는 Player 객체에 캐싱되어 있으므로 PlayerManager에서 제거할 때 RoomManager에도 알려주는 방식으로 구현할 수 있을 듯)
    }
    
    g_SessionManager.RemoveBySessionId(Id());

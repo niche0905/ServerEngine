@@ -172,19 +172,51 @@ bool Room::Join(PlayerId playerId, SessionId sessionId)
 
 bool Room::Leave(PlayerId playerId)
 {
-   // TEMP
-   std::lock_guard<std::mutex> lock(mutex_);
+   SendBufferRef leaveResBuffer;
+   SendBufferRef despawnBufferToOthers;
+   std::shared_ptr<PlayerSession> sessionRef = g_SessionManager.FindByPlayerId(playerId);
    
-   auto it = roomPlayers_.find(playerId);
-   if (it == roomPlayers_.end())
-      return false;   // 방에 존재하지 않는 플레이어
+   {
+      // TEMP
+      std::lock_guard<std::mutex> lock(mutex_);
+      
+      if (playerId == 0)
+         return false;   // 유효하지 않은 playerId
    
-   const ObjectId pawnId = it->second.pawnObjectId;
-   if (pawnId != ObjectId{}) {
-      DespawnObject(pawnId);   // 플레이어의 Pawn이 존재하면 제거
+      auto it = roomPlayers_.find(playerId);
+      if (it == roomPlayers_.end())
+         return false;   // 방에 존재하지 않는 플레이어
+      
+      if (sessionRef) 
+      {
+         se::room::S_RoomLeaveRes res;
+         res.set_success(true);
+         
+         leaveResBuffer = ServerPacketHandler::MakeSendBuffer(res);
+      }
+      
+      {
+         se::room::N_EntityDespawn noti;
+         auto* entityIdPtr = noti.mutable_entity_id();
+         entityIdPtr->set_value(it->second.pawnObjectId.value);
+         
+         despawnBufferToOthers = ServerPacketHandler::MakeSendBuffer(noti);
+      }
+   
+      const ObjectId pawnId = it->second.pawnObjectId;
+      roomPlayers_.erase(it);
+      
+      if (pawnId != ObjectId{}) {
+         DespawnObject(pawnId);   // 플레이어의 Pawn이 존재하면 제거
+      }
    }
    
-   roomPlayers_.erase(it);
+   if (sessionRef and leaveResBuffer)
+      sessionRef->Send(leaveResBuffer);   // 퇴장한 플레이어에게 퇴장 결과 전송
+   
+   if (despawnBufferToOthers)
+      Broadcast(despawnBufferToOthers, playerId);
+   
    return true;
 }
 
@@ -308,8 +340,8 @@ ObjectId Room::GetObjectId(PlayerId playerId) const
 
 void Room::Broadcast(std::shared_ptr<SendBuffer> sendBuffer, PlayerId exceptPlayerId)
 {
-   // // TEMP
-   // std::lock_guard<std::mutex> lock(mutex_);
+   // TEMP
+   std::lock_guard<std::mutex> lock(mutex_);
    
    if (not sendBuffer)
       return;   // 유효하지 않은 SendBuffer
