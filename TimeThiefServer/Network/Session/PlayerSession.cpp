@@ -58,6 +58,7 @@ void PlayerSession::OnConnected()
    SessionId newSessionId = SessionIdMaker::Next();
    AssignId(newSessionId);
    g_SessionManager.Add(newSessionId, AsShared<PlayerSession>());
+   g_SessionManager.BindPlayer(newSessionId, newSessionId);    // TEMP
 }
 
 void PlayerSession::OnDisconnected()

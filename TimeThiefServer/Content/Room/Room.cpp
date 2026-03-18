@@ -30,106 +30,142 @@ Room::~Room()
 
 bool Room::Join(PlayerId playerId, SessionId sessionId)
 {
-   // TEMP
-   std::lock_guard<std::mutex> lock(mutex_);   // 방에 플레이어가 입장/퇴장할 때마다 Lock을 잡는 구조 (샤딩 도입 전까지는 이 구조로 유지)
+   SendBufferRef enterResBuffer;
+   std::vector<SendBufferRef> spawnBuffersToNewPlayer;
+   SendBufferRef spawnBufferToOthers;
+   std::shared_ptr<PlayerSession> sessionRef = g_SessionManager.FindBySessionId(sessionId);
    
-   if (playerId == 0 or sessionId == 0)      // 유효하지 않은 playerId 또는 sessionId
-      return false;
+   if (!sessionRef) return false;   // 세션이 존재하지 않음 (정상적이지 않은 상황)
    
-   auto it = roomPlayers_.find(playerId);
-   if (it != roomPlayers_.end()) {
-      it->second.sessionId = sessionId;
-      return true;   // 이미 방에 존재하는 플레이어, 세션 정보만 업데이트
+   {
+      std::lock_guard<std::mutex> lock(mutex_);   // 방에 플레이어가 입장/퇴장할 때마다 Lock을 잡는 구조 (샤딩 도입 전까지는 이 구조로 유지)
+   
+      if (playerId == 0 or sessionId == 0)      // 유효하지 않은 playerId 또는 sessionId
+         return false;
+      
+      auto it = roomPlayers_.find(playerId);
+      if (it != roomPlayers_.end()) {
+         return false;   // 이미 방에 존재하는 플레이어의 경우 실패 처리
+      }
+      
+      RoomPlayer newPlayer;
+      newPlayer.playerId = playerId;
+      newPlayer.sessionId = sessionId;
+      
+      auto playerPawn = SpawnObject<PlayerPawn>(ObjectFlags::Replicable | ObjectFlags::Tickable);
+      if (!playerPawn) {
+         consoleLogger->Log(Color::Yellow, L"[Room] Failed to spawn PlayerPawn for playerId %u\n", playerId);
+         return false;   // 플레이어 Pawn 생성 실패
+      }
+      playerPawn->SetPosition(Vector3{0.0f + static_cast<float>(playerId * 100), 0.0f, 0.0f});   // TEMP: 플레이어마다 x축으로 100씩 떨어뜨려서 스폰하기
+      
+      newPlayer.pawnObjectId = playerPawn->GetId();
+      
+      auto [insertIt, inserted]= roomPlayers_.emplace(playerId, std::move(newPlayer));
+      if (not inserted) return false;
+      
+      auto& joinedPlayer = insertIt->second;
+      
+      {
+         // 입장한 플레이어에게 방 스냅샷 전송
+         se::room::S_RoomEnterRes res;
+         {
+            res.set_success(true);
+            auto* snapshot = res.mutable_snapshot();
+            snapshot->set_room_id(roomId_);
+            
+            for (auto& [exPlayerId, exPlayer] : roomPlayers_) {
+               auto* roomPlayer = snapshot->add_players();
+               auto* playerIdPtr = roomPlayer->mutable_player_id();
+               playerIdPtr->set_value(exPlayerId);
+               auto* entityIdPtr = roomPlayer->mutable_entity_id();
+               entityIdPtr->set_value(exPlayer.pawnObjectId.value);
+               roomPlayer->set_nickname("Player" + std::to_string(exPlayerId));   // TEMP
+            }
+            
+            auto* myEntityId = res.mutable_my_entity_id();
+            myEntityId->set_value(joinedPlayer.pawnObjectId.value);
+         }
+         
+         enterResBuffer = ServerPacketHandler::MakeSendBuffer(res);
+      }
+      {
+         // 입장한 플레이어에게 기존 플레이어들의 스폰 정보 전송
+         for (const auto& [exPlayerId, exPlayer] : roomPlayers_) {
+            
+            if (exPlayerId == playerId)
+               continue;   // 자기 자신은 제외
+            
+            se::room::N_EntitySpawn spawnPkt;
+            {
+               auto* spawnInfo = spawnPkt.mutable_info();
+               
+               spawnInfo->set_type(se::common::OBJ_PLAYER);
+               spawnInfo->set_template_id(1);   // TEMP (기본 플레이어...?)
+               auto* entityIdPtr = spawnInfo->mutable_entity_id();
+               entityIdPtr->set_value(exPlayer.pawnObjectId.value);
+               
+               auto* movementPtr = spawnInfo->mutable_movement();
+               auto* positionPtr = movementPtr->mutable_position();
+               
+               auto* exPawn = objectManager_.Find(exPlayer.pawnObjectId);
+               if (!exPawn) {
+	               consoleLogger->Log(Color::Yellow, L"[Room] PlayerPawn not exist\n");
+                  continue;
+               }
+               
+               auto* exPlayerPawn = dynamic_cast<PlayerPawn*>(exPawn);
+               if (!exPlayerPawn) {
+                  consoleLogger->Log(Color::Yellow, L"[Room] PlayerPawn is not PlayerPawn\n");
+                  continue;
+               }
+               
+               const auto& exPos = exPlayerPawn->GetPosition();
+               positionPtr->set_x(exPos.x);
+               positionPtr->set_y(exPos.y);
+               positionPtr->set_z(exPos.z);
+               
+               movementPtr->set_yaw(exPlayerPawn->GetYaw());
+               movementPtr->set_pitch(exPlayerPawn->GetPitch());
+               
+            }
+            SendBufferRef sendBuffer = ServerPacketHandler::MakeSendBuffer(spawnPkt);
+            spawnBuffersToNewPlayer.push_back(sendBuffer);
+         }
+      }
+      {
+         se::room::N_EntitySpawn spawnPkt;
+         {
+            auto* spawnInfo = spawnPkt.mutable_info();
+               
+            spawnInfo->set_type(se::common::OBJ_PLAYER);
+            spawnInfo->set_template_id(1);   // TEMP (기본 플레이어...?)
+            auto* entityIdPtr = spawnInfo->mutable_entity_id();
+            entityIdPtr->set_value(joinedPlayer.pawnObjectId.value);
+            
+            // TODO: 아래 SpawnPoint 부분을 나중에 Spawn 지점으로 변경하기 (미리 Spawn Point에 Pawn 값을 설정하기)
+            auto* movementPtr = spawnInfo->mutable_movement();
+            auto* positionPtr = movementPtr->mutable_position();
+               
+            const auto& JoinerPos = playerPawn->GetPosition();
+            positionPtr->set_x(JoinerPos.x);
+            positionPtr->set_y(JoinerPos.y);
+            positionPtr->set_z(JoinerPos.z);
+               
+            movementPtr->set_yaw(playerPawn->GetYaw());
+            movementPtr->set_pitch(playerPawn->GetPitch());
+         }
+         
+         spawnBufferToOthers = ServerPacketHandler::MakeSendBuffer(spawnPkt);
+      }
    }
    
-   RoomPlayer newPlayer;
-   newPlayer.playerId = playerId;
-   newPlayer.sessionId = sessionId;
-   
-   auto playerPawn = SpawnObject<PlayerPawn>(ObjectFlags::Replicable | ObjectFlags::Tickable);
-   newPlayer.pawnObjectId = playerPawn->GetId();
-   
-   roomPlayers_.emplace(playerId, std::move(newPlayer));
-   
-   // // TEMP
-   // {
-   //    se::lobby::S_LobbyEnterRes enterResPkt;
-   //    {
-   //       se::common::Result* result = enterResPkt.mutable_result();
-   //       result->set_code(se::common::ERR_NONE);
-   //       result->set_message("success");
-   //       
-   //       se::lobby::PlayerProfile* profile = enterResPkt.mutable_profile();
-   //       se::common::PlayerId* playerIdPtr = profile->mutable_player_id();
-   //       
-   //       playerIdPtr->set_value(playerId);
-   //       profile->set_nickname("Player" + std::to_string(playerId));   // TEMP
-   //       profile->set_level(1);  // TEMP
-   //    }
-   //    
-   //    SendBufferRef sendBuffer = ServerPacketHandler::MakeSendBuffer(enterResPkt);
-   //    g_SessionManager.FindBySessionId(sessionId)->Send(sendBuffer);
-   // }
-   // {
-   //    se::room::S_JoinRoom joinRoomPkt;
-   //    {
-   //       auto* playerIdPtr = joinRoomPkt.mutable_player_id();
-   //       playerIdPtr->set_value(playerId);
-   //       
-   //       se::room::RoomSnapshot* snapshot = joinRoomPkt.mutable_snapshot();
-   //       snapshot->set_room_id(roomId_);
-   //       for (const auto& [otherPlayerId, otherPlayer] : roomPlayers_) {
-   //
-   //          se::room::RoomPlayer* roomPlayer = snapshot->add_players();
-   //          se::common::PlayerId* playerIdPtr2 = roomPlayer->mutable_player_id();
-   //          playerIdPtr2->set_value(otherPlayerId);
-   //          se::common::ObjectId* entityIdPtr = roomPlayer->mutable_entity_id();
-   //          entityIdPtr->set_value(otherPlayer.pawnObjectId.value);
-   //          roomPlayer->set_nickname("Player" + std::to_string(otherPlayerId));   // TEMP
-   //          
-   //          se::room::N_EntitySpawn* entitySpawn = joinRoomPkt.add_existing_entities();
-   //          entitySpawn->set_entity_type(se::common::OBJ_PLAYER);
-   //          se::room::EntityState* entityState = entitySpawn->mutable_entity();
-   //          
-   //          BaseObject* otherPawn = objectManager_.Find(otherPlayer.pawnObjectId);
-   //          PlayerPawn* otherPlayerPawn = static_cast<PlayerPawn*>(otherPawn);
-   //          
-   //          se::common::ObjectId* entityIdPtr2 = entityState->mutable_entity_id();
-   //          entityIdPtr2->set_value(otherPlayer.pawnObjectId.value);
-   //          se::common::MovementState* movementState = entityState->mutable_movement();
-   //          se::common::Vector3* postion = movementState->mutable_position();
-   //          postion->set_x(otherPlayerPawn->GetPosition().x);
-   //          postion->set_y(otherPlayerPawn->GetPosition().y);
-   //          postion->set_z(otherPlayerPawn->GetPosition().z);
-   //          movementState->set_yaw(otherPlayerPawn->GetYaw());
-   //          movementState->set_pitch(otherPlayerPawn->GetPitch());
-   //       }
-   //    }
-   //    
-   //    SendBufferRef sendBuffer = ServerPacketHandler::MakeSendBuffer(joinRoomPkt);
-   //    g_SessionManager.FindBySessionId(sessionId)->Send(sendBuffer);
-   // }
-   // {
-   //    se::room::N_EntitySpawn spawnPkt;
-   //    {
-   //       spawnPkt.set_entity_type(se::common::OBJ_PLAYER);
-   //       
-   //       se::room::EntityState* entityState = spawnPkt.mutable_entity();
-   //       
-   //       se::common::ObjectId* entityId = entityState->mutable_entity_id();
-   //       entityId->set_value(playerPawn->GetId().value);
-   //       se::common::MovementState* movementState = entityState->mutable_movement();
-   //       se::common::Vector3* postion = movementState->mutable_position();
-   //       postion->set_x(playerPawn->GetPosition().x);
-   //       postion->set_y(playerPawn->GetPosition().y);
-   //       postion->set_z(playerPawn->GetPosition().z);
-   //       movementState->set_yaw(playerPawn->GetYaw());
-   //       movementState->set_pitch(playerPawn->GetPitch());
-   //    }
-   //    
-   //    SendBufferRef sendBuffer = ServerPacketHandler::MakeSendBuffer(spawnPkt);
-   //    Broadcast(sendBuffer, playerId);
-   // }
+   if (enterResBuffer)
+      sessionRef->Send(enterResBuffer);   // 입장한 플레이어에게 방 스냅샷 전송
+   for (const auto& buf : spawnBuffersToNewPlayer)
+      sessionRef->Send(buf);   // 입장한 플레이어에게 기존 플레이어들의 스폰 정보 전송
+   if (spawnBufferToOthers)
+      Broadcast(spawnBufferToOthers);   // 입장한 플레이어를 spawn
    
    return true;
 }

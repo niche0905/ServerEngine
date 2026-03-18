@@ -3,6 +3,7 @@
 
 #include "Content/Room/Room.h"
 #include "Session/PlayerSession.h"
+#include "Session/SessionManager/SessionManager.h"
 
 PacketHandlerFunc GPacketHandler[kMaxMessageId + 1];
 
@@ -45,7 +46,20 @@ bool Handle_C_MatchQueueCancelReq(PacketSessionRef& session, const se::lobby::C_
     
 bool Handle_C_RoomEnterReq(PacketSessionRef& session, const se::room::C_RoomEnterReq& pkt)
 {
-    return false;
+    if (!session) return false;
+    
+    SessionId sessionId = session->Id();
+    PlayerId playerId;
+    if (!g_SessionManager.TryGetPlayerId(sessionId, playerId)) return false;
+    
+    if (playerId == 0 or sessionId == 0) return false;
+    
+    auto room = GRoom;
+    if (!room) return false;
+    
+    // pkt.room_id();
+    
+    return room->Join(playerId, sessionId);
 }
     
 bool Handle_C_RoomLeaveReq(PacketSessionRef& session, const se::room::C_RoomLeaveReq& pkt)
