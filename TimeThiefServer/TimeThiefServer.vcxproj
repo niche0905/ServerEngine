@@ -570,6 +570,7 @@
     <ClInclude Include="Content\Room\Systems\ZoneSystem.h" />
     <ClInclude Include="Content\Room\Systems\ZoneTypes.h" />
     <ClInclude Include="Content\Shared\BaseComponent.h" />
+    <ClInclude Include="Data\Tables\ZoneTable.h" />
     <ClInclude Include="Network\ServerConfigReader.h" />
     <ClInclude Include="Network\ServerConfig.h" />
     <ClInclude Include="Network\Session\PlayerSession.h" />
