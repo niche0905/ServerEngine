@@ -577,6 +577,7 @@
     <ClInclude Include="Network\Session\PlayerSession.h" />
     <ClInclude Include="Network\Session\SessionIdMaker.h" />
     <ClInclude Include="Network\Session\SessionManager\SessionManager.h" />
+    <ClInclude Include="Network\Session\PlayerSessionState.h" />
     <ClInclude Include="Utils\pch.h" />
   </ItemGroup>
   <ItemGroup>

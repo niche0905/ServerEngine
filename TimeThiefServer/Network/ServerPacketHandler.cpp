@@ -16,7 +16,12 @@ bool Handle_INVALID(PacketSessionRef& session, BYTE* buffer, int32 len)
 
 bool Handle_C_HandshakeReq(PacketSessionRef& session, const se::auth::C_HandshakeReq& pkt)
 {
-    return false;
+    if (!session) return false;
+    
+    auto playerSession = std::static_pointer_cast<PlayerSession>(session);
+    if (!playerSession) return false;
+    
+    return playerSession->HandleHandshake(pkt);
 }
     
 bool Handle_C_LoginReq(PacketSessionRef& session, const se::auth::C_LoginReq& pkt)

@@ -6,6 +6,7 @@
 #include "Content/Player/PlayerManager/PlayerManager.h"
 #include "Content/Room/Room.h"
 #include "Generated/ServerPacketHandler.h"
+#include "Protocol/ProtocolVersion.h"
 
 /*-----------------
    PlayerSession
@@ -54,12 +55,52 @@ void PlayerSession::OnRecvPacket(byte* buffer, int32 len)
    ServerPacketHandler::Dispatch(session, buffer, len);
 }
 
+bool PlayerSession::HandleHandshake(const se::auth::C_HandshakeReq& pkt)
+{
+   if (state_ != PlayerSessionState::Handshaking) 
+      return false;
+   
+   if (pkt.client_protocol_version() != se::protocol::kProtocolVersion) {
+      SendHandshakeRes(false, se::common::ERR_INVALID_PROTOCOL_VERSION, "Protocol version mismatch");
+      Disconnect(L"Incompatible protocol version");
+      return false;
+   }
+   
+   SendHandshakeRes(true, se::common::ERR_NONE, "OK");
+   
+   state_ = PlayerSessionState::InLobby;
+   return true;
+}
+
+void PlayerSession::SendHandshakeRes(bool success, se::common::ErrorCode errorCode, const std::string& errorMessage)
+{
+   se::auth::S_HandshakeRes handshakeRes;
+   handshakeRes.set_success(success);
+   auto* result = handshakeRes.mutable_result();
+   result->set_code(errorCode);
+   result->set_message(errorMessage);
+   
+   PlayerId playerId = 0;
+   if (g_SessionManager.TryGetPlayerId(Id(), playerId)) {
+      handshakeRes.set_session_player_id(playerId);
+   }
+   auto* config = handshakeRes.mutable_config();
+   config->set_movement_update_hz(10);   // TODO: 이 값은 .ini나 .config 파일로 부터 읽어와서 적용해야 할 듯 싶다
+   config->set_ping_interval_ms(1000);   // TODO: 이 값은 .ini나 .config 파일로 부터 읽어와서 적용해야 할 듯 싶다
+   
+   auto buffer = ServerPacketHandler::MakeSendBuffer(handshakeRes);
+   Send(buffer);
+}
+
+
 void PlayerSession::OnConnected()
 {
    SessionId newSessionId = SessionIdMaker::Next();
    AssignId(newSessionId);
    g_SessionManager.Add(newSessionId, AsShared<PlayerSession>());
    g_SessionManager.BindPlayer(newSessionId, newSessionId);    // TEMP
+   
+   state_ = PlayerSessionState::Handshaking;
 }
 
 void PlayerSession::OnDisconnected()

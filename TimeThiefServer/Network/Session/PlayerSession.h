@@ -1,6 +1,8 @@
 ﻿#pragma once
+#include "PlayerSessionState.h"
 #include "Network/Session/IOCP/IocpSession.h"
 #include "Protocol/Framing/PacketHeader.h"
+#include "Protocol.pb.h"
 
 /*-----------------
    PlayerSession
@@ -31,6 +33,16 @@ public:
    bool CanPacketProcess(const byte* buffer, int32 len) override;
    void OnRecvPacket(byte* buffer, int32 len) override;
    
+public:
+   PlayerSessionState GetState() const { return state_; }
+   void SetState(PlayerSessionState newState) { state_ = newState; }
+   
+public:
+   bool HandleHandshake(const se::auth::C_HandshakeReq& pkt);
+   
+public:
+   void SendHandshakeRes(bool success, se::common::ErrorCode errorCode, const std::string& errorMessage);
+   
 // on event interface for content override
 protected:
    void OnConnected() override;
@@ -39,6 +51,8 @@ protected:
    void OnSend(int32 len) override;
    
 private:
+   PlayerSessionState state_ = PlayerSessionState::Connected;
+   
    // TODO: 플레이어 세션 관련 멤버 변수 추가 예정
     
 };
