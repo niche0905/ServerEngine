@@ -317,6 +317,7 @@ bool Room::HandleMove(PlayerId playerId, const se::game::C_MoveReq& pkt)
          
          movementPtr->set_yaw(playerPawn->GetYaw());
          movementPtr->set_pitch(playerPawn->GetPitch());
+         movementPtr->set_speed(move.speed());
       }
       
       moveBroadcastBuffer = ServerPacketHandler::MakeSendBuffer(noti);
