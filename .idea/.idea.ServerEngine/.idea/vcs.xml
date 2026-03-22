@@ -4,5 +4,7 @@
     <mapping directory="" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/External/ProtocolShared" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/External/protobuf" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/External/protobuf/third_party/benchmark" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/External/protobuf/third_party/googletest" vcs="Git" />
   </component>
 </project>

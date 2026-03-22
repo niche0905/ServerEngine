@@ -31,7 +31,20 @@ bool Handle_C_LoginReq(PacketSessionRef& session, const se::auth::C_LoginReq& pk
     
 bool Handle_C_Ping(PacketSessionRef& session, const se::auth::C_Ping& pkt)
 {
-    return false;
+    if (!session) return false;
+    
+    // TODO: Session에서 Ping/Pong을 가지고 timeout 판정을 하거나, 개별로 RTT를 필요로 한다면 HandlePing 멤버함수 만들기
+    //       지금은 간단한 Pong 응답만 보내도록 구현
+    
+    se::auth::S_Pong pongPkt;
+    pongPkt.set_client_time_ms(pkt.client_time_ms());
+    // pongPkt.set_server_time_ms(GetCurrentTimeMs());  // 아직 서버 시간 보내는 기능이 필요하지 않아서 주석 처리, 필요해지면 구현 예정
+    
+    auto sendBuffer = ServerPacketHandler::MakeSendBuffer(pongPkt);
+    if (!sendBuffer) return false;
+    
+    session->Send(sendBuffer);
+    return true;
 }
     
 bool Handle_C_SetNicknameReq(PacketSessionRef& session, const se::lobby::C_SetNicknameReq& pkt)
