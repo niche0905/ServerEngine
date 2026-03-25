@@ -37,7 +37,7 @@ namespace se::map
     
     bool RunServerMapLoaderTest()
     {
-        const std::string filePath = "TestMap.servermap";
+        const std::string filePath = "TestMap_Tagged.servermap";
 
         // if (not WriteTestMapFile(filePath)) {
         //     std::cout << "[Test] WriteTestMapFile failed\n";
@@ -58,23 +58,27 @@ namespace se::map
             std::cout << "[Test] No colliders loaded\n";
             return false;
         }
-
-        const ColliderData& collider = loadedMapData.colliders[0];
-
-        std::cout << "[Test] type = " << static_cast<int>(collider.type) << "\n";
-        std::cout << "[Test] flags = " << collider.flags << "\n";
-        std::cout << "[Test] position = "
-                  << collider.position.x << ", "
-                  << collider.position.y << ", "
-                  << collider.position.z << "\n";
-        std::cout << "[Test] rotationDeg = "
-                  << collider.rotationDeg.x << ", "
-                  << collider.rotationDeg.y << ", "
-                  << collider.rotationDeg.z << "\n";
-        std::cout << "[Test] extents = "
-                  << collider.extents.x << ", "
-                  << collider.extents.y << ", "
-                  << collider.extents.z << "\n";
+        
+        for (size_t i = 0; i < loadedMapData.colliders.size(); ++i) {
+            const ColliderData& collider = loadedMapData.colliders[i];
+            std::cout << "[Test] Collider " << i << ":\n";
+            std::cout << "  type = " << static_cast<int>(collider.type) << "\n";
+            std::cout << "  flags = " << collider.flags << "\n";
+            std::cout << "  position = "
+                      << collider.position.x << ", "
+                      << collider.position.y << ", "
+                      << collider.position.z << "\n";
+            std::cout << "  rotationDeg = "
+                      << collider.rotationDeg.x << ", "
+                      << collider.rotationDeg.y << ", "
+                      << collider.rotationDeg.z << "\n";
+            std::cout << "  extents = "
+                      << collider.extents.x << ", "
+                      << collider.extents.y << ", "
+                      << collider.extents.z << "\n";
+            std::cout << "  radius = " << collider.radius << "\n";
+            std::cout << "  halfHeight = " << collider.halfHeight << "\n";
+        }
 
         return true;
     }
