@@ -58,3 +58,7 @@ namespace se::map
 	
 	
 }
+
+static_assert(sizeof(se::map::Float3) == 12);
+static_assert(sizeof(se::map::MapHeader) == 20);
+static_assert(sizeof(se::map::ColliderData) == 52);
