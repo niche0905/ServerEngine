@@ -346,6 +346,7 @@
     <ClCompile Include="Content\Room\Room.cpp" />
     <ClCompile Include="Content\Room\Systems\ZoneSystem.cpp" />
     <ClCompile Include="Data\Loader\ServerMapLoader.cpp" />
+    <ClCompile Include="Data\Loader\ServerMapLoaderTest.cpp" />
     <ClCompile Include="Main\main.cpp">
       <RuntimeLibrary>MultiThreadedDebugDll</RuntimeLibrary>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -573,6 +574,7 @@
     <ClInclude Include="Content\Shared\BaseComponent.h" />
     <ClInclude Include="Data\GameDataManager.h" />
     <ClInclude Include="Data\Loader\ServerMapLoader.h" />
+    <ClInclude Include="Data\Loader\ServerMapLoaderTest.h" />
     <ClInclude Include="Data\Map\ServerMapFormat.h" />
     <ClInclude Include="Data\Tables\ZoneTable.h" />
     <ClInclude Include="Network\ServerConfigReader.h" />
