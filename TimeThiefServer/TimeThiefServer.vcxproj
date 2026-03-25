@@ -345,6 +345,7 @@
     <ClCompile Include="Content\Player\PlayerManager\PlayerManager.cpp" />
     <ClCompile Include="Content\Room\Room.cpp" />
     <ClCompile Include="Content\Room\Systems\ZoneSystem.cpp" />
+    <ClCompile Include="Data\Loader\ServerMapLoader.cpp" />
     <ClCompile Include="Main\main.cpp">
       <RuntimeLibrary>MultiThreadedDebugDll</RuntimeLibrary>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -571,6 +572,8 @@
     <ClInclude Include="Content\Room\Systems\ZoneTypes.h" />
     <ClInclude Include="Content\Shared\BaseComponent.h" />
     <ClInclude Include="Data\GameDataManager.h" />
+    <ClInclude Include="Data\Loader\ServerMapLoader.h" />
+    <ClInclude Include="Data\Map\ServerMapFormat.h" />
     <ClInclude Include="Data\Tables\ZoneTable.h" />
     <ClInclude Include="Network\ServerConfigReader.h" />
     <ClInclude Include="Network\ServerConfig.h" />
@@ -582,9 +585,6 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="CMakeLists.txt" />
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Data\Loader\" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
