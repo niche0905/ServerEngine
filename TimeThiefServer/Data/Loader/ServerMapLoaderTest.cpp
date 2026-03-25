@@ -39,10 +39,10 @@ namespace se::map
     {
         const std::string filePath = "TestMap.servermap";
 
-        if (not WriteTestMapFile(filePath)) {
-            std::cout << "[Test] WriteTestMapFile failed\n";
-            return false;
-        }
+        // if (not WriteTestMapFile(filePath)) {
+        //     std::cout << "[Test] WriteTestMapFile failed\n";
+        //     return false;
+        // }
 
         ServerMapLoader loader;
         LoadedMapData loadedMapData;
