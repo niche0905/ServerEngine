@@ -1,5 +1,6 @@
 ﻿#pragma once
 #include "Pawn.h"
+#include "Content/Gameplay/AI/MonsterAiComponent.h"
 #include "Content/Gameplay/Loot/ILootSource.h"
 #include "Content/Gameplay/Loot/LootSourceComponent.h"
 #include "Content/Gameplay/Spawn/RespawnComponent.h"
@@ -80,5 +81,7 @@ private:
    
    RespawnComponent respawn_;
    LootSourceComponent loot_;
+   
+   MonsterAiComponent ai_;
     
 };

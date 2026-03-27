@@ -252,6 +252,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="Content\Gameplay\AI\MonsterAiComponent.cpp" />
     <ClCompile Include="Content\Gameplay\Loot\LootTableService.cpp">
       <RuntimeLibrary>MultiThreadedDebugDll</RuntimeLibrary>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -508,6 +509,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\External\ProtocolShared\cpp\Protocol.pb.h" />
+    <ClInclude Include="Content\Gameplay\AI\MonsterAiComponent.h" />
     <ClInclude Include="Content\Gameplay\Combat\DamageTypes.h" />
     <ClInclude Include="Content\Gameplay\Combat\HealthComponent.h" />
     <ClInclude Include="Content\Gameplay\Combat\IDamageable.h" />
@@ -587,6 +589,9 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Content\Gameplay\AI\Nodes\" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

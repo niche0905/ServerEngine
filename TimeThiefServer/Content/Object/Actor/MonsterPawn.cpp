@@ -58,20 +58,26 @@ void MonsterPawn::OnSpawn()
 
    respawn_.Init(GetId(), RespawnPolicy{});
    loot_.Init(GetId(), 0);
+   // TODO: AI 컴포넌트 초기화 (BT 트리 로드)
+   // ai_.Initialize(this, objectManager_, "path...");
    
    SetDead(false);
 }
 
 void MonsterPawn::Tick(float dt)
 {
-   Pawn::Tick(dt);
-   
    if (IsDead())
       return;
+
+   Pawn::Tick(dt);
+   
+   ai_.Tick(dt);
+   
 }
 
 void MonsterPawn::OnPreDestroy()
 {
+   ai_.Shutdown();
    Pawn::OnPreDestroy();
    // 필요하다면 정리
    // ex) brain detach, 드랍 정리 등
