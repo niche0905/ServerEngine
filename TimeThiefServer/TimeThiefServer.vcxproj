@@ -345,6 +345,7 @@
     <ClCompile Include="Content\Player\Player.cpp" />
     <ClCompile Include="Content\Player\PlayerManager\PlayerManager.cpp" />
     <ClCompile Include="Content\Room\Room.cpp" />
+    <ClCompile Include="Content\Room\RoomManager.cpp" />
     <ClCompile Include="Content\Room\Systems\ZoneSystem.cpp" />
     <ClCompile Include="Data\Loader\ServerMapLoader.cpp" />
     <ClCompile Include="Data\Loader\ServerMapLoaderTest.cpp" />
@@ -571,6 +572,7 @@
     <ClInclude Include="Content\Player\PlayerManager\PlayerManager.h" />
     <ClInclude Include="Content\Player\PlayerState.h" />
     <ClInclude Include="Content\Room\Room.h" />
+    <ClInclude Include="Content\Room\RoomManager.h" />
     <ClInclude Include="Content\Room\Systems\ZoneSystem.h" />
     <ClInclude Include="Content\Room\Systems\ZoneTypes.h" />
     <ClInclude Include="Content\Shared\BaseComponent.h" />
