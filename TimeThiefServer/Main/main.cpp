@@ -12,11 +12,21 @@
 #include "Network/Session/SessionManager/SessionManager.h"
 #include "Network/ServerConfigReader.h"
 #include "Generated/ServerPacketHandler.h"
+#include "Service/MatchMaking/MatchMaker.h"
 
 class PlayerSession;
 
 
 ThreadManager threadManager;
+
+void MatchingJob()
+{
+	while (true) {
+		std::this_thread::sleep_for(std::chrono::milliseconds(200));
+		
+		g_MatchMaker.TryMatch();
+	}
+}
 
 void WorkerJob(ServiceRef& service)
 {
@@ -69,6 +79,10 @@ int main()
 			WorkerJob(service);
 		});
 	}
+	threadManager.Launch([]()
+	{
+		MatchingJob();
+	});
 	
 	consoleLogger->Log(Color::Green, L"[main] launched workers\n");
 
