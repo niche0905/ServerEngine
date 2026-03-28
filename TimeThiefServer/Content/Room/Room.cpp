@@ -5,6 +5,7 @@
 #include "Content/Object/Actor/Pawn.h"
 #include "Network/Session/SessionManager/SessionManager.h"
 #include "Content/Object/Actor/PlayerPawn.h"
+#include "Content/Player/PlayerManager/PlayerManager.h"
 
 /*---------
    Room
@@ -27,18 +28,20 @@ Room::~Room()
 
 bool Room::Join(PlayerId playerId, SessionId sessionId)
 {
+   if (playerId == 0 or sessionId == 0)      // 유효하지 않은 playerId 또는 sessionId
+      return false;
+   
    SendBufferRef enterResBuffer;
    std::vector<SendBufferRef> spawnBuffersToNewPlayer;
    SendBufferRef spawnBufferToOthers;
    std::shared_ptr<PlayerSession> sessionRef = g_SessionManager.FindBySessionId(sessionId);
+   std::shared_ptr<Player> playerRef = g_PlayerManager.Find(playerId);
    
    if (!sessionRef) return false;   // 세션이 존재하지 않음 (정상적이지 않은 상황)
+   if (!playerRef) return false;    // 플레이어가 존재하지 않음 (정상적이지 않은 상황)
    
    {
       std::lock_guard<std::mutex> lock(mutex_);   // 방에 플레이어가 입장/퇴장할 때마다 Lock을 잡는 구조 (샤딩 도입 전까지는 이 구조로 유지)
-   
-      if (playerId == 0 or sessionId == 0)      // 유효하지 않은 playerId 또는 sessionId
-         return false;
       
       auto it = roomPlayers_.find(playerId);
       if (it != roomPlayers_.end()) {
@@ -60,6 +63,8 @@ bool Room::Join(PlayerId playerId, SessionId sessionId)
       
       auto [insertIt, inserted]= roomPlayers_.emplace(playerId, std::move(newPlayer));
       if (not inserted) return false;
+      playerRef->roomId_ = roomId_;    // 플레이어의 현재 방 ID 업데이트
+      playerRef->pawnId_ = insertIt->second.pawnObjectId;
       
       auto& joinedPlayer = insertIt->second;
       
