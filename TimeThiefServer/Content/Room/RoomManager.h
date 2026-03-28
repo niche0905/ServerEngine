@@ -24,6 +24,9 @@ public:
    RoomManager() = default;
    ~RoomManager() = default;
    
+   RoomManager(RoomManager const&) = delete;
+   RoomManager& operator=(RoomManager const&) = delete;
+   
 public:
    RoomRef CreateRoom(RoomId roomId);
    
