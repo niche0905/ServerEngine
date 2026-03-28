@@ -1,6 +1,7 @@
 ﻿#include "pch.h"
 #include "Generated/ServerPacketHandler.h"
 
+#include "Service/MatchMaking/MatchMaker.h"
 #include "Service/Player/PlayerManager/PlayerManager.h"
 #include "Service/Room/Room.h"
 #include "Service/Room/RoomManager.h"
@@ -78,12 +79,52 @@ bool Handle_C_SetNicknameReq(PacketSessionRef& session, const se::lobby::C_SetNi
     
 bool Handle_C_MatchQueueEnterReq(PacketSessionRef& session, const se::lobby::C_MatchQueueEnterReq& pkt)
 {
-    return false;
+    if (!session) return false;
+    
+    SessionId sessionId = session->Id();
+    
+    PlayerId playerId = 0;
+    if (!g_SessionManager.TryGetPlayerId(sessionId, playerId)) return false;
+    
+    bool succ = g_MatchMaker.Enqueue(playerId);
+    se::lobby::S_MatchQueueEnterRes resPkt;
+    resPkt.set_success(succ);
+    if (!succ) {
+        auto result = resPkt.mutable_result();
+        result->set_code(se::common::ERR_MATCHMAKING_UNAVAILABLE);
+        result->set_message("Failed to enter matchmaking queue");
+    }
+    
+    auto sendBuffer = ServerPacketHandler::MakeSendBuffer(resPkt);
+    if (!sendBuffer) return false;
+    
+    session->Send(sendBuffer);
+    return true;
 }
     
 bool Handle_C_MatchQueueCancelReq(PacketSessionRef& session, const se::lobby::C_MatchQueueCancelReq& pkt)
 {
-    return false;
+    if (!session) return false;
+    
+    SessionId sessionId = session->Id();
+    
+    PlayerId playerId = 0;
+    if (!g_SessionManager.TryGetPlayerId(sessionId, playerId)) return false;
+    
+    bool succ = g_MatchMaker.Cancel(playerId);
+    se::lobby::S_MatchQueueCancelRes resPkt;
+    resPkt.set_success(succ);
+    if (!succ) {
+        auto result = resPkt.mutable_result();
+        result->set_code(se::common::ERR_NOT_IN_MATCH_QUEUE);
+        result->set_message("Failed to cancel matchmaking queue");
+    }
+    
+    auto sendBuffer = ServerPacketHandler::MakeSendBuffer(resPkt);
+    if (!sendBuffer) return false;
+    
+    session->Send(sendBuffer);
+    return true;
 }
     
 bool Handle_C_RoomEnterReq(PacketSessionRef& session, const se::room::C_RoomEnterReq& pkt)
