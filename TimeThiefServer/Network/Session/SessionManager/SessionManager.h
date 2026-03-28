@@ -1,5 +1,5 @@
 ﻿#pragma once
-#include "Content/Player/Player.h"
+#include "Service/Player/Player.h"
 #include "Network/Session/PlayerSession.h"
 #include "Network/Buffer/SendBuffer.h"
 

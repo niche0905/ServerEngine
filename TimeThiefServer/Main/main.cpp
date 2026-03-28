@@ -4,7 +4,7 @@
 #include <thread>
 #include <vector>
 
-#include "Content/Room/RoomManager.h"
+#include "Service/Room/RoomManager.h"
 #include "Core/Service/IOCP/IocpServerService.h"
 #include "Core/IoCore/IocpCore/IocpCore.h"
 #include "Core/Thread/ThreadManager.h"

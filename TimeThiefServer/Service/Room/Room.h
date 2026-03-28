@@ -1,7 +1,7 @@
 ﻿#pragma once
 #include <mutex>
 #include "Content/Object/ObjectManager.h"
-#include "Content/Player/Player.h"
+#include "Service/Player/Player.h"
 #include "Generated/ServerPacketHandler.h"
 
 class BaseObject;

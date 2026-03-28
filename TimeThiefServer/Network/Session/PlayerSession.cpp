@@ -3,9 +3,9 @@
 
 #include "SessionManager/SessionManager.h"
 #include "SessionIdMaker.h"
-#include "Content/Player/PlayerManager/PlayerManager.h"
-#include "Content/Room/Room.h"
-#include "Content/Room/RoomManager.h"
+#include "Service/Player/PlayerManager/PlayerManager.h"
+#include "Service/Room/Room.h"
+#include "Service/Room/RoomManager.h"
 #include "Generated/ServerPacketHandler.h"
 #include "Protocol/ProtocolVersion.h"
 
