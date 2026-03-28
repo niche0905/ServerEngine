@@ -425,6 +425,8 @@
     <ClCompile Include="Network\ServerPacketHandler.cpp" />
     <ClCompile Include="Network\Session\PlayerSession.cpp" />
     <ClCompile Include="Network\Session\SessionManager\SessionManager.cpp" />
+    <ClCompile Include="Service\MatchMaking\MatchMaker.cpp" />
+    <ClCompile Include="Service\MatchMaking\MatchMakingQueue.cpp" />
     <ClCompile Include="Service\Player\Player.cpp" />
     <ClCompile Include="Service\Player\PlayerManager\PlayerManager.cpp" />
     <ClCompile Include="Service\Room\Room.cpp" />
@@ -580,6 +582,8 @@
     <ClInclude Include="Network\Session\SessionIdMaker.h" />
     <ClInclude Include="Network\Session\SessionManager\SessionManager.h" />
     <ClInclude Include="Network\Session\PlayerSessionState.h" />
+    <ClInclude Include="Service\MatchMaking\MatchMaker.h" />
+    <ClInclude Include="Service\MatchMaking\MatchMakingQueue.h" />
     <ClInclude Include="Service\Player\Player.h" />
     <ClInclude Include="Service\Player\PlayerManager\PlayerManager.h" />
     <ClInclude Include="Service\Player\PlayerState.h" />

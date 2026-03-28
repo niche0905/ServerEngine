@@ -7,6 +7,10 @@ enum class PlayerSessionState : uint8
     Connected,          // TCP 연결 직후
     Handshaking,        // Handshake 요청/응답 대기
     InLobby,            // Handshake 성공, Lobby 상태
+    
+    MatchMaking,        // 매칭 대기 상태
+    MatchingSucc,       // 매칭 성공, Room 입장 대기 상태
+    
     InRoom,             // 방 입장 상태
     
     Closing,            // 종료 처리 중
