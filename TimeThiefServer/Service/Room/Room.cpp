@@ -177,6 +177,7 @@ bool Room::Leave(PlayerId playerId)
    SendBufferRef leaveResBuffer;
    SendBufferRef despawnBufferToOthers;
    std::shared_ptr<PlayerSession> sessionRef = g_SessionManager.FindByPlayerId(playerId);
+   std::shared_ptr<Player> playerRef = g_PlayerManager.Find(playerId);
    
    {
       // TEMP
@@ -207,6 +208,8 @@ bool Room::Leave(PlayerId playerId)
    
       const ObjectId pawnId = it->second.pawnObjectId;
       roomPlayers_.erase(it);
+      playerRef->roomId_ = 0;    // 플레이어의 현재 방 ID 업데이트
+      playerRef->pawnId_.value = 0;
       
       if (pawnId != ObjectId{}) {
          DespawnObject(pawnId);   // 플레이어의 Pawn이 존재하면 제거

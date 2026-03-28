@@ -100,6 +100,12 @@ void PlayerSession::OnConnected()
    AssignId(newSessionId);
    g_SessionManager.Add(newSessionId, AsShared<PlayerSession>());
    g_SessionManager.BindPlayer(newSessionId, newSessionId);    // TEMP
+   auto player = g_PlayerManager.Create(newSessionId);
+   if (player == nullptr) {
+      Disconnect(L"Failed to create player");
+      return;
+   }
+   player->TrySetNickname(std::string{"Player"} + std::to_string(newSessionId));   // TEMP
    
    state_ = PlayerSessionState::Handshaking;
 }
