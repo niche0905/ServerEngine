@@ -96,7 +96,7 @@ bool Handle_C_RoomEnterReq(PacketSessionRef& session, const se::room::C_RoomEnte
     
     if (playerId == 0 or sessionId == 0) return false;
     
-    auto room = g_RoomManager->FindRoom(1);;  // TEMP
+    auto room = g_RoomManager->FindRoom(1);  // TEMP
     if (!room) return false;
     
     // pkt.room_id();
@@ -114,7 +114,7 @@ bool Handle_C_RoomLeaveReq(PacketSessionRef& session, const se::room::C_RoomLeav
     
     if (playerId == 0 or sessionId == 0) return false;
     
-    auto room = g_RoomManager->FindRoom(1);;  // TEMP
+    auto room = g_RoomManager->FindRoom(1);  // TEMP
     if (!room) return false;
     
     return room->Leave(playerId);
@@ -131,7 +131,7 @@ bool Handle_C_LoadingCompleteReq(PacketSessionRef& session, const se::game::C_Lo
     
     if (playerId == 0 or sessionId == 0) return false;
     
-    auto room = g_RoomManager->FindRoom(1);;  // TEMP
+    auto room = g_RoomManager->FindRoom(1);  // TEMP
     if (!room) return false;
     
     return room->HandleLoadingComplete(playerId);
@@ -148,7 +148,7 @@ bool Handle_C_MoveReq(PacketSessionRef& session, const se::game::C_MoveReq& pkt)
     
     if (playerId == 0 or sessionId == 0) return false;
     
-    auto room = g_RoomManager->FindRoom(1);;  // TEMP
+    auto room = g_RoomManager->FindRoom(1);  // TEMP
     if (!room) return false;
     
     return room->HandleMove(playerId, pkt);
