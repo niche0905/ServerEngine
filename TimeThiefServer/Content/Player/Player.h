@@ -1,4 +1,6 @@
 ﻿#pragma once
+#include <string>
+#include <string_view>
 #include "PlayerState.h"
 #include "Content/Object/ObjectId.h"
 
@@ -27,7 +29,16 @@ public:
     ShardId shardId_ = 0;           // 플레이어가 현재 접속한 샤드 ID (Thread)
     RoomId roomId_ = 0;             // 플레이어가 현재 위치한 Room ID
     
+    std::string nickname_{};        // 플레이어 닉네임 (임시 Session 마다 설정)
     
     PlayerState state_;
+    
+public:
+    bool TrySetNickname(std::string_view nickname);
+    
+    const std::string& GetNickname() const;
+    
+private:
+    static bool IsValidNickname(std::string_view nickname);
     
 };

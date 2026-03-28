@@ -1,6 +1,7 @@
 ﻿#include "pch.h"
 #include "Generated/ServerPacketHandler.h"
 
+#include "Content/Player/PlayerManager/PlayerManager.h"
 #include "Content/Room/Room.h"
 #include "Content/Room/RoomManager.h"
 #include "Session/PlayerSession.h"
@@ -50,7 +51,29 @@ bool Handle_C_Ping(PacketSessionRef& session, const se::auth::C_Ping& pkt)
     
 bool Handle_C_SetNicknameReq(PacketSessionRef& session, const se::lobby::C_SetNicknameReq& pkt)
 {
-    return false;
+    if (!session) return false;
+    
+    SessionId sessionId = session->Id();
+    
+    PlayerId playerId = 0;
+    if (!g_SessionManager.TryGetPlayerId(sessionId, playerId)) return false;
+    
+    auto player = g_PlayerManager.Find(playerId);
+    if (!player) return false;
+    
+    se::lobby::S_SetNicknameRes resPkt;
+    
+    bool success = player->TrySetNickname(pkt.nickname());
+    resPkt.set_success(success);
+    if (success) {
+        resPkt.set_nickname(player->GetNickname());
+    }
+    
+    auto sendBuffer = ServerPacketHandler::MakeSendBuffer(resPkt);
+    if (!sendBuffer) return false;
+    
+    session->Send(sendBuffer);
+    return true;
 }
     
 bool Handle_C_MatchQueueEnterReq(PacketSessionRef& session, const se::lobby::C_MatchQueueEnterReq& pkt)
