@@ -5,6 +5,7 @@
 #include "SessionIdMaker.h"
 #include "Content/Player/PlayerManager/PlayerManager.h"
 #include "Content/Room/Room.h"
+#include "Content/Room/RoomManager.h"
 #include "Generated/ServerPacketHandler.h"
 #include "Protocol/ProtocolVersion.h"
 
@@ -113,7 +114,7 @@ void PlayerSession::OnDisconnected()
       if (playerRef) {
          RoomId roomId = playerRef->roomId_;
          // TODO: RoomManager에서 방 정보를 찾아서 플레이어 제거 요청하기 (방 정보는 Player 객체에 캐싱되어 있으므로 PlayerManager에서 제거할 때 RoomManager에도 알려주는 방식으로 구현할 수 있을 듯)
-         auto roomRef = GRoom;   // TEMP
+         auto roomRef = g_RoomManager->FindRoom(1);   // TEMP
          if (roomRef) {
             roomRef->Leave(playerId);
          }

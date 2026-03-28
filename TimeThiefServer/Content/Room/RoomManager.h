@@ -28,6 +28,7 @@ public:
    RoomManager& operator=(RoomManager const&) = delete;
    
 public:
+   RoomRef CreateRoom();
    RoomRef CreateRoom(RoomId roomId);
    
    bool RemoveRoom(RoomId roomId);
@@ -45,6 +46,8 @@ private:
 private:
    mutable std::mutex mutex_;
    std::unordered_map<RoomId, RoomRef> rooms_;
-   std::atomic<RoomId> nextRoomId_;
+   std::atomic<RoomId> nextRoomId_{ 1 }; 
     
 };
+
+extern RoomManager* g_RoomManager;

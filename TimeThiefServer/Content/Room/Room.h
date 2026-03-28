@@ -103,5 +103,3 @@ private:
    std::vector<ObjectId> npcTickList_;                      // 매 틱마다 업데이트가 필요한 NPC들의 ID 리스트
     
 };
-
-extern std::shared_ptr<Room> GRoom;

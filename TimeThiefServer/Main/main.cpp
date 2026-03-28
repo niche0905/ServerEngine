@@ -4,6 +4,7 @@
 #include <thread>
 #include <vector>
 
+#include "Content/Room/RoomManager.h"
 #include "Core/Service/IOCP/IocpServerService.h"
 #include "Core/IoCore/IocpCore/IocpCore.h"
 #include "Core/Thread/ThreadManager.h"
@@ -11,7 +12,6 @@
 #include "Network/Session/SessionManager/SessionManager.h"
 #include "Network/ServerConfigReader.h"
 #include "Generated/ServerPacketHandler.h"
-#include "Data/Loader/ServerMapLoaderTest.h"
 
 class PlayerSession;
 
@@ -30,11 +30,9 @@ int main()
 {
 	SE::Init();
 	ServerPacketHandler::Init();
+	g_RoomManager->CreateRoom();
 	
 	consoleLogger->Log(Color::Green, L"[main] entered main\n");
-	
-	const bool result = se::map::RunServerMapLoaderTest();
-	return result ? 0 : 1;
 	
 	bool configLoadSucc = g_ConfigReader.LoadFromFile("..\\External\\ProtocolShared\\config\\server.dev.json");
 	if (not configLoadSucc) {

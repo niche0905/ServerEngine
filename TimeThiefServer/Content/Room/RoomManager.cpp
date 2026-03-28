@@ -6,6 +6,24 @@
    RoomManager
 ----------------*/
 
+RoomManager* g_RoomManager = new RoomManager();
+
+RoomManager::RoomRef RoomManager::CreateRoom()
+{
+   RoomId roomId = GenerateUniqueRoomId();
+   auto room = std::make_shared<Room>(roomId);
+   
+   {
+      std::lock_guard lock(mutex_);
+      auto [it, inserted] = rooms_.emplace(roomId, room);
+      if (!inserted) {
+         return nullptr;
+      }
+   }
+   
+   return room;
+}
+
 RoomManager::RoomRef RoomManager::CreateRoom(RoomId roomId)
 {
    auto room = std::make_shared<Room>(roomId);

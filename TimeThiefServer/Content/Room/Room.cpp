@@ -10,9 +10,6 @@
    Room
 ---------*/
 
-// TEMP: 임시로 전역으로 생성, 추후 Service와 Thread와 맞게 구조 변경 필요
-std::shared_ptr<Room> GRoom = std::make_shared<Room>(1);
-
 Room::Room(RoomId roomId)
    : roomId_(roomId)
    , objectManager_(roomId)
