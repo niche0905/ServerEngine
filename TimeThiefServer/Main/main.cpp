@@ -6,14 +6,14 @@
 
 #include "Service/Room/RoomManager.h"
 #include "Core/Service/IOCP/IocpServerService.h"
-#include "Core/IoCore/IocpCore/IocpCore.h"
 #include "Core/Thread/ThreadManager.h"
 #include "Network/Session/PlayerSession.h"
-#include "Network/Session/SessionManager/SessionManager.h"
 #include "Network/ServerConfigReader.h"
 #include "Generated/ServerPacketHandler.h"
 #include "Service/MatchMaking/MatchMaker.h"
 #include "Utils/FilePathHelper.h"
+#include "Data/Tables/ZoneTable.h"
+#include "Data/Tables/ZoneTableJson.h"
 
 class PlayerSession;
 
@@ -44,6 +44,24 @@ int main(int argc, char* argv[])
 	g_RoomManager->CreateRoom();
 	
 	consoleLogger->Log(Color::Green, L"[main] entered main\n");
+	
+	std::string value = "D:/GitHub/ServerEngine/TimeThiefServer/config/data/tables/ZoneDataTable.json";
+	std::filesystem::path path{value};
+	std::string outputLog = "";
+	
+	std::cout << path << std::endl;
+	
+	ZoneTable zoneTable;
+	if (ZoneTableJson::LoadFromFile(path, zoneTable, &outputLog)) {
+		std::cout << zoneTable << std::endl;
+	}
+	else
+	{
+		std::cout << "Fail!!" << std::endl;
+		std::cout << outputLog << std::endl;
+	}
+	
+	return 0;
 	
 	auto configPath = ResolveConfigPath(argc, argv);
 	bool configLoadSucc = g_ConfigReader.LoadFromFile(configPath.string());

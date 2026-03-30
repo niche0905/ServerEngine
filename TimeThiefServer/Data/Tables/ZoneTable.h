@@ -1,14 +1,36 @@
 #pragma once
+#include <vector>
+#include <ostream>
 
 struct ZonePhaseData
 {
-    float Radius = 0.0f;
-    float DamagePerSecond = 0.0f;
-    float WaitTimeSeconds = 0.0f;
-    float ShrinkTimeSeconds = 0.0f;
+    float radius = 0.0f;
+    float damagePerSecond = 0.0f;
+    float waitTimeSeconds = 0.0f;
+    float shrinkTimeSeconds = 0.0f;
 };
 
 struct ZoneTable
 {
-    std::vector<ZonePhaseData> Phases;
+    std::vector<ZonePhaseData> phases;
 };
+
+inline std::ostream& operator<<(std::ostream& os, const ZonePhaseData& z)
+{
+    os << "radius: " << z.radius 
+        << ", damagePerSecond: " << z.damagePerSecond
+        << ", waitTimeSeconds: " << z.waitTimeSeconds 
+        << ", shrinkTimeSeconds: " << z.shrinkTimeSeconds;
+    
+    return os;
+}
+
+inline std::ostream& operator<<(std::ostream& os, const ZoneTable& z)
+{
+    os << "ZoneTable:\n";
+    for (size_t i = 0; i < z.phases.size(); i++) {
+        os << "Phase " << i + 1 << " => " << z.phases[i] << "\n";
+    }
+    
+    return os;
+}
