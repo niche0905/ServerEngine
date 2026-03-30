@@ -13,7 +13,7 @@ class GameDataManager
 public:
    static GameDataManager& Instance();
    
-   bool Initialze();
+   bool Initialize();
    const ZoneTable& GetZoneTable() const { return zoneTable_; }
    
 private:
