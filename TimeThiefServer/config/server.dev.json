@@ -1,0 +1,8 @@
+{
+    "network": {
+        "bind_ip": "0.0.0.0",
+        "game_port": 8252,
+        "login_port": 8282,
+        "db_port": 3306
+    }
+}
