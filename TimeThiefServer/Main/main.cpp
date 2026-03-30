@@ -86,7 +86,6 @@ int main()
 	
 	consoleLogger->Log(Color::Green, L"[main] launched workers\n");
 
-	int32 testIndex = 0;
 	while (true) {
 		std::this_thread::sleep_for(std::chrono::seconds(1));
 	}
