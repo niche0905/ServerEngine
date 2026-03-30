@@ -13,6 +13,7 @@
 #include "Network/ServerConfigReader.h"
 #include "Generated/ServerPacketHandler.h"
 #include "Service/MatchMaking/MatchMaker.h"
+#include "Utils/FilePathHelper.h"
 
 class PlayerSession;
 
@@ -36,7 +37,7 @@ void WorkerJob(ServiceRef& service)
 	}
 }
 
-int main()
+int main(int argc, char* argv[])
 {
 	SE::Init();
 	ServerPacketHandler::Init();
@@ -44,7 +45,8 @@ int main()
 	
 	consoleLogger->Log(Color::Green, L"[main] entered main\n");
 	
-	bool configLoadSucc = g_ConfigReader.LoadFromFile("..\\External\\ProtocolShared\\config\\server.dev.json");
+	auto configPath = ResolveConfigPath(argc, argv);
+	bool configLoadSucc = g_ConfigReader.LoadFromFile(configPath.string());
 	if (not configLoadSucc) {
 		consoleLogger->Log(Color::Red, L"[main] config load fail\n");
 		return 0;
