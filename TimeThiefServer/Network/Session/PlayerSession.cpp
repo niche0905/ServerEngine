@@ -105,6 +105,8 @@ void PlayerSession::OnConnected()
       Disconnect(L"Failed to create player");
       return;
    }
+   player->id_ = newSessionId;
+   player->sessionId_ = newSessionId;
    player->TrySetNickname(std::string{"Player"} + std::to_string(newSessionId));   // TEMP
    
    state_ = PlayerSessionState::Handshaking;

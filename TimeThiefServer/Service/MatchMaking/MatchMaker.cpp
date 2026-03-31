@@ -46,12 +46,32 @@ MatchMaker g_MatchMaker;
 
 bool MatchMaker::Enqueue(PlayerId playerId)
 {
-   return queue_.Enqueue(playerId);
+   bool success = queue_.Enqueue(playerId);
+   
+   if (success) {
+      auto session = g_SessionManager.FindByPlayerId(playerId);
+      
+      if (session) {
+         session->SetState(PlayerSessionState::MatchMaking);
+      }
+   }
+   
+   return success;
 }
 
 bool MatchMaker::Cancel(PlayerId playerId)
 {
-   return queue_.Cancel(playerId);
+   bool success = queue_.Cancel(playerId);
+   
+   if (success) {
+      auto session = g_SessionManager.FindByPlayerId(playerId);
+      
+      if (session) {
+         session->SetState(PlayerSessionState::InLobby);
+      }
+   }
+   
+   return success;
 }
 
 void MatchMaker::TryMatch()

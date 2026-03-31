@@ -20,7 +20,7 @@ public:
     void TryMatch();
     
 private:
-    static constexpr size_t kMatchSize = 8;
+    static constexpr size_t kMatchSize = 2;
     
     MatchMakingQueue queue_;
     
