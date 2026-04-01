@@ -514,6 +514,7 @@ bool Room::HandleThrowGrenade(PlayerId playerId, const se::game::C_ThrowGrenadeR
 
 bool Room::HandleReload(PlayerId playerId, const se::game::C_ReloadReq& pkt)
 {
+   // TODO: 재장전 결과 패킷 (S_ReleadRes 를 작성해서 프로토콜 업데이트 하기)
    SendBufferRef reloadResultBuffer;      // 재장전 결과를 해당 플레이어에게 보내는 패킷 (예: 재장전 성공 여부, 남은 탄창 수 등)
    SendBufferRef reloadBroadcastBuffer;
    std::shared_ptr<PlayerSession> sessionRef = g_SessionManager.FindByPlayerId(playerId);
