@@ -194,6 +194,36 @@ bool Handle_C_MoveReq(PacketSessionRef& session, const se::game::C_MoveReq& pkt)
     
     return room->HandleMove(playerId, pkt);
 }
+
+bool Handle_C_JumpReq(PacketSessionRef& session, const se::game::C_JumpReq& pkt)
+{
+    return false;
+}
+
+bool Handle_C_JumpLand(PacketSessionRef& session, const se::game::C_JumpLand& pkt)
+{
+    return false;
+}
+    
+bool Handle_C_CrouchReq(PacketSessionRef& session, const se::game::C_CrouchReq& pkt)
+{
+    return false;
+}
+    
+bool Handle_C_WireActionReq(PacketSessionRef& session, const se::game::C_WireActionReq& pkt)
+{
+    return false;
+}
+    
+bool Handle_C_WireActionEnd(PacketSessionRef& session, const se::game::C_WireActionEnd& pkt)
+{
+    return false;
+}
+    
+bool Handle_C_AimReq(PacketSessionRef& session, const se::game::C_AimReq& pkt)
+{
+    return false;
+}
     
 bool Handle_C_FireReq(PacketSessionRef& session, const se::game::C_FireReq& pkt)
 {
