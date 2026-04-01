@@ -36,6 +36,12 @@ public:
 public:
    bool HandleLoadingComplete(PlayerId playerId);
    bool HandleMove(PlayerId playerId, const se::game::C_MoveReq& pkt);
+   bool HandleAim(PlayerId playerId, const se::game::C_AimReq& pkt);
+   bool HandleFire(PlayerId playerId, const se::game::C_FireReq& pkt);
+   // bool HandleAttack(PlayerId playerId, const se::game::C_AttackReq& pkt);
+   bool HandleThrowGrenade(PlayerId playerId, const se::game::C_ThrowGrenadeReq& pkt);
+   bool HandleReload(PlayerId playerId, const se::game::C_ReloadReq& pkt);
+   bool HandleWeaponChange(PlayerId playerId, const se::game::C_WeaponChangeReq& pkt);
    
 public:
    template<typename T, typename... Args>

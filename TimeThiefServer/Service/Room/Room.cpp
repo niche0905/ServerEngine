@@ -337,6 +337,280 @@ bool Room::HandleMove(PlayerId playerId, const se::game::C_MoveReq& pkt)
    return true;
 }
 
+bool Room::HandleAim(PlayerId playerId, const se::game::C_AimReq& pkt)
+{
+   SendBufferRef aimBroadcastBuffer;
+   std::shared_ptr<PlayerSession> sessionRef = g_SessionManager.FindByPlayerId(playerId);
+   
+   if (!sessionRef) return false;   // 세션이 존재하지 않음 (정상적이지 않은 상황)
+   
+   {
+      std::lock_guard<std::mutex> lock(mutex_);
+      
+      if (playerId == 0)
+         return false;
+      
+      auto it = roomPlayers_.find(playerId);
+      if (it == roomPlayers_.end())
+         return false;   // 방에 존재하지 않는 플레이어
+      
+      if (not it->second.loadingComplete)
+         return false;
+      
+      auto* obj = objectManager_.Find(it->second.pawnObjectId);
+      if (!obj)
+         return false;
+      
+      auto* playerPawn = dynamic_cast<PlayerPawn*>(obj);
+      if (!playerPawn)
+         return false;
+      
+      // TODO: Player State를 추가해서, Aim 상태인지 아닌지 관리하기 (예: PlayerState에 IsAiming bool 값 추가)
+      
+      se::game::N_Aim aimNoti;
+      {
+         auto* entityIdPtr = aimNoti.mutable_entity_id();
+         entityIdPtr->set_value(it->second.pawnObjectId.value);
+         
+         // TODO: 아래를 pkt Aiming이 아니라 Player State의 IsAiming 값으로 변경하기 (예: PlayerState에 IsAiming bool 값 추가)
+         aimNoti.set_is_aiming(pkt.is_aiming());
+      }
+      
+      aimBroadcastBuffer = ServerPacketHandler::MakeSendBuffer(aimNoti);
+   }
+   
+   if (aimBroadcastBuffer)
+      Broadcast(aimBroadcastBuffer, playerId);   // 에임 상태를 변경한 플레이어를 제외한 나머지 플레이어들에게 에임 상태 변경 정보 Broadcast
+   
+   return true;
+}
+
+bool Room::HandleFire(PlayerId playerId, const se::game::C_FireReq& pkt)
+{
+   SendBufferRef fireBroadcastBuffer;
+   std::shared_ptr<PlayerSession> sessionRef = g_SessionManager.FindByPlayerId(playerId);
+   
+   if (!sessionRef) return false;   // 세션이 존재하지 않음 (정상적이지 않은 상황)
+   
+   {
+      std::lock_guard<std::mutex> lock(mutex_);
+      
+      if (playerId == 0)
+         return false;
+      
+      auto it = roomPlayers_.find(playerId);
+      if (it == roomPlayers_.end())
+         return false;   // 방에 존재하지 않는 플레이어
+      
+      if (not it->second.loadingComplete)
+         return false;
+      
+      auto* obj = objectManager_.Find(it->second.pawnObjectId);
+      if (!obj)
+         return false;
+      
+      auto* playerPawn = dynamic_cast<PlayerPawn*>(obj);
+      if (!playerPawn)
+         return false;
+      
+      const auto& startPos = pkt.start_position();
+      const auto& dir = pkt.direction();
+      
+      // TODO: 발사 판정 및 데미지 계산은 여기서 (예: Raycast로 명중 판정, 명중한 경우 데미지 계산 등)
+      
+      se::game::N_Fire noti;
+      {
+         auto* entityIdPtr = noti.mutable_entity_id();
+         entityIdPtr->set_value(it->second.pawnObjectId.value);
+         
+         // TODO: pkt의 weapon_id를 바로 사용하지 않고 Player State의 Weapon Id 와 비교 한번 진행하기
+         noti.set_weapon_id(pkt.weapon_id());
+         
+         auto* startPosPtr = noti.mutable_start_position();
+         startPosPtr->set_x(startPos.x());
+         startPosPtr->set_y(startPos.y());
+         startPosPtr->set_z(startPos.z());
+         
+         auto* dirPtr = noti.mutable_direction();
+         dirPtr->set_x(dir.x());
+         dirPtr->set_y(dir.y());
+         dirPtr->set_z(dir.z());
+      }
+      
+      fireBroadcastBuffer = ServerPacketHandler::MakeSendBuffer(noti);
+   }
+   
+   if (fireBroadcastBuffer)
+      Broadcast(fireBroadcastBuffer, playerId);   // 발사한 플레이어를 제외한 나머지 플레이어들에게 발사 정보 Broadcast
+   
+   return true;
+}
+
+bool Room::HandleThrowGrenade(PlayerId playerId, const se::game::C_ThrowGrenadeReq& pkt)
+{
+   SendBufferRef throwBroadcastBuffer;
+   SendBufferRef grenadeSpawnBuffer;      // se::room::N_EntitySpawn 형태로 투척한 수류탄의 스폰 정보
+   std::shared_ptr<PlayerSession> sessionRef = g_SessionManager.FindByPlayerId(playerId);
+   
+   if (!sessionRef) return false;   // 세션이 존재하지 않음 (정상적이지 않은 상황)
+   
+   {
+      std::lock_guard<std::mutex> lock(mutex_);
+      
+      if (playerId == 0)
+         return false;
+      
+      auto it = roomPlayers_.find(playerId);
+      if (it == roomPlayers_.end())
+         return false;   // 방에 존재하지 않는 플레이어
+      
+      if (not it->second.loadingComplete)
+         return false;
+      
+      auto* obj = objectManager_.Find(it->second.pawnObjectId);
+      if (!obj)
+         return false;
+      
+      auto* playerPawn = dynamic_cast<PlayerPawn*>(obj);
+      if (!playerPawn)
+         return false;
+      
+      const auto& startPos = pkt.start_position();
+      const auto& dir = pkt.direction();
+      
+      // TODO: 투척 판정 및 폭발 처리 로직은 여기서 (예: GrenadePawn을 생성해서 투척, 일정 시간 후 폭발 처리 등)
+      //       다음 Spawn? 로직도 여기서 진행 (Replicated가 붙은 Grenade Actor)
+      //       우선 Inventory 유효성 체크도 해야함
+      
+      se::game::N_ThrowGrenade noti;
+      {
+         auto* entityIdPtr = noti.mutable_entity_id();
+         entityIdPtr->set_value(it->second.pawnObjectId.value);
+         
+         noti.set_grenade_type(pkt.grenade_type());
+         
+         auto* startPosPtr = noti.mutable_start_position();
+         startPosPtr->set_x(startPos.x());
+         startPosPtr->set_y(startPos.y());
+         startPosPtr->set_z(startPos.z());
+         
+         auto* dirPtr = noti.mutable_direction();
+         dirPtr->set_x(dir.x());
+         dirPtr->set_y(dir.y());
+         dirPtr->set_z(dir.z());
+      }
+      
+      throwBroadcastBuffer = ServerPacketHandler::MakeSendBuffer(noti);
+   }
+   
+   if (throwBroadcastBuffer)
+      Broadcast(throwBroadcastBuffer, playerId);   // 투척한 플레이어를 제외한 나머지 플레이어들에게 투척 정보 Broadcast
+   
+   if (grenadeSpawnBuffer)
+      Broadcast(grenadeSpawnBuffer);
+   
+   return true;
+}
+
+bool Room::HandleReload(PlayerId playerId, const se::game::C_ReloadReq& pkt)
+{
+   SendBufferRef reloadResultBuffer;      // 재장전 결과를 해당 플레이어에게 보내는 패킷 (예: 재장전 성공 여부, 남은 탄창 수 등)
+   SendBufferRef reloadBroadcastBuffer;
+   std::shared_ptr<PlayerSession> sessionRef = g_SessionManager.FindByPlayerId(playerId);
+   
+   if (!sessionRef) return false;   // 세션이 존재하지 않음 (정상적이지 않은 상황)
+   
+   {
+      std::lock_guard<std::mutex> lock(mutex_);
+      
+      if (playerId == 0)
+         return false;
+      
+      auto it = roomPlayers_.find(playerId);
+      if (it == roomPlayers_.end())
+         return false;   // 방에 존재하지 않는 플레이어
+      
+      if (not it->second.loadingComplete)
+         return false;
+      
+      auto* obj = objectManager_.Find(it->second.pawnObjectId);
+      if (!obj)
+         return false;
+      
+      auto* playerPawn = dynamic_cast<PlayerPawn*>(obj);
+      if (!playerPawn)
+         return false;
+      
+      // TODO: 재장전 및 탄창 갯수 관리 로직은 여기서 (예: Player State에 탄창 갯수 관리, 재장전 시간 관리 등)
+      
+      se::game::N_Reload noti;
+      {
+         auto* entityIdPtr = noti.mutable_entity_id();
+         entityIdPtr->set_value(it->second.pawnObjectId.value);
+         
+         noti.set_weapon_id(pkt.weapon_id());
+      }
+      
+      reloadBroadcastBuffer = ServerPacketHandler::MakeSendBuffer(noti);
+   }
+   
+   if (reloadResultBuffer)
+      sessionRef->Send(reloadResultBuffer);   // 재장전 결과를 해당 플레이어에게 전송
+   
+   if (reloadBroadcastBuffer)
+      Broadcast(reloadBroadcastBuffer, playerId);   // 재장전한 플레이어를 제외한 나머지 플레이어들에게 재장전 정보 Broadcast
+   
+   return true;
+}
+
+bool Room::HandleWeaponChange(PlayerId playerId, const se::game::C_WeaponChangeReq& pkt)
+{
+   SendBufferRef weaponChangeBroadcastBuffer;
+   std::shared_ptr<PlayerSession> sessionRef = g_SessionManager.FindByPlayerId(playerId);
+   
+   if (!sessionRef) return false;   // 세션이 존재하지 않음 (정상적이지 않은 상황)
+   
+   {
+      std::lock_guard<std::mutex> lock(mutex_);
+      
+      if (playerId == 0)
+         return false;
+      
+      auto it = roomPlayers_.find(playerId);
+      if (it == roomPlayers_.end())
+         return false;   // 방에 존재하지 않는 플레이어
+      
+      if (not it->second.loadingComplete)
+         return false;
+      
+      auto* obj = objectManager_.Find(it->second.pawnObjectId);
+      if (!obj)
+         return false;
+      
+      auto* playerPawn = dynamic_cast<PlayerPawn*>(obj);
+      if (!playerPawn)
+         return false;
+      
+      // TODO: 무기 변경 로직은 여기서 (Player State의 현재 무기 업데이트 등)
+      
+      se::game::N_WeaponChanged noti;
+      {
+         auto* entityIdPtr = noti.mutable_entity_id();
+         entityIdPtr->set_value(it->second.pawnObjectId.value);
+         
+         // TODO: pkt의 weapon_id를 사용하지 않고 Player State의 Weapon Id 사용하기 (유효성 검사)
+         noti.set_weapon_id(pkt.weapon_id());
+      }
+      
+      weaponChangeBroadcastBuffer = ServerPacketHandler::MakeSendBuffer(noti);
+   }
+   
+   if (weaponChangeBroadcastBuffer)
+      Broadcast(weaponChangeBroadcastBuffer);   // 모두에게 무기 변경 정보 Broadcast (본인 플레이어에겐 잘못된 무기 교체 요구일 수도 있으므로 예외 없이 모두에게 Broadcast)
+   
+   return true;
+}
+
 // bool Room::HandleMove(PlayerId playerId, const se::room::C_MoveInput& pkt)
 // {
 //    ObjectId playerPawnId = GetObjectId(playerId);

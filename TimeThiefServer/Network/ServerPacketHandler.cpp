@@ -189,7 +189,10 @@ bool Handle_C_MoveReq(PacketSessionRef& session, const se::game::C_MoveReq& pkt)
     
     if (playerId == 0 or sessionId == 0) return false;
     
-    auto room = g_RoomManager->FindRoom(1);  // TEMP
+    auto player = g_PlayerManager.Find(playerId);
+    if (!player) return false;
+    
+    auto room = g_RoomManager->FindRoom(player->roomId_);
     if (!room) return false;
     
     return room->HandleMove(playerId, pkt);
@@ -222,12 +225,42 @@ bool Handle_C_WireActionEnd(PacketSessionRef& session, const se::game::C_WireAct
     
 bool Handle_C_AimReq(PacketSessionRef& session, const se::game::C_AimReq& pkt)
 {
-    return false;
+    if (!session) return false;
+    
+    SessionId sessionId = session->Id();
+    
+    PlayerId playerId = 0;
+    if (!g_SessionManager.TryGetPlayerId(sessionId, playerId)) return false;
+    
+    if (playerId == 0 or sessionId == 0) return false;
+    
+    auto player = g_PlayerManager.Find(playerId);
+    if (!player) return false;
+    
+    auto room = g_RoomManager->FindRoom(player->roomId_);
+    if (!room) return false;
+    
+    return room->HandleAim(playerId, pkt);
 }
     
 bool Handle_C_FireReq(PacketSessionRef& session, const se::game::C_FireReq& pkt)
 {
-    return false;
+    if (!session) return false;
+    
+    SessionId sessionId = session->Id();
+    
+    PlayerId playerId = 0;
+    if (!g_SessionManager.TryGetPlayerId(sessionId, playerId)) return false;
+    
+    if (playerId == 0 or sessionId == 0) return false;
+    
+    auto player = g_PlayerManager.Find(playerId);
+    if (!player) return false;
+    
+    auto room = g_RoomManager->FindRoom(player->roomId_);
+    if (!room) return false;
+    
+    return room->HandleFire(playerId, pkt);
 }
     
 bool Handle_C_AttackReq(PacketSessionRef& session, const se::game::C_AttackReq& pkt)
@@ -237,17 +270,62 @@ bool Handle_C_AttackReq(PacketSessionRef& session, const se::game::C_AttackReq& 
     
 bool Handle_C_ThrowGrenadeReq(PacketSessionRef& session, const se::game::C_ThrowGrenadeReq& pkt)
 {
-    return false;
+    if (!session) return false;
+    
+    SessionId sessionId = session->Id();
+    
+    PlayerId playerId = 0;
+    if (!g_SessionManager.TryGetPlayerId(sessionId, playerId)) return false;
+    
+    if (playerId == 0 or sessionId == 0) return false;
+    
+    auto player = g_PlayerManager.Find(playerId);
+    if (!player) return false;
+    
+    auto room = g_RoomManager->FindRoom(player->roomId_);
+    if (!room) return false;
+    
+    return room->HandleThrowGrenade(playerId, pkt);
 }
     
 bool Handle_C_ReloadReq(PacketSessionRef& session, const se::game::C_ReloadReq& pkt)
 {
-    return false;
+    if (!session) return false;
+    
+    SessionId sessionId = session->Id();
+    
+    PlayerId playerId = 0;
+    if (!g_SessionManager.TryGetPlayerId(sessionId, playerId)) return false;
+    
+    if (playerId == 0 or sessionId == 0) return false;
+    
+    auto player = g_PlayerManager.Find(playerId);
+    if (!player) return false;
+    
+    auto room = g_RoomManager->FindRoom(player->roomId_);
+    if (!room) return false;
+    
+    return room->HandleReload(playerId, pkt);
 }
     
 bool Handle_C_WeaponChangeReq(PacketSessionRef& session, const se::game::C_WeaponChangeReq& pkt)
 {
-    return false;
+    if (!session) return false;
+    
+    SessionId sessionId = session->Id();
+    
+    PlayerId playerId = 0;
+    if (!g_SessionManager.TryGetPlayerId(sessionId, playerId)) return false;
+    
+    if (playerId == 0 or sessionId == 0) return false;
+    
+    auto player = g_PlayerManager.Find(playerId);
+    if (!player) return false;
+    
+    auto room = g_RoomManager->FindRoom(player->roomId_);
+    if (!room) return false;
+    
+    return room->HandleWeaponChange(playerId, pkt);
 }
     
 bool Handle_C_UseAbilityReq(PacketSessionRef& session, const se::game::C_UseAbilityReq& pkt)
