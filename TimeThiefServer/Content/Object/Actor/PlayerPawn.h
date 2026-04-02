@@ -119,7 +119,6 @@ private:
     WalletComponent wallet_{};
     RespawnComponent respawn_{};
     
-    CombatState combatState_{};
     ActionState actionState_{};
     
 };
