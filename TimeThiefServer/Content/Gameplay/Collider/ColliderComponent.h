@@ -23,21 +23,23 @@ enum class ColliderRole
 class ColliderComponent : public BaseComponent
 {
 public:
-   void SetOwner(Actor* owner) { owner_ = owner; }
-   Actor* GetOwner() const { return owner_; }
+   void Init(ObjectId owner, Actor* ownerActor, ColliderRole role, std::unique_ptr<SE::Physics::Collider> collider);
    
-   void SetCollider(std::unique_ptr<SE::Physics::Collider> collider)
-   {
-      collider_ = std::move(collider);
-   }
+   void SetOwnerActor(Actor* ownerActor) { ownerActor_ = ownerActor; }
+   Actor* GetOwnerActor() const { return ownerActor_; }
    
-   SE::Physics::Collider* GetCollider() { return collider_.get(); }
+   void SetCollider(std::unique_ptr<SE::Physics::Collider> collider);
+   SE::Physics::Collider* GetCollider();
+   const SE::Physics::Collider* GetCollider() const;
+   
+   bool HasCollider() const { return collider_ != nullptr; }
    
    void SetRole(ColliderRole role) { role_ = role; }
    ColliderRole GetRole() const { return role_; }
    
 private:
-   Actor* owner_ = nullptr;   // ColliderComponent가 부착된 Actor에 대한 포인터 (필요하다면 사용)
+   Actor* ownerActor_ = nullptr;   // ColliderComponent가 부착된 Actor (Owner)
+   
    ColliderRole role_ = ColliderRole::Trigger;
    std::unique_ptr<SE::Physics::Collider> collider_;
     

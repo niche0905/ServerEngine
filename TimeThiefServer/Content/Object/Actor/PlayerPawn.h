@@ -27,7 +27,7 @@ class PlayerPawn : public Pawn
                     , public IRespawnOwner
 {
 public:
-    PlayerPawn();
+    PlayerPawn() = default;
     virtual ~PlayerPawn() = default;
     
     PlayerPawn(const PlayerPawn&) = delete;

@@ -7,18 +7,6 @@
    PlayerPawn
 --------------*/
 
-PlayerPawn::PlayerPawn()
-{
-   // TEMP
-   {
-      auto bodyCollider = std::make_unique<ColliderComponent>();
-      bodyCollider->SetOwner(this);
-      bodyCollider->SetRole(ColliderRole::Hit);
-      auto capsuleCollider = std::make_unique<SE::Physics::CharacterCapsuleCollider>(SE::Math::Vector3{0.0f, 0.0f, 0.0f}, 180.0f, 30.0f);
-      bodyCollider->SetCollider(std::move(capsuleCollider));
-   }
-}
-
 bool PlayerPawn::IsConsumable(ItemId itemId) const
 {
    // TODO: 아이템 데이터베이스 조회 후 소모품 여부 확인
@@ -93,6 +81,15 @@ void PlayerPawn::GrantSpawnInvulnerability(ObjectManager& om, uint32 durationMs)
 void PlayerPawn::OnSpawn()
 {
    Pawn::OnSpawn();
+   
+   // TEMP
+   {
+      auto bodyCollider = std::make_unique<ColliderComponent>();
+      auto capsuleCollider = std::make_unique<SE::Physics::CharacterCapsuleCollider>(SE::Math::Vector3{0.0f, 0.0f, 0.0f}, 180.0f, 30.0f);
+      bodyCollider->Init(GetId(), this, ColliderRole::Hit, std::move(capsuleCollider));
+      
+      colliders_.push_back(std::move(bodyCollider));
+   }
    
    dropOnDeath_.Init(GetId(), DropOnDeathPolicy{});
    respawn_.Init(GetId(), RespawnPolicy{});

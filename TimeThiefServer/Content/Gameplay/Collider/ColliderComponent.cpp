@@ -1,2 +1,30 @@
 ﻿#include "pch.h"
 #include "ColliderComponent.h"
+
+/*---------------------
+   ColliderComponent
+---------------------*/
+
+void ColliderComponent::Init(ObjectId owner, Actor* ownerActor, ColliderRole role,
+    std::unique_ptr<SE::Physics::Collider> collider)
+{
+    SetOwner(owner);
+    SetOwnerActor(ownerActor);
+    SetRole(role);
+    SetCollider(std::move(collider));
+}
+
+void ColliderComponent::SetCollider(std::unique_ptr<SE::Physics::Collider> collider)
+{
+    collider_ = std::move(collider);
+}
+
+SE::Physics::Collider* ColliderComponent::GetCollider()
+{
+    return collider_.get(); 
+}
+
+const SE::Physics::Collider* ColliderComponent::GetCollider() const
+{
+    return collider_.get(); 
+}
