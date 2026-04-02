@@ -86,7 +86,7 @@ void PlayerPawn::OnSpawn()
    {
       auto bodyCollider = std::make_unique<ColliderComponent>();
       auto capsuleCollider = std::make_unique<SE::Physics::CharacterCapsuleCollider>(SE::Math::Vector3{0.0f, 0.0f, 0.0f}, 180.0f, 30.0f);
-      bodyCollider->Init(GetId(), this, ColliderRole::Hit, std::move(capsuleCollider));
+      bodyCollider->Init(GetId(), this, ColliderRole::Hurtbox, std::move(capsuleCollider));
       
       colliders_.push_back(std::move(bodyCollider));
    }
