@@ -563,6 +563,7 @@
     <ClInclude Include="Content\Object\Actor\MonsterPawn.h" />
     <ClInclude Include="Content\Object\Actor\Pawn.h" />
     <ClInclude Include="Content\Object\Actor\PlayerPawn.h" />
+    <ClInclude Include="Content\Object\Actor\PlayerPawnState.h" />
     <ClInclude Include="Content\Object\Actor\ProjectileActor.h" />
     <ClInclude Include="Content\Object\Actor\StaticActor.h" />
     <ClInclude Include="Content\Object\Actor\WorldItemActor.h" />

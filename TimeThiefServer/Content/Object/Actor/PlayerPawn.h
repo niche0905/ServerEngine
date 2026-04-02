@@ -8,6 +8,7 @@
 #include "Content/Gameplay/Inventory/InventoryComponent.h"
 #include "Content/Gameplay/Economy/WalletComponent.h"
 #include "Content/Gameplay/Spawn/RespawnComponent.h"
+#include "Content/Object/Actor/PlayerPawnState.h"
 
 class ObjectManager;
 
@@ -108,7 +109,6 @@ protected:
 private:
     void StartDeadState(ObjectManager& om, const DamageResult& dmgResult);
     
-    
 private:
     uint32 playerId_;
     
@@ -118,5 +118,8 @@ private:
     InventoryComponent inventory_{};
     WalletComponent wallet_{};
     RespawnComponent respawn_{};
+    
+    CombatState combatState_{};
+    ActionState actionState_{};
     
 };
