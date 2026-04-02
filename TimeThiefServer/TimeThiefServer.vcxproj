@@ -254,6 +254,7 @@
     </ClCompile>
     <ClCompile Include="Content\Gameplay\AI\MonsterAiComponent.cpp" />
     <ClCompile Include="Content\Gameplay\Collider\ColliderComponent.cpp" />
+    <ClCompile Include="Content\Gameplay\Combat\CombatComponent.cpp" />
     <ClCompile Include="Content\Gameplay\Loot\LootTableService.cpp">
       <RuntimeLibrary>MultiThreadedDebugDll</RuntimeLibrary>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -516,6 +517,8 @@
     <ClInclude Include="..\External\ProtocolShared\cpp\Protocol.pb.h" />
     <ClInclude Include="Content\Gameplay\AI\MonsterAiComponent.h" />
     <ClInclude Include="Content\Gameplay\Collider\ColliderComponent.h" />
+    <ClInclude Include="Content\Gameplay\Combat\CombatComponent.h" />
+    <ClInclude Include="Content\Gameplay\Combat\CombatTypes.h" />
     <ClInclude Include="Content\Gameplay\Combat\DamageTypes.h" />
     <ClInclude Include="Content\Gameplay\Combat\HealthComponent.h" />
     <ClInclude Include="Content\Gameplay\Combat\IDamageable.h" />
