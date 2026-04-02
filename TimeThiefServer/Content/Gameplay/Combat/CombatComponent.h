@@ -23,7 +23,7 @@ public:
    void SetOwnerPawn(Pawn* pawn);
    Pawn* GetOwnerPawn() const;
    
-   virtual bool CanAttack() const;
+   virtual bool CanAttack(const AttackRequest& request) const;
    virtual bool TryAttack(const AttackRequest& request);
    
 protected:

@@ -27,8 +27,10 @@ Pawn* CombatComponent::GetOwnerPawn() const
    return ownerPawn_;
 }
 
-bool CombatComponent::CanAttack() const
+bool CombatComponent::CanAttack(const AttackRequest& request) const
 {
+   (void)request;   // 현재는 request를 사용하지 않지만, 향후 공격 유형이나 상황에 따른 조건을 추가할 때 사용할 수 있음
+   
    if (ownerPawn_ == nullptr)
       return false;
    
@@ -40,7 +42,7 @@ bool CombatComponent::CanAttack() const
 
 bool CombatComponent::TryAttack(const AttackRequest& request)
 {
-   if (not CanAttack()) {
+   if (not CanAttack(request)) {
       return false;   // 공격할 수 없는 상태
    }
    
