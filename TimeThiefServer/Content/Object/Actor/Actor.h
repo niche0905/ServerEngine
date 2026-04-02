@@ -8,6 +8,7 @@ struct SE::Math::Vector3;
 class ObjectManager;
 class SpawnService;
 class ReplicationSystem;
+class ColliderComponent;
 
 /*---------
    Actor
@@ -49,9 +50,11 @@ protected:
 protected:
    void RegisterLifetimeMs(uint64 nowMs, uint32 lifetimeMs);   // 파생 클래스가 수명이 있는 Actor일 경우 호출하여 수명 등록
    
-private:
+protected:
    Vector3  position_{};
    float    yaw_{0.0f};
+   
+   std::vector<std::unique_ptr<ColliderComponent>> colliders_;
    
    // TODO: 추가하기 (회전, 스케일 등 Transform 관련 정보 들)
     
