@@ -2,6 +2,17 @@
 #include "Physics/Collider/Collider.h"
 #include "Content/Shared/BaseComponent.h"
 
+class Actor;
+
+enum class ColliderRole
+{
+   Movement,
+   Hit,
+   Hurtbox,
+   Hitbox,
+   Trigger
+};
+
 /*---------------------
    ColliderComponent
 ---------------------*/
@@ -12,6 +23,9 @@
 class ColliderComponent : public BaseComponent
 {
 public:
+   void SetOwner(Actor* owner) { owner_ = owner; }
+   Actor* GetOwner() const { return owner_; }
+   
    void SetCollider(std::unique_ptr<SE::Physics::Collider> collider)
    {
       collider_ = std::move(collider);
@@ -19,7 +33,12 @@ public:
    
    SE::Physics::Collider* GetCollider() { return collider_.get(); }
    
+   void SetRole(ColliderRole role) { role_ = role; }
+   ColliderRole GetRole() const { return role_; }
+   
 private:
+   Actor* owner_ = nullptr;   // ColliderComponent가 부착된 Actor에 대한 포인터 (필요하다면 사용)
+   ColliderRole role_ = ColliderRole::Trigger;
    std::unique_ptr<SE::Physics::Collider> collider_;
     
 };

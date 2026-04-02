@@ -1,9 +1,23 @@
 ﻿#include "pch.h"
 #include "PlayerPawn.h"
+#include "Content/Gameplay/Collider/ColliderComponent.h"
+#include "Physics/Collider/CharacterCapsuleCollider.h"
 
 /*--------------
    PlayerPawn
 --------------*/
+
+PlayerPawn::PlayerPawn()
+{
+   // TEMP
+   {
+      auto bodyCollider = std::make_unique<ColliderComponent>();
+      bodyCollider->SetOwner(this);
+      bodyCollider->SetRole(ColliderRole::Hit);
+      auto capsuleCollider = std::make_unique<SE::Physics::CharacterCapsuleCollider>(SE::Math::Vector3{0.0f, 0.0f, 0.0f}, 180.0f, 30.0f);
+      bodyCollider->SetCollider(std::move(capsuleCollider));
+   }
+}
 
 bool PlayerPawn::IsConsumable(ItemId itemId) const
 {
