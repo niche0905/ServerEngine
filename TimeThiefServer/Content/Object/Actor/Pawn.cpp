@@ -1,5 +1,6 @@
 ﻿#include "pch.h"
 #include "Pawn.h"
+#include "Content/Gameplay/Combat/CombatComponent.h"
 
 /*--------
    Pawn
@@ -66,6 +67,7 @@ void Pawn::OnSpawn()
    health_.Init(GetId(), 100);
    cooldowns_.Init(GetId());
    effects_.Init(GetId());
+   combat_->Init(GetId(), this);
    
    isDead_ = false;
    velocity_ = Vector3{};

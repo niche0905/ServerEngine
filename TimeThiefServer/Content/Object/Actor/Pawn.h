@@ -15,9 +15,11 @@
 // Cooldown과 Effect 컴포넌트를 포함하여 게임플레이 메커니즘을 지원합니다.
 //
 
+class CombatComponent;
+
 class Pawn : public Actor
-            , public IDamageable
-            , public IEffectOwner
+             , public IDamageable
+             , public IEffectOwner
 {
 public:
     Pawn() = default;
@@ -82,6 +84,7 @@ protected:
     HealthComponent health_;
     CooldownComponent cooldowns_;
     EffectComponent effects_;
+    std::unique_ptr<CombatComponent> combat_;
     
     bool isDead_{false};
     Vector3 velocity_{};
