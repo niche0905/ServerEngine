@@ -85,6 +85,9 @@ public:
    std::shared_ptr<Room> GetRoomRef() { return shared_from_this(); }
    RoomId GetRoomId() const { return roomId_; }
    
+   ObjectManager& GetObjectManager() { return objectManager_; }
+   const ObjectManager& GetObjectManager() const { return objectManager_; }
+   
    bool HasPlayer(PlayerId playerId) const;
    SessionId GetSessionId(PlayerId playerId) const;
    ObjectId GetObjectId(PlayerId playerId) const;

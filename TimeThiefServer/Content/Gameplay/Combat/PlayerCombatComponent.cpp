@@ -5,6 +5,7 @@
 #include "Content/Object/Actor/Pawn.h"
 #include "Physics/Ray/Ray.h"
 #include "Physics/Ray/RaycastHit.h"
+#include "Service/Room/Room.h"
 
 namespace 
 {
@@ -202,6 +203,7 @@ bool PlayerCombatComponent::ExecuteAttack(const AttackRequest& request)
     case AttackType::Melee:
         break;
     case AttackType::Hitscan:
+        // TODO: Weapon Id에 맞게 분기
         hit = FireHitscan(request);
         break;
     case AttackType::Projectile:
@@ -230,21 +232,36 @@ bool PlayerCombatComponent::FireHitscan(const AttackRequest& request)
     SE::Math::Vector3 dir = request.direction.Normalized();
     SE::Physics::Ray ray(request.origin, dir, request.range);
     
-    float closestDistance = request.range;
-    Actor* hitActor = nullptr;
-    ColliderComponent* hitColliderComponent = nullptr;
-    SE::Physics::RaycastHit hitInfo{};
+    Actor* victim = nullptr;
+    SE::Physics::Hit::HitResult hitInfo{};
     
-    // TODO: World(Room)에 존재하는 Collider 들 찾아서 Raycast 수행하기
-    //       room->Raycast(ray, hitInfo);
+    if (room->TraceHit(ray, hitInfo)) {
+        if (hitInfo.hit) {
+            victim = hitInfo.actor;
+        }
+    }
     
-    if (hitActor == nullptr) 
+    if (victim == nullptr) 
         return false;   // 히트한 Actor가 없는 경우
     
-    if (IDamageable* damageable = dynamic_cast<IDamageable*>(hitActor)) {
-        // TODO: ApplyDamage 인자 채우기 (수정해야 할 듯 함)
-        // damageable->ApplyDamage(...)
-    }
+    IDamageable* damageable = dynamic_cast<IDamageable*>(victim);
+    if (!damageable)
+        return false;
+    
+    DamageContext ctx;
+    ctx.attacker = ownerPawn->GetId();
+    ctx.instigator = victim->GetId();
+    ctx.type = DamageType::Ranged;
+    ctx.source = DamageSource::Weapon;
+    
+    DamageResult damageResult = damageable->ApplyDamage(room->GetObjectManager(), 20, ctx);
+
+    // TODO: 데미지 처리 결과에 따른 추가 로직 (예: 사망 처리, 킬 카운트 증가 등)
+    // room->BroadcastHit(...);
+    // if (damageResult.killed) {
+    //     if (IsPlayer(victim) and IsPlayer(ownerPawn))
+    //         room->BroadcastKillPlayer(...);
+    // }
     
     return true;
 }

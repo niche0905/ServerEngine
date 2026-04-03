@@ -31,6 +31,8 @@ DamageResult Pawn::ApplyDamage(ObjectManager& om, int32 amount, const DamageCont
    }
    
    DamageResult result = health_.ApplyDamage(amount, ctx);
+   // TODO: 체력이 변한 게 Player Pawn이라면 해당 클라이언트에게 체력 업데이트 패킷 보내기 (혹은 Room에서 BroadcastHealthUpdate(...))
+   // room->BroadcastHealthUpdate(...);
    
    if (not health_.IsAlive() and not isDead_) {
       isDead_ = true;
@@ -91,4 +93,7 @@ void Pawn::OnDeath(ObjectManager& om, const DamageResult& dmgResult)
    (void)dmgResult;
    // 기본적으로 아무 작업도 하지 않음
    // 파생 클래스에서 필요에 따라 재정의 (DropOnDeath, RespawnSchedule 등)
+   
+   // TODO: 사망 시 처리할 공통 로직이 있다면 여기에 작성 (예: 사망 애니메이션 재생, 사망 위치에 이펙트 생성 등)
+   // room->BroadcastDeath(...);
 }
