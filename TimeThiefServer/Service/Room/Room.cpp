@@ -794,6 +794,8 @@ bool Room::SendToPlayer(PlayerId playerId, SendBufferRef buffer)
    if (playerId == 0 or buffer == nullptr)
       return false;  // 유효하지 않은 playerId 또는 SendBuffer
    
+   // THINK: 원래라면 Room에 있는 Container에 접근할 때 Lock을 하고 접근하는 것이 안전하다...
+   //        다만... 현재 유일한 호출은 Room::HandleFire 여기의 Lock 안에서 호출 되므로 Dead lock이 발생한다...
    // // TEMP
    // std::lock_guard<std::mutex> lock(mutex_);
    
