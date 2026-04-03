@@ -46,6 +46,7 @@ public:
 // Damageable
 public:
     virtual DamageResult ApplyDamage(ObjectManager& om, int32 amount, const DamageContext& ctx) override;
+    virtual void Damaged(const DamageResult& dmgResult);
     
     virtual bool IsAlive() const override;
     virtual int32 GetHp() const override;

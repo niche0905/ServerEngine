@@ -2,10 +2,19 @@
 #include "PlayerPawn.h"
 #include "Content/Gameplay/Collider/ColliderComponent.h"
 #include "Physics/Collider/CharacterCapsuleCollider.h"
+#include "Service/Room/Room.h"
 
 /*--------------
    PlayerPawn
 --------------*/
+
+void PlayerPawn::Damaged(const DamageResult& dmgResult)
+{
+   Pawn::Damaged(dmgResult);
+   if (auto room = GetRoom()) {
+      room->NotifyHealthChange(GetPlayerId(), dmgResult.hpAfter, -dmgResult.applied);
+   }
+}
 
 bool PlayerPawn::IsConsumable(ItemId itemId) const
 {

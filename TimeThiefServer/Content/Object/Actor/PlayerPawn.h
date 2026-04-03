@@ -56,6 +56,9 @@ public:
     
     RespawnComponent& GetRespawn() { return respawn_; }
     const RespawnComponent& GetRespawn() const { return respawn_; }
+    
+public:
+    virtual void Damaged(const DamageResult& dmgResult) override;
 
 // IDropOnDeath
 public:

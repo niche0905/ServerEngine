@@ -94,9 +94,11 @@ public:
    
 private:
    void Broadcast(std::shared_ptr<SendBuffer> sendBuffer, PlayerId exceptPlayerId = 0);
+   bool SendToPlayer(PlayerId playerId, SendBufferRef sendBuffer);
    
 public:
    void BroadcastDeath(ObjectId objectId);
+   void NotifyHealthChange(PlayerId id, int newHealth, int deltaHealth);
    
 private:
    void IndexObject_OnAdd(BaseObject* object);

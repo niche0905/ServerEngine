@@ -1,6 +1,7 @@
 ﻿#include "pch.h"
 #include "Pawn.h"
 #include "Content/Gameplay/Combat/CombatComponent.h"
+#include "Data/Tables/ZoneTableJson.h"
 #include "Service/Room/Room.h"
 
 /*--------
@@ -32,8 +33,9 @@ DamageResult Pawn::ApplyDamage(ObjectManager& om, int32 amount, const DamageCont
    }
    
    DamageResult result = health_.ApplyDamage(amount, ctx);
-   // TODO: 체력이 변한 게 Player Pawn이라면 해당 클라이언트에게 체력 업데이트 패킷 보내기 (혹은 Room에서 BroadcastHealthUpdate(...))
-   // room->BroadcastHealthUpdate(...);
+   if (result.applied > 0) {
+      Damaged(result);
+   }
    
    if (not health_.IsAlive() and not isDead_) {
       isDead_ = true;
@@ -46,6 +48,11 @@ DamageResult Pawn::ApplyDamage(ObjectManager& om, int32 amount, const DamageCont
    }
    
    return result;
+}
+
+void Pawn::Damaged(const DamageResult& dmgResult)
+{
+   // None...
 }
 
 bool Pawn::IsAlive() const

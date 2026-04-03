@@ -789,6 +789,26 @@ void Room::Broadcast(std::shared_ptr<SendBuffer> sendBuffer, PlayerId exceptPlay
    }
 }
 
+bool Room::SendToPlayer(PlayerId playerId, SendBufferRef buffer)
+{
+   if (playerId == 0 or buffer == nullptr)
+      return false;  // 유효하지 않은 playerId 또는 SendBuffer
+   
+   // // TEMP
+   // std::lock_guard<std::mutex> lock(mutex_);
+   
+   auto it = roomPlayers_.find(playerId);
+   if (it == roomPlayers_.end())
+      return false;  // 방에 존재하지 않는 플레이어
+   
+   auto session = g_SessionManager.FindByPlayerId(playerId);
+   if (!session)
+      return false;  // 플레이어의 세션이 존재하지 않음 (정상적이지 않은 상황)
+   
+   session->Send(buffer);
+   return true;
+}
+
 void Room::BroadcastDeath(ObjectId objectId)
 {
    se::game::N_EntityDied noti;
@@ -798,7 +818,24 @@ void Room::BroadcastDeath(ObjectId objectId)
    }
    
    SendBufferRef deathBroadcastBuffer = ServerPacketHandler::MakeSendBuffer(noti);
-   Broadcast(deathBroadcastBuffer);   // 모두에게 사망 정보 Broadcast
+   
+   if (deathBroadcastBuffer)
+      Broadcast(deathBroadcastBuffer);   // 모두에게 사망 정보 Broadcast
+}
+
+void Room::NotifyHealthChange(PlayerId id, int newHealth, int deltaHealth)
+{
+   se::game::N_HealthChanged noti;
+   {
+      noti.set_new_health(newHealth);
+      noti.set_delta(deltaHealth);
+   }
+   
+   SendBufferRef healthChangeBuffer = ServerPacketHandler::MakeSendBuffer(noti);
+   if (!healthChangeBuffer)
+      return;   // 유효하지 않은 SendBuffer
+   
+   SendToPlayer(id, healthChangeBuffer);
 }
 
 void Room::IndexObject_OnAdd(BaseObject* object)
