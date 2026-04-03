@@ -2,6 +2,7 @@
 #include "PlayerCombatComponent.h"
 #include "Content/Object/Actor/Actor.h"
 #include "IDamageable.h"
+#include "Content/Object/Actor/Pawn.h"
 #include "Physics/Ray/Ray.h"
 #include "Physics/Ray/RaycastHit.h"
 
@@ -222,6 +223,10 @@ bool PlayerCombatComponent::FireHitscan(const AttackRequest& request)
     if (!ownerPawn)
         return false;
     
+    auto room = ownerPawn->GetRoom();
+    if (!room)
+        return false;
+    
     SE::Math::Vector3 dir = request.direction.Normalized();
     SE::Physics::Ray ray(request.origin, dir, request.range);
     
@@ -231,9 +236,7 @@ bool PlayerCombatComponent::FireHitscan(const AttackRequest& request)
     SE::Physics::RaycastHit hitInfo{};
     
     // TODO: World(Room)에 존재하는 Collider 들 찾아서 Raycast 수행하기
-    //       Room* room = ownerPawn->GetRoom();
-    //       if (!room) return false;
-    //       room->Raycast(ray, hitInfo, ...);
+    //       room->Raycast(ray, hitInfo);
     
     if (hitActor == nullptr) 
         return false;   // 히트한 Actor가 없는 경우

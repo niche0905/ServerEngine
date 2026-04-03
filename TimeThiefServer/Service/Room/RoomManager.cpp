@@ -11,7 +11,7 @@ RoomManager* g_RoomManager = new RoomManager();
 RoomManager::RoomRef RoomManager::CreateRoom()
 {
    RoomId roomId = GenerateUniqueRoomId();
-   auto room = std::make_shared<Room>(roomId);
+   auto room = Room::Create(roomId);
    
    {
       std::lock_guard lock(mutex_);
@@ -26,7 +26,7 @@ RoomManager::RoomRef RoomManager::CreateRoom()
 
 RoomManager::RoomRef RoomManager::CreateRoom(RoomId roomId)
 {
-   auto room = std::make_shared<Room>(roomId);
+   auto room = Room::Create(roomId);
    
    {
       std::lock_guard lock(mutex_);

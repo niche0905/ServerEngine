@@ -2,6 +2,7 @@
 #include "ObjectId.h"
 #include "ObjectEnum.h"
 
+class Room;
 struct ObjectId;
 
 /*--------------
@@ -26,6 +27,8 @@ public:
     ObjectId GetId() const { return id_; }
     RoomId GetRoomId() const { return roomId_; }
     
+    std::shared_ptr<Room> GetRoom() const { return room_.lock(); }
+    
     ObjectState GetState() const { return state_; }
     bool IsAlive() const { return state_ == ObjectState::Alive; }
     bool IsPendingDestory() const { return state_ == ObjectState::PendingDestroy; }
@@ -35,10 +38,11 @@ public:
     
 // Lifecycle (Room에서만 호출)
 public:
-    void __Spawn(ObjectId id, RoomId roomId, ObjectFlags flags)
+    void __Spawn(ObjectId id, RoomId roomId, const std::shared_ptr<Room>& room, ObjectFlags flags)
     {
         id_ = id;
         roomId_ = roomId;
+        room_ = room;
         flags_ = flags;
         state_ = ObjectState::Alive;
         
@@ -59,6 +63,8 @@ public:
             return;
         OnDestroy();
         state_ = ObjectState::Destroyed;
+        room_.reset();
+        roomId_ = 0;
     }
     
     // TODO: Tick 기준을 float로 할지 int로 할지 고민 필요
@@ -76,9 +82,10 @@ protected:
     virtual void Tick(float dt) {}
     
 private:
-    ObjectId        id_{};
-    RoomId          roomId_{ 0 };
-    ObjectFlags     flags_{ ObjectFlags::None };
-    ObjectState     state_{ ObjectState::Destroyed };
+    ObjectId                id_{};
+    RoomId                  roomId_{ 0 };
+    std::weak_ptr<Room>     room_;
+    ObjectFlags             flags_{ ObjectFlags::None };
+    ObjectState             state_{ ObjectState::Destroyed };
     
 };

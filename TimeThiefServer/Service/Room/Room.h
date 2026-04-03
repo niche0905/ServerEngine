@@ -21,10 +21,20 @@ class Room : public std::enable_shared_from_this<Room>
 {
 public:
    using Vector3 = SE::Math::Vector3;
+   
+public:
+   static std::shared_ptr<Room> Create(RoomId roomId)
+   {
+      auto room = std::make_shared<Room>(roomId);
+      room->PostCreate();
+      return room;
+   }
 
 public:
    explicit Room(RoomId roomId);
    ~Room();
+   
+   void PostCreate();
    
 public:
    bool Join(PlayerId playerId, SessionId sessionId);

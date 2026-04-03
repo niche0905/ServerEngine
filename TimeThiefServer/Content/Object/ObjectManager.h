@@ -33,6 +33,8 @@ public:
    ObjectManager& operator=(const ObjectManager&) = delete;
    
    RoomId roomId() const { return roomId_; }
+   void SetRoom(const std::shared_ptr<Room>& room) { room_ = room; }
+   std::shared_ptr<Room> GetRoom() const { return room_.lock(); }
    
    template<typename T, typename... Args>
    T* Create(ObjectFlags flags, Args&&... args)
@@ -49,7 +51,8 @@ public:
       e.ptr = obj;
       e.destroyQueued = false;
       
-      obj->__Spawn(id, roomId_, flags);
+      auto room = room_.lock();
+      obj->__Spawn(id, roomId_, room, flags);
       
       ++aliveCount_;
       return obj;
@@ -216,6 +219,7 @@ private:
    
 private:
    RoomId roomId_;
+   std::weak_ptr<Room> room_;
    std::vector<Entry> entries_;
    std::vector<uint16> freeList_;
    std::deque<ObjectId> destroyQueue_;

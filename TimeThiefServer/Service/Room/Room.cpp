@@ -26,6 +26,11 @@ Room::~Room()
    npcTickList_.clear();
 }
 
+void Room::PostCreate()
+{
+   objectManager_.SetRoom(shared_from_this());
+}
+
 bool Room::Join(PlayerId playerId, SessionId sessionId)
 {
    if (playerId == 0 or sessionId == 0)      // 유효하지 않은 playerId 또는 sessionId
