@@ -23,10 +23,10 @@ public:
    Pawn* GetOwnerPawn() const;
    
    virtual bool CanAttack(const AttackRequest& request) const;
-   virtual bool TryAttack(const AttackRequest& request);
+   virtual bool TryAttack(AttackRequest& request);
    
 protected:
-   virtual bool ExecuteAttack(const AttackRequest& request) = 0;
+   virtual bool ExecuteAttack(AttackRequest& request) = 0;
    
 private:
    Pawn* ownerPawn_ = nullptr;   // non-owning cache

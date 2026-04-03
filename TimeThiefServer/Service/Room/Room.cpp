@@ -418,10 +418,22 @@ bool Room::HandleFire(PlayerId playerId, const se::game::C_FireReq& pkt)
       if (!playerPawn)
          return false;
       
-      const auto& startPos = pkt.start_position();
-      const auto& dir = pkt.direction();
+      auto combatComp = playerPawn->GetCombatComponent();
+      if (!combatComp) {
+         consoleLogger->Log(Color::Yellow, L"[Room] PlayerPawn has no CombatComponent\n");
+         return false;
+      }
       
-      // TODO: 발사 판정 및 데미지 계산은 여기서 (예: Raycast로 명중 판정, 명중한 경우 데미지 계산 등)
+      
+      AttackRequest attackReq;
+      attackReq.type = pkt.weapon_id() != 3 ? AttackType::Hitscan : AttackType::Projectile;   // TEMP: weapon_id가 3이면 투사체, 아니면 히트스캔으로 간주하기 (나중에 Weapon Data로 관리하기)
+      attackReq.instigator = playerPawn;
+      const auto& startPos = pkt.start_position();
+      attackReq.origin = Vector3{startPos.x(), startPos.y(), startPos.z()};
+      const auto& dir = pkt.direction();
+      attackReq.direction = Vector3{dir.x(), dir.y(), dir.z()};
+      
+      bool attackSucc = combatComp->TryAttack(attackReq);
       
       se::game::N_Fire noti;
       {

@@ -195,7 +195,7 @@ uint32 PlayerCombatComponent::GetCurrentWeaponId() const
     return combatState_.weapons[combatState_.currentWeaponSlot].weaponId;
 }
 
-bool PlayerCombatComponent::ExecuteAttack(const AttackRequest& request)
+bool PlayerCombatComponent::ExecuteAttack(AttackRequest& request)
 {
     bool hit = false;
     switch (request.type)
@@ -209,6 +209,9 @@ bool PlayerCombatComponent::ExecuteAttack(const AttackRequest& request)
             // TODO: 무기 ID Enum 값으로 변경...
             case 1:
                 {
+                    // TODO: 여기서 무기에 따른 데이터 처리하기 (예: 데미지, 사거리, 탄착 효과 등등)
+                    request.damage = 12;
+                    request.range = 1000.0f;
                     hit = FireHitscan(request);
                 }
                 break;
@@ -262,7 +265,7 @@ bool PlayerCombatComponent::FireHitscan(const AttackRequest& request)
     ctx.type = DamageType::Ranged;
     ctx.source = DamageSource::Weapon;
     
-    DamageResult damageResult = damageable->ApplyDamage(room->GetObjectManager(), 12, ctx);
+    DamageResult damageResult = damageable->ApplyDamage(room->GetObjectManager(), request.damage, ctx);
     room->HandleDamageResult(GetOwnerPawn(), victim, hitInfo, ctx, damageResult);
     
     return true;

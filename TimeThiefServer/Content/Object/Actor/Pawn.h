@@ -71,6 +71,11 @@ public:
     
     virtual void OnEffectChanged() override {}
     
+// Combat
+public:
+        CombatComponent* GetCombatComponent() { return combat_.get(); }
+        const CombatComponent* GetCombatComponent() const { return combat_.get(); }
+    
 // Lifecycle
 protected:
     void OnSpawn() override;

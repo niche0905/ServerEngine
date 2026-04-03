@@ -38,7 +38,7 @@ public:
    uint32 GetCurrentWeaponId() const;
    
 protected:
-   virtual bool ExecuteAttack(const AttackRequest& request) override;
+   virtual bool ExecuteAttack(AttackRequest& request) override;
    
 private:
    bool FireHitscan(const AttackRequest& request);

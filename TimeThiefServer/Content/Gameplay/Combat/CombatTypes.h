@@ -24,7 +24,7 @@ struct AttackRequest
     SE::Math::Vector3 direction{};
    
     float range = 0.0f;
-    float damage = 0.0f;
+    int32 damage = 0;   // 공격이 가할 피해량 (향후 무기 시스템이 구현되면 활용)
     
     uint32 weaponId = 0;   // 공격에 사용된 무기의 ID (향후 무기 시스템이 구현되면 활용)
 };

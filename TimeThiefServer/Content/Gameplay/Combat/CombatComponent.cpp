@@ -40,7 +40,7 @@ bool CombatComponent::CanAttack(const AttackRequest& request) const
    return true;
 }
 
-bool CombatComponent::TryAttack(const AttackRequest& request)
+bool CombatComponent::TryAttack(AttackRequest& request)
 {
    if (not CanAttack(request)) {
       return false;   // 공격할 수 없는 상태
