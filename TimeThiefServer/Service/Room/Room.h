@@ -1,6 +1,6 @@
 ﻿#pragma once
 #include <mutex>
-
+#include "Content/Object/ObjectId.h"
 #include "Content/Gameplay/Combat/DamageTypes.h"
 #include "Content/Object/ObjectManager.h"
 #include "Service/Player/Player.h"
@@ -14,6 +14,7 @@ class Pawn;
 class BaseObject;
 class ObjectManager;
 class Player;
+struct ObjectId;
 
 /*---------
    Room
@@ -136,6 +137,7 @@ private:
    
    std::unordered_map<PlayerId, RoomPlayer> roomPlayers_;   // Room Membership cache (플레이어 ID -> RoomPlayer 정보)
    
+   // TODO: ObjectHandle로 가지고 있는 것도 괜찮을 듯...?
    std::unordered_set<ObjectId> pawnObjects_;               // Pawn들
    std::vector<ObjectId> npcTickList_;                      // 매 틱마다 업데이트가 필요한 NPC들의 ID 리스트
     

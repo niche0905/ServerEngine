@@ -871,10 +871,24 @@ void Room::HandleDamageResult(Pawn* attacker, Actor* victim, const SE::Physics::
    const bool VictimIsPlayer = victim->IsPlayer();
    
    if (KillerIsPlayer and VictimIsPlayer) {
+      const PlayerId killerPlayerId = attacker->GetOwnerPlayerId();
+      
+      Pawn* victimPawn = dynamic_cast<Pawn*>(victim);
+      if (!victimPawn)
+         return;  // 피해자가 Pawn이 아님 (이 경우는 발생하지 않아야 함)
+      
+      const PlayerId victimPlayerId = victimPawn->GetOwnerPlayerId();
+      
+      if (killerPlayerId == 0 or victimPlayerId == 0)
+         return;   // 유효하지 않은 플레이어 ID (이 경우는 발생하지 않아야 함)
+      
+      // THINK: 2중 Lock 예상되는 부분...
+      //        std::mutex를 reculsive 한 것으로 바꿀까..?
+      if (!HasPlayer(killerPlayerId) || !HasPlayer(victimPlayerId))
+         return;   // 방에 존재하지 않는 플레이어가 공격자 또는 피해자인 경우 (이 경우는 발생하지 않아야 함)
+      
       const ObjectId killerId = attacker->GetId();
       const ObjectId victimId = victim->GetId();
-      
-      // TODO: Room에 존재하는 Player인지 확인하는 로직 추가하기
       
       BroadcastKillPlayer(killerId, victimId);   // 모두에게 킬 정보 Broadcast
       return;

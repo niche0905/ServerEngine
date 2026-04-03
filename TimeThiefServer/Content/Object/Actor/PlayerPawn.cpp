@@ -12,7 +12,7 @@ void PlayerPawn::Damaged(const DamageResult& dmgResult)
 {
    Pawn::Damaged(dmgResult);
    if (auto room = GetRoom()) {
-      room->NotifyHealthChange(GetPlayerId(), dmgResult.hpAfter, -dmgResult.applied);
+      room->NotifyHealthChange(GetOwnerPlayerId(), dmgResult.hpAfter, -dmgResult.applied);
    }
 }
 

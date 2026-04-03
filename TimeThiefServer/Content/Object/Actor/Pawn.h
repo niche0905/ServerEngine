@@ -29,6 +29,11 @@ public:
     Pawn(const Pawn&) = delete;
     Pawn& operator=(const Pawn&) = delete;
     
+public:
+    virtual PlayerId GetOwnerPlayerId() const { return 0;}
+    
+    bool IsOwnedByPlayer() const { return GetOwnerPlayerId() != 0; }
+    
 // Health
 public:
     HealthComponent& GetHealth() { return health_; }

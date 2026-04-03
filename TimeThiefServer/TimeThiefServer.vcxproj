@@ -603,6 +603,7 @@
     <ClInclude Include="Service\Room\Systems\ZoneTypes.h" />
     <ClInclude Include="Utils\FilePathHelper.h" />
     <ClInclude Include="Utils\pch.h" />
+    <ClInclude Include="Utils\TypesDef.h" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="CMakeLists.txt" />

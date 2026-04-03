@@ -35,8 +35,10 @@ public:
     
 // PlayerId (Room 내에서 고유한 플레이어 식별자)
 public:
-    uint32 GetPlayerId() const { return playerId_; }
-    void SetPlayerId(uint32 playerId) { playerId_ = playerId; }
+    virtual PlayerId GetOwnerPlayerId() const override { return playerId_; }
+    
+    void SetOwnerPlayerId(PlayerId playerId) { playerId_ = playerId; }
+    
     
 // pitch
 public:
@@ -113,7 +115,7 @@ private:
     void StartDeadState(ObjectManager& om, const DamageResult& dmgResult);
     
 private:
-    uint32 playerId_;
+    PlayerId playerId_;
     
     float pitch_{0.0f};
     
