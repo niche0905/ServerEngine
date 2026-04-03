@@ -203,8 +203,17 @@ bool PlayerCombatComponent::ExecuteAttack(const AttackRequest& request)
     case AttackType::Melee:
         break;
     case AttackType::Hitscan:
-        // TODO: Weapon Id에 맞게 분기
-        hit = FireHitscan(request);
+        {
+            switch (request.weaponId)
+            {
+            // TODO: 무기 ID Enum 값으로 변경...
+            case 1:
+                {
+                    hit = FireHitscan(request);
+                }
+                break;
+            }
+        }
         break;
     case AttackType::Projectile:
         break;
