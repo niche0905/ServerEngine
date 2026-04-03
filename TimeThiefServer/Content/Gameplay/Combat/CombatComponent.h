@@ -3,7 +3,6 @@
 #include "CombatTypes.h"
 
 class Pawn;
-class ColliderComponent;
 
 /*-------------------
    CombatComponent

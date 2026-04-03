@@ -2,6 +2,7 @@
 #include "Actor.h"
 #include "Content/Gameplay/Combat/IDamageable.h"
 #include "Content/Gameplay/Combat/HealthComponent.h"
+#include "Content/Gameplay/Combat/CombatComponent.h"
 #include "Content/Gameplay/Cooldown/CooldownComponent.h"
 #include "Content/Gameplay/Effects/EffectComponent.h"
 #include "Content/Gameplay/Effects/IEffectOwner.h"

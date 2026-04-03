@@ -1,6 +1,7 @@
 ﻿#pragma once
 #include "Content/Object/BaseObject.h"
 #include "Content/Object/ObjectId.h"
+#include "Content/Gameplay/Collider/ColliderComponent.h"
 #include <vector>
 #include <memory>
 
