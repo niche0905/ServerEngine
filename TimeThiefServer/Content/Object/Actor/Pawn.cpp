@@ -1,6 +1,7 @@
 ﻿#include "pch.h"
 #include "Pawn.h"
 #include "Content/Gameplay/Combat/CombatComponent.h"
+#include "Service/Room/Room.h"
 
 /*--------
    Pawn
@@ -91,9 +92,10 @@ void Pawn::OnDeath(ObjectManager& om, const DamageResult& dmgResult)
 {
    (void)om;
    (void)dmgResult;
-   // 기본적으로 아무 작업도 하지 않음
-   // 파생 클래스에서 필요에 따라 재정의 (DropOnDeath, RespawnSchedule 등)
    
-   // TODO: 사망 시 처리할 공통 로직이 있다면 여기에 작성 (예: 사망 애니메이션 재생, 사망 위치에 이펙트 생성 등)
-   // room->BroadcastDeath(...);
+   // 사망 시 모든 Client에 사망 사실 Broadcast (Room에서 BroadcastDeath 패킷을 보내는 형태로)
+   // 파생 클래스에서 필요에 따라 재정의 (DropOnDeath, RespawnSchedule 등)
+   if (auto room = GetRoom()) {
+      room->BroadcastDeath(GetId());
+   }
 }

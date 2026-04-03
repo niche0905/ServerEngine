@@ -789,6 +789,18 @@ void Room::Broadcast(std::shared_ptr<SendBuffer> sendBuffer, PlayerId exceptPlay
    }
 }
 
+void Room::BroadcastDeath(ObjectId objectId)
+{
+   se::game::N_EntityDied noti;
+   {
+      auto* entityIdPtr = noti.mutable_entity_id();
+      entityIdPtr->set_value(objectId.value);
+   }
+   
+   SendBufferRef deathBroadcastBuffer = ServerPacketHandler::MakeSendBuffer(noti);
+   Broadcast(deathBroadcastBuffer);   // 모두에게 사망 정보 Broadcast
+}
+
 void Room::IndexObject_OnAdd(BaseObject* object)
 {
    if (not object)

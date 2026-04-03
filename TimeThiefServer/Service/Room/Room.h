@@ -95,6 +95,9 @@ public:
 private:
    void Broadcast(std::shared_ptr<SendBuffer> sendBuffer, PlayerId exceptPlayerId = 0);
    
+public:
+   void BroadcastDeath(ObjectId objectId);
+   
 private:
    void IndexObject_OnAdd(BaseObject* object);
    void IndexObject_OnRemove(ObjectId objectId);
