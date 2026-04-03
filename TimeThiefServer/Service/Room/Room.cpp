@@ -840,6 +840,57 @@ void Room::NotifyHealthChange(PlayerId id, int newHealth, int deltaHealth)
    SendToPlayer(id, healthChangeBuffer);
 }
 
+void Room::BroadcastKillPlayer(ObjectId killerId, ObjectId victimId)
+{
+   se::game::N_KillPlayer noti;
+   {
+      auto* killerIdPtr = noti.mutable_killer_id();
+      killerIdPtr->set_value(killerId.value);
+      
+      auto* victimIdPtr = noti.mutable_victim_id();
+      victimIdPtr->set_value(victimId.value);
+   }
+   
+   SendBufferRef killPlayerBuffer = ServerPacketHandler::MakeSendBuffer(noti);
+   if (killPlayerBuffer)
+      Broadcast(killPlayerBuffer);
+}
+
+void Room::HandleDamageResult(Pawn* attacker, Actor* victim, const SE::Physics::Hit::HitResult& hitResult,
+                              const DamageContext& ctx, const DamageResult& damageResult)
+{
+   if (!attacker || !victim)
+      return;   // 유효하지 않은 공격자 또는 피해자
+   
+   // TODO: Hit 패킷 만들어지면 Room::BroadcastHit 작성하고 호출하기
+   
+   if (!damageResult.killed)
+      return;
+   
+   const bool KillerIsPlayer = attacker->IsPlayer();
+   const bool VictimIsPlayer = victim->IsPlayer();
+   
+   if (KillerIsPlayer and VictimIsPlayer) {
+      const ObjectId killerId = attacker->GetId();
+      const ObjectId victimId = victim->GetId();
+      
+      // TODO: Room에 존재하는 Player인지 확인하는 로직 추가하기
+      
+      BroadcastKillPlayer(killerId, victimId);   // 모두에게 킬 정보 Broadcast
+      return;
+   }
+   
+   if (KillerIsPlayer and victim->IsNPC()) {
+      // NPC Kill 처리...
+      return;
+   }
+   
+   if (attacker->IsNPC() and VictimIsPlayer) {
+      // Player가 NPC에게 죽은 경우 처리...
+      return;
+   }
+}
+
 void Room::IndexObject_OnAdd(BaseObject* object)
 {
    if (not object)

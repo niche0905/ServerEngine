@@ -1,5 +1,23 @@
 ﻿#pragma once
 
+/*--------------
+   EntityType
+--------------*/
+//
+// EntityType는 게임 내에서 다양한 유형의 엔티티를 구분하기 위한 열거형입니다.
+// 아마.. GameShared로 위임 될 가능성이 다수 존재한다...
+//
+
+enum class EntityType : uint8
+{
+    None = 0,
+    
+    Player,
+    NPC,
+    Item,
+    Projectile,
+};
+
 /*----------------
    ObjectState
 ----------------*/

@@ -1,5 +1,7 @@
 ﻿#pragma once
 #include <mutex>
+
+#include "Content/Gameplay/Combat/DamageTypes.h"
 #include "Content/Object/ObjectManager.h"
 #include "Service/Player/Player.h"
 #include "Generated/ServerPacketHandler.h"
@@ -7,6 +9,8 @@
 #include "Physics/Ray/Ray.h"
 #include "Physics/Ray/RaycastHit.h"
 
+struct DamageContext;
+class Pawn;
 class BaseObject;
 class ObjectManager;
 class Player;
@@ -99,6 +103,11 @@ private:
 public:
    void BroadcastDeath(ObjectId objectId);
    void NotifyHealthChange(PlayerId id, int newHealth, int deltaHealth);
+   // void BroadcastHit();
+   void BroadcastKillPlayer(ObjectId killerId, ObjectId victimId);
+   
+public:
+   void HandleDamageResult(Pawn* attacker, Actor* victim, const SE::Physics::Hit::HitResult& hitResult, const DamageContext& ctx, const DamageResult& damageResult);
    
 private:
    void IndexObject_OnAdd(BaseObject* object);

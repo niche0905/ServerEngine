@@ -259,20 +259,11 @@ bool PlayerCombatComponent::FireHitscan(const AttackRequest& request)
     
     DamageContext ctx;
     ctx.attacker = ownerPawn->GetId();
-    ctx.instigator = victim->GetId();
     ctx.type = DamageType::Ranged;
     ctx.source = DamageSource::Weapon;
     
-    DamageResult damageResult = damageable->ApplyDamage(room->GetObjectManager(), 20, ctx);
-
-    // TODO: 히트 정보... 근데 여기서 호출하는 게 맞나..? 피격자가 호출하는 게 맞지 않나...?
-    // room->BroadcastHit(...);
-    
-    // TODO: 데미지 처리 결과에 따른 추가 로직 (예: 사망 처리, 킬 카운트 증가 등)
-    // if (damageResult.killed) {
-    //     if (IsPlayer(victim) and IsPlayer(ownerPawn))
-    //         room->BroadcastKillPlayer(...);
-    // }
+    DamageResult damageResult = damageable->ApplyDamage(room->GetObjectManager(), 12, ctx);
+    room->HandleDamageResult(GetOwnerPawn(), victim, hitInfo, ctx, damageResult);
     
     return true;
 }
