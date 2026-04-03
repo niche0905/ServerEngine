@@ -33,7 +33,7 @@ DamageResult Pawn::ApplyDamage(ObjectManager& om, int32 amount, const DamageCont
    }
    
    DamageResult result = health_.ApplyDamage(amount, ctx);
-   if (result.applied > 0) {
+   if (result.accepted) {
       Damaged(result);
    }
    
