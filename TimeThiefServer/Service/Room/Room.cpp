@@ -770,11 +770,11 @@ ObjectId Room::GetObjectId(PlayerId playerId) const
 
 void Room::Broadcast(std::shared_ptr<SendBuffer> sendBuffer, PlayerId exceptPlayerId)
 {
-   // TEMP
-   std::lock_guard<std::mutex> lock(mutex_);
-   
    if (not sendBuffer)
       return;   // 유효하지 않은 SendBuffer
+
+   // TEMP
+   std::lock_guard<std::mutex> lock(mutex_);
    
    for (const auto& [playerId, roomPlayer] : roomPlayers_) {
       if (playerId == exceptPlayerId)
