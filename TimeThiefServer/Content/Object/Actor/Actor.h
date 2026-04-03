@@ -43,6 +43,8 @@ public:
    
 // Collider 관련 함수들
 public:
+    virtual void ForEachCollider(const std::function<void(ColliderComponent*)>& fn) const override;
+   
    const std::vector<std::unique_ptr<ColliderComponent>>& GetColliders() const { return colliders_; }
    // std::vector<std::unique_ptr<ColliderComponent>>& GetColliders() { return colliders_; }
    

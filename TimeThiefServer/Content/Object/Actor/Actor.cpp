@@ -37,6 +37,13 @@ void Actor::SetPosition(const Vector3& position)
     OnRepDirtyTransform();
 }
 
+void Actor::ForEachCollider(const std::function<void(ColliderComponent*)>& fn) const
+{
+    for (const auto& collider : colliders_) {
+        fn(collider.get());
+    }
+}
+
 void Actor::OnRepDirtyTransform()
 {
     if (auto* rep = TryGetReplication(GetRoomId())) {

@@ -25,6 +25,7 @@ class ColliderComponent : public BaseComponent
 public:
    void Init(ObjectId owner, Actor* ownerActor, ColliderRole role, std::unique_ptr<SE::Physics::Collider> collider);
    
+public:
    void SetOwnerActor(Actor* ownerActor) { ownerActor_ = ownerActor; }
    Actor* GetOwnerActor() const { return ownerActor_; }
    

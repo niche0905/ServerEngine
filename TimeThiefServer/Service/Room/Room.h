@@ -3,6 +3,9 @@
 #include "Content/Object/ObjectManager.h"
 #include "Service/Player/Player.h"
 #include "Generated/ServerPacketHandler.h"
+#include "Physics/Hitbox/HitResult.h"
+#include "Physics/Ray/Ray.h"
+#include "Physics/Ray/RaycastHit.h"
 
 class BaseObject;
 class ObjectManager;
@@ -76,6 +79,7 @@ public:
 
 public:
    void UpdateTick();
+   bool TraceHit(const SE::Physics::Ray& ray, SE::Physics::Hit::HitResult& outHit) const;   
    
 public:
    std::shared_ptr<Room> GetRoomRef() { return shared_from_this(); }

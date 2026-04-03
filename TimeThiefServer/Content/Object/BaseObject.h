@@ -1,6 +1,7 @@
 ﻿#pragma once
 #include "ObjectId.h"
 #include "ObjectEnum.h"
+#include "Content/Gameplay/Collider/ColliderComponent.h"
 
 class Room;
 struct ObjectId;
@@ -35,6 +36,9 @@ public:
     
     ObjectFlags GetFlags() const { return flags_; }
     bool IsTickable() const { return HasFlag(flags_, ObjectFlags::Tickable); }
+    
+public:
+    virtual void ForEachCollider(const std::function<void(ColliderComponent*)>& fn) const {}
     
 // Lifecycle (Room에서만 호출)
 public:

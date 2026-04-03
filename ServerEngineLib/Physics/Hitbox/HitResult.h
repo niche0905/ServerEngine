@@ -1,6 +1,8 @@
 ﻿#pragma once
 #include "HitGroup.h"
 
+class Actor;
+
 /*-------------
    HitResult
 -------------*/
@@ -26,6 +28,7 @@ namespace SE::Physics::Hit
         float damageMultiplier{1.0f};       // 데미지 배율
         
         uint16 partIndex{0};               // 히트한 부위 인덱스(없으면 0)
+        Actor* actor{nullptr};             // 히트한 Actor (없으면 nullptr)
         
         void Reset()
         {
@@ -36,6 +39,7 @@ namespace SE::Physics::Hit
             group = HitGroup::Unknown;
             damageMultiplier = 1.0f;
             partIndex = 0;
+            actor = nullptr;
         }
     };
 }

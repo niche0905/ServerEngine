@@ -1,6 +1,8 @@
 ﻿#include "pch.h"
 #include "ColliderComponent.h"
 
+#include "Physics/Ray/RaycastHit.h"
+
 /*---------------------
    ColliderComponent
 ---------------------*/

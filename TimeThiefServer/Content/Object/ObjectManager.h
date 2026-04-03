@@ -137,13 +137,13 @@ public:
    }
    
    template<typename Fn>
-   void ForEachAlive(Fn&& fn)
+   void ForEachAlive(Fn&& fn) const // TEMP: const는 나중에 제거할 수도 있음...
    {
       for (const Entry& e : entries_) {
          if (!e.ptr) continue;
          if (!e.ptr->IsAlive()) continue;
          
-         fn(*e.ptr);
+         fn(e.ptr);
       }
    }
    

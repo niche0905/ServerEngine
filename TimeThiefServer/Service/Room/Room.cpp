@@ -687,6 +687,55 @@ void Room::UpdateTick()
    // objectManager_.SweepDestroy();   // 오브젝트 제거 처리
 }
 
+bool Room::TraceHit(const SE::Physics::Ray& ray, SE::Physics::Hit::HitResult& outHit) const
+{
+   bool hasHit = false;
+   float closestT = std::numeric_limits<float>::max();
+   
+   outHit.Reset();
+   
+   objectManager_.ForEachAlive([&](BaseObject* obj)
+   {
+      if (!obj)
+         return;
+      
+      obj->ForEachCollider([&](ColliderComponent* collider)
+      {
+         if (!collider)
+            return;
+         
+         const ColliderRole role = collider->GetRole();
+         if (role != ColliderRole::Hit && role != ColliderRole::Hurtbox)
+            return;   // 명중 판정이 필요한 콜라이더가 아닌 경우 건너 뛰기
+         
+         SE::Physics::RaycastHit rayHit{};
+         if (!collider->GetCollider()->Raycast(ray, rayHit)) 
+            return;
+         
+         if (!rayHit.hit)
+            return;
+         
+         if (rayHit.t >= closestT) 
+            return;
+         
+         outHit.hit = rayHit.hit;
+         outHit.t = rayHit.t;
+         outHit.point = rayHit.point;
+         outHit.normal = rayHit.normal;
+         
+         outHit.group = SE::Physics::Hit::HitGroup::Torso;
+         outHit.damageMultiplier = 1.0f;   // TODO: HitGroup에 따른 데미지 배율 적용하기
+         outHit.partIndex = 0;   // TODO: HitGroup에 따른 부위 인덱스 적용하기
+         outHit.actor = collider->GetOwnerActor();
+         
+         closestT = rayHit.t;
+         hasHit = true;
+      });
+   });
+   
+   return hasHit;
+}
+
 bool Room::HasPlayer(PlayerId playerId) const
 {
    // TEMP
