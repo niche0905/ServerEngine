@@ -729,6 +729,34 @@ bool Room::HandlePickupItem(PlayerId playerId, const se::game::C_PickupItemReq& 
    return true;
 }
 
+bool Room::HandleSetSavePoint(PlayerId playerId, const se::game::C_SetSavePointReq& pkt)
+{
+   // THINK: 안전상 쿨타임이 존재해야 하지만 우선은 쿨타임 없이 바로 적용하는 구조로 (현재는 패킷이 너무 자주 요청 될 수 있음...)
+   {
+      std::lock_guard<std::recursive_mutex> lock(mutex_);
+      
+      if (playerId == 0)
+         return false;
+      
+      auto it = roomPlayers_.find(playerId);
+      if (it == roomPlayers_.end())
+         return false;   // 방에 존재하지 않는 플레이어
+      
+      auto* obj = objectManager_.Find(it->second.pawnObjectId);
+      if (!obj)
+         return false;
+      
+      auto* playerPawn = dynamic_cast<PlayerPawn*>(obj);
+      if (!playerPawn)
+         return false;
+      
+      const auto& savePointPos = pkt.position();
+      playerPawn->SetSavedRespawnPosition(Vector3{savePointPos.x(), savePointPos.y(), savePointPos.z()});
+   }
+   
+   return true;
+}
+
 // bool Room::HandleMove(PlayerId playerId, const se::room::C_MoveInput& pkt)
 // {
 //    ObjectId playerPawnId = GetObjectId(playerId);

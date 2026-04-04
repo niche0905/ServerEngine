@@ -370,6 +370,21 @@ bool Handle_C_UseStoreReq(PacketSessionRef& session, const se::game::C_UseStoreR
     
 bool Handle_C_SetSavePointReq(PacketSessionRef& session, const se::game::C_SetSavePointReq& pkt)
 {
-    return false;
+    if (!session) return false;
+    
+    SessionId sessionId = session->Id();
+    
+    PlayerId playerId = 0;
+    if (!g_SessionManager.TryGetPlayerId(sessionId, playerId)) return false;
+    
+    if (playerId == 0 or sessionId == 0) return false;
+    
+    auto player = g_PlayerManager.Find(playerId);
+    if (!player) return false;
+    
+    auto room = g_RoomManager->FindRoom(player->roomId_);
+    if (!room) return false;
+    
+    return room->HandleSetSavePoint(playerId, pkt);
 }
     
