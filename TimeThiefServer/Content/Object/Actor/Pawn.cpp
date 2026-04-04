@@ -1,7 +1,5 @@
 ﻿#include "pch.h"
 #include "Pawn.h"
-#include "Content/Gameplay/Combat/CombatComponent.h"
-#include "Content/Gameplay/Combat/PlayerCombatComponent.h"
 #include "Data/Tables/ZoneTableJson.h"
 #include "Service/Room/Room.h"
 
@@ -78,8 +76,6 @@ void Pawn::OnSpawn()
    health_.Init(GetId(), 100);
    cooldowns_.Init(GetId());
    effects_.Init(GetId());
-   combat_ = std::make_unique<PlayerCombatComponent>();
-   combat_->Init(GetId(), this);
    
    isDead_ = false;
    velocity_ = Vector3{};

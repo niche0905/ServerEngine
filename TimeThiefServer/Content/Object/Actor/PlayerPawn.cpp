@@ -1,6 +1,7 @@
 ﻿#include "pch.h"
 #include "PlayerPawn.h"
 #include "Content/Gameplay/Collider/ColliderComponent.h"
+#include "Content/Gameplay/Combat/PlayerCombatComponent.h"
 #include "Physics/Collider/CharacterCapsuleCollider.h"
 #include "Service/Room/Room.h"
 
@@ -90,6 +91,10 @@ void PlayerPawn::GrantSpawnInvulnerability(ObjectManager& om, uint32 durationMs)
 void PlayerPawn::OnSpawn()
 {
    Pawn::OnSpawn();
+   
+   combat_ = std::make_unique<PlayerCombatComponent>();
+   if (combat_)
+      combat_->Init(GetId(), this);
    
    // TEMP
    {
