@@ -378,8 +378,7 @@ bool Room::HandleAim(PlayerId playerId, const se::game::C_AimReq& pkt)
          auto* entityIdPtr = aimNoti.mutable_entity_id();
          entityIdPtr->set_value(it->second.pawnObjectId.value);
          
-         // TODO: 아래를 pkt Aiming이 아니라 Player State의 IsAiming 값으로 변경하기 (예: PlayerState에 IsAiming bool 값 추가)
-         aimNoti.set_is_aiming(pkt.is_aiming());
+         aimNoti.set_is_aiming(playerPawn->IsAiming());
       }
       
       aimBroadcastBuffer = ServerPacketHandler::MakeSendBuffer(aimNoti);
@@ -619,15 +618,21 @@ bool Room::HandleWeaponChange(PlayerId playerId, const se::game::C_WeaponChangeR
       if (!playerPawn)
          return false;
       
-      // TODO: 무기 변경 로직은 여기서 (Player State의 현재 무기 업데이트 등)
+      const uint32 weaponId = pkt.weapon_id();
+      auto* playerCombatComp = playerPawn->GetPlayerCombat();
+      if (!playerCombatComp) {
+         consoleLogger->Log(Color::Yellow, L"[Room] PlayerPawn has no PlayerCombatComponent\n");
+         return false;
+      }
+      playerCombatComp->SwitchWeapon(weaponId);
       
+      const uint32 handWeaponId = playerCombatComp->GetCurrentWeaponId();
       se::game::N_WeaponChanged noti;
       {
          auto* entityIdPtr = noti.mutable_entity_id();
          entityIdPtr->set_value(it->second.pawnObjectId.value);
          
-         // TODO: pkt의 weapon_id를 사용하지 않고 Player State의 Weapon Id 사용하기 (유효성 검사)
-         noti.set_weapon_id(pkt.weapon_id());
+         noti.set_weapon_id(handWeaponId);
       }
       
       weaponChangeBroadcastBuffer = ServerPacketHandler::MakeSendBuffer(noti);

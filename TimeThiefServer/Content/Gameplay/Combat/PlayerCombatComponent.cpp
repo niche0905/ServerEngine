@@ -228,6 +228,9 @@ bool PlayerCombatComponent::ExecuteAttack(AttackRequest& request)
 
 bool PlayerCombatComponent::FireHitscan(const AttackRequest& request)
 {
+    if (request.weaponId == 0 or request.weaponId != GetCurrentWeaponId())
+        return false;   // 무기 ID가 0이거나 현재 무기와 일치하지 않는 경우 유효하지 않음
+    
     uint8 weaponSlot = WeaponSlotFromWeaponId(request.weaponId);
     if (!ConsumeAmmo(weaponSlot, 1))
         return false;
