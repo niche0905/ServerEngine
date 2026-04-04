@@ -109,6 +109,9 @@ public:
     bool IsAiming() const { return actionState_.isAiming; }
     void SetAiming(bool isAiming) { actionState_.isAiming = isAiming; }
     
+    bool IsJumping() const { return actionState_.isJumping; }
+    void SetJumping(bool isJumping) { actionState_.isJumping = isJumping; }
+    
 protected:
     void OnSpawn() override;
     void OnPreDestroy() override;

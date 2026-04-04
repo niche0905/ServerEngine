@@ -62,6 +62,8 @@ public:
    bool HandleWeaponChange(PlayerId playerId, const se::game::C_WeaponChangeReq& pkt);
    bool HandlePickupItem(PlayerId playerId, const se::game::C_PickupItemReq& pkt);
    bool HandleSetSavePoint(PlayerId playerId, const se::game::C_SetSavePointReq& pkt);
+   bool HandleJump(PlayerId playerId, const se::game::C_JumpReq& pkt);
+   bool HandleJumpLand(PlayerId playerId, const se::game::C_JumpLand& pkt);
    
 public:
    template<typename T, typename... Args>

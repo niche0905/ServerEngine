@@ -757,6 +757,83 @@ bool Room::HandleSetSavePoint(PlayerId playerId, const se::game::C_SetSavePointR
    return true;
 }
 
+bool Room::HandleJump(PlayerId playerId, const se::game::C_JumpReq& pkt)
+{
+   SendBufferRef jumpBroadcastBuffer;
+   
+   {
+      std::lock_guard<std::recursive_mutex> lock(mutex_);
+      
+      if (playerId == 0)
+         return false;
+      
+      auto it = roomPlayers_.find(playerId);
+      if (it == roomPlayers_.end())
+         return false;   // 방에 존재하지 않는 플레이어
+      
+      auto* obj = objectManager_.Find(it->second.pawnObjectId);
+      if (!obj)
+         return false;
+      
+      auto* playerPawn = dynamic_cast<PlayerPawn*>(obj);
+      if (!playerPawn)
+         return false;
+      
+      playerPawn->SetJumping(true);
+      
+      se::game::N_Jump noti;
+      {
+         auto* entityIdPtr = noti.mutable_entity_id();
+         entityIdPtr->set_value(it->second.pawnObjectId.value);
+      }
+      jumpBroadcastBuffer = ServerPacketHandler::MakeSendBuffer(noti);
+   }
+   
+   if (jumpBroadcastBuffer)
+      Broadcast(jumpBroadcastBuffer, playerId);   // 점프한 플레이어를 제외한 나머지 플레이어들에게 점프 정보 Broadcast
+   
+   return true;
+}
+
+bool Room::HandleJumpLand(PlayerId playerId, const se::game::C_JumpLand& pkt)
+{
+   SendBufferRef landBroadcastBuffer;
+   
+   {
+      std::lock_guard<std::recursive_mutex> lock(mutex_);
+      
+      if (playerId == 0)
+         return false;
+      
+      auto it = roomPlayers_.find(playerId);
+      if (it == roomPlayers_.end())
+         return false;   // 방에 존재하지 않는 플레이어
+      
+      auto* obj = objectManager_.Find(it->second.pawnObjectId);
+      if (!obj)
+         return false;
+      
+      auto* playerPawn = dynamic_cast<PlayerPawn*>(obj);
+      if (!playerPawn)
+         return false;
+      
+      playerPawn->SetJumping(false);
+      
+      se::game::N_JumpLand noti;
+      {
+         auto* entityIdPtr = noti.mutable_entity_id();
+         entityIdPtr->set_value(it->second.pawnObjectId.value);
+      }
+      landBroadcastBuffer = ServerPacketHandler::MakeSendBuffer(noti);
+   }
+   
+   if (landBroadcastBuffer)
+      Broadcast(landBroadcastBuffer, playerId);   // 착지한 플레이어를 제외한 나머지 플레이어들에게 착지 정보 Broadcast
+   
+   return true;
+}
+
+
 // bool Room::HandleMove(PlayerId playerId, const se::room::C_MoveInput& pkt)
 // {
 //    ObjectId playerPawnId = GetObjectId(playerId);
