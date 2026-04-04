@@ -60,6 +60,7 @@ public:
    bool HandleThrowGrenade(PlayerId playerId, const se::game::C_ThrowGrenadeReq& pkt);
    bool HandleReload(PlayerId playerId, const se::game::C_ReloadReq& pkt);
    bool HandleWeaponChange(PlayerId playerId, const se::game::C_WeaponChangeReq& pkt);
+   bool HandlePickupItem(PlayerId playerId, const se::game::C_PickupItemReq& pkt);
    
 public:
    template<typename T, typename... Args>

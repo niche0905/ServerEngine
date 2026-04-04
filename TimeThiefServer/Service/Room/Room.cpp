@@ -6,6 +6,7 @@
 #include "Content/Object/Actor/Pawn.h"
 #include "Network/Session/SessionManager/SessionManager.h"
 #include "Content/Object/Actor/PlayerPawn.h"
+#include "Content/Object/Actor/WorldItemActor.h"
 #include "Service/Player/PlayerManager/PlayerManager.h"
 
 /*---------
@@ -640,6 +641,90 @@ bool Room::HandleWeaponChange(PlayerId playerId, const se::game::C_WeaponChangeR
    
    if (weaponChangeBroadcastBuffer)
       Broadcast(weaponChangeBroadcastBuffer);   // 모두에게 무기 변경 정보 Broadcast (본인 플레이어에겐 잘못된 무기 교체 요구일 수도 있으므로 예외 없이 모두에게 Broadcast)
+   
+   return true;
+}
+
+bool Room::HandlePickupItem(PlayerId playerId, const se::game::C_PickupItemReq& pkt)
+{
+   SendBufferRef pickupResultBuffer;
+   SendBufferRef pickupBroadcastBuffer;
+   SendBufferRef itemDespawnBuffer;
+   std::shared_ptr<PlayerSession> sessionRef = g_SessionManager.FindByPlayerId(playerId);
+   
+   if (!sessionRef) return false;   // 세션이 존재하지 않음 (정상적이지 않은 상황)
+   
+   {
+      std::lock_guard<std::recursive_mutex> lock(mutex_);
+      
+      if (playerId == 0)
+         return false;
+      
+      auto it = roomPlayers_.find(playerId);
+      if (it == roomPlayers_.end())
+         return false;   // 방에 존재하지 않는 플레이어
+      
+      if (not it->second.loadingComplete)
+         return false;
+      
+      const ObjectId& pawnId = it->second.pawnObjectId;
+      auto* obj = objectManager_.Find(pawnId);
+      if (!obj)
+         return false;
+      
+      auto* playerPawn = dynamic_cast<PlayerPawn*>(obj);
+      if (!playerPawn)
+         return false;
+      
+      ObjectId itemObjectId{pkt.item_entity_id().value()};
+      auto* itemObj = objectManager_.Find(itemObjectId);
+      if (!itemObj)
+         return false;
+      
+      bool itemActorRemove = objectManager_.RequestDestroy(itemObjectId);
+      
+      auto* item = dynamic_cast<WorldItemActor*>(itemObj);
+      if (!item)
+         return false;
+      
+      const auto& itemStack = item->GetItemStack();
+      if (!itemStack.IsValid())
+         return false;
+      
+      se::game::N_ItemGained itemGainedNoti;
+      {
+         itemGainedNoti.set_item_id(itemStack.id);
+         itemGainedNoti.set_quantity(itemStack.count);
+      }
+      pickupResultBuffer = ServerPacketHandler::MakeSendBuffer(itemGainedNoti);
+      
+      se::game::N_PickupItem pickupItemNoti;
+      {
+         auto* entityPtr = pickupItemNoti.mutable_entity_id();
+         entityPtr->set_value(pawnId.value);
+         
+         auto* itemIdPtr = pickupItemNoti.mutable_item_entity_id();
+         itemIdPtr->set_value(itemObjectId.value);
+      }
+      pickupBroadcastBuffer = ServerPacketHandler::MakeSendBuffer(pickupItemNoti);
+      
+      se::room::N_EntityDespawn itemDespawnNoti;
+      {
+         auto* entityIdPtr = itemDespawnNoti.mutable_entity_id();
+         entityIdPtr->set_value(itemObjectId.value);
+      }
+      itemDespawnBuffer = ServerPacketHandler::MakeSendBuffer(itemDespawnNoti);
+   }
+   
+   if (pickupResultBuffer)
+      sessionRef->Send(pickupResultBuffer);   // 아이템 획득 결과를 해당 플레이어에게 전송
+   
+   if (pickupBroadcastBuffer)
+      Broadcast(pickupBroadcastBuffer);   // 아이템을 획득 (이펙트를 위해)
+   
+   // TODO: 아이템이 사라지는 패킷은 아이템 획득 이펙트가 재생된 후에 잠시 딜레이를 두고 보내는 구조로 변경하기 (클라이언트에서 아이템 획득 이펙트가 재생된 후에 아이템이 사라지는 구조로)
+   if (itemDespawnBuffer)
+      Broadcast(itemDespawnBuffer);   // 아이템이 사라졌음을 모두에게 Broadcast
    
    return true;
 }

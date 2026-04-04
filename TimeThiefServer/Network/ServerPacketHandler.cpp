@@ -345,7 +345,22 @@ bool Handle_C_ChestInteractReq(PacketSessionRef& session, const se::game::C_Ches
     
 bool Handle_C_PickupItemReq(PacketSessionRef& session, const se::game::C_PickupItemReq& pkt)
 {
-    return false;
+    if (!session) return false;
+    
+    SessionId sessionId = session->Id();
+    
+    PlayerId playerId = 0;
+    if (!g_SessionManager.TryGetPlayerId(sessionId, playerId)) return false;
+    
+    if (playerId == 0 or sessionId == 0) return false;
+    
+    auto player = g_PlayerManager.Find(playerId);
+    if (!player) return false;
+    
+    auto room = g_RoomManager->FindRoom(player->roomId_);
+    if (!room) return false;
+    
+    return room->HandlePickupItem(playerId, pkt);
 }
     
 bool Handle_C_UseStoreReq(PacketSessionRef& session, const se::game::C_UseStoreReq& pkt)
