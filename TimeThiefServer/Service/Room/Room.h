@@ -128,7 +128,7 @@ private:
 
    // TEMP: 샤딩을 통한 thread safety가 보장되기 전 Lock 구조
 private:
-   mutable std::mutex mutex_;
+   mutable std::recursive_mutex mutex_;
    
 private:
    RoomId roomId_;

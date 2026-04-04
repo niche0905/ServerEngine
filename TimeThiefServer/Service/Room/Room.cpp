@@ -46,7 +46,7 @@ bool Room::Join(PlayerId playerId, SessionId sessionId)
    if (!playerRef) return false;    // 플레이어가 존재하지 않음 (정상적이지 않은 상황)
    
    {
-      std::lock_guard<std::mutex> lock(mutex_);   // 방에 플레이어가 입장/퇴장할 때마다 Lock을 잡는 구조 (샤딩 도입 전까지는 이 구조로 유지)
+      std::lock_guard<std::recursive_mutex> lock(mutex_);   // 방에 플레이어가 입장/퇴장할 때마다 Lock을 잡는 구조 (샤딩 도입 전까지는 이 구조로 유지)
       
       auto it = roomPlayers_.find(playerId);
       if (it != roomPlayers_.end()) {
@@ -186,7 +186,7 @@ bool Room::Leave(PlayerId playerId)
    
    {
       // TEMP
-      std::lock_guard<std::mutex> lock(mutex_);
+      std::lock_guard<std::recursive_mutex> lock(mutex_);
       
       if (playerId == 0)
          return false;   // 유효하지 않은 playerId
@@ -233,7 +233,7 @@ bool Room::Leave(PlayerId playerId)
 bool Room::UpdateSession(PlayerId playerId, SessionId newSessionId)
 {
    // TEMP
-   std::lock_guard<std::mutex> lock(mutex_);
+   std::lock_guard<std::recursive_mutex> lock(mutex_);
    
    if (newSessionId == 0)
       return false;   // 유효하지 않은 sessionId
@@ -254,7 +254,7 @@ bool Room::HandleLoadingComplete(PlayerId playerId)
    
    {
       // TEMP
-      std::lock_guard<std::mutex> lock(mutex_);
+      std::lock_guard<std::recursive_mutex> lock(mutex_);
       
       if (playerId == 0) 
          return false;   // 유효하지 않은 playerId
@@ -282,7 +282,7 @@ bool Room::HandleMove(PlayerId playerId, const se::game::C_MoveReq& pkt)
    
    {
       // TEMP
-      std::lock_guard<std::mutex> lock(mutex_);
+      std::lock_guard<std::recursive_mutex> lock(mutex_);
       
       if (playerId == 0)
          return false;
@@ -350,7 +350,7 @@ bool Room::HandleAim(PlayerId playerId, const se::game::C_AimReq& pkt)
    if (!sessionRef) return false;   // 세션이 존재하지 않음 (정상적이지 않은 상황)
    
    {
-      std::lock_guard<std::mutex> lock(mutex_);
+      std::lock_guard<std::recursive_mutex> lock(mutex_);
       
       if (playerId == 0)
          return false;
@@ -398,7 +398,7 @@ bool Room::HandleFire(PlayerId playerId, const se::game::C_FireReq& pkt)
    if (!sessionRef) return false;   // 세션이 존재하지 않음 (정상적이지 않은 상황)
    
    {
-      std::lock_guard<std::mutex> lock(mutex_);
+      std::lock_guard<std::recursive_mutex> lock(mutex_);
       
       if (playerId == 0)
          return false;
@@ -472,7 +472,7 @@ bool Room::HandleThrowGrenade(PlayerId playerId, const se::game::C_ThrowGrenadeR
    if (!sessionRef) return false;   // 세션이 존재하지 않음 (정상적이지 않은 상황)
    
    {
-      std::lock_guard<std::mutex> lock(mutex_);
+      std::lock_guard<std::recursive_mutex> lock(mutex_);
       
       if (playerId == 0)
          return false;
@@ -539,7 +539,7 @@ bool Room::HandleReload(PlayerId playerId, const se::game::C_ReloadReq& pkt)
    if (!sessionRef) return false;   // 세션이 존재하지 않음 (정상적이지 않은 상황)
    
    {
-      std::lock_guard<std::mutex> lock(mutex_);
+      std::lock_guard<std::recursive_mutex> lock(mutex_);
       
       if (playerId == 0)
          return false;
@@ -589,7 +589,7 @@ bool Room::HandleWeaponChange(PlayerId playerId, const se::game::C_WeaponChangeR
    if (!sessionRef) return false;   // 세션이 존재하지 않음 (정상적이지 않은 상황)
    
    {
-      std::lock_guard<std::mutex> lock(mutex_);
+      std::lock_guard<std::recursive_mutex> lock(mutex_);
       
       if (playerId == 0)
          return false;
@@ -634,7 +634,7 @@ bool Room::HandleWeaponChange(PlayerId playerId, const se::game::C_WeaponChangeR
 //    ObjectId playerPawnId = GetObjectId(playerId);
 //    
 //    // TEMP
-//    std::lock_guard<std::mutex> lock(mutex_);
+//    std::lock_guard<std::recursive_mutex> lock(mutex_);
 //    
 //    auto* obj = objectManager_.Find(playerPawnId);
 //    if (not obj)
@@ -671,7 +671,7 @@ bool Room::HandleWeaponChange(PlayerId playerId, const se::game::C_WeaponChangeR
 void Room::UpdateTick()
 {
    // TEMP
-   std::lock_guard<std::mutex> lock(mutex_);
+   std::lock_guard<std::recursive_mutex> lock(mutex_);
    
    // Room 정책
    // NPC만 Tick 진행
@@ -751,7 +751,7 @@ bool Room::TraceHit(const SE::Physics::Ray& ray, SE::Physics::Hit::HitResult& ou
 bool Room::HasPlayer(PlayerId playerId) const
 {
    // TEMP
-   std::lock_guard<std::mutex> lock(mutex_);
+   std::lock_guard<std::recursive_mutex> lock(mutex_);
    
    return roomPlayers_.contains(playerId);
 }
@@ -759,7 +759,7 @@ bool Room::HasPlayer(PlayerId playerId) const
 SessionId Room::GetSessionId(PlayerId playerId) const
 {
    // TEMP
-   std::lock_guard<std::mutex> lock(mutex_);
+   std::lock_guard<std::recursive_mutex> lock(mutex_);
    
    auto it = roomPlayers_.find(playerId);
    if (it == roomPlayers_.end())
@@ -771,7 +771,7 @@ SessionId Room::GetSessionId(PlayerId playerId) const
 ObjectId Room::GetObjectId(PlayerId playerId) const
 {
    // TEMP
-   std::lock_guard<std::mutex> lock(mutex_);
+   std::lock_guard<std::recursive_mutex> lock(mutex_);
    
    auto it = roomPlayers_.find(playerId);
    if (it == roomPlayers_.end())
@@ -786,7 +786,7 @@ void Room::Broadcast(std::shared_ptr<SendBuffer> sendBuffer, PlayerId exceptPlay
       return;   // 유효하지 않은 SendBuffer
 
    // TEMP
-   std::lock_guard<std::mutex> lock(mutex_);
+   std::lock_guard<std::recursive_mutex> lock(mutex_);
    
    for (const auto& [playerId, roomPlayer] : roomPlayers_) {
       if (playerId == exceptPlayerId)
