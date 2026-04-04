@@ -371,15 +371,7 @@ bool Room::HandleAim(PlayerId playerId, const se::game::C_AimReq& pkt)
       if (!playerPawn)
          return false;
       
-      auto* combatComp = playerPawn->GetCombatComponent();
-      auto* playerCombat = dynamic_cast<PlayerCombatComponent*>(combatComp);
-      
-      if (!playerCombat) {
-         consoleLogger->Log(Color::Yellow, L"[Room] PlayerCombatComponent not exist\n");
-         return false;
-      }
-      
-      playerCombat->SetAiming(pkt.is_aiming());
+      playerPawn->SetAiming(pkt.is_aiming());
       
       se::game::N_Aim aimNoti;
       {

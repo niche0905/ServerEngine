@@ -125,16 +125,6 @@ bool PlayerCombatComponent::SwitchWeapon(uint32 newWeaponId)
     return true;
 }
 
-bool PlayerCombatComponent::IsAiming() const
-{
-    return combatState_.isAiming;
-}
-
-void PlayerCombatComponent::SetAiming(bool aiming)
-{
-    combatState_.isAiming = aiming;
-}
-
 const WeaponState* PlayerCombatComponent::GetCurrentWeaponState() const
 {
     return GetWeaponState(combatState_.currentWeaponSlot);

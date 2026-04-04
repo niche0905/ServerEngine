@@ -1,5 +1,6 @@
 ﻿#pragma once
 #include "Pawn.h"
+#include "Content/Gameplay/Combat/PlayerCombatComponent.h"
 #include "Content/Gameplay/Drop/DropOnDeathComponent.h"
 #include "Content/Gameplay/Drop/IDropOnDeathOwner.h"
 #include "Content/Gameplay/Economy/IWalletOwner.h"
@@ -47,6 +48,9 @@ public:
     
 // Component
 public:
+    PlayerCombatComponent* GetPlayerCombat() { return static_cast<PlayerCombatComponent*>(combat_.get()); }
+    const PlayerCombatComponent* GetPlayerCombat() const { return static_cast<const PlayerCombatComponent*>(combat_.get()); }
+    
     DropOnDeathComponent& GetDropOnDeath() { return dropOnDeath_; }
     const DropOnDeathComponent& GetDropOnDeath() const { return dropOnDeath_; }
     
@@ -99,6 +103,11 @@ public:
     virtual void OnPostRespawn(ObjectManager& om) override;
     virtual void ApplyRespawnToWorld(ObjectManager& om, const Vector3& pos) override;
     virtual void GrantSpawnInvulnerability(ObjectManager& om, uint32 durationMs) override;
+    
+// Player State (Action State)
+public:
+    bool IsAiming() const { return actionState_.isAiming; }
+    void SetAiming(bool isAiming) { actionState_.isAiming = isAiming; }
     
 protected:
     void OnSpawn() override;

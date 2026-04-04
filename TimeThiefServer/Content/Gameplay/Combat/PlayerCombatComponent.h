@@ -22,9 +22,6 @@ public:
    virtual bool TryReload();
    bool SwitchWeapon(uint32 newWeaponId);
    
-   bool IsAiming() const;
-   void SetAiming(bool aiming);
-   
    const WeaponState* GetCurrentWeaponState() const;
    WeaponState* GetCurrentWeaponState();
    

@@ -46,7 +46,6 @@ struct PlayerCombatState
 {
     static constexpr size_t MaxWeaponSlots = 3;
     
-    bool isAiming = false;
     std::array<WeaponState, MaxWeaponSlots> weapons{};
     uint8 currentWeaponSlot = 0;
 };
