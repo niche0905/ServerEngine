@@ -1,5 +1,6 @@
 ﻿#include "pch.h"
 #include "Room.h"
+#include "Content/Gameplay/Combat/PlayerCombatComponent.h"
 #include "Content/Object/BaseObject.h"
 #include "Content/Object/Actor/MonsterPawn.h"
 #include "Content/Object/Actor/Pawn.h"
@@ -370,7 +371,15 @@ bool Room::HandleAim(PlayerId playerId, const se::game::C_AimReq& pkt)
       if (!playerPawn)
          return false;
       
-      // TODO: Player State를 추가해서, Aim 상태인지 아닌지 관리하기 (예: PlayerState에 IsAiming bool 값 추가)
+      auto* combatComp = playerPawn->GetCombatComponent();
+      auto* playerCombat = dynamic_cast<PlayerCombatComponent*>(combatComp);
+      
+      if (!playerCombat) {
+         consoleLogger->Log(Color::Yellow, L"[Room] PlayerCombatComponent not exist\n");
+         return false;
+      }
+      
+      playerCombat->SetAiming(pkt.is_aiming());
       
       se::game::N_Aim aimNoti;
       {
@@ -423,7 +432,6 @@ bool Room::HandleFire(PlayerId playerId, const se::game::C_FireReq& pkt)
          consoleLogger->Log(Color::Yellow, L"[Room] PlayerPawn has no CombatComponent\n");
          return false;
       }
-      
       
       AttackRequest attackReq;
       attackReq.type = pkt.weapon_id() != 3 ? AttackType::Hitscan : AttackType::Projectile;   // TEMP: weapon_id가 3이면 투사체, 아니면 히트스캔으로 간주하기 (나중에 Weapon Data로 관리하기)
