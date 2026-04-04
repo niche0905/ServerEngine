@@ -559,7 +559,17 @@ bool Room::HandleReload(PlayerId playerId, const se::game::C_ReloadReq& pkt)
       if (!playerPawn)
          return false;
       
-      // TODO: 재장전 및 탄창 갯수 관리 로직은 여기서 (예: Player State에 탄창 갯수 관리, 재장전 시간 관리 등)
+      auto* playerCombatComp = playerPawn->GetPlayerCombat();
+      if (!playerCombatComp) {
+         consoleLogger->Log(Color::Yellow, L"[Room] PlayerPawn has no PlayerCombatComponent\n");
+         return false;
+      }
+
+      const uint32 handWeaponId = playerCombatComp->GetCurrentWeaponId();
+      if (handWeaponId != pkt.weapon_id()) {
+         consoleLogger->Log(Color::Yellow, L"[Room] Reload Failed: weapon_id mismatch (handWeaponId: %u, pkt.weapon_id: %u)\n", handWeaponId, pkt.weapon_id());
+      }
+      playerCombatComp->TryReload();
       
       se::game::N_Reload noti;
       {

@@ -111,6 +111,15 @@ bool PlayerCombatComponent::TryReload()
     return true;
 }
 
+uint32 PlayerCombatComponent::GetHandWeaponId() const
+{
+    const WeaponState* currentWeapon = GetCurrentWeaponState();
+    if (!currentWeapon)
+        return 0;   // 현재 무기가 없는 경우 유효하지 않은 무기 ID 반환
+    
+    return currentWeapon->weaponId;
+}
+
 bool PlayerCombatComponent::SwitchWeapon(uint32 newWeaponId)
 {
     const uint8 newSlotIndex = WeaponSlotFromWeaponId(newWeaponId);

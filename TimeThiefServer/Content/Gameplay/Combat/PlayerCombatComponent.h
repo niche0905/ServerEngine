@@ -20,6 +20,8 @@ public:
    
    virtual bool CanAttack(const AttackRequest& request) const override;
    virtual bool TryReload();
+   
+   uint32 GetHandWeaponId() const;
    bool SwitchWeapon(uint32 newWeaponId);
    
    const WeaponState* GetCurrentWeaponState() const;
