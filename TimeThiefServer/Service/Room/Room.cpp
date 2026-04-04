@@ -833,6 +833,126 @@ bool Room::HandleJumpLand(PlayerId playerId, const se::game::C_JumpLand& pkt)
    return true;
 }
 
+bool Room::HandleCrouch(PlayerId playerId, const se::game::C_CrouchReq& pkt)
+{
+   SendBufferRef crouchBroadcastBuffer;
+   
+   {
+      std::lock_guard<std::recursive_mutex> lock(mutex_);
+      
+      if (playerId == 0)
+         return false;
+      
+      auto it = roomPlayers_.find(playerId);
+      if (it == roomPlayers_.end())
+         return false;   // 방에 존재하지 않는 플레이어
+      
+      auto* obj = objectManager_.Find(it->second.pawnObjectId);
+      if (!obj)
+         return false;
+      
+      auto* playerPawn = dynamic_cast<PlayerPawn*>(obj);
+      if (!playerPawn)
+         return false;
+      
+      playerPawn->SetCrouching(pkt.is_crouching());
+      
+      se::game::N_Crouch crouchNoti;
+      {
+         auto* entityIdPtr = crouchNoti.mutable_entity_id();
+         entityIdPtr->set_value(it->second.pawnObjectId.value);
+         
+         crouchNoti.set_is_crouching(playerPawn->IsCrouching());
+      }
+      
+      crouchBroadcastBuffer = ServerPacketHandler::MakeSendBuffer(crouchNoti);
+   }
+   
+   if (crouchBroadcastBuffer)
+      Broadcast(crouchBroadcastBuffer, playerId);   // 크로치 상태를 변경한 플레이어를 제외한 나머지 플레이어들에게 크로치 상태 변경 정보 Broadcast
+   
+   return true;
+}
+
+bool Room::HandleWireAction(PlayerId playerId, const se::game::C_WireActionReq& pkt)
+{
+   SendBufferRef wireBroadcastBuffer;
+   
+   {
+      std::lock_guard<std::recursive_mutex> lock(mutex_);
+      
+      if (playerId == 0)
+         return false;
+      
+      auto it = roomPlayers_.find(playerId);
+      if (it == roomPlayers_.end())
+         return false;
+      
+      auto* obj = objectManager_.Find(it->second.pawnObjectId);
+      if (!obj)
+         return false;
+      
+      auto* playerPawn = dynamic_cast<PlayerPawn*>(obj);
+      if (!playerPawn)
+         return false;
+      
+      playerPawn->SetWired(true);
+      
+      se::game::N_WireAction noti;
+      {
+         auto* entityIdPtr = noti.mutable_entity_id();
+         entityIdPtr->set_value(it->second.pawnObjectId.value);
+         
+         auto* anchorPosPtr = noti.mutable_anchor_point();
+         anchorPosPtr->CopyFrom(pkt.anchor_point());
+      }
+      wireBroadcastBuffer = ServerPacketHandler::MakeSendBuffer(noti);
+   }
+   
+   if (wireBroadcastBuffer)
+      Broadcast(wireBroadcastBuffer, playerId);   // 와이어 액션을 시작한 플레이어를 제외한 나머지 플레이어들에게 와이어 액션 정보 Broadcast
+   
+   return true;
+}
+
+bool Room::HandleWireActionEnd(PlayerId playerId, const se::game::C_WireActionEnd& pkt)
+{
+   SendBufferRef wireEndBroadcastBuffer;
+   
+   {
+      std::lock_guard<std::recursive_mutex> lock(mutex_);
+      
+      if (playerId == 0)
+         return false;
+      
+      auto it = roomPlayers_.find(playerId);
+      if (it == roomPlayers_.end())
+         return false;
+      
+      auto* obj = objectManager_.Find(it->second.pawnObjectId);
+      if (!obj)
+         return false;
+      
+      auto* playerPawn = dynamic_cast<PlayerPawn*>(obj);
+      if (!playerPawn)
+         return false;
+      
+      playerPawn->SetWired(false);
+      
+      se::game::N_WireActionEnd noti;
+      {
+         auto* entityIdPtr = noti.mutable_entity_id();
+         entityIdPtr->set_value(it->second.pawnObjectId.value);
+      }
+      wireEndBroadcastBuffer = ServerPacketHandler::MakeSendBuffer(noti);
+   }
+   
+   if (wireEndBroadcastBuffer)
+      Broadcast(wireEndBroadcastBuffer, playerId);   // 와이어 액션을 종료한 플레이어를 제외한 나머지 플레이어들에게 와이어 액션 종료 정보 Broadcast
+   
+   return true;
+}
+
 
 // bool Room::HandleMove(PlayerId playerId, const se::room::C_MoveInput& pkt)
 // {

@@ -112,6 +112,12 @@ public:
     bool IsJumping() const { return actionState_.isJumping; }
     void SetJumping(bool isJumping) { actionState_.isJumping = isJumping; }
     
+    bool IsCrouching() const { return actionState_.isCrouching; }
+    void SetCrouching(bool isCrouching) { actionState_.isCrouching = isCrouching; }
+    
+    bool IsWired() const { return actionState_.isWireActing; }
+    void SetWired(bool isWired) { actionState_.isWireActing = isWired; }
+    
 protected:
     void OnSpawn() override;
     void OnPreDestroy() override;

@@ -240,17 +240,62 @@ bool Handle_C_JumpLand(PacketSessionRef& session, const se::game::C_JumpLand& pk
     
 bool Handle_C_CrouchReq(PacketSessionRef& session, const se::game::C_CrouchReq& pkt)
 {
-    return false;
+    if (!session) return false;
+    
+    SessionId sessionId = session->Id();
+    
+    PlayerId playerId = 0;
+    if (!g_SessionManager.TryGetPlayerId(sessionId, playerId)) return false;
+    
+    if (playerId == 0 or sessionId == 0) return false;
+    
+    auto player = g_PlayerManager.Find(playerId);
+    if (!player) return false;
+    
+    auto room = g_RoomManager->FindRoom(player->roomId_);
+    if (!room) return false;
+    
+    return room->HandleCrouch(playerId, pkt);
 }
     
 bool Handle_C_WireActionReq(PacketSessionRef& session, const se::game::C_WireActionReq& pkt)
 {
-    return false;
+    if (!session) return false;
+    
+    SessionId sessionId = session->Id();
+    
+    PlayerId playerId = 0;
+    if (!g_SessionManager.TryGetPlayerId(sessionId, playerId)) return false;
+    
+    if (playerId == 0 or sessionId == 0) return false;
+    
+    auto player = g_PlayerManager.Find(playerId);
+    if (!player) return false;
+    
+    auto room = g_RoomManager->FindRoom(player->roomId_);
+    if (!room) return false;
+    
+    return room->HandleWireAction(playerId, pkt);
 }
     
 bool Handle_C_WireActionEnd(PacketSessionRef& session, const se::game::C_WireActionEnd& pkt)
 {
-    return false;
+    if (!session) return false;
+    
+    SessionId sessionId = session->Id();
+    
+    PlayerId playerId = 0;
+    if (!g_SessionManager.TryGetPlayerId(sessionId, playerId)) return false;
+    
+    if (playerId == 0 or sessionId == 0) return false;
+    
+    auto player = g_PlayerManager.Find(playerId);
+    if (!player) return false;
+    
+    auto room = g_RoomManager->FindRoom(player->roomId_);
+    if (!room) return false;
+    
+    return room->HandleWireActionEnd(playerId, pkt);
 }
     
 bool Handle_C_AimReq(PacketSessionRef& session, const se::game::C_AimReq& pkt)

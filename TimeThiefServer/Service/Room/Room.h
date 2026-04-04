@@ -64,6 +64,9 @@ public:
    bool HandleSetSavePoint(PlayerId playerId, const se::game::C_SetSavePointReq& pkt);
    bool HandleJump(PlayerId playerId, const se::game::C_JumpReq& pkt);
    bool HandleJumpLand(PlayerId playerId, const se::game::C_JumpLand& pkt);
+   bool HandleCrouch(PlayerId playerId, const se::game::C_CrouchReq& pkt);
+   bool HandleWireAction(PlayerId playerId, const se::game::C_WireActionReq& pkt);
+   bool HandleWireActionEnd(PlayerId playerId, const se::game::C_WireActionEnd& pkt);
    
 public:
    template<typename T, typename... Args>
