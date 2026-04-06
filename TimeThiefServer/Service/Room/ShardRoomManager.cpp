@@ -6,25 +6,28 @@
    ShardRoomManager
 --------------------*/
 
-ShardRoomManager::RoomRef ShardRoomManager::CreateRoom(RoomId roomId)
+bool ShardRoomManager::AddRoom(RoomId roomId, RoomRef room)
 {
-   auto room = Room::Create(roomId);
+   if (roomId == 0 or room == nullptr)
+      return false;
    
-   auto [it, inserted] = rooms_.emplace(roomId, room);
-   if (!inserted) {
-      return nullptr;
-   }
-   
-   return room;
+   auto [it, inserted] = rooms_.emplace(roomId, std::move(room));
+   return inserted;
 }
 
 bool ShardRoomManager::RemoveRoom(RoomId roomId)
 {
+   if (roomId == 0)
+      return false;
+   
    return rooms_.erase(roomId) > 0;
 }
 
 ShardRoomManager::RoomRef ShardRoomManager::FindRoom(RoomId roomId) const
 {
+   if (roomId == 0)
+      return nullptr;
+   
    auto it = rooms_.find(roomId);
    if (it == rooms_.end()) {
       return nullptr;

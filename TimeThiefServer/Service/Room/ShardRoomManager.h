@@ -23,8 +23,7 @@ public:
    ShardRoomManager& operator=(ShardRoomManager const&) = delete;
    
 public:
-   RoomRef CreateRoom(RoomId roomId);
-   
+   bool AddRoom(RoomId roomId, RoomRef room);
    bool RemoveRoom(RoomId roomId);
    RoomRef FindRoom(RoomId roomId) const;
    

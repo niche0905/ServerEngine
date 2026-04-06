@@ -438,6 +438,7 @@
     <ClCompile Include="Service\Room\ShardRoomManager.cpp" />
     <ClCompile Include="Service\Room\Systems\ZoneSystem.cpp" />
     <ClCompile Include="Service\Server\TimeThiefServerApp.cpp" />
+    <ClCompile Include="Shard\GameShard.cpp" />
     <ClCompile Include="Shard\RoomDirectory.cpp" />
     <ClCompile Include="Utils\pch.cpp">
       <RuntimeLibrary>MultiThreadedDebugDll</RuntimeLibrary>
@@ -606,6 +607,7 @@
     <ClInclude Include="Service\Room\Systems\ZoneSystem.h" />
     <ClInclude Include="Service\Room\Systems\ZoneTypes.h" />
     <ClInclude Include="Service\Server\TimeThiefServerApp.h" />
+    <ClInclude Include="Shard\GameShard.h" />
     <ClInclude Include="Shard\RoomDirectory.h" />
     <ClInclude Include="Utils\FilePathHelper.h" />
     <ClInclude Include="Utils\pch.h" />
