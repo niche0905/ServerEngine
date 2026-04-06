@@ -1,0 +1,84 @@
+﻿#include "pch.h"
+#include "ShardManager.h"
+#include "GameShard.h"
+#include "RoomDirectory.h"
+#include "Core/Thread/ThreadManager.h"
+
+/*----------------
+   ShardManager
+----------------*/
+
+bool ShardManager::Init(int32 shardCount, RoomDirectory* roomDirectory)
+{
+   if (shardCount <= 0 or roomDirectory == nullptr)
+      return false;
+   
+   roomDirectory_ = roomDirectory;
+   shards_.clear();
+   shards_.reserve(shardCount);
+   
+   for (int32 i = 0; i < shardCount; ++i) {
+      shards_.push_back(std::make_unique<GameShard>(static_cast<ShardId>(i)));
+   }
+   
+   return true;
+}
+
+bool ShardManager::Start(ThreadManager& threadManager)
+{
+   for (auto& shard : shards_) {
+      if (!shard or !shard->Start(threadManager)) {
+         return false;
+      }
+   }
+   
+   return true;
+}
+
+void ShardManager::Stop()
+{
+   for (auto& shard : shards_) {
+      if (shard) {
+         shard->Stop();
+      }
+   }
+}
+
+GameShard* ShardManager::GetShard(ShardId shardId)
+{
+   if (shardId >= shards_.size())
+      return nullptr;
+   
+   return shards_[shardId].get();
+}
+
+const GameShard* ShardManager::GetShard(ShardId shardId) const
+{
+   if (shardId >= shards_.size())
+      return nullptr;
+   
+   return shards_[shardId].get();
+}
+
+bool ShardManager::Enqueue(ShardId shardId, Job job)
+{
+   GameShard* shard = GetShard(shardId);
+   if (!shard)
+      return false;
+   
+   return shard->Enqueue(std::move(job));
+}
+
+ShardId ShardManager::SelectShardForNewRoom()
+{
+   if (shards_.empty())
+      return 0;   // Shard가 없는 경우, 기본적으로 Shard ID 0을 반환 (이 경우는 발생하지 않아야 함)
+   
+   uint32 index = nextShard_.fetch_add(1, std::memory_order_relaxed);
+   return static_cast<ShardId>(index % shards_.size());
+}
+
+int32 ShardManager::GetShardCount() const
+{
+   return static_cast<int32>(shards_.size());
+}

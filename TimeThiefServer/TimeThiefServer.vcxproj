@@ -440,6 +440,7 @@
     <ClCompile Include="Service\Server\TimeThiefServerApp.cpp" />
     <ClCompile Include="Shard\GameShard.cpp" />
     <ClCompile Include="Shard\RoomDirectory.cpp" />
+    <ClCompile Include="Shard\ShardManager.cpp" />
     <ClCompile Include="Utils\pch.cpp">
       <RuntimeLibrary>MultiThreadedDebugDll</RuntimeLibrary>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -609,6 +610,7 @@
     <ClInclude Include="Service\Server\TimeThiefServerApp.h" />
     <ClInclude Include="Shard\GameShard.h" />
     <ClInclude Include="Shard\RoomDirectory.h" />
+    <ClInclude Include="Shard\ShardManager.h" />
     <ClInclude Include="Utils\FilePathHelper.h" />
     <ClInclude Include="Utils\pch.h" />
     <ClInclude Include="Utils\TypesDef.h" />

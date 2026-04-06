@@ -19,7 +19,6 @@ class GameShard
 {
 public:
    using RoomRef = std::shared_ptr<Room>;
-   using Job = std::function<void()>;
    
 public:
    explicit GameShard(ShardId shardId);
@@ -47,7 +46,7 @@ private:
    ShardId shardId_ = 0;
    std::atomic<bool> running_ = false;
    
-   ShardRoomManager shardRoomManager_;
+   ShardRoomManager shardRoomManager_{};
    // TODO: Job Queue와 Timer Queue 구현하기
     
 };
