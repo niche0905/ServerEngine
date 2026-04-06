@@ -1,6 +1,7 @@
 ﻿#pragma once
 #include "Core/Thread/ThreadManager.h"
 
+class RoomDirectory;
 class MatchMaker;
 
 /*----------------------
@@ -22,7 +23,7 @@ public:
 private:
    std::shared_ptr<IocpServerService> networkService_;
    // ShardManager... TODO!
-   // RoomDirectory... TODO! (Room을 Shard에 등록할 수 있고, RoomId를 통해 ShardId를 찾을 수 있는 형태로)
+   std::unique_ptr<RoomDirectory> roomDirectory_;
    std::unique_ptr<MatchMaker> matchMaker_;
    ThreadManager threadManager_;
    
