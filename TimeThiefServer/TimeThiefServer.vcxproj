@@ -436,6 +436,7 @@
     <ClCompile Include="Service\Room\Room.cpp" />
     <ClCompile Include="Service\Room\RoomManager.cpp" />
     <ClCompile Include="Service\Room\Systems\ZoneSystem.cpp" />
+    <ClCompile Include="Service\Server\TimeThiefServerApp.cpp" />
     <ClCompile Include="Utils\pch.cpp">
       <RuntimeLibrary>MultiThreadedDebugDll</RuntimeLibrary>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -601,6 +602,7 @@
     <ClInclude Include="Service\Room\RoomManager.h" />
     <ClInclude Include="Service\Room\Systems\ZoneSystem.h" />
     <ClInclude Include="Service\Room\Systems\ZoneTypes.h" />
+    <ClInclude Include="Service\Server\TimeThiefServerApp.h" />
     <ClInclude Include="Utils\FilePathHelper.h" />
     <ClInclude Include="Utils\pch.h" />
     <ClInclude Include="Utils\TypesDef.h" />
