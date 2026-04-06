@@ -15,6 +15,8 @@ class ThreadManager;
 // Job Queue 처리와 Room Tick을 수행합니다
 //
 
+// TODO: Shard는 Thread 관련한 내용이라 Cache Thrashing을 발생하게 하지 않기 위해 64바이트 정렬을 하는 것이 좋아 보임
+//       혹은 Shard Manager에서 vector를 사용할 때 패딩을 주는 방법도 찾아 볼 것
 class GameShard
 {
 public:
