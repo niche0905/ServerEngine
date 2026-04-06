@@ -1,5 +1,6 @@
 ﻿#pragma once
 #include "Core/Thread/ThreadManager.h"
+#include "Shard/ShardManager.h"
 
 class RoomDirectory;
 class MatchMaker;
@@ -22,7 +23,7 @@ public:
    
 private:
    std::shared_ptr<IocpServerService> networkService_;
-   // ShardManager... TODO!
+   std::unique_ptr<ShardManager> shardManager_;
    std::unique_ptr<RoomDirectory> roomDirectory_;
    std::unique_ptr<MatchMaker> matchMaker_;
    ThreadManager threadManager_;
