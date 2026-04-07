@@ -32,4 +32,5 @@ private:
     
 };
 
+// TODO: TTSA 완성하고 제대로 의존성 제거 후 아래 전역 변수 정의 지우기
 extern PlayerManager g_PlayerManager;
