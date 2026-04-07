@@ -29,8 +29,6 @@ public:
 // Session interface
 public:
 	SessionId Id() const noexcept { return sessionId_; }
-	
-protected:
 	void AssignId(SessionId sessionId) noexcept { sessionId_ = sessionId; }
 
 // Architecture interface

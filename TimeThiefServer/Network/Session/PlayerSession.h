@@ -37,6 +37,9 @@ public:
    PlayerSessionState GetState() const { return state_; }
    void SetState(PlayerSessionState newState) { state_ = newState; }
    
+   PlayerId GetPlayerId() const { return playerId_; }
+   void SetPlayerId(PlayerId playerId) { playerId_ = playerId; }
+   
 public:
    bool HandleHandshake(const se::auth::C_HandshakeReq& pkt);
    
@@ -52,6 +55,8 @@ protected:
    
 private:
    PlayerSessionState state_ = PlayerSessionState::Connected;
+   
+   PlayerId playerId_ = 0;   // Caching
    
    // TODO: 플레이어 세션 관련 멤버 변수 추가 예정
     

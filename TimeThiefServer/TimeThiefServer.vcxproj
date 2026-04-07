@@ -428,6 +428,7 @@
     <ClCompile Include="Network\PacketDispatcher\ServerPacketDispatcher.cpp" />
     <ClCompile Include="Network\ServerConfigReader.cpp" />
     <ClCompile Include="Network\ServerPacketHandler.cpp" />
+    <ClCompile Include="Network\Session\Lifecycle\PlayerSessionLifecycleService.cpp" />
     <ClCompile Include="Network\Session\PlayerSession.cpp" />
     <ClCompile Include="Network\Session\SessionManager\SessionManager.cpp" />
     <ClCompile Include="Service\MatchMaking\MatchMaker.cpp" />
@@ -596,6 +597,8 @@
     <ClInclude Include="Network\PacketDispatcher\ServerPacketDispatcher.h" />
     <ClInclude Include="Network\ServerConfigReader.h" />
     <ClInclude Include="Network\ServerConfig.h" />
+    <ClInclude Include="Network\Session\Lifecycle\IPlayerSessionLifecycle.h" />
+    <ClInclude Include="Network\Session\Lifecycle\PlayerSessionLifecycleService.h" />
     <ClInclude Include="Network\Session\PlayerSession.h" />
     <ClInclude Include="Network\Session\SessionIdMaker.h" />
     <ClInclude Include="Network\Session\SessionManager\SessionManager.h" />
