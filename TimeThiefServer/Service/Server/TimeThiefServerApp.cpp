@@ -4,6 +4,7 @@
 #include "Utils/FilePathHelper.h"
 #include "Core/Service/IOCP/IocpServerService.h"
 #include "Network/ServerConfigReader.h"
+#include "Network/PacketDispatcher/ServerPacketDispatcher.h"
 #include "Network/Session/SessionManager/SessionManager.h"
 #include "Service/MatchMaking/MatchMaker.h"
 #include "Service/Player/PlayerManager/PlayerManager.h"
@@ -85,7 +86,6 @@ void TimeThiefServerApp::Shutdown()
 bool TimeThiefServerApp::InitCore()
 {
    SE::Init();
-   ServerPacketHandler::Init();
    
    consoleLogger->Log(Color::Green, L"[TTSA] Core Initialized\n");
    return true;
@@ -123,6 +123,11 @@ bool TimeThiefServerApp::CreateManagers()
       return false;
    }
    
+   if (not CreatePacketDispatcher()) {
+      consoleLogger->Log(Color::Red, L"[TTSA] CreatePacketDispatcher fail\n");
+      return false;
+   }
+   
    consoleLogger->Log(Color::Green, L"[TTSA] managers created\n");
    return true;
 }
@@ -147,6 +152,20 @@ bool TimeThiefServerApp::CreateNetworkService()
    }
    
    consoleLogger->Log(Color::Green, L"[TTSA] network service created\n");
+   return true;
+}
+
+bool TimeThiefServerApp::CreatePacketDispatcher()
+{
+   packetDispatcher_ = std::make_unique<ServerPacketDispatcher>(
+      *sessionManager_,
+      *playerManager_,
+      *matchMaker_,
+      *roomDirectory_,
+      shardManager_.get());
+   
+   SetServerPacketDispatcher(packetDispatcher_.get());
+   ServerPacketHandler::Init();
    return true;
 }
 
