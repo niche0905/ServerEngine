@@ -5,6 +5,7 @@
 #include "Core/Service/IOCP/IocpServerService.h"
 #include "Network/ServerConfigReader.h"
 #include "Network/PacketDispatcher/ServerPacketDispatcher.h"
+#include "Network/Session/Lifecycle/PlayerSessionLifecycleService.h"
 #include "Network/Session/SessionManager/SessionManager.h"
 #include "Service/MatchMaking/MatchMaker.h"
 #include "Service/Player/PlayerManager/PlayerManager.h"
@@ -13,6 +14,9 @@
 /*----------------------
    TimeThiefServerApp
 ----------------------*/
+
+TimeThiefServerApp::TimeThiefServerApp() = default;
+TimeThiefServerApp::~TimeThiefServerApp() = default;
 
 bool TimeThiefServerApp::Init(int argc, char* argv[])
 {
@@ -139,6 +143,8 @@ bool TimeThiefServerApp::CreateManagers()
 
 bool TimeThiefServerApp::CreateNetworkService()
 {
+   playerSessionLifecycleService_ = std::make_unique<PlayerSessionLifecycleService>(*sessionManager_, *playerManager_, *shardManager_);
+   
    const auto& cfg = configReader_->Get();
    
    std::string serverIPStr = cfg.network.bindIp;
@@ -147,7 +153,10 @@ bool TimeThiefServerApp::CreateNetworkService()
    
    networkService_ = std::make_shared<IocpServerService>(
       NetAddr(serverIP, serverPort),
-      std::make_shared<PlayerSession>,
+      [this]() -> std::shared_ptr<SessionBase>
+      {
+         return std::make_shared<PlayerSession>(*playerSessionLifecycleService_);
+      },
       5
    );
    

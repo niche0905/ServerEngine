@@ -4,6 +4,8 @@
 #include "Protocol/Framing/PacketHeader.h"
 #include "Protocol.pb.h"
 
+class IPlayerSessionLifecycle;
+
 /*-----------------
    PlayerSession
 -----------------*/
@@ -15,8 +17,8 @@
 class PlayerSession : public IocpSession
 {
 public:
-   PlayerSession();
-   virtual ~PlayerSession();
+   PlayerSession(IPlayerSessionLifecycle& lifecycle);
+   virtual ~PlayerSession() override;
    
    void Dispatch(class IIoEvent* ioEvent, int32 numOfBytes) override;
    
@@ -43,9 +45,6 @@ public:
 public:
    bool HandleHandshake(const se::auth::C_HandshakeReq& pkt);
    
-public:
-   void SendHandshakeRes(bool success, se::common::ErrorCode errorCode, const std::string& errorMessage);
-   
 // on event interface for content override
 protected:
    void OnConnected() override;
@@ -54,6 +53,8 @@ protected:
    void OnSend(int32 len) override;
    
 private:
+   IPlayerSessionLifecycle& lifecycle_;
+   
    PlayerSessionState state_ = PlayerSessionState::Connected;
    
    PlayerId playerId_ = 0;   // Caching
