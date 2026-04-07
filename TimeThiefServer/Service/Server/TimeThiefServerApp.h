@@ -2,6 +2,9 @@
 #include "Core/Thread/ThreadManager.h"
 #include "Shard/ShardManager.h"
 
+class ServerConfigReader;
+class PlayerManager;
+class SessionManager;
 class RoomDirectory;
 class MatchMaker;
 
@@ -26,8 +29,11 @@ private:
    std::unique_ptr<ShardManager> shardManager_;
    std::unique_ptr<RoomDirectory> roomDirectory_;
    std::unique_ptr<MatchMaker> matchMaker_;
+   std::unique_ptr<SessionManager> sessionManager_;
+   std::unique_ptr<PlayerManager> playerManager_;
+   std::unique_ptr<ServerConfigReader> configReader_;
    ThreadManager threadManager_;
    
-   std::atomic<bool> running_;
+   std::atomic<bool> running_ { false };
     
 };
