@@ -10,6 +10,20 @@
 
 PacketHandlerFunc GPacketHandler[kMaxMessageId + 1];
 
+namespace 
+{
+    ServerPacketDispatcher* GServerPacketDispatcher = nullptr;  // non-owning
+}
+
+void SetServerPacketDispatcher(ServerPacketDispatcher* dispatcher)
+{
+    GServerPacketDispatcher = dispatcher;
+}
+
+ServerPacketDispatcher* GetServerPacketDispatcher()
+{
+    return GServerPacketDispatcher;
+}
 
 bool Handle_INVALID(PacketSessionRef& session, BYTE* buffer, int32 len)
 {
@@ -52,6 +66,11 @@ bool Handle_C_Ping(PacketSessionRef& session, const se::auth::C_Ping& pkt)
     
 bool Handle_C_SetNicknameReq(PacketSessionRef& session, const se::lobby::C_SetNicknameReq& pkt)
 {
+    // TODO: ServerPacketDispatcher로 패킷 디스패치 하는 구조로 변경하기 (현재는 ServerPacketHandler에서 직접 처리)
+    // auto* dispatcher = GetServerPacketDispatcher();
+    // if (!dispatcher) return false;
+    // return dispatcher->Handle_C_SetNicknameReq(session, pkt);
+    
     if (!session) return false;
     
     SessionId sessionId = session->Id();
