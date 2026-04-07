@@ -72,5 +72,3 @@ std::vector<PlayerManager::PlayerRef> PlayerManager::SnapshotPlayers() const
    
    return players;
 }
-
-PlayerManager g_PlayerManager;

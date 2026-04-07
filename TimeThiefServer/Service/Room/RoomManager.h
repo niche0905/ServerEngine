@@ -28,11 +28,11 @@ public:
    RoomManager& operator=(RoomManager const&) = delete;
    
 public:
-   RoomRef CreateRoom();
-   RoomRef CreateRoom(RoomId roomId);
-   
-   bool RemoveRoom(RoomId roomId);
-   RoomRef FindRoom(RoomId roomId) const;
+   // RoomRef CreateRoom();
+   // RoomRef CreateRoom(RoomId roomId);
+   //
+   // bool RemoveRoom(RoomId roomId);
+   // RoomRef FindRoom(RoomId roomId) const;
    
    size_t GetRoomCount() const;
    
@@ -49,6 +49,3 @@ private:
    std::atomic<RoomId> nextRoomId_{ 1 }; 
     
 };
-
-// TODO: TTSA 완성하고 제대로 의존성 제거 후 아래 전역 변수 정의 지우기
-extern RoomManager* g_RoomManager;

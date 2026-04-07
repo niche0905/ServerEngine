@@ -1,7 +1,9 @@
 ﻿#pragma once
 #include "Service/Player/Player.h"
 #include "Service/MatchMaking/MatchMakingQueue.h"
+#include "Service/Room/RoomIdGenerator.h"
 
+class RoomDirectory;
 class ShardManager;
 class PlayerManager;
 class SessionManager;
@@ -24,7 +26,7 @@ public:
     MatchMaker& operator=(const MatchMaker&) = delete;
     
 public:
-    bool Init(SessionManager& sessionManager, PlayerManager& playerManager, ShardManager& shardManager);
+    bool Init(SessionManager& sessionManager, PlayerManager& playerManager, ShardManager& shardManage, RoomDirectory& roomDirectory);
     
 public:
     bool Enqueue(PlayerId playerId);
@@ -36,13 +38,12 @@ private:
     SessionManager*         sessionManager_ = nullptr;       // non-owning
     PlayerManager*          playerManager_ = nullptr;        // non-owning
     ShardManager*           shardManager_ = nullptr;         // non-owning
+    RoomDirectory*          roomDirectory_ = nullptr;        // non-owning   
     
 private:
     static constexpr size_t kMatchSize = 2; // TODO: 이 값도 밖에서 받아오는 config 값 사용하기
     
     MatchMakingQueue queue_;
+    RoomIdGenerator roomIdGenerator_;
     
 };
-
-// TODO: TTSA 완성하고 제대로 의존성 제거 후 아래 전역 변수 정의 지우기
-extern MatchMaker g_MatchMaker;

@@ -3,7 +3,10 @@
 #include "Network/Session/SessionManager/SessionManager.h"
 #include "Service/Player/PlayerManager/PlayerManager.h"
 #include "Service/Room/Room.h"
+#include "Service/Room/RoomIdGenerator.h"
 #include "Service/Room/RoomManager.h"
+#include "Shard/RoomDirectory.h"
+#include "Shard/ShardManager.h"
 
 namespace 
 {
@@ -42,13 +45,12 @@ namespace
    MatchMaker
 --------------*/
 
-MatchMaker g_MatchMaker;
-
-bool MatchMaker::Init(SessionManager& sessionManager, PlayerManager& playerManager, ShardManager& shardManager)
+bool MatchMaker::Init(SessionManager& sessionManager, PlayerManager& playerManager, ShardManager& shardManager, RoomDirectory& roomDirectory)
 {
    sessionManager_ = &sessionManager;
    playerManager_ = &playerManager;
    shardManager_ = &shardManager;
+   roomDirectory_ = &roomDirectory;
    
    return true;
 }
@@ -125,11 +127,12 @@ void MatchMaker::TryMatch()
    }
    
    // Room Create
-   auto room = g_RoomManager->CreateRoom();
-   // TODO: Room Create 후 Shard에 배치하는 로직 필요
-   //       Room::Create(roomID);
-   //       shardManager->SelectShardForNewRoom();
-   //       roomDirectory->RegisterRoom(roomId, shardId);
+   RoomId roomId = roomIdGenerator_.Generate();
+   auto room = Room::Create(roomId, *sessionManager_);
+   ShardId shardId = shardManager_->SelectShardForNewRoom();
+   roomDirectory_->RegisterRoom(roomId, shardId);
+   // TODO: 위 Room 생성 로직 MatchMaker에서 하지 않고 Shard로 위임 할 것
+   
    if (!room) {   // Room Create Fail
       for (const auto& candidate : candidates)
          requeueIds.push_back(candidate.player->id_);

@@ -127,7 +127,7 @@ bool TimeThiefServerApp::CreateManagers()
       return false;
    }
    
-   if (not matchMaker_->Init(*sessionManager_, *playerManager_, *shardManager_)) {
+   if (not matchMaker_->Init(*sessionManager_, *playerManager_, *shardManager_, *roomDirectory_)) {
       consoleLogger->Log(Color::Red, L"[TTSA] MatchMaker init fail\n");
       return false;
    }

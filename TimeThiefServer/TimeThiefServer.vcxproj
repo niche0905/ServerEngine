@@ -609,6 +609,7 @@
     <ClInclude Include="Service\Player\PlayerManager\PlayerManager.h" />
     <ClInclude Include="Service\Player\PlayerState.h" />
     <ClInclude Include="Service\Room\Room.h" />
+    <ClInclude Include="Service\Room\RoomIdGenerator.h" />
     <ClInclude Include="Service\Room\RoomManager.h" />
     <ClInclude Include="Service\Room\ShardRoomManager.h" />
     <ClInclude Include="Service\Room\Systems\ZoneSystem.h" />

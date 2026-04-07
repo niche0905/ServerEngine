@@ -10,8 +10,6 @@
    ServerConfigReader
 -----------------------*/
 
-ServerConfigReader g_ConfigReader;
-
 bool ServerConfigReader::LoadFromFile(const std::string& filePath)
 {
    // debug log

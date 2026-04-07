@@ -56,6 +56,3 @@ private:
    std::unordered_map<SessionId, PlayerId> playerIdBySessionId_;  // 세션 ID -> 플레이어 ID (바인딩 정보)
     
 };
-
-// TODO: TTSA 완성하고 제대로 의존성 제거 후 아래 전역 변수 정의 지우기
-extern SessionManager g_SessionManager;

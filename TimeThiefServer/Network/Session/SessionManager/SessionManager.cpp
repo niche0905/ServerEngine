@@ -173,6 +173,3 @@ std::vector<SessionManager::SessionRef> SessionManager::SnapshotSessions() const
    
    return out;
 }
-
-SessionManager g_SessionManager;
-

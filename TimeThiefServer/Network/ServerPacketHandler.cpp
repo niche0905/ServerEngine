@@ -1,6 +1,7 @@
 ﻿#include "pch.h"
 #include "Generated/ServerPacketHandler.h"
 
+#include "PacketDispatcher/ServerPacketDispatcher.h"
 #include "Service/MatchMaking/MatchMaker.h"
 #include "Service/Player/PlayerManager/PlayerManager.h"
 #include "Service/Room/Room.h"
@@ -13,6 +14,11 @@ PacketHandlerFunc GPacketHandler[kMaxMessageId + 1];
 namespace 
 {
     ServerPacketDispatcher* GServerPacketDispatcher = nullptr;  // non-owning
+    
+    inline ServerPacketDispatcher* Dispatcher()
+    {
+        return GServerPacketDispatcher;
+    }
 }
 
 void SetServerPacketDispatcher(ServerPacketDispatcher* dispatcher)
@@ -50,8 +56,8 @@ bool Handle_C_Ping(PacketSessionRef& session, const se::auth::C_Ping& pkt)
 {
     if (!session) return false;
     
-    // TODO: Session에서 Ping/Pong을 가지고 timeout 판정을 하거나, 개별로 RTT를 필요로 한다면 HandlePing 멤버함수 만들기
-    //       지금은 간단한 Pong 응답만 보내도록 구현
+    // THINK: Session에서 Ping/Pong을 가지고 timeout 판정을 하거나, 개별로 RTT를 필요로 한다면 HandlePing 멤버함수 만들기
+    //        지금은 간단한 Pong 응답만 보내도록 구현
     
     se::auth::S_Pong pongPkt;
     pongPkt.set_client_time_ms(pkt.client_time_ms());
@@ -66,419 +72,476 @@ bool Handle_C_Ping(PacketSessionRef& session, const se::auth::C_Ping& pkt)
     
 bool Handle_C_SetNicknameReq(PacketSessionRef& session, const se::lobby::C_SetNicknameReq& pkt)
 {
-    // TODO: ServerPacketDispatcher로 패킷 디스패치 하는 구조로 변경하기 (현재는 ServerPacketHandler에서 직접 처리)
-    // auto* dispatcher = GetServerPacketDispatcher();
-    // if (!dispatcher) return false;
-    // return dispatcher->Handle_C_SetNicknameReq(session, pkt);
+    if (!Dispatcher()) return false;
+    return Dispatcher()->Handle_C_SetNicknameReq(session, pkt);
     
-    if (!session) return false;
-    
-    SessionId sessionId = session->Id();
-    
-    PlayerId playerId = 0;
-    if (!g_SessionManager.TryGetPlayerId(sessionId, playerId)) return false;
-    
-    auto player = g_PlayerManager.Find(playerId);
-    if (!player) return false;
-    
-    se::lobby::S_SetNicknameRes resPkt;
-    
-    bool success = player->TrySetNickname(pkt.nickname());
-    resPkt.set_success(success);
-    if (success) {
-        resPkt.set_nickname(player->GetNickname());
-    }
-    
-    auto sendBuffer = ServerPacketHandler::MakeSendBuffer(resPkt);
-    if (!sendBuffer) return false;
-    
-    session->Send(sendBuffer);
-    return true;
+    // if (!session) return false;
+    //
+    // SessionId sessionId = session->Id();
+    //
+    // PlayerId playerId = 0;
+    // if (!g_SessionManager.TryGetPlayerId(sessionId, playerId)) return false;
+    //
+    // auto player = g_PlayerManager.Find(playerId);
+    // if (!player) return false;
+    //
+    // se::lobby::S_SetNicknameRes resPkt;
+    //
+    // bool success = player->TrySetNickname(pkt.nickname());
+    // resPkt.set_success(success);
+    // if (success) {
+    //     resPkt.set_nickname(player->GetNickname());
+    // }
+    //
+    // auto sendBuffer = ServerPacketHandler::MakeSendBuffer(resPkt);
+    // if (!sendBuffer) return false;
+    //
+    // session->Send(sendBuffer);
+    // return true;
 }
     
 bool Handle_C_MatchQueueEnterReq(PacketSessionRef& session, const se::lobby::C_MatchQueueEnterReq& pkt)
 {
-    if (!session) return false;
+    if (!Dispatcher()) return false;
+    return Dispatcher()->Handle_C_MatchQueueEnterReq(session, pkt);
     
-    SessionId sessionId = session->Id();
-    
-    PlayerId playerId = 0;
-    if (!g_SessionManager.TryGetPlayerId(sessionId, playerId)) return false;
-    
-    bool succ = g_MatchMaker.Enqueue(playerId);
-    se::lobby::S_MatchQueueEnterRes resPkt;
-    resPkt.set_success(succ);
-    if (!succ) {
-        auto result = resPkt.mutable_result();
-        result->set_code(se::common::ERR_MATCHMAKING_UNAVAILABLE);
-        result->set_message("Failed to enter matchmaking queue");
-    }
-    
-    auto sendBuffer = ServerPacketHandler::MakeSendBuffer(resPkt);
-    if (!sendBuffer) return false;
-    
-    session->Send(sendBuffer);
-    return true;
+    // if (!session) return false;
+    //
+    // SessionId sessionId = session->Id();
+    //
+    // PlayerId playerId = 0;
+    // if (!g_SessionManager.TryGetPlayerId(sessionId, playerId)) return false;
+    //
+    // bool succ = g_MatchMaker.Enqueue(playerId);
+    // se::lobby::S_MatchQueueEnterRes resPkt;
+    // resPkt.set_success(succ);
+    // if (!succ) {
+    //     auto result = resPkt.mutable_result();
+    //     result->set_code(se::common::ERR_MATCHMAKING_UNAVAILABLE);
+    //     result->set_message("Failed to enter matchmaking queue");
+    // }
+    //
+    // auto sendBuffer = ServerPacketHandler::MakeSendBuffer(resPkt);
+    // if (!sendBuffer) return false;
+    //
+    // session->Send(sendBuffer);
+    // return true;
 }
     
 bool Handle_C_MatchQueueCancelReq(PacketSessionRef& session, const se::lobby::C_MatchQueueCancelReq& pkt)
 {
-    if (!session) return false;
+    if (!Dispatcher()) return false;
+    return Dispatcher()->Handle_C_MatchQueueCancelReq(session, pkt);
     
-    SessionId sessionId = session->Id();
-    
-    PlayerId playerId = 0;
-    if (!g_SessionManager.TryGetPlayerId(sessionId, playerId)) return false;
-    
-    bool succ = g_MatchMaker.Cancel(playerId);
-    se::lobby::S_MatchQueueCancelRes resPkt;
-    resPkt.set_success(succ);
-    if (!succ) {
-        auto result = resPkt.mutable_result();
-        result->set_code(se::common::ERR_NOT_IN_MATCH_QUEUE);
-        result->set_message("Failed to cancel matchmaking queue");
-    }
-    
-    auto sendBuffer = ServerPacketHandler::MakeSendBuffer(resPkt);
-    if (!sendBuffer) return false;
-    
-    session->Send(sendBuffer);
-    return true;
+    // if (!session) return false;
+    //
+    // SessionId sessionId = session->Id();
+    //
+    // PlayerId playerId = 0;
+    // if (!g_SessionManager.TryGetPlayerId(sessionId, playerId)) return false;
+    //
+    // bool succ = g_MatchMaker.Cancel(playerId);
+    // se::lobby::S_MatchQueueCancelRes resPkt;
+    // resPkt.set_success(succ);
+    // if (!succ) {
+    //     auto result = resPkt.mutable_result();
+    //     result->set_code(se::common::ERR_NOT_IN_MATCH_QUEUE);
+    //     result->set_message("Failed to cancel matchmaking queue");
+    // }
+    //
+    // auto sendBuffer = ServerPacketHandler::MakeSendBuffer(resPkt);
+    // if (!sendBuffer) return false;
+    //
+    // session->Send(sendBuffer);
+    // return true;
 }
     
 bool Handle_C_RoomEnterReq(PacketSessionRef& session, const se::room::C_RoomEnterReq& pkt)
 {
-    if (!session) return false;
+    if (!Dispatcher()) return false;
+    return Dispatcher()->Handle_C_RoomEnterReq(session, pkt);
     
-    SessionId sessionId = session->Id();
-    PlayerId playerId = 0;
-    if (!g_SessionManager.TryGetPlayerId(sessionId, playerId)) return false;
-    
-    if (playerId == 0 or sessionId == 0) return false;
-    
-    auto room = g_RoomManager->FindRoom(1);  // TEMP
-    if (!room) return false;
-    
-    // pkt.room_id();
-    
-    return room->Join(playerId, sessionId);
+    // if (!session) return false;
+    //
+    // SessionId sessionId = session->Id();
+    // PlayerId playerId = 0;
+    // if (!g_SessionManager.TryGetPlayerId(sessionId, playerId)) return false;
+    //
+    // if (playerId == 0 or sessionId == 0) return false;
+    //
+    // auto room = g_RoomManager->FindRoom(1);  // TEMP
+    // if (!room) return false;
+    //
+    // // pkt.room_id();
+    //
+    // return room->Join(playerId, sessionId);
 }
     
 bool Handle_C_RoomLeaveReq(PacketSessionRef& session, const se::room::C_RoomLeaveReq& pkt)
 {
-    if (!session) return false;
+    if (!Dispatcher()) return false;
+    return Dispatcher()->Handle_C_RoomLeaveReq(session, pkt);
     
-    SessionId sessionId = session->Id();
-    PlayerId playerId = 0;
-    if (!g_SessionManager.TryGetPlayerId(sessionId, playerId)) return false;
-    
-    if (playerId == 0 or sessionId == 0) return false;
-    
-    auto room = g_RoomManager->FindRoom(1);  // TEMP
-    if (!room) return false;
-    
-    return room->Leave(playerId);
+    // if (!session) return false;
+    //
+    // SessionId sessionId = session->Id();
+    // PlayerId playerId = 0;
+    // if (!g_SessionManager.TryGetPlayerId(sessionId, playerId)) return false;
+    //
+    // if (playerId == 0 or sessionId == 0) return false;
+    //
+    // auto room = g_RoomManager->FindRoom(1);  // TEMP
+    // if (!room) return false;
+    //
+    // return room->Leave(playerId);
 }
     
 bool Handle_C_LoadingCompleteReq(PacketSessionRef& session, const se::game::C_LoadingCompleteReq& pkt)
 {
-    if (!session) return false;
+    if (!Dispatcher()) return false;
+    return Dispatcher()->Handle_C_LoadingCompleteReq(session, pkt);
     
-    SessionId sessionId = session->Id();
-    
-    PlayerId playerId = 0;
-    if (!g_SessionManager.TryGetPlayerId(sessionId, playerId)) return false;
-    
-    if (playerId == 0 or sessionId == 0) return false;
-    
-    auto room = g_RoomManager->FindRoom(1);  // TEMP
-    if (!room) return false;
-    
-    return room->HandleLoadingComplete(playerId);
+    // if (!session) return false;
+    //
+    // SessionId sessionId = session->Id();
+    //
+    // PlayerId playerId = 0;
+    // if (!g_SessionManager.TryGetPlayerId(sessionId, playerId)) return false;
+    //
+    // if (playerId == 0 or sessionId == 0) return false;
+    //
+    // auto room = g_RoomManager->FindRoom(1);  // TEMP
+    // if (!room) return false;
+    //
+    // return room->HandleLoadingComplete(playerId);
 }
     
 bool Handle_C_MoveReq(PacketSessionRef& session, const se::game::C_MoveReq& pkt)
 {
-    if (!session) return false;
+    if (!Dispatcher()) return false;
+    return Dispatcher()->Handle_C_MoveReq(session, pkt);
     
-    SessionId sessionId = session->Id();
-    
-    PlayerId playerId = 0;
-    if (!g_SessionManager.TryGetPlayerId(sessionId, playerId)) return false;
-    
-    if (playerId == 0 or sessionId == 0) return false;
-    
-    auto player = g_PlayerManager.Find(playerId);
-    if (!player) return false;
-    
-    auto room = g_RoomManager->FindRoom(player->roomId_);
-    if (!room) return false;
-    
-    return room->HandleMove(playerId, pkt);
+    // if (!session) return false;
+    //
+    // SessionId sessionId = session->Id();
+    //
+    // PlayerId playerId = 0;
+    // if (!g_SessionManager.TryGetPlayerId(sessionId, playerId)) return false;
+    //
+    // if (playerId == 0 or sessionId == 0) return false;
+    //
+    // auto player = g_PlayerManager.Find(playerId);
+    // if (!player) return false;
+    //
+    // auto room = g_RoomManager->FindRoom(player->roomId_);
+    // if (!room) return false;
+    //
+    // return room->HandleMove(playerId, pkt);
 }
 
 bool Handle_C_JumpReq(PacketSessionRef& session, const se::game::C_JumpReq& pkt)
 {
-    if (!session) return false;
+    if (!Dispatcher()) return false;
+    return Dispatcher()->Handle_C_JumpReq(session, pkt);
     
-    SessionId sessionId = session->Id();
-    
-    PlayerId playerId = 0;
-    if (!g_SessionManager.TryGetPlayerId(sessionId, playerId)) return false;
-    
-    if (playerId == 0 or sessionId == 0) return false;
-    
-    auto player = g_PlayerManager.Find(playerId);
-    if (!player) return false;
-    
-    auto room = g_RoomManager->FindRoom(player->roomId_);
-    if (!room) return false;
-    
-    return room->HandleJump(playerId, pkt);
+    // if (!session) return false;
+    //
+    // SessionId sessionId = session->Id();
+    //
+    // PlayerId playerId = 0;
+    // if (!g_SessionManager.TryGetPlayerId(sessionId, playerId)) return false;
+    //
+    // if (playerId == 0 or sessionId == 0) return false;
+    //
+    // auto player = g_PlayerManager.Find(playerId);
+    // if (!player) return false;
+    //
+    // auto room = g_RoomManager->FindRoom(player->roomId_);
+    // if (!room) return false;
+    //
+    // return room->HandleJump(playerId, pkt);
 }
 
 bool Handle_C_JumpLand(PacketSessionRef& session, const se::game::C_JumpLand& pkt)
 {
-    if (!session) return false;
+    if (!Dispatcher()) return false;
+    return Dispatcher()->Handle_C_JumpLand(session, pkt);
     
-    SessionId sessionId = session->Id();
-    
-    PlayerId playerId = 0;
-    if (!g_SessionManager.TryGetPlayerId(sessionId, playerId)) return false;
-    
-    if (playerId == 0 or sessionId == 0) return false;
-    
-    auto player = g_PlayerManager.Find(playerId);
-    if (!player) return false;
-    
-    auto room = g_RoomManager->FindRoom(player->roomId_);
-    if (!room) return false;
-    
-    return room->HandleJumpLand(playerId, pkt);
+    // if (!session) return false;
+    //
+    // SessionId sessionId = session->Id();
+    //
+    // PlayerId playerId = 0;
+    // if (!g_SessionManager.TryGetPlayerId(sessionId, playerId)) return false;
+    //
+    // if (playerId == 0 or sessionId == 0) return false;
+    //
+    // auto player = g_PlayerManager.Find(playerId);
+    // if (!player) return false;
+    //
+    // auto room = g_RoomManager->FindRoom(player->roomId_);
+    // if (!room) return false;
+    //
+    // return room->HandleJumpLand(playerId, pkt);
 }
     
 bool Handle_C_CrouchReq(PacketSessionRef& session, const se::game::C_CrouchReq& pkt)
 {
-    if (!session) return false;
+    if (!Dispatcher()) return false;
+    return Dispatcher()->Handle_C_CrouchReq(session, pkt);
     
-    SessionId sessionId = session->Id();
-    
-    PlayerId playerId = 0;
-    if (!g_SessionManager.TryGetPlayerId(sessionId, playerId)) return false;
-    
-    if (playerId == 0 or sessionId == 0) return false;
-    
-    auto player = g_PlayerManager.Find(playerId);
-    if (!player) return false;
-    
-    auto room = g_RoomManager->FindRoom(player->roomId_);
-    if (!room) return false;
-    
-    return room->HandleCrouch(playerId, pkt);
+    // if (!session) return false;
+    //
+    // SessionId sessionId = session->Id();
+    //
+    // PlayerId playerId = 0;
+    // if (!g_SessionManager.TryGetPlayerId(sessionId, playerId)) return false;
+    //
+    // if (playerId == 0 or sessionId == 0) return false;
+    //
+    // auto player = g_PlayerManager.Find(playerId);
+    // if (!player) return false;
+    //
+    // auto room = g_RoomManager->FindRoom(player->roomId_);
+    // if (!room) return false;
+    //
+    // return room->HandleCrouch(playerId, pkt);
 }
     
 bool Handle_C_WireActionReq(PacketSessionRef& session, const se::game::C_WireActionReq& pkt)
 {
-    if (!session) return false;
+    if (!Dispatcher()) return false;
+    return Dispatcher()->Handle_C_WireActionReq(session, pkt);
     
-    SessionId sessionId = session->Id();
-    
-    PlayerId playerId = 0;
-    if (!g_SessionManager.TryGetPlayerId(sessionId, playerId)) return false;
-    
-    if (playerId == 0 or sessionId == 0) return false;
-    
-    auto player = g_PlayerManager.Find(playerId);
-    if (!player) return false;
-    
-    auto room = g_RoomManager->FindRoom(player->roomId_);
-    if (!room) return false;
-    
-    return room->HandleWireAction(playerId, pkt);
+    // if (!session) return false;
+    //
+    // SessionId sessionId = session->Id();
+    //
+    // PlayerId playerId = 0;
+    // if (!g_SessionManager.TryGetPlayerId(sessionId, playerId)) return false;
+    //
+    // if (playerId == 0 or sessionId == 0) return false;
+    //
+    // auto player = g_PlayerManager.Find(playerId);
+    // if (!player) return false;
+    //
+    // auto room = g_RoomManager->FindRoom(player->roomId_);
+    // if (!room) return false;
+    //
+    // return room->HandleWireAction(playerId, pkt);
 }
     
 bool Handle_C_WireActionEnd(PacketSessionRef& session, const se::game::C_WireActionEnd& pkt)
 {
-    if (!session) return false;
+    if (!Dispatcher()) return false;
+    return Dispatcher()->Handle_C_WireActionEnd(session, pkt);
     
-    SessionId sessionId = session->Id();
-    
-    PlayerId playerId = 0;
-    if (!g_SessionManager.TryGetPlayerId(sessionId, playerId)) return false;
-    
-    if (playerId == 0 or sessionId == 0) return false;
-    
-    auto player = g_PlayerManager.Find(playerId);
-    if (!player) return false;
-    
-    auto room = g_RoomManager->FindRoom(player->roomId_);
-    if (!room) return false;
-    
-    return room->HandleWireActionEnd(playerId, pkt);
+    // if (!session) return false;
+    //
+    // SessionId sessionId = session->Id();
+    //
+    // PlayerId playerId = 0;
+    // if (!g_SessionManager.TryGetPlayerId(sessionId, playerId)) return false;
+    //
+    // if (playerId == 0 or sessionId == 0) return false;
+    //
+    // auto player = g_PlayerManager.Find(playerId);
+    // if (!player) return false;
+    //
+    // auto room = g_RoomManager->FindRoom(player->roomId_);
+    // if (!room) return false;
+    //
+    // return room->HandleWireActionEnd(playerId, pkt);
 }
     
 bool Handle_C_AimReq(PacketSessionRef& session, const se::game::C_AimReq& pkt)
 {
-    if (!session) return false;
+    if (!Dispatcher()) return false;
+    return Dispatcher()->Handle_C_AimReq(session, pkt);
     
-    SessionId sessionId = session->Id();
-    
-    PlayerId playerId = 0;
-    if (!g_SessionManager.TryGetPlayerId(sessionId, playerId)) return false;
-    
-    if (playerId == 0 or sessionId == 0) return false;
-    
-    auto player = g_PlayerManager.Find(playerId);
-    if (!player) return false;
-    
-    auto room = g_RoomManager->FindRoom(player->roomId_);
-    if (!room) return false;
-    
-    return room->HandleAim(playerId, pkt);
+    // if (!session) return false;
+    //
+    // SessionId sessionId = session->Id();
+    //
+    // PlayerId playerId = 0;
+    // if (!g_SessionManager.TryGetPlayerId(sessionId, playerId)) return false;
+    //
+    // if (playerId == 0 or sessionId == 0) return false;
+    //
+    // auto player = g_PlayerManager.Find(playerId);
+    // if (!player) return false;
+    //
+    // auto room = g_RoomManager->FindRoom(player->roomId_);
+    // if (!room) return false;
+    //
+    // return room->HandleAim(playerId, pkt);
 }
     
 bool Handle_C_FireReq(PacketSessionRef& session, const se::game::C_FireReq& pkt)
 {
-    if (!session) return false;
+    if (!Dispatcher()) return false;
+    return Dispatcher()->Handle_C_FireReq(session, pkt);
     
-    SessionId sessionId = session->Id();
-    
-    PlayerId playerId = 0;
-    if (!g_SessionManager.TryGetPlayerId(sessionId, playerId)) return false;
-    
-    if (playerId == 0 or sessionId == 0) return false;
-    
-    auto player = g_PlayerManager.Find(playerId);
-    if (!player) return false;
-    
-    auto room = g_RoomManager->FindRoom(player->roomId_);
-    if (!room) return false;
-    
-    return room->HandleFire(playerId, pkt);
+    // if (!session) return false;
+    //
+    // SessionId sessionId = session->Id();
+    //
+    // PlayerId playerId = 0;
+    // if (!g_SessionManager.TryGetPlayerId(sessionId, playerId)) return false;
+    //
+    // if (playerId == 0 or sessionId == 0) return false;
+    //
+    // auto player = g_PlayerManager.Find(playerId);
+    // if (!player) return false;
+    //
+    // auto room = g_RoomManager->FindRoom(player->roomId_);
+    // if (!room) return false;
+    //
+    // return room->HandleFire(playerId, pkt);
 }
     
 bool Handle_C_AttackReq(PacketSessionRef& session, const se::game::C_AttackReq& pkt)
 {
-    return false;
+    if (!Dispatcher()) return false;
+    return Dispatcher()->Handle_C_AttackReq(session, pkt);
 }
     
 bool Handle_C_ThrowGrenadeReq(PacketSessionRef& session, const se::game::C_ThrowGrenadeReq& pkt)
 {
-    if (!session) return false;
+    if (!Dispatcher()) return false;
+    return Dispatcher()->Handle_C_ThrowGrenadeReq(session, pkt);
     
-    SessionId sessionId = session->Id();
-    
-    PlayerId playerId = 0;
-    if (!g_SessionManager.TryGetPlayerId(sessionId, playerId)) return false;
-    
-    if (playerId == 0 or sessionId == 0) return false;
-    
-    auto player = g_PlayerManager.Find(playerId);
-    if (!player) return false;
-    
-    auto room = g_RoomManager->FindRoom(player->roomId_);
-    if (!room) return false;
-    
-    return room->HandleThrowGrenade(playerId, pkt);
+    // if (!session) return false;
+    //
+    // SessionId sessionId = session->Id();
+    //
+    // PlayerId playerId = 0;
+    // if (!g_SessionManager.TryGetPlayerId(sessionId, playerId)) return false;
+    //
+    // if (playerId == 0 or sessionId == 0) return false;
+    //
+    // auto player = g_PlayerManager.Find(playerId);
+    // if (!player) return false;
+    //
+    // auto room = g_RoomManager->FindRoom(player->roomId_);
+    // if (!room) return false;
+    //
+    // return room->HandleThrowGrenade(playerId, pkt);
 }
     
 bool Handle_C_ReloadReq(PacketSessionRef& session, const se::game::C_ReloadReq& pkt)
 {
-    if (!session) return false;
+    if (!Dispatcher()) return false;
+    return Dispatcher()->Handle_C_ReloadReq(session, pkt);
     
-    SessionId sessionId = session->Id();
-    
-    PlayerId playerId = 0;
-    if (!g_SessionManager.TryGetPlayerId(sessionId, playerId)) return false;
-    
-    if (playerId == 0 or sessionId == 0) return false;
-    
-    auto player = g_PlayerManager.Find(playerId);
-    if (!player) return false;
-    
-    auto room = g_RoomManager->FindRoom(player->roomId_);
-    if (!room) return false;
-    
-    return room->HandleReload(playerId, pkt);
+    // if (!session) return false;
+    //
+    // SessionId sessionId = session->Id();
+    //
+    // PlayerId playerId = 0;
+    // if (!g_SessionManager.TryGetPlayerId(sessionId, playerId)) return false;
+    //
+    // if (playerId == 0 or sessionId == 0) return false;
+    //
+    // auto player = g_PlayerManager.Find(playerId);
+    // if (!player) return false;
+    //
+    // auto room = g_RoomManager->FindRoom(player->roomId_);
+    // if (!room) return false;
+    //
+    // return room->HandleReload(playerId, pkt);
 }
     
 bool Handle_C_WeaponChangeReq(PacketSessionRef& session, const se::game::C_WeaponChangeReq& pkt)
 {
-    if (!session) return false;
+    if (!Dispatcher()) return false;
+    return Dispatcher()->Handle_C_WeaponChangeReq(session, pkt);
     
-    SessionId sessionId = session->Id();
-    
-    PlayerId playerId = 0;
-    if (!g_SessionManager.TryGetPlayerId(sessionId, playerId)) return false;
-    
-    if (playerId == 0 or sessionId == 0) return false;
-    
-    auto player = g_PlayerManager.Find(playerId);
-    if (!player) return false;
-    
-    auto room = g_RoomManager->FindRoom(player->roomId_);
-    if (!room) return false;
-    
-    return room->HandleWeaponChange(playerId, pkt);
+    // if (!session) return false;
+    //
+    // SessionId sessionId = session->Id();
+    //
+    // PlayerId playerId = 0;
+    // if (!g_SessionManager.TryGetPlayerId(sessionId, playerId)) return false;
+    //
+    // if (playerId == 0 or sessionId == 0) return false;
+    //
+    // auto player = g_PlayerManager.Find(playerId);
+    // if (!player) return false;
+    //
+    // auto room = g_RoomManager->FindRoom(player->roomId_);
+    // if (!room) return false;
+    //
+    // return room->HandleWeaponChange(playerId, pkt);
 }
     
 bool Handle_C_UseAbilityReq(PacketSessionRef& session, const se::game::C_UseAbilityReq& pkt)
 {
-    return false;
+    if (!Dispatcher()) return false;
+    return Dispatcher()->Handle_C_UseAbilityReq(session, pkt);
 }
     
 bool Handle_C_UseItemReq(PacketSessionRef& session, const se::game::C_UseItemReq& pkt)
 {
-    return false;
+    if (!Dispatcher()) return false;
+    return Dispatcher()->Handle_C_UseItemReq(session, pkt);
 }
     
 bool Handle_C_ChestInteractReq(PacketSessionRef& session, const se::game::C_ChestInteractReq& pkt)
 {
-    return false;
+    if (!Dispatcher()) return false;
+    return Dispatcher()->Handle_C_ChestInteractReq(session, pkt);
 }
     
 bool Handle_C_PickupItemReq(PacketSessionRef& session, const se::game::C_PickupItemReq& pkt)
 {
-    if (!session) return false;
+    if (!Dispatcher()) return false;
+    return Dispatcher()->Handle_C_PickupItemReq(session, pkt);
     
-    SessionId sessionId = session->Id();
-    
-    PlayerId playerId = 0;
-    if (!g_SessionManager.TryGetPlayerId(sessionId, playerId)) return false;
-    
-    if (playerId == 0 or sessionId == 0) return false;
-    
-    auto player = g_PlayerManager.Find(playerId);
-    if (!player) return false;
-    
-    auto room = g_RoomManager->FindRoom(player->roomId_);
-    if (!room) return false;
-    
-    return room->HandlePickupItem(playerId, pkt);
+    // if (!session) return false;
+    //
+    // SessionId sessionId = session->Id();
+    //
+    // PlayerId playerId = 0;
+    // if (!g_SessionManager.TryGetPlayerId(sessionId, playerId)) return false;
+    //
+    // if (playerId == 0 or sessionId == 0) return false;
+    //
+    // auto player = g_PlayerManager.Find(playerId);
+    // if (!player) return false;
+    //
+    // auto room = g_RoomManager->FindRoom(player->roomId_);
+    // if (!room) return false;
+    //
+    // return room->HandlePickupItem(playerId, pkt);
 }
     
 bool Handle_C_UseStoreReq(PacketSessionRef& session, const se::game::C_UseStoreReq& pkt)
 {
-    return false;
+    if (!Dispatcher()) return false;
+    return Dispatcher()->Handle_C_UseStoreReq(session, pkt);
 }
     
 bool Handle_C_SetSavePointReq(PacketSessionRef& session, const se::game::C_SetSavePointReq& pkt)
 {
-    if (!session) return false;
+    if (!Dispatcher()) return false;
+    return Dispatcher()->Handle_C_SetSavePointReq(session, pkt);
     
-    SessionId sessionId = session->Id();
-    
-    PlayerId playerId = 0;
-    if (!g_SessionManager.TryGetPlayerId(sessionId, playerId)) return false;
-    
-    if (playerId == 0 or sessionId == 0) return false;
-    
-    auto player = g_PlayerManager.Find(playerId);
-    if (!player) return false;
-    
-    auto room = g_RoomManager->FindRoom(player->roomId_);
-    if (!room) return false;
-    
-    return room->HandleSetSavePoint(playerId, pkt);
+    // if (!session) return false;
+    //
+    // SessionId sessionId = session->Id();
+    //
+    // PlayerId playerId = 0;
+    // if (!g_SessionManager.TryGetPlayerId(sessionId, playerId)) return false;
+    //
+    // if (playerId == 0 or sessionId == 0) return false;
+    //
+    // auto player = g_PlayerManager.Find(playerId);
+    // if (!player) return false;
+    //
+    // auto room = g_RoomManager->FindRoom(player->roomId_);
+    // if (!room) return false;
+    //
+    // return room->HandleSetSavePoint(playerId, pkt);
 }
     

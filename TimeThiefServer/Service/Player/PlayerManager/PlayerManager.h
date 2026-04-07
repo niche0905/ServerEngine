@@ -31,6 +31,3 @@ private:
    std::unordered_map<PlayerId, PlayerRef> playersById_;       // 플레이어 ID -> 플레이어 참조
     
 };
-
-// TODO: TTSA 완성하고 제대로 의존성 제거 후 아래 전역 변수 정의 지우기
-extern PlayerManager g_PlayerManager;
