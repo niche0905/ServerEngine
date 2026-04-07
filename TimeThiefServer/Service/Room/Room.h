@@ -9,6 +9,7 @@
 #include "Physics/Ray/Ray.h"
 #include "Physics/Ray/RaycastHit.h"
 
+class SessionManager;
 struct DamageContext;
 class Pawn;
 class BaseObject;
@@ -31,15 +32,15 @@ public:
    using Vector3 = SE::Math::Vector3;
    
 public:
-   static std::shared_ptr<Room> Create(RoomId roomId)
+   static std::shared_ptr<Room> Create(RoomId roomId, SessionManager& sessionManager)
    {
-      auto room = std::make_shared<Room>(roomId);
+      auto room = std::make_shared<Room>(roomId, sessionManager);
       room->PostCreate();
       return room;
    }
 
 public:
-   explicit Room(RoomId roomId);
+   explicit Room(RoomId roomId, SessionManager& sessionManager);
    ~Room();
    
    void PostCreate();
@@ -120,6 +121,9 @@ public:
 private:
    void IndexObject_OnAdd(BaseObject* object);
    void IndexObject_OnRemove(ObjectId objectId);
+   
+public:
+   SessionManager& sessionManager_;
    
 private:
    struct RoomPlayer

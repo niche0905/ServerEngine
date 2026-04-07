@@ -1,6 +1,7 @@
 ﻿#include "pch.h"
 #include "RoomManager.h"
 #include "Room.h"
+#include "Network/Session/SessionManager/SessionManager.h"
 
 /*----------------
    RoomManager
@@ -11,7 +12,7 @@ RoomManager* g_RoomManager = new RoomManager();
 RoomManager::RoomRef RoomManager::CreateRoom()
 {
    RoomId roomId = GenerateUniqueRoomId();
-   auto room = Room::Create(roomId);
+   auto room = Room::Create(roomId, g_SessionManager);
    
    {
       std::lock_guard lock(mutex_);
@@ -26,7 +27,7 @@ RoomManager::RoomRef RoomManager::CreateRoom()
 
 RoomManager::RoomRef RoomManager::CreateRoom(RoomId roomId)
 {
-   auto room = Room::Create(roomId);
+   auto room = Room::Create(roomId, g_SessionManager);
    
    {
       std::lock_guard lock(mutex_);

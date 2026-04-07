@@ -13,9 +13,10 @@
    Room
 ---------*/
 
-Room::Room(RoomId roomId)
+Room::Room(RoomId roomId, SessionManager& sessionManager)
    : roomId_(roomId)
    , objectManager_(roomId)
+   , sessionManager_(sessionManager)
 {
 }
 
@@ -41,11 +42,9 @@ bool Room::Join(PlayerId playerId, SessionId sessionId)
    SendBufferRef enterResBuffer;
    std::vector<SendBufferRef> spawnBuffersToNewPlayer;
    SendBufferRef spawnBufferToOthers;
-   std::shared_ptr<PlayerSession> sessionRef = g_SessionManager.FindBySessionId(sessionId);
-   std::shared_ptr<Player> playerRef = g_PlayerManager.Find(playerId);
+   std::shared_ptr<PlayerSession> sessionRef = sessionManager_.FindBySessionId(sessionId);
    
    if (!sessionRef) return false;   // 세션이 존재하지 않음 (정상적이지 않은 상황)
-   if (!playerRef) return false;    // 플레이어가 존재하지 않음 (정상적이지 않은 상황)
    
    {
       std::lock_guard<std::recursive_mutex> lock(mutex_);   // 방에 플레이어가 입장/퇴장할 때마다 Lock을 잡는 구조 (샤딩 도입 전까지는 이 구조로 유지)
@@ -70,8 +69,9 @@ bool Room::Join(PlayerId playerId, SessionId sessionId)
       
       auto [insertIt, inserted]= roomPlayers_.emplace(playerId, std::move(newPlayer));
       if (not inserted) return false;
-      playerRef->roomId_ = roomId_;    // 플레이어의 현재 방 ID 업데이트
-      playerRef->pawnId_ = insertIt->second.pawnObjectId;
+      // TODO: 아래 코드는 Join을 호출한 상위 로직에서 처리한다
+      // playerRef->roomId_ = roomId_;    // 플레이어의 현재 방 ID 업데이트
+      // playerRef->pawnId_ = insertIt->second.pawnObjectId;
       
       auto& joinedPlayer = insertIt->second;
       
@@ -183,8 +183,7 @@ bool Room::Leave(PlayerId playerId)
 {
    SendBufferRef leaveResBuffer;
    SendBufferRef despawnBufferToOthers;
-   std::shared_ptr<PlayerSession> sessionRef = g_SessionManager.FindByPlayerId(playerId);
-   std::shared_ptr<Player> playerRef = g_PlayerManager.Find(playerId);
+   std::shared_ptr<PlayerSession> sessionRef = sessionManager_.FindByPlayerId(playerId);
    
    {
       // TEMP
@@ -215,8 +214,9 @@ bool Room::Leave(PlayerId playerId)
    
       const ObjectId pawnId = it->second.pawnObjectId;
       roomPlayers_.erase(it);
-      playerRef->roomId_ = 0;    // 플레이어의 현재 방 ID 업데이트
-      playerRef->pawnId_.value = 0;
+      // TODO: 아래 코드는 Leave을 호출한 상위 로직에서 처리한다
+      // playerRef->roomId_ = 0;    // 플레이어의 현재 방 ID 업데이트
+      // playerRef->pawnId_.value = 0;
       
       if (pawnId != ObjectId{}) {
          DespawnObject(pawnId);   // 플레이어의 Pawn이 존재하면 제거
@@ -250,7 +250,7 @@ bool Room::UpdateSession(PlayerId playerId, SessionId newSessionId)
 
 bool Room::HandleLoadingComplete(PlayerId playerId)
 {
-   std::shared_ptr<PlayerSession> sessionRef = g_SessionManager.FindByPlayerId(playerId);
+   std::shared_ptr<PlayerSession> sessionRef = sessionManager_.FindByPlayerId(playerId);
    
    if (!sessionRef) return false;   // 세션이 존재하지 않음 (정상적이지 않은 상황)
    
@@ -277,7 +277,7 @@ bool Room::HandleLoadingComplete(PlayerId playerId)
 bool Room::HandleMove(PlayerId playerId, const se::game::C_MoveReq& pkt)
 {
    SendBufferRef moveBroadcastBuffer;
-   std::shared_ptr<PlayerSession> sessionRef = g_SessionManager.FindByPlayerId(playerId);
+   std::shared_ptr<PlayerSession> sessionRef = sessionManager_.FindByPlayerId(playerId);
    
    if (!sessionRef) return false;   // 세션이 존재하지 않음 (정상적이지 않은 상황)
    // TODO: 기본적으로 본인 Player에겐 예외, 다만 유효성 판정 실패 시 보정 패킷을 보내야 한다
@@ -347,7 +347,7 @@ bool Room::HandleMove(PlayerId playerId, const se::game::C_MoveReq& pkt)
 bool Room::HandleAim(PlayerId playerId, const se::game::C_AimReq& pkt)
 {
    SendBufferRef aimBroadcastBuffer;
-   std::shared_ptr<PlayerSession> sessionRef = g_SessionManager.FindByPlayerId(playerId);
+   std::shared_ptr<PlayerSession> sessionRef = sessionManager_.FindByPlayerId(playerId);
    
    if (!sessionRef) return false;   // 세션이 존재하지 않음 (정상적이지 않은 상황)
    
@@ -394,7 +394,7 @@ bool Room::HandleAim(PlayerId playerId, const se::game::C_AimReq& pkt)
 bool Room::HandleFire(PlayerId playerId, const se::game::C_FireReq& pkt)
 {
    SendBufferRef fireBroadcastBuffer;
-   std::shared_ptr<PlayerSession> sessionRef = g_SessionManager.FindByPlayerId(playerId);
+   std::shared_ptr<PlayerSession> sessionRef = sessionManager_.FindByPlayerId(playerId);
    
    if (!sessionRef) return false;   // 세션이 존재하지 않음 (정상적이지 않은 상황)
    
@@ -467,7 +467,7 @@ bool Room::HandleThrowGrenade(PlayerId playerId, const se::game::C_ThrowGrenadeR
 {
    SendBufferRef throwBroadcastBuffer;
    SendBufferRef grenadeSpawnBuffer;      // se::room::N_EntitySpawn 형태로 투척한 수류탄의 스폰 정보
-   std::shared_ptr<PlayerSession> sessionRef = g_SessionManager.FindByPlayerId(playerId);
+   std::shared_ptr<PlayerSession> sessionRef = sessionManager_.FindByPlayerId(playerId);
    
    if (!sessionRef) return false;   // 세션이 존재하지 않음 (정상적이지 않은 상황)
    
@@ -534,7 +534,7 @@ bool Room::HandleReload(PlayerId playerId, const se::game::C_ReloadReq& pkt)
    // TODO: 재장전 결과 패킷 (S_ReleadRes 를 작성해서 프로토콜 업데이트 하기)
    SendBufferRef reloadResultBuffer;      // 재장전 결과를 해당 플레이어에게 보내는 패킷 (예: 재장전 성공 여부, 남은 탄창 수 등)
    SendBufferRef reloadBroadcastBuffer;
-   std::shared_ptr<PlayerSession> sessionRef = g_SessionManager.FindByPlayerId(playerId);
+   std::shared_ptr<PlayerSession> sessionRef = sessionManager_.FindByPlayerId(playerId);
    
    if (!sessionRef) return false;   // 세션이 존재하지 않음 (정상적이지 않은 상황)
    
@@ -594,7 +594,7 @@ bool Room::HandleReload(PlayerId playerId, const se::game::C_ReloadReq& pkt)
 bool Room::HandleWeaponChange(PlayerId playerId, const se::game::C_WeaponChangeReq& pkt)
 {
    SendBufferRef weaponChangeBroadcastBuffer;
-   std::shared_ptr<PlayerSession> sessionRef = g_SessionManager.FindByPlayerId(playerId);
+   std::shared_ptr<PlayerSession> sessionRef = sessionManager_.FindByPlayerId(playerId);
    
    if (!sessionRef) return false;   // 세션이 존재하지 않음 (정상적이지 않은 상황)
    
@@ -650,7 +650,7 @@ bool Room::HandlePickupItem(PlayerId playerId, const se::game::C_PickupItemReq& 
    SendBufferRef pickupResultBuffer;
    SendBufferRef pickupBroadcastBuffer;
    SendBufferRef itemDespawnBuffer;
-   std::shared_ptr<PlayerSession> sessionRef = g_SessionManager.FindByPlayerId(playerId);
+   std::shared_ptr<PlayerSession> sessionRef = sessionManager_.FindByPlayerId(playerId);
    
    if (!sessionRef) return false;   // 세션이 존재하지 않음 (정상적이지 않은 상황)
    
@@ -1122,7 +1122,7 @@ void Room::Broadcast(std::shared_ptr<SendBuffer> sendBuffer, PlayerId exceptPlay
       
       // TODO: 더 좋게 변경할 수 있다면 하기,,,
       //       현재는 Lock도 걸고 우아하지 않아 보임...
-      g_SessionManager.FindBySessionId(roomPlayer.sessionId)->Send(sendBuffer);   // 세션을 찾아서 메시지 전송
+      sessionManager_.FindBySessionId(roomPlayer.sessionId)->Send(sendBuffer);   // 세션을 찾아서 메시지 전송
    }
 }
 
@@ -1140,7 +1140,7 @@ bool Room::SendToPlayer(PlayerId playerId, SendBufferRef buffer)
    if (it == roomPlayers_.end())
       return false;  // 방에 존재하지 않는 플레이어
    
-   auto session = g_SessionManager.FindByPlayerId(playerId);
+   auto session = sessionManager_.FindByPlayerId(playerId);
    if (!session)
       return false;  // 플레이어의 세션이 존재하지 않음 (정상적이지 않은 상황)
    
