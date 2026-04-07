@@ -1,6 +1,11 @@
 ﻿#pragma once
 #include "IPlayerSessionLifecycle.h"
 
+namespace se::common
+{
+   enum ErrorCode : int;
+}
+
 class SessionManager;
 class PlayerManager;
 class ShardManager;
@@ -24,6 +29,9 @@ public:
    virtual void OnDisconnected(PlayerSession& session) override;
     
    virtual bool HandleHandshake(PlayerSession& session, const se::auth::C_HandshakeReq& pkt) override;
+   
+private:
+   void SendHandshakeRes(PlayerSession& session, bool success, se::common::ErrorCode code, const std::string& message);
    
 private:
    SessionManager&   sessionManager_;

@@ -85,50 +85,36 @@ bool PlayerSessionLifecycleService::HandleHandshake(PlayerSession& session, cons
     }
     
     if (pkt.client_protocol_version() != se::protocol::kProtocolVersion) {
-        se::auth::S_HandshakeRes handshakeRes;
-        handshakeRes.set_success(false);
-        
-        auto* result = handshakeRes.mutable_result();
-        result->set_code(se::common::ERR_INVALID_PROTOCOL_VERSION);
-        result->set_message("Protocol version mismatch");
-        
-        if (session.GetPlayerId() != 0) 
-            handshakeRes.set_session_player_id(session.GetPlayerId());
-        
-        auto* config = handshakeRes.mutable_config();
-        config->set_movement_update_hz(10);   // TODO: config에서 읽어오기
-        config->set_ping_interval_ms(1000);    // TODO: config에서 읽어오기
-        
-        auto buffer = ServerPacketHandler::MakeSendBuffer(handshakeRes);
-        if (buffer) {
-            session.Send(buffer);
-        }
+        SendHandshakeRes(session, false, se::common::ERR_INVALID_PROTOCOL_VERSION, "Protocol version mismatch");
         
         session.Disconnect(L"Incompatible protocol version");
         return false;
     }
     
-    {
-        se::auth::S_HandshakeRes handshakeRes;
-        handshakeRes.set_success(true);
-        
-        auto* result = handshakeRes.mutable_result();
-        result->set_code(se::common::ERR_NONE);
-        result->set_message("OK");
-        
-        if (session.GetPlayerId() != 0) 
-            handshakeRes.set_session_player_id(session.GetPlayerId());
-        
-        auto* config = handshakeRes.mutable_config();
-        config->set_movement_update_hz(10);   // TODO: config에서 읽어오기
-        config->set_ping_interval_ms(1000);    // TODO: config에서 읽어오기
-        
-        auto buffer = ServerPacketHandler::MakeSendBuffer(handshakeRes);
-        if (buffer) {
-            session.Send(buffer);
-        }
-    }
+    SendHandshakeRes(session, true, se::common::ERR_NONE, "OK");
     
     session.SetState(PlayerSessionState::InLobby);
     return true;
+}
+
+void PlayerSessionLifecycleService::SendHandshakeRes(PlayerSession& session, bool success, se::common::ErrorCode code, const std::string& message)
+{
+    se::auth::S_HandshakeRes handshakeRes;
+    handshakeRes.set_success(success);
+    
+    auto* result = handshakeRes.mutable_result();
+    result->set_code(code);
+    result->set_message(message);
+    
+    if (session.GetPlayerId() != 0) 
+        handshakeRes.set_session_player_id(session.GetPlayerId());
+    
+    auto* config = handshakeRes.mutable_config();
+    config->set_movement_update_hz(10);   // TODO: config에서 읽어오기
+    config->set_ping_interval_ms(1000);    // TODO: config에서 읽어오기
+    
+    auto buffer = ServerPacketHandler::MakeSendBuffer(handshakeRes);
+    if (buffer) {
+        session.Send(buffer);
+    }
 }
