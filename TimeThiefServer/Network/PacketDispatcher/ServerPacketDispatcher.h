@@ -1,0 +1,72 @@
+﻿#pragma once
+#include <memory>
+#include "Protocol.pb.h"
+
+class Room;
+class PacketSession;
+class RoomDirectory;
+class ShardManager;
+class MatchMaker;
+class PlayerManager;
+class SessionManager;
+
+/*--------------------------
+   ServerPacketDispatcher
+--------------------------*/
+//
+// ServerPacketDispatcher는 서버에서 클라이언트로부터 수신된 패킷을 처리하는 역할을 담당하는 클래스입니다.
+//
+
+class ServerPacketDispatcher
+{
+public:
+   using PacketSessionRef = std::shared_ptr<PacketSession>;
+   
+public:
+   ServerPacketDispatcher(SessionManager& sessionManager,
+      PlayerManager& playerManager,
+      MatchMaker& matchMaker,
+      RoomDirectory& roomDirectory,
+      ShardManager* shardManager = nullptr);
+   
+public:
+   bool Handle_C_HandshakeReq(PacketSessionRef& session, const se::auth::C_HandshakeReq& pkt);
+   bool Handle_C_LoginReq(PacketSessionRef& session, const se::auth::C_LoginReq& pkt);
+   bool Handle_C_Ping(PacketSessionRef& session, const se::auth::C_Ping& pkt);
+   bool Handle_C_SetNicknameReq(PacketSessionRef& session, const se::lobby::C_SetNicknameReq& pkt);
+   bool Handle_C_MatchQueueEnterReq(PacketSessionRef& session, const se::lobby::C_MatchQueueEnterReq& pkt);
+   bool Handle_C_MatchQueueCancelReq(PacketSessionRef& session, const se::lobby::C_MatchQueueCancelReq& pkt);
+   bool Handle_C_RoomEnterReq(PacketSessionRef& session, const se::room::C_RoomEnterReq& pkt);
+   bool Handle_C_RoomLeaveReq(PacketSessionRef& session, const se::room::C_RoomLeaveReq& pkt);
+   bool Handle_C_LoadingCompleteReq(PacketSessionRef& session, const se::game::C_LoadingCompleteReq& pkt);
+   bool Handle_C_MoveReq(PacketSessionRef& session, const se::game::C_MoveReq& pkt);
+   bool Handle_C_JumpReq(PacketSessionRef& session, const se::game::C_JumpReq& pkt);
+   bool Handle_C_JumpLand(PacketSessionRef& session, const se::game::C_JumpLand& pkt);
+   bool Handle_C_CrouchReq(PacketSessionRef& session, const se::game::C_CrouchReq& pkt);
+   bool Handle_C_WireActionReq(PacketSessionRef& session, const se::game::C_WireActionReq& pkt);
+   bool Handle_C_WireActionEnd(PacketSessionRef& session, const se::game::C_WireActionEnd& pkt);
+   bool Handle_C_AimReq(PacketSessionRef& session, const se::game::C_AimReq& pkt);
+   bool Handle_C_FireReq(PacketSessionRef& session, const se::game::C_FireReq& pkt);
+   bool Handle_C_AttackReq(PacketSessionRef& session, const se::game::C_AttackReq& pkt);
+   bool Handle_C_ThrowGrenadeReq(PacketSessionRef& session, const se::game::C_ThrowGrenadeReq& pkt);
+   bool Handle_C_ReloadReq(PacketSessionRef& session, const se::game::C_ReloadReq& pkt);
+   bool Handle_C_WeaponChangeReq(PacketSessionRef& session, const se::game::C_WeaponChangeReq& pkt);
+   bool Handle_C_UseAbilityReq(PacketSessionRef& session, const se::game::C_UseAbilityReq& pkt);
+   bool Handle_C_UseItemReq(PacketSessionRef& session, const se::game::C_UseItemReq& pkt);
+   bool Handle_C_ChestInteractReq(PacketSessionRef& session, const se::game::C_ChestInteractReq& pkt);
+   bool Handle_C_PickupItemReq(PacketSessionRef& session, const se::game::C_PickupItemReq& pkt);
+   bool Handle_C_UseStoreReq(PacketSessionRef& session, const se::game::C_UseStoreReq& pkt);
+   bool Handle_C_SetSavePointReq(PacketSessionRef& session, const se::game::C_SetSavePointReq& pkt);
+   
+private:
+   bool TryGetPlayerId(PacketSessionRef& session, PlayerId outPlayerId) const;
+   Room* FindPlayerRoom(PlayerId playerId) const;
+   
+private:
+   SessionManager& sessionManager_;
+   PlayerManager& playerManager_;
+   MatchMaker& matchMaker_;
+   RoomDirectory& roomDirectory_;
+   ShardManager* shardManager_ = nullptr;
+    
+};

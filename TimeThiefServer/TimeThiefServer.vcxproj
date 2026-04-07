@@ -425,6 +425,7 @@
       <LinkCompiled>true</LinkCompiled>
       <AdditionalIncludeDirectories>;C:\Users\yudle\vcpkg\installed\x64-windows\include;$(SolutionDir)Libraries\Libs\ServerEngineLib\;</AdditionalIncludeDirectories>
     </ClCompile>
+    <ClCompile Include="Network\PacketDispatcher\ServerPacketDispatcher.cpp" />
     <ClCompile Include="Network\ServerConfigReader.cpp" />
     <ClCompile Include="Network\ServerPacketHandler.cpp" />
     <ClCompile Include="Network\Session\PlayerSession.cpp" />
@@ -592,6 +593,7 @@
     <ClInclude Include="Data\Map\ServerMapFormat.h" />
     <ClInclude Include="Data\Tables\ZoneTable.h" />
     <ClInclude Include="Data\Tables\ZoneTableJson.h" />
+    <ClInclude Include="Network\PacketDispatcher\ServerPacketDispatcher.h" />
     <ClInclude Include="Network\ServerConfigReader.h" />
     <ClInclude Include="Network\ServerConfig.h" />
     <ClInclude Include="Network\Session\PlayerSession.h" />
