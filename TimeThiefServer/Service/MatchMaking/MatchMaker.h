@@ -2,6 +2,9 @@
 #include "Service/Player/Player.h"
 #include "Service/MatchMaking/MatchMakingQueue.h"
 
+class ShardManager;
+class PlayerManager;
+class SessionManager;
 class PlayerSession;
 
 /*--------------
@@ -14,13 +17,28 @@ class PlayerSession;
 class MatchMaker
 {
 public:
+    MatchMaker() = default;
+    ~MatchMaker() = default;
+    
+    MatchMaker(const MatchMaker&) = delete;
+    MatchMaker& operator=(const MatchMaker&) = delete;
+    
+public:
+    bool Init(SessionManager& sessionManager, PlayerManager& playerManager, ShardManager& shardManager);
+    
+public:
     bool Enqueue(PlayerId playerId);
     bool Cancel(PlayerId playerId);
     
     void TryMatch();
     
 private:
-    static constexpr size_t kMatchSize = 2;
+    SessionManager*         sessionManager_ = nullptr;       // non-owning
+    PlayerManager*          playerManager_ = nullptr;        // non-owning
+    ShardManager*           shardManager_ = nullptr;         // non-owning
+    
+private:
+    static constexpr size_t kMatchSize = 2; // TODO: 이 값도 밖에서 받아오는 config 값 사용하기
     
     MatchMakingQueue queue_;
     

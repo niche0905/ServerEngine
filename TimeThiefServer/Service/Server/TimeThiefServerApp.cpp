@@ -123,6 +123,11 @@ bool TimeThiefServerApp::CreateManagers()
       return false;
    }
    
+   if (not matchMaker_->Init(*sessionManager_, *playerManager_, *shardManager_)) {
+      consoleLogger->Log(Color::Red, L"[TTSA] MatchMaker init fail\n");
+      return false;
+   }
+   
    if (not CreatePacketDispatcher()) {
       consoleLogger->Log(Color::Red, L"[TTSA] CreatePacketDispatcher fail\n");
       return false;

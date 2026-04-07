@@ -44,12 +44,21 @@ namespace
 
 MatchMaker g_MatchMaker;
 
+bool MatchMaker::Init(SessionManager& sessionManager, PlayerManager& playerManager, ShardManager& shardManager)
+{
+   sessionManager_ = &sessionManager;
+   playerManager_ = &playerManager;
+   shardManager_ = &shardManager;
+   
+   return true;
+}
+
 bool MatchMaker::Enqueue(PlayerId playerId)
 {
    bool success = queue_.Enqueue(playerId);
    
    if (success) {
-      auto session = g_SessionManager.FindByPlayerId(playerId);
+      auto session = sessionManager_->FindByPlayerId(playerId);
       
       if (session) {
          session->SetState(PlayerSessionState::MatchMaking);
@@ -64,7 +73,7 @@ bool MatchMaker::Cancel(PlayerId playerId)
    bool success = queue_.Cancel(playerId);
    
    if (success) {
-      auto session = g_SessionManager.FindByPlayerId(playerId);
+      auto session = sessionManager_->FindByPlayerId(playerId);
       
       if (session) {
          session->SetState(PlayerSessionState::InLobby);
@@ -95,11 +104,11 @@ void MatchMaker::TryMatch()
 
    for (PlayerId playerId : poppedIds)
    {
-      auto player = g_PlayerManager.Find(playerId);
+      auto player = playerManager_->Find(playerId);
       if (!IsValidPlayer(player))
          continue;
 
-      auto session = g_SessionManager.FindByPlayerId(playerId);
+      auto session = sessionManager_->FindByPlayerId(playerId);
       if (!IsValidSession(session))
          continue;
 
@@ -117,6 +126,10 @@ void MatchMaker::TryMatch()
    
    // Room Create
    auto room = g_RoomManager->CreateRoom();
+   // TODO: Room Create 후 Shard에 배치하는 로직 필요
+   //       Room::Create(roomID);
+   //       shardManager->SelectShardForNewRoom();
+   //       roomDirectory->RegisterRoom(roomId, shardId);
    if (!room) {   // Room Create Fail
       for (const auto& candidate : candidates)
          requeueIds.push_back(candidate.player->id_);
