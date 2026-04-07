@@ -2,6 +2,7 @@
 #include <memory>
 #include <vector>
 #include <atomic>
+#include "GameShard.h"
 
 class GameShard;
 class RoomDirectory;

@@ -1,9 +1,7 @@
 ﻿#include "pch.h"
 #include "TimeThiefServerApp.h"
-
 #include <Generated/ServerPacketHandler.h>
-
-#include "FilePathHelper.h"
+#include "Utils/FilePathHelper.h"
 #include "Core/Service/IOCP/IocpServerService.h"
 #include "Network/ServerConfigReader.h"
 #include "Network/Session/SessionManager/SessionManager.h"
@@ -37,10 +35,10 @@ bool TimeThiefServerApp::Start()
    if (running_.load())
       return true;
    
+   running_.store(true);
+   
    if (not StartServices())
       return false;
-   
-   running_.store(true);
    
    LaunchWorkerThreads();
    LaunchMatchThread();
@@ -116,8 +114,17 @@ bool TimeThiefServerApp::CreateManagers()
    shardManager_        = std::make_unique<ShardManager>();
    matchMaker_          = std::make_unique<MatchMaker>();
    
-   // TODO: Shard 초기화 및 생성 작성
-   const auto& cfg = configReader_->Get();
+   // TODO: GameShard의 개수 정책 어떻게 할 지 고민해 보아야 함
+   const int32 hc = static_cast<int32>(std::thread::hardware_concurrency());
+   const int32 shardCount = (hc / 2) > 1 ? (hc / 2) : 1;   // TEMP: Network IO Worker thread의 반절
+   
+   if (not shardManager_->Init(shardCount, roomDirectory_.get())) {
+      consoleLogger->Log(Color::Red, L"[TTSA] ShardManager init fail\n");
+      return false;
+   }
+   
+   consoleLogger->Log(Color::Green, L"[TTSA] managers created\n");
+   return true;
 }
 
 bool TimeThiefServerApp::CreateNetworkService()
