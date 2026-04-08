@@ -4,6 +4,7 @@
 #include <atomic>
 #include "GameShard.h"
 
+struct CreateRoomParams;
 class GameShard;
 class RoomDirectory;
 class ThreadManager;
@@ -26,7 +27,7 @@ public:
    ShardManager& operator=(ShardManager const&) = delete;
    
 public:
-   bool Init(int32 shardCount, RoomDirectory* roomDirectory);
+   bool Init(int32 shardCount, SessionManager* sessionManager, RoomDirectory* roomDirectory);
    bool Start(ThreadManager& threadManager);
    void Stop();
    
@@ -34,14 +35,18 @@ public:
    const GameShard* GetShard(ShardId shardId) const;
    
    bool Enqueue(ShardId shardId, Job job);
+   bool RequestCreateRoom(ShardId shardId, CreateRoomParams params);
    
    ShardId SelectShardForNewRoom();
    
    int32 GetShardCount() const;
    
 private:
+   SessionManager* sessionManager_ = nullptr;    // non-owning
+   RoomDirectory* roomDirectory_ = nullptr;      // non-owning
+   
+private:
    std::vector<std::unique_ptr<GameShard>> shards_;
-   RoomDirectory* roomDirectory_ = nullptr;
    std::atomic<uint32> nextShard_ = 0;   // 라운드로빈 방식으로 Shard를 선택하기 위한 카운터
     
 };

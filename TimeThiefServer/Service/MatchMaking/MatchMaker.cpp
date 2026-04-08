@@ -2,6 +2,7 @@
 #include "MatchMaker.h"
 #include "Network/Session/SessionManager/SessionManager.h"
 #include "Service/Player/PlayerManager/PlayerManager.h"
+#include "Service/Room/CreateRoomParams.h"
 #include "Service/Room/Room.h"
 #include "Service/Room/RoomIdGenerator.h"
 #include "Service/Room/RoomManager.h"
@@ -128,34 +129,19 @@ void MatchMaker::TryMatch()
    
    // Room Create
    RoomId roomId = roomIdGenerator_.Generate();
-   auto room = Room::Create(roomId, *sessionManager_);
    ShardId shardId = shardManager_->SelectShardForNewRoom();
-   roomDirectory_->RegisterRoom(roomId, shardId);
-   // TODO: 위 Room 생성 로직 MatchMaker에서 하지 않고 Shard로 위임 할 것
    
-   if (!room) {   // Room Create Fail
+   CreateRoomParams params;
+   params.roomId = roomId;
+   params.playerIds = poppedIds;
+   
+   bool ok = shardManager_->RequestCreateRoom(shardId, std::move(params));
+   if (not ok) {
+      // Room Create Request Fail
+      
       for (const auto& candidate : candidates)
          requeueIds.push_back(candidate.player->id_);
       
       queue_.RequeueFrontBatch(requeueIds);
-      return;
-   }
-   
-   // Matching Success
-   se::lobby::N_MatchFound matchFoundPkt;
-   matchFoundPkt.set_room_id(room->GetRoomId());
-   auto sendBuffer = ServerPacketHandler::MakeSendBuffer(matchFoundPkt);
-   if (!sendBuffer) {   // Packet Create Fail
-      for (const auto& candidate : candidates)
-         requeueIds.push_back(candidate.player->id_);
-      
-      queue_.RequeueFrontBatch(requeueIds);
-      return;
-   }
-   
-   for (auto& c : candidates) {
-      
-      c.session->SetState(PlayerSessionState::MatchingSucc);
-      c.session->Send(sendBuffer);
    }
 }

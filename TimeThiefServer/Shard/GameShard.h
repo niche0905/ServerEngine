@@ -4,10 +4,13 @@
 #include <functional>
 
 #include "Service/Job/JobQueue.h"
+#include "Service/Room/CreateRoomParams.h"
 #include "Service/Room/ShardRoomManager.h"
 
+class RoomDirectory;
 class Room;
 class ThreadManager;
+class SessionManager;
 
 /*--------------
    GameShard
@@ -25,7 +28,7 @@ public:
    using RoomRef = std::shared_ptr<Room>;
    
 public:
-   explicit GameShard(ShardId shardId);
+   explicit GameShard(ShardId shardId, SessionManager& sessionManager, RoomDirectory& roomDirectory);
    
    bool Start(ThreadManager& threadManager);
    void Stop();
@@ -34,6 +37,7 @@ public:
    
    bool Enqueue(Job job);
    
+   bool CreateRoom(CreateRoomParams params);
    bool AddRoom(RoomId roomId, RoomRef room);
    bool RemoveRoom(RoomId roomId);
    RoomRef FindRoom(RoomId roomId) const;
@@ -45,6 +49,10 @@ public:
 private:
    void ProcessJobs();
    void TickRooms();
+   
+private:
+   SessionManager& sessionManager_;
+   RoomDirectory& roomDirectory_;
    
 private:
    ShardId shardId_ = 0;

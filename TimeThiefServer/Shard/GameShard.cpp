@@ -1,14 +1,19 @@
 ﻿#include "pch.h"
 #include "GameShard.h"
 
+#include "RoomDirectory.h"
 #include "Core/Thread/ThreadManager.h"
+#include "Network/Session/SessionManager/SessionManager.h"
+#include "Service/Room/Room.h"
 
 /*--------------
    GameShard
 --------------*/
 
-GameShard::GameShard(ShardId shardId)
+GameShard::GameShard(ShardId shardId, SessionManager& sessionManager, RoomDirectory& roomDirectory)
    : shardId_{ shardId }
+   , sessionManager_{ sessionManager }
+   , roomDirectory_{ roomDirectory }
 {
    
 }
@@ -48,6 +53,41 @@ bool GameShard::Enqueue(Job job)
       return false;
    
    jobQueue_.Push(std::move(job));
+   return true;
+}
+
+bool GameShard::CreateRoom(CreateRoomParams params)
+{
+   if (params.roomId == 0)
+      return false;
+   
+   auto room = Room::Create(params.roomId, sessionManager_);
+   if (!room) {
+      // TODO: MatchMaking Fail 처리 해야 할 듯 싶다 (다시 등록 or 매칭 실패 패킷 보내기)
+      return false;
+   }
+   
+   // TODO: Room 초기화 (스크립트 읽어와서 Spawn 및 세팅 하는게 좋을듯)
+   if (!AddRoom(params.roomId, room)) {
+      // TODO: MatchMaking Fail 처리 해야 할 듯 싶다 (다시 등록 or 매칭 실패 패킷 보내기)
+      return false;
+   }
+   
+   roomDirectory_.RegisterRoom(params.roomId, shardId_);
+   
+   se::lobby::N_MatchFound matchFoundPkt;
+   matchFoundPkt.set_room_id(params.roomId);
+   auto sendBuffer = ServerPacketHandler::MakeSendBuffer(matchFoundPkt);
+   if (sendBuffer) {
+      for (const auto& playerId : params.playerIds) {
+         auto session = sessionManager_.FindByPlayerId(playerId);
+         if (session) {
+            session->SetState(PlayerSessionState::MatchingSucc);
+            session->Send(sendBuffer);
+         }
+      }
+   }
+   
    return true;
 }
 

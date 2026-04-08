@@ -3,23 +3,25 @@
 #include "GameShard.h"
 #include "RoomDirectory.h"
 #include "Core/Thread/ThreadManager.h"
+#include "Service/Room/CreateRoomParams.h"
 
 /*----------------
    ShardManager
 ----------------*/
 
-bool ShardManager::Init(int32 shardCount, RoomDirectory* roomDirectory)
+bool ShardManager::Init(int32 shardCount, SessionManager* sessionManager, RoomDirectory* roomDirectory)
 {
    if (shardCount <= 0 or roomDirectory == nullptr)
       return false;
    
    roomDirectory_ = roomDirectory;
+   sessionManager_ = sessionManager;
    shards_.clear();
    shards_.reserve(shardCount);
    
    for (int32 i = 0; i < shardCount; ++i) {
       ShardId shardId = static_cast<ShardId>(i + 1);
-      shards_.push_back(std::make_unique<GameShard>(shardId));
+      shards_.push_back(std::make_unique<GameShard>(shardId, *sessionManager_, *roomDirectory_));
    }
    
    return true;
@@ -76,6 +78,22 @@ bool ShardManager::Enqueue(ShardId shardId, Job job)
       return false;
    
    return shard->Enqueue(std::move(job));
+}
+
+bool ShardManager::RequestCreateRoom(ShardId shardId, CreateRoomParams params)
+{
+   GameShard* shard = GetShard(shardId);
+   if (!shard)
+      return false;
+   
+   return Enqueue(shardId, [this, shardId, params = std::move(params)]()
+   {
+      GameShard* shard = GetShard(shardId);
+      if (!shard)
+         return;
+      
+      
+   });
 }
 
 ShardId ShardManager::SelectShardForNewRoom()

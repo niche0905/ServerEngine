@@ -7,6 +7,7 @@
 #include "Service/Room/Room.h"
 #include "Routing/PlayerRoute.h"
 #include "Service/MatchMaking/MatchMaker.h"
+#include "Shard/RoomDirectory.h"
 #include "Shard/ShardManager.h"
 
 ServerPacketDispatcher::ServerPacketDispatcher(SessionManager& sessionManager, PlayerManager& playerManager,
@@ -117,6 +118,8 @@ bool ServerPacketDispatcher::Handle_C_MatchQueueCancelReq(PacketSessionRef& sess
 
 bool ServerPacketDispatcher::Handle_C_RoomEnterReq(PacketSessionRef& session, const se::room::C_RoomEnterReq& pkt)
 {
+    SessionId sessionId = session->Id();
+    
     PlayerId playerId = 0;
     if (!TryGetPlayerId(session, playerId)) return false;
       
@@ -130,6 +133,26 @@ bool ServerPacketDispatcher::Handle_C_RoomEnterReq(PacketSessionRef& session, co
     if (clientRoomId == 0) return false;
     
     // TODO: RoomDirectory에서 RoomId로 ShardId, RoomId 찾는 구조로 변경하기 (현재는 RoomDirectory가 ShardManager보다 아래에 있어서 ShardManager에서 RoomDirectory를 참조하는 구조로 되어 있지만, RoomDirectory가 ShardManager보다 위에 있는 구조로 변경하기)
+    ShardId shardId = 0;
+    auto shardCandi = roomDirectory_.FindShardId(clientRoomId);
+    if (!shardCandi) return false;
+    shardId = *shardCandi;
+    
+    route.shardId = shardId;
+    route.playerId = playerId;
+    route.roomId = clientRoomId;
+    if (!route.IsValid()) return false;
+    
+    return shardManager->Enqueue(route.shardId, [shardManager, route, sessionId]()
+    {
+        auto* shard = shardManager->GetShard(route.shardId);
+        if (!shard) return;
+        
+        auto room = shard->FindRoom(route.roomId);
+        if (!room) return;
+        
+        room->Join(route.playerId, sessionId);
+    });
 }
 
 bool ServerPacketDispatcher::Handle_C_RoomLeaveReq(PacketSessionRef& session, const se::room::C_RoomLeaveReq& pkt)
