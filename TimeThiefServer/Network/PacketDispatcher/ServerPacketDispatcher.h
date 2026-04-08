@@ -2,6 +2,7 @@
 #include <memory>
 #include "Protocol.pb.h"
 
+struct PlayerRoute;
 class Room;
 class PacketSession;
 class RoomDirectory;
@@ -59,7 +60,8 @@ public:
    bool Handle_C_SetSavePointReq(PacketSessionRef& session, const se::game::C_SetSavePointReq& pkt);
    
 private:
-   bool TryGetPlayerId(PacketSessionRef& session, PlayerId outPlayerId) const;
+   bool TryGetPlayerId(PacketSessionRef& session, PlayerId& outPlayerId) const;
+   bool TryResolvePlayerRoute(PlayerId playerId, PlayerRoute& outRoute) const;
    Room* FindPlayerRoom(PlayerId playerId) const;
    
 private:
