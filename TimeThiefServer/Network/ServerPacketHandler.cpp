@@ -87,21 +87,6 @@ bool Handle_C_RoomEnterReq(PacketSessionRef& session, const se::room::C_RoomEnte
 {
     if (!Dispatcher()) return false;
     return Dispatcher()->Handle_C_RoomEnterReq(session, pkt);
-    
-    // if (!session) return false;
-    //
-    // SessionId sessionId = session->Id();
-    // PlayerId playerId = 0;
-    // if (!g_SessionManager.TryGetPlayerId(sessionId, playerId)) return false;
-    //
-    // if (playerId == 0 or sessionId == 0) return false;
-    //
-    // auto room = g_RoomManager->FindRoom(1);  // TEMP
-    // if (!room) return false;
-    //
-    // // pkt.room_id();
-    //
-    // return room->Join(playerId, sessionId);
 }
     
 bool Handle_C_RoomLeaveReq(PacketSessionRef& session, const se::room::C_RoomLeaveReq& pkt)

@@ -129,6 +129,9 @@ bool ServerPacketDispatcher::Handle_C_RoomEnterReq(PacketSessionRef& session, co
     auto* shardManager = shardManager_;
     if (!shardManager) return false;
     
+    auto* playerManager = &playerManager_;
+    if (!playerManager) return false;
+    
     RoomId clientRoomId = pkt.room_id();
     if (clientRoomId == 0) return false;
     
@@ -143,7 +146,7 @@ bool ServerPacketDispatcher::Handle_C_RoomEnterReq(PacketSessionRef& session, co
     route.roomId = clientRoomId;
     if (!route.IsValid()) return false;
     
-    return shardManager->Enqueue(route.shardId, [shardManager, route, sessionId]()
+    return shardManager->Enqueue(route.shardId, [shardManager, playerManager, route, sessionId]()
     {
         auto* shard = shardManager->GetShard(route.shardId);
         if (!shard) return;
@@ -151,7 +154,10 @@ bool ServerPacketDispatcher::Handle_C_RoomEnterReq(PacketSessionRef& session, co
         auto room = shard->FindRoom(route.roomId);
         if (!room) return;
         
-        room->Join(route.playerId, sessionId);
+        if (!room->Join(route.playerId, sessionId))
+            return;
+        
+        playerManager->UpdateRoute(route.playerId, route.shardId, route.roomId);
     });
 }
 

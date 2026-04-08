@@ -23,6 +23,8 @@ public:
    PlayerRef Find(PlayerId playerId) const;
    size_t GetPlayerCount() const;
    
+   void UpdateRoute(PlayerId playerId, ShardId shardId, RoomId roomId);
+   
    std::vector<PlayerRef> SnapshotPlayers() const;
    
 private:

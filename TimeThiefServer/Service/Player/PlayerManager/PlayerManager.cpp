@@ -57,6 +57,22 @@ size_t PlayerManager::GetPlayerCount() const
    return playersById_.size();
 }
 
+void PlayerManager::UpdateRoute(PlayerId playerId, ShardId shardId, RoomId roomId)
+{
+   std::unique_lock<std::shared_mutex> lock(mutex_);
+   
+   auto it = playersById_.find(playerId);
+   if (it == playersById_.end())
+      return;   // 플레이어가 존재하지 않음
+   
+   auto& player = it->second;
+   if (!player)
+      return;   // 플레이어 참조가 유효하지 않음
+   
+   player->shardId_ = shardId;
+   player->roomId_ = roomId;
+}
+
 std::vector<PlayerManager::PlayerRef> PlayerManager::SnapshotPlayers() const
 {
    std::vector<PlayerRef> players;
