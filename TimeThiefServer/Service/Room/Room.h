@@ -137,10 +137,6 @@ private:
       // TODO: Room 로직에서 필요한 추가 정보 (예: 플레이어 상태, 위치, 이동 동기화 시간 등) 캐싱
    };
 
-   // TEMP: 샤딩을 통한 thread safety가 보장되기 전 Lock 구조
-private:
-   mutable std::recursive_mutex mutex_;
-   
 private:
    RoomId roomId_;
    
