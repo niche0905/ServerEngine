@@ -1,6 +1,8 @@
 ﻿#pragma once
 #include <memory>
 #include "Protocol.pb.h"
+#include "Routing/PlayerRoute.h"
+#include "Shard/ShardManager.h"
 
 struct PlayerRoute;
 class Room;
@@ -63,6 +65,32 @@ private:
    bool TryGetPlayerId(PacketSessionRef& session, PlayerId& outPlayerId) const;
    bool TryResolvePlayerRoute(PlayerId playerId, PlayerRoute& outRoute) const;
    Room* FindPlayerRoom(PlayerId playerId) const;
+   
+private:
+   template <typename Packet, typename Fn>
+   bool EnqueueToPlayerRoom(PacketSessionRef& session, const Packet& pkt, Fn&& fn)
+   {
+      PlayerId playerId = 0;
+      if (!TryGetPlayerId(session, playerId)) return false;
+      
+      PlayerRoute route;
+      if (!TryResolvePlayerRoute(playerId, route)) return false;
+      
+      auto* shardManager = shardManager_;
+      if (!shardManager) return false;
+      
+      return shardManager->Enqueue(route.shardId, [shardManager, route, pkt, fn = std::forward<Fn>(fn)]() mutable
+      {
+         auto* shard = shardManager->GetShard(route.shardId);
+         if (!shard) return;
+         
+         auto room = shard->FindRoom(route.roomId);
+         if (!room) return;
+         
+         fn(*room, route.playerId, pkt);
+      });
+      
+   }
    
 private:
    SessionManager& sessionManager_;

@@ -68,24 +68,9 @@ bool ServerPacketDispatcher::Handle_C_LoadingCompleteReq(PacketSessionRef& sessi
 
 bool ServerPacketDispatcher::Handle_C_MoveReq(PacketSessionRef& session, const se::game::C_MoveReq& pkt)
 {
-    PlayerId playerId = 0;
-    if (!TryGetPlayerId(session, playerId)) return false;
-    
-    PlayerRoute route;
-    if (!TryResolvePlayerRoute(playerId, route)) return false;
-    
-    auto* shardManager = shardManager_;
-    if (!shardManager) return false;
-    
-    return shardManager->Enqueue(route.shardId, [shardManager, route, pkt]()
+    return EnqueueToPlayerRoom(session, pkt, [](Room& room, PlayerId playerId, const se::game::C_MoveReq& pkt)
     {
-        auto shard = shardManager->GetShard(route.shardId);
-        if (!shard) return;
-        
-        auto room = shard->FindRoom(route.roomId);
-        if (!room) return;
-        
-        room->HandleMove(route.playerId, pkt);
+        room.HandleMove(playerId, pkt);
     });
 }
 
