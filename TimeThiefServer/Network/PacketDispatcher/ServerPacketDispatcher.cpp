@@ -123,9 +123,6 @@ bool ServerPacketDispatcher::Handle_C_RoomEnterReq(PacketSessionRef& session, co
     PlayerId playerId = 0;
     if (!TryGetPlayerId(session, playerId)) return false;
       
-    PlayerRoute route;
-    if (!TryResolvePlayerRoute(playerId, route)) return false;
-      
     auto* shardManager = shardManager_;
     if (!shardManager) return false;
     
@@ -140,9 +137,7 @@ bool ServerPacketDispatcher::Handle_C_RoomEnterReq(PacketSessionRef& session, co
     if (!shardCandi) return false;
     ShardId shardId = *shardCandi;
     
-    route.shardId = shardId;
-    route.playerId = playerId;
-    route.roomId = clientRoomId;
+    PlayerRoute route = {.playerId = playerId, .roomId = clientRoomId, .shardId = shardId};
     if (!route.IsValid()) return false;
     
     return shardManager->Enqueue(route.shardId, [shardManager, playerManager, route, sessionId]()
