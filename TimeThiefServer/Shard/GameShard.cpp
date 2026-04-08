@@ -47,7 +47,7 @@ bool GameShard::Enqueue(Job job)
    if (!job)
       return false;
    
-   // TODO: Job queue push
+   jobQueue_.Push(std::move(job));
    return true;
 }
 
@@ -74,7 +74,15 @@ size_t GameShard::GetRoomCount() const
 
 void GameShard::ProcessJobs()
 {
-   // TODO: Job Queue Logic
+   std::vector<Job> jobs;
+   jobs.reserve(64);
+   size_t jobCount = jobQueue_.DrainTo(jobs);
+
+   for (auto& job : jobs) {
+      if (job) {
+         job();
+      }
+   }
 }
 
 void GameShard::TickRooms()

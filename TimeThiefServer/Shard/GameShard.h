@@ -2,6 +2,8 @@
 #include <atomic>
 #include <memory>
 #include <functional>
+
+#include "Service/Job/JobQueue.h"
 #include "Service/Room/ShardRoomManager.h"
 
 class Room;
@@ -49,6 +51,7 @@ private:
    std::atomic<bool> running_ = false;
    
    ShardRoomManager shardRoomManager_{};
-   // TODO: Job Queue와 Timer Queue 구현하기
+   JobQueue jobQueue_{};
+   // TODO: Timer Queue 작성하기
     
 };
