@@ -315,7 +315,6 @@ bool ServerPacketDispatcher::TryResolvePlayerRoute(PlayerId playerId, PlayerRout
     auto player = playerManager_.Find(playerId);
     if (!player) return false;
     
-    // TODO: shard id가 0인 경우는 고민이 좀 더 필요
     if (player->roomId_ == 0 or player->shardId_ == 0) return false;
     
     outRoute.playerId = playerId;
@@ -332,7 +331,7 @@ Room* ServerPacketDispatcher::FindPlayerRoom(PlayerId playerId) const
     auto player = playerManager_.Find(playerId);
     if (!player) return nullptr;
     
-    // if (player->shardId_ == 0 or player->roomId_ == 0) return nullptr;
+    if (player->shardId_ == 0 or player->roomId_ == 0) return nullptr;
     
     return shardManager_->GetShard(player->shardId_)->FindRoom(player->roomId_).get();
 }

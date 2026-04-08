@@ -18,7 +18,8 @@ bool ShardManager::Init(int32 shardCount, RoomDirectory* roomDirectory)
    shards_.reserve(shardCount);
    
    for (int32 i = 0; i < shardCount; ++i) {
-      shards_.push_back(std::make_unique<GameShard>(static_cast<ShardId>(i)));
+      ShardId shardId = static_cast<ShardId>(i + 1);
+      shards_.push_back(std::make_unique<GameShard>(shardId));
    }
    
    return true;
@@ -46,18 +47,26 @@ void ShardManager::Stop()
 
 GameShard* ShardManager::GetShard(ShardId shardId)
 {
-   if (shardId >= shards_.size())
+   if (shardId == 0)
       return nullptr;
    
-   return shards_[shardId].get();
+   const size_t index = static_cast<size_t>(shardId - 1);
+   if (index >= shards_.size())
+      return nullptr;
+   
+   return shards_[index].get();
 }
 
 const GameShard* ShardManager::GetShard(ShardId shardId) const
 {
-   if (shardId >= shards_.size())
+   if (shardId == 0)
       return nullptr;
    
-   return shards_[shardId].get();
+   const size_t index = static_cast<size_t>(shardId - 1);
+   if (index >= shards_.size())
+      return nullptr;
+   
+   return shards_[index].get();
 }
 
 bool ShardManager::Enqueue(ShardId shardId, Job job)
@@ -74,8 +83,8 @@ ShardId ShardManager::SelectShardForNewRoom()
    if (shards_.empty())
       return 0;   // Shard가 없는 경우, 기본적으로 Shard ID 0을 반환 (이 경우는 발생하지 않아야 함)
    
-   uint32 index = nextShard_.fetch_add(1, std::memory_order_relaxed);
-   return static_cast<ShardId>(index % shards_.size());
+   uint32 index = nextShard_.fetch_add(1, std::memory_order_relaxed) % shards_.size();
+   return static_cast<ShardId>(index + 1);
 }
 
 int32 ShardManager::GetShardCount() const
