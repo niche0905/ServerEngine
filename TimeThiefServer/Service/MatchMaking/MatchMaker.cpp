@@ -46,14 +46,15 @@ namespace
    MatchMaker
 --------------*/
 
-bool MatchMaker::Init(SessionManager& sessionManager, PlayerManager& playerManager, ShardManager& shardManager, RoomDirectory& roomDirectory)
+bool MatchMaker::Init(SessionManager& sessionManager, PlayerManager& playerManager, ShardManager& shardManager, RoomDirectory& roomDirectory, RoomIdFactory roomIdFactory)
 {
    sessionManager_ = &sessionManager;
    playerManager_ = &playerManager;
    shardManager_ = &shardManager;
    roomDirectory_ = &roomDirectory;
+   roomIdFactory_ = std::move(roomIdFactory);
    
-   return true;
+   return sessionManager_ && playerManager_ && shardManager_ && roomDirectory_ && roomIdFactory_;
 }
 
 bool MatchMaker::Enqueue(PlayerId playerId)
@@ -128,7 +129,7 @@ void MatchMaker::TryMatch()
    }
    
    // Room Create
-   RoomId roomId = roomIdGenerator_.Generate();
+   RoomId roomId = roomIdFactory_();
    ShardId shardId = shardManager_->SelectShardForNewRoom();
    
    CreateRoomParams params;

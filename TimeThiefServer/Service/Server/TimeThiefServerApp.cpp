@@ -127,7 +127,7 @@ bool TimeThiefServerApp::CreateManagers()
       return false;
    }
    
-   if (not matchMaker_->Init(*sessionManager_, *playerManager_, *shardManager_, *roomDirectory_)) {
+   if (not matchMaker_->Init(*sessionManager_, *playerManager_, *shardManager_, *roomDirectory_, [this](){ return GenerateRoomId(); })) {
       consoleLogger->Log(Color::Red, L"[TTSA] MatchMaker init fail\n");
       return false;
    }
@@ -201,6 +201,13 @@ bool TimeThiefServerApp::StartServices()
       }
    }
    
+   if (!CreateInitialRooms()) {
+      consoleLogger->Log(Color::Red, L"[TTSA] initial room bootstrap FAIL\n");
+      networkService_->StopService();
+      if (shardManager_) shardManager_->Stop();
+      return false;
+   }
+   
    consoleLogger->Log(Color::Green, L"[TTSA] services started\n");
    return true;
 }
@@ -231,6 +238,31 @@ void TimeThiefServerApp::LaunchMatchThread()
    });
    
    consoleLogger->Log(Color::Green, L"[TTSA] match thread launched\n");
+}
+
+bool TimeThiefServerApp::CreateInitialRooms()
+{
+   if (!shardManager_ || !roomDirectory_)
+      return false;
+   
+   const RoomId initialRoomId = GenerateRoomId();
+   const ShardId initialShardId = shardManager_->SelectShardForNewRoom();
+   if (initialRoomId == 0 or initialShardId == 0)
+      return false;
+   
+   bool ok = shardManager_->RequestCreateRoom(initialShardId, CreateRoomParams{ initialRoomId, {} });
+   if (!ok) {
+      consoleLogger->Log(Color::Red, L"[TTSA] initial room creation fail\n");
+      return false;
+   }
+   
+   consoleLogger->Log(Color::Green, L"[TTSA] initial room created\n");
+   return true;
+}
+
+RoomId TimeThiefServerApp::GenerateRoomId()
+{
+   return roomIdGenerator_.Generate();
 }
 
 void TimeThiefServerApp::WorkerLoop()

@@ -19,6 +19,9 @@ class PlayerSession;
 class MatchMaker
 {
 public:
+    using RoomIdFactory = std::function<RoomId()>;
+    
+public:
     MatchMaker() = default;
     ~MatchMaker() = default;
     
@@ -26,7 +29,7 @@ public:
     MatchMaker& operator=(const MatchMaker&) = delete;
     
 public:
-    bool Init(SessionManager& sessionManager, PlayerManager& playerManager, ShardManager& shardManage, RoomDirectory& roomDirectory);
+    bool Init(SessionManager& sessionManager, PlayerManager& playerManager, ShardManager& shardManage, RoomDirectory& roomDirectory, RoomIdFactory roomIdFactory);
     
 public:
     bool Enqueue(PlayerId playerId);
@@ -44,6 +47,6 @@ private:
     static constexpr size_t kMatchSize = 2; // TODO: 이 값도 밖에서 받아오는 config 값 사용하기
     
     MatchMakingQueue queue_;
-    RoomIdGenerator roomIdGenerator_;
+    RoomIdFactory roomIdFactory_;
     
 };

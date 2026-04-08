@@ -1,5 +1,6 @@
 ﻿#pragma once
 #include "Core/Thread/ThreadManager.h"
+#include "Service/Room/RoomIdGenerator.h"
 #include "Shard/ShardManager.h"
 
 class PlayerSessionLifecycleService;
@@ -40,6 +41,11 @@ private:
    void LaunchWorkerThreads();
    void LaunchMatchThread();
    
+private:
+   bool CreateInitialRooms();
+   RoomId GenerateRoomId();
+   
+private:
    void WorkerLoop();
    void MatchLoop();
    
@@ -53,7 +59,9 @@ private:
    std::unique_ptr<ServerConfigReader>             configReader_;
    std::unique_ptr<ServerPacketDispatcher>         packetDispatcher_;
    std::unique_ptr<PlayerSessionLifecycleService>  playerSessionLifecycleService_;
-   ThreadManager                                   threadManager_;
+   ThreadManager                                   threadManager_{};
+   
+   RoomIdGenerator                                 roomIdGenerator_{};
    
    std::atomic<bool>                               running_ { false };
     
