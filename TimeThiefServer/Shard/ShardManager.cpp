@@ -92,7 +92,7 @@ bool ShardManager::RequestCreateRoom(ShardId shardId, CreateRoomParams params)
       if (!shard)
          return;
       
-      
+      shard->CreateRoom(std::move(params));
    });
 }
 
