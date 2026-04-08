@@ -6,6 +6,7 @@
 #include "Service/Room/RoomManager.h"
 #include "Service/Room/Room.h"
 #include "Routing/PlayerRoute.h"
+#include "Service/MatchMaking/MatchMaker.h"
 #include "Shard/ShardManager.h"
 
 ServerPacketDispatcher::ServerPacketDispatcher(SessionManager& sessionManager, PlayerManager& playerManager,
@@ -35,29 +36,123 @@ bool ServerPacketDispatcher::Handle_C_Ping(PacketSessionRef& session, const se::
 
 bool ServerPacketDispatcher::Handle_C_SetNicknameReq(PacketSessionRef& session, const se::lobby::C_SetNicknameReq& pkt)
 {
-    return false;
+    PlayerId playerId = 0;
+    if (!sessionManager_.TryGetPlayerId(session->Id(), playerId)) return false;
+    
+    if (playerId == 0) return false;
+    
+    se::lobby::S_SetNicknameRes resPkt;
+    auto player = playerManager_.Find(playerId);
+    if (!player) {
+        auto* resultPtr = resPkt.mutable_result();
+        resultPtr->set_code(se::common::ERR_INTERNAL_ERROR);
+        resultPtr->set_message("Player not found for the session");
+    }
+    
+    bool success = player->TrySetNickname(pkt.nickname());
+    resPkt.set_success(success);
+    if (success) {
+        resPkt.set_nickname(pkt.nickname());
+    }
+    else {
+        auto* resultPtr = resPkt.mutable_result();
+        resultPtr->set_code(se::common::ERR_INTERNAL_ERROR);    // TODO: ErrCode 추가되면 바꾸기
+        resultPtr->set_message("Failed to set nickname");
+    }
+    
+    auto sendBuffer = ServerPacketHandler::MakeSendBuffer(resPkt);
+    if (!sendBuffer) return false;
+    
+    session->Send(sendBuffer);
+    return true;
 }
 
 bool ServerPacketDispatcher::Handle_C_MatchQueueEnterReq(PacketSessionRef& session,
     const se::lobby::C_MatchQueueEnterReq& pkt)
 {
-    return false;
+    PlayerId playerId = 0;
+    if (!sessionManager_.TryGetPlayerId(session->Id(), playerId)) return false;
+    
+    if (playerId == 0) return false;
+    
+    bool succ = matchMaker_.Enqueue(playerId);
+    se::lobby::S_MatchQueueEnterRes resPkt;
+    resPkt.set_success(succ);
+    if (!succ) {
+        auto* resultPtr = resPkt.mutable_result();
+        resultPtr->set_code(se::common::ERR_MATCHMAKING_UNAVAILABLE);
+        resultPtr->set_message("Failed to enter matchmaking queue");
+    }
+    
+    auto sendBuffer = ServerPacketHandler::MakeSendBuffer(resPkt);
+    if (!sendBuffer) return false;
+    
+    session->Send(sendBuffer);
+    return true;
 }
 
 bool ServerPacketDispatcher::Handle_C_MatchQueueCancelReq(PacketSessionRef& session,
     const se::lobby::C_MatchQueueCancelReq& pkt)
 {
-    return false;
+    PlayerId playerId = 0;
+    if (!sessionManager_.TryGetPlayerId(session->Id(), playerId)) return false;
+    
+    if (playerId == 0) return false;
+    
+    bool succ = matchMaker_.Cancel(playerId);
+    se::lobby::S_MatchQueueCancelRes resPkt;
+    resPkt.set_success(succ);
+    if (!succ) {
+        auto* resultPtr = resPkt.mutable_result();
+        resultPtr->set_code(se::common::ERR_NOT_IN_MATCH_QUEUE);
+        resultPtr->set_message("Failed to cancel matchmaking queue");
+    }
+    
+    auto sendBuffer = ServerPacketHandler::MakeSendBuffer(resPkt);
+    if (!sendBuffer) return false;
+    
+    session->Send(sendBuffer);
+    return true;
 }
 
 bool ServerPacketDispatcher::Handle_C_RoomEnterReq(PacketSessionRef& session, const se::room::C_RoomEnterReq& pkt)
 {
-    return false;
+    PlayerId playerId = 0;
+    if (!TryGetPlayerId(session, playerId)) return false;
+      
+    PlayerRoute route;
+    if (!TryResolvePlayerRoute(playerId, route)) return false;
+      
+    auto* shardManager = shardManager_;
+    if (!shardManager) return false;
+    
+    RoomId clientRoomId = pkt.room_id();
+    if (clientRoomId == 0) return false;
+    
+    // TODO: RoomDirectory에서 RoomId로 ShardId, RoomId 찾는 구조로 변경하기 (현재는 RoomDirectory가 ShardManager보다 아래에 있어서 ShardManager에서 RoomDirectory를 참조하는 구조로 되어 있지만, RoomDirectory가 ShardManager보다 위에 있는 구조로 변경하기)
 }
 
 bool ServerPacketDispatcher::Handle_C_RoomLeaveReq(PacketSessionRef& session, const se::room::C_RoomLeaveReq& pkt)
 {
-    return false;
+    PlayerId playerId = 0;
+    if (!TryGetPlayerId(session, playerId)) return false;
+      
+    PlayerRoute route;
+    if (!TryResolvePlayerRoute(playerId, route)) return false;
+      
+    auto* shardManager = shardManager_;
+    if (!shardManager) return false;
+    
+    return shardManager->Enqueue(route.shardId, [shardManager, route]()
+    {
+        auto* shard = shardManager->GetShard(route.shardId);
+        if (!shard) return;
+        
+        auto room = shard->FindRoom(route.roomId);
+        if (!room) return;
+        
+        room->Leave(route.playerId);
+    });
 }
 
 bool ServerPacketDispatcher::Handle_C_LoadingCompleteReq(PacketSessionRef& session,

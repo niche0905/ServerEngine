@@ -2,12 +2,7 @@
 #include "Generated/ServerPacketHandler.h"
 
 #include "PacketDispatcher/ServerPacketDispatcher.h"
-#include "Service/MatchMaking/MatchMaker.h"
-#include "Service/Player/PlayerManager/PlayerManager.h"
-#include "Service/Room/Room.h"
-#include "Service/Room/RoomManager.h"
 #include "Session/PlayerSession.h"
-#include "Session/SessionManager/SessionManager.h"
 
 PacketHandlerFunc GPacketHandler[kMaxMessageId + 1];
 
@@ -74,86 +69,18 @@ bool Handle_C_SetNicknameReq(PacketSessionRef& session, const se::lobby::C_SetNi
 {
     if (!Dispatcher()) return false;
     return Dispatcher()->Handle_C_SetNicknameReq(session, pkt);
-    
-    // if (!session) return false;
-    //
-    // SessionId sessionId = session->Id();
-    //
-    // PlayerId playerId = 0;
-    // if (!g_SessionManager.TryGetPlayerId(sessionId, playerId)) return false;
-    //
-    // auto player = g_PlayerManager.Find(playerId);
-    // if (!player) return false;
-    //
-    // se::lobby::S_SetNicknameRes resPkt;
-    //
-    // bool success = player->TrySetNickname(pkt.nickname());
-    // resPkt.set_success(success);
-    // if (success) {
-    //     resPkt.set_nickname(player->GetNickname());
-    // }
-    //
-    // auto sendBuffer = ServerPacketHandler::MakeSendBuffer(resPkt);
-    // if (!sendBuffer) return false;
-    //
-    // session->Send(sendBuffer);
-    // return true;
 }
     
 bool Handle_C_MatchQueueEnterReq(PacketSessionRef& session, const se::lobby::C_MatchQueueEnterReq& pkt)
 {
     if (!Dispatcher()) return false;
     return Dispatcher()->Handle_C_MatchQueueEnterReq(session, pkt);
-    
-    // if (!session) return false;
-    //
-    // SessionId sessionId = session->Id();
-    //
-    // PlayerId playerId = 0;
-    // if (!g_SessionManager.TryGetPlayerId(sessionId, playerId)) return false;
-    //
-    // bool succ = g_MatchMaker.Enqueue(playerId);
-    // se::lobby::S_MatchQueueEnterRes resPkt;
-    // resPkt.set_success(succ);
-    // if (!succ) {
-    //     auto result = resPkt.mutable_result();
-    //     result->set_code(se::common::ERR_MATCHMAKING_UNAVAILABLE);
-    //     result->set_message("Failed to enter matchmaking queue");
-    // }
-    //
-    // auto sendBuffer = ServerPacketHandler::MakeSendBuffer(resPkt);
-    // if (!sendBuffer) return false;
-    //
-    // session->Send(sendBuffer);
-    // return true;
 }
     
 bool Handle_C_MatchQueueCancelReq(PacketSessionRef& session, const se::lobby::C_MatchQueueCancelReq& pkt)
 {
     if (!Dispatcher()) return false;
     return Dispatcher()->Handle_C_MatchQueueCancelReq(session, pkt);
-    
-    // if (!session) return false;
-    //
-    // SessionId sessionId = session->Id();
-    //
-    // PlayerId playerId = 0;
-    // if (!g_SessionManager.TryGetPlayerId(sessionId, playerId)) return false;
-    //
-    // bool succ = g_MatchMaker.Cancel(playerId);
-    // se::lobby::S_MatchQueueCancelRes resPkt;
-    // resPkt.set_success(succ);
-    // if (!succ) {
-    //     auto result = resPkt.mutable_result();
-    //     result->set_code(se::common::ERR_NOT_IN_MATCH_QUEUE);
-    //     result->set_message("Failed to cancel matchmaking queue");
-    // }
-    //
-    // auto sendBuffer = ServerPacketHandler::MakeSendBuffer(resPkt);
-    // if (!sendBuffer) return false;
-    //
-    // session->Send(sendBuffer);
-    // return true;
 }
     
 bool Handle_C_RoomEnterReq(PacketSessionRef& session, const se::room::C_RoomEnterReq& pkt)
@@ -181,19 +108,6 @@ bool Handle_C_RoomLeaveReq(PacketSessionRef& session, const se::room::C_RoomLeav
 {
     if (!Dispatcher()) return false;
     return Dispatcher()->Handle_C_RoomLeaveReq(session, pkt);
-    
-    // if (!session) return false;
-    //
-    // SessionId sessionId = session->Id();
-    // PlayerId playerId = 0;
-    // if (!g_SessionManager.TryGetPlayerId(sessionId, playerId)) return false;
-    //
-    // if (playerId == 0 or sessionId == 0) return false;
-    //
-    // auto room = g_RoomManager->FindRoom(1);  // TEMP
-    // if (!room) return false;
-    //
-    // return room->Leave(playerId);
 }
     
 bool Handle_C_LoadingCompleteReq(PacketSessionRef& session, const se::game::C_LoadingCompleteReq& pkt)
