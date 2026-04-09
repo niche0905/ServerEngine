@@ -5,10 +5,13 @@
    ZoneSystem
 --------------*/
 
-void ZoneSystem::Init(const MapData& map_data)
+void ZoneSystem::Init(Room* ownerRoom, const ZoneBounds& bounds)
 {
-   // TODO: 맵 데이터에서 초기 Zone 정보 설정
-   //       굳이 맵 데이터가 아니더라도 초기 Zone 정보를 설정할 수 있는 방법이 필요
+   if (ownerRoom == nullptr)
+      return;
+   
+   ownerRoom_ = ownerRoom;
+   zoneBounds_ = bounds;
 }
 
 void ZoneSystem::Update(float deltaTime)
@@ -27,10 +30,4 @@ float ZoneSystem::GetDamagePerSecond() const
 {
    // TODO: ZoneTable을 참조하여 현재 Phase에 따른 초당 피해량 반환
    return 0.0f;
-}
-
-void ZoneSystem::NextZoneCalculate()
-{
-   // TODO: CurrnetZone의 내부에 NextZone이 생성되도록 구현
-   //       ZoneTable이 먼저 작성되어야 한다 (Phase에 따른 반지름을 참조해야 하기 때문)
 }
