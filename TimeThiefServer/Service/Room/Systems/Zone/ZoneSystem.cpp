@@ -95,7 +95,11 @@ void ZoneSystem::Update(float deltaTime)
       }
    }
    
-   ApplyZoneDamage(deltaTime);
+   damageTickElapsed_ += deltaTime;
+   while (damageTickElapsed_ >= kDefaultDamageTickElapsed) {
+      damageTickElapsed_ -= kDefaultDamageTickElapsed;
+      ApplyZoneDamage(kDefaultDamageTickElapsed);
+   }
 }
 
 void ZoneSystem::Reset()
@@ -103,6 +107,7 @@ void ZoneSystem::Reset()
    currentPhase_ = 0;
    phaseElapsedTime_ = 0.0f;
    isShrinking_ = false;
+   damageTickElapsed_ = 0.0f;
    
    startZone_ = ZoneCircle{ zoneBounds_.center, 1000000.0f };   // 초기 Zone은 매우 큰 반지름으로 설정하여 사실상 모든 영역이 안전지대가 되도록 함
    currentZone_ = startZone_;

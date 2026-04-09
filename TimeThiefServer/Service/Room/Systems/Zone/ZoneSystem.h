@@ -39,6 +39,9 @@ private:
     void BroadcastZoneChange();
     
 private:
+    static constexpr float  kDefaultDamageTickElapsed = 1.0f;       // TODO: config 값으로 빼어도 좋음
+    
+private:
     Room*               ownerRoom_ = nullptr;
     
     ZoneBounds          zoneBounds_;
@@ -52,5 +55,7 @@ private:
     
     float               phaseElapsedTime_ = 0.0f;
     bool                isShrinking_ = false;
+    
+    float               damageTickElapsed_ = 0.0f;
     
 };
