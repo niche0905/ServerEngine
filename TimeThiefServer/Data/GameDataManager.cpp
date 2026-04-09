@@ -15,5 +15,13 @@ bool GameDataManager::Init(const ServerConfig& config)
       return false;
    }
    
+   // debug log
+   // consoleLogger->Log(Color::Green, L"[GDM] ZoneTable loaded successfully. Number of phases: %zu\n", zoneTable_.phases.size());
+   // for (size_t i = 0; i < zoneTable_.phases.size(); i++) {
+   //    const auto& phase = zoneTable_.phases[i];
+   //    consoleLogger->Log(Color::Green, L"Phase %zu => radius: %.2f, damagePerSecond: %.2f, waitTimeSeconds: %.2f, shrinkTimeSeconds: %.2f\n",
+   //       i + 1, phase.radius, phase.damagePerSecond, phase.waitTimeSeconds, phase.shrinkTimeSeconds);
+   // }
+   
    return true;
 }
