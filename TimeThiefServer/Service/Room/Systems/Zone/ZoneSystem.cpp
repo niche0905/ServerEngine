@@ -27,19 +27,17 @@ namespace
    SE::Math::Vector3 RandPointInCircle(float radius)
    {
       // TODO: std::mt19937이 아닌 재현 가능한 Rng를 만들어서 사용하자
-      static thread_local std::mt19937 rng(1004);  // 시드 고정하여 재현 가능하도록
-      static thread_local std::uniform_real_distribution<float> dist(-1.0f, 1.0f);
-      
-      SE::Math::Vector3 point{};
-      
-      do
-      {
-         point.x = dist(rng);   // -1.0 ~ 1.0
-         point.y = dist(rng);   // -1.0 ~ 1.0
-      }
-      while (point.LengthSq() > 1.0f);   // 단위 원 안에 있는 점이 나올 때까지 반복
-      
-      return point * radius;
+      static thread_local std::mt19937 rng(std::random_device{}());
+      static thread_local std::uniform_real_distribution<float> dist01(0.0f, 1.0f);
+
+      float r = std::sqrt(dist01(rng)) * radius;
+      float theta = dist01(rng) * 2.0f * 3.1415926535f;
+
+      return SE::Math::Vector3{
+         r * std::cos(theta),
+         r * std::sin(theta),
+         0.0f
+     };
    }
 }
 
