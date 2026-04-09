@@ -75,9 +75,6 @@ bool Room::Join(PlayerId playerId, SessionId sessionId)
       
       auto [insertIt, inserted]= roomPlayers_.emplace(playerId, std::move(newPlayer));
       if (not inserted) return false;
-      // TODO: 아래 코드는 Join을 호출한 상위 로직에서 처리한다
-      // playerRef->roomId_ = roomId_;    // 플레이어의 현재 방 ID 업데이트
-      // playerRef->pawnId_ = insertIt->second.pawnObjectId;
       
       auto& joinedPlayer = insertIt->second;
       
@@ -1075,8 +1072,6 @@ void Room::Broadcast(std::shared_ptr<SendBuffer> sendBuffer, PlayerId exceptPlay
       if (roomPlayer.sessionId == 0)
          continue;   // 유효하지 않은 세션 ID인 플레이어는 건너뛰기
       
-      // TODO: 더 좋게 변경할 수 있다면 하기,,,
-      //       현재는 Lock도 걸고 우아하지 않아 보임...
       sessionManager_.FindBySessionId(roomPlayer.sessionId)->Send(sendBuffer);   // 세션을 찾아서 메시지 전송
    }
 }
@@ -1190,6 +1185,25 @@ void Room::HandleDamageResult(Pawn* attacker, Actor* victim, const SE::Physics::
       // Player가 NPC에게 죽은 경우 처리...
       return;
    }
+}
+
+void Room::OnZoneChanged(uint32 phase, const ZoneCircle& newZone, float waitDuration, float shrinkDuration)
+{
+   se::game::N_TimeStormChange noti;
+   {
+      auto* centerPtr = noti.mutable_center();
+      centerPtr->set_x(newZone.center.x);
+      centerPtr->set_y(newZone.center.y);
+      centerPtr->set_z(newZone.center.z);
+      
+      noti.set_radius(newZone.radius);
+      noti.set_waiting_time(waitDuration);
+      noti.set_shrinking_time(shrinkDuration);
+   }
+   
+   SendBufferRef zoneChangeBuffer = ServerPacketHandler::MakeSendBuffer(noti);
+   if (zoneChangeBuffer)
+      Broadcast(zoneChangeBuffer);
 }
 
 void Room::IndexObject_OnAdd(BaseObject* object)

@@ -17,7 +17,6 @@ class Player
 public:
     PlayerId id_ = 0;               // 플레이어 고유 ID (DB ID)
     SessionId sessionId_ = 0;       // 플레이어와 연결된 세션 ID
-    ObjectId pawnId_{};             // 플레이어가 조종하는 Pawn의 ObjectId
     
     // 라우팅 힌트용 (캐시)
     ShardId shardId_ = 0;           // 플레이어가 현재 접속한 샤드 ID (Thread)

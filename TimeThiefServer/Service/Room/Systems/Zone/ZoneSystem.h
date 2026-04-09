@@ -36,6 +36,8 @@ private:
     void CalculateNextZone();
     void ApplyZoneDamage(float deltaTime);
     
+    void BroadcastZoneChange();
+    
 private:
     Room*               ownerRoom_ = nullptr;
     

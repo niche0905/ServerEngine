@@ -2,6 +2,7 @@
 #include "ZoneSystem.h"
 #include <random>
 #include "Data/Tables/ZoneTable.h"
+#include "Service/Room/Room.h"
 
 namespace 
 {
@@ -136,8 +137,6 @@ void ZoneSystem::EnterNextPhase()
    const ZonePhaseData& phaseData = zoneTable_->GetPhaseData(currentPhase_);
    startZone_ = currentZone_;
    CalculateNextZone();
-   
-   // TODO: Phase가 변경되었음을 Room에 알리는 로직 추가 (예: 패킷 전송 등) Broadcast 할 것
 }
 
 void ZoneSystem::CalculateNextZone()
@@ -167,6 +166,8 @@ void ZoneSystem::CalculateNextZone()
    
    nextZone_.center = newCenter;
    nextZone_.radius = nextRadius;
+   
+   BroadcastZoneChange();
 }
 
 void ZoneSystem::ApplyZoneDamage(float deltaTime)
@@ -184,4 +185,12 @@ void ZoneSystem::ApplyZoneDamage(float deltaTime)
    
    // TODO: Room이 제공하는 Pawn 순회 및 자기장 데미지 적용
    
+}
+
+void ZoneSystem::BroadcastZoneChange()
+{
+   if (ownerRoom_ == nullptr)
+      return;
+   
+   ownerRoom_->OnZoneChanged(currentPhase_, nextZone_, zoneTable_->GetPhaseData(currentPhase_).waitTimeSeconds, zoneTable_->GetPhaseData(currentPhase_).shrinkTimeSeconds);
 }

@@ -123,6 +123,9 @@ public:
 public:
    void HandleDamageResult(Pawn* attacker, Actor* victim, const SE::Physics::Hit::HitResult& hitResult, const DamageContext& ctx, const DamageResult& damageResult);
    
+public:
+   void OnZoneChanged(uint32 phase, const ZoneCircle& newZone, float waitDuration, float shrinkDuration);
+   
 private:
    void IndexObject_OnAdd(BaseObject* object);
    void IndexObject_OnRemove(ObjectId objectId);
