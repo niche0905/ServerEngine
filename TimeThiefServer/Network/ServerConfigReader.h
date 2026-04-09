@@ -1,5 +1,6 @@
 ﻿#pragma once
 #include <string>
+#include <filesystem>
 #include "ServerConfig.h"
 
 /*-----------------------
@@ -12,16 +13,16 @@
 class ServerConfigReader
 {
 public:
-   bool LoadFromFile(const std::string& filePath);
-   bool Reload();
+   bool LoadFromFile(const std::filesystem::path& filePath);
    
    const ServerConfig& Get() const { return config_; }
    
 private:
-   bool ParseJsonText(const std::string& jsonText);
+   bool ParseJsonText(const std::string& jsonText, const std::filesystem::path& baseDir);
+   std::filesystem::path ResolvePath(const std::string& rawPath, const std::filesystem::path& baseDir) const;
    
 private:
-   std::string loadedFilePath_;
-   ServerConfig config_;
+   std::filesystem::path      loadedFilePath_{};
+   ServerConfig               config_{};
     
 };

@@ -4,5 +4,8 @@
         "game_port": 8252,
         "login_port": 8282,
         "db_port": 3306
+    },
+    "data_files": {
+        "zone_table": "data/tables/ZoneDataTable.json"
     }
 }

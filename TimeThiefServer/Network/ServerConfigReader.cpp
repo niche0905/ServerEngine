@@ -10,40 +10,35 @@
    ServerConfigReader
 -----------------------*/
 
-bool ServerConfigReader::LoadFromFile(const std::string& filePath)
+bool ServerConfigReader::LoadFromFile(const std::filesystem::path& filePath)
 {
    // debug log
-   std::filesystem::path p = std::filesystem::absolute(filePath);
-	consoleLogger->Log(Color::Blue, L"[Config] Try to access: %S\n", p.string().c_str());
+   std::filesystem::path absPath = std::filesystem::absolute(filePath);
+	consoleLogger->Log(Color::Blue, L"[Config] Try to access: %S\n", absPath.string().c_str());
    
    std::ifstream file{filePath};
    if (not file.is_open())
    {
-	   consoleLogger->Log(Color::Red, L"[Config] Failed to open file: %S\n", filePath.c_str());
+	   consoleLogger->Log(Color::Red, L"[Config] Failed to open file: %S\n", absPath.string().c_str());
       return false;
    }
    
    std::stringstream buffer;
    buffer << file.rdbuf();
    
-   if (not ParseJsonText(buffer.str()))
+   const std::filesystem::path baseDir = absPath.parent_path();
+   
+   if (not ParseJsonText(buffer.str(), baseDir))
    {
-      consoleLogger->Log(Color::Red, L"[Config] Failed to parse config file: %S\n", filePath.c_str());
+      consoleLogger->Log(Color::Red, L"[Config] Failed to parse config file: %S\n", absPath.string().c_str());
       return false;
    }
    
-   loadedFilePath_ = filePath;
+   loadedFilePath_ = absPath;
    return true;
 }
 
-bool ServerConfigReader::Reload()
-{
-   if (loadedFilePath_.empty()) return false;
-   
-   return LoadFromFile(loadedFilePath_);
-}
-
-bool ServerConfigReader::ParseJsonText(const std::string& jsonText)
+bool ServerConfigReader::ParseJsonText(const std::string& jsonText, const std::filesystem::path& baseDir)
 {
    Json::CharReaderBuilder builder;
    Json::Value root;
@@ -57,21 +52,48 @@ bool ServerConfigReader::ParseJsonText(const std::string& jsonText)
       return false;
    }
    
+   ServerConfig newConfig{};
+   
    // network
    if (root.isMember("network"))
    {
       const Json::Value& network = root["network"];
       
       if (network.isMember("bind_ip"))
-         config_.network.bindIp = network["bind_ip"].asString();
+         newConfig.network.bindIp = network["bind_ip"].asString();
       
       if (network.isMember("game_port"))
-         config_.network.gamePort = network["game_port"].asInt();
+         newConfig.network.gamePort = network["game_port"].asInt();
       
       if (network.isMember("login_port"))
-         config_.network.loginPort = network["login_port"].asInt();
+         newConfig.network.loginPort = network["login_port"].asInt();
    }
    
+   // data files
+   if (root.isMember("data_files"))
+   {
+      const Json::Value& dataFiles = root["data_files"];
+      
+      if (dataFiles.isMember("zone_table"))
+         newConfig.dataFiles.zoneTablePath = ResolvePath(dataFiles["zone_table"].asString(), baseDir);
+      
+   }
+   
+   config_ = std::move(newConfig);
    return true;
+}
+
+std::filesystem::path ServerConfigReader::ResolvePath(const std::string& rawPath,
+   const std::filesystem::path& baseDir) const
+{
+   if (rawPath.empty())
+      return {};
+   
+   std::filesystem::path path{ rawPath };
+   
+   if (path.is_absolute())
+      return path.lexically_normal();
+   
+   return (baseDir / path).lexically_normal();
 }
 

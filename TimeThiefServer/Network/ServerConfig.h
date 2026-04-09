@@ -1,5 +1,6 @@
 ﻿#pragma once
 #include <string>
+#include <filesystem>
 
 struct NetworkConfig
 {
@@ -8,13 +9,13 @@ struct NetworkConfig
     uint16 loginPort = 8282;
 };
 
-struct ProtocolConfig
+struct DataFilesConfig
 {
-    int32 version = 1;
+    std::filesystem::path zoneTablePath;
 };
 
 struct ServerConfig
 {
     NetworkConfig network;
-    ProtocolConfig protocol;
+    DataFilesConfig dataFiles;
 };

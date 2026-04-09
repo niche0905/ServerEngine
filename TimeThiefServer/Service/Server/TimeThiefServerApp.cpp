@@ -118,14 +118,14 @@ bool TimeThiefServerApp::CreateManagers()
    shardManager_        = std::make_unique<ShardManager>();
    matchMaker_          = std::make_unique<MatchMaker>();
    
-   // TODO: GameShard의 개수 정책 어떻게 할 지 고민해 보아야 함
-   const int32 hc = static_cast<int32>(std::thread::hardware_concurrency());
-   const int32 shardCount = (hc / 2) > 1 ? (hc / 2) : 1;   // TEMP: Network IO Worker thread의 반절
-   
    if (not gameDataManager_.Init()) {
       consoleLogger->Log(Color::Red, L"[TTSA] GameDataManager init fail\n");
       return false;
    }
+   
+   // TODO: GameShard의 개수 정책 어떻게 할 지 고민해 보아야 함
+   const int32 hc = static_cast<int32>(std::thread::hardware_concurrency());
+   const int32 shardCount = (hc / 2) > 1 ? (hc / 2) : 1;   // TEMP: Network IO Worker thread의 반절
    
    if (not shardManager_->Init(shardCount, sessionManager_.get(), roomDirectory_.get())) {
       consoleLogger->Log(Color::Red, L"[TTSA] ShardManager init fail\n");
