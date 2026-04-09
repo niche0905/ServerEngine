@@ -13,6 +13,16 @@ struct ZonePhaseData
 struct ZoneTable
 {
     std::vector<ZonePhaseData> phases;
+    
+    const size_t Phase() const { return phases.size(); }
+    
+    const ZonePhaseData& GetPhaseData(uint32 phase) const
+    {
+        if (phase >= phases.size())
+            return phases.back();   // 마지막 Phase의 데이터를 반환
+        
+        return phases[phase];
+    }
 };
 
 inline std::ostream& operator<<(std::ostream& os, const ZonePhaseData& z)

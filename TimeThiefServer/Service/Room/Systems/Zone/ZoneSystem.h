@@ -21,6 +21,8 @@ public:
     bool Init(Room* ownerRoom, const ZoneBounds& bounds, const ZoneTable& zoneTable);
     void Update(float deltaTime);
     
+    void Reset();
+    
     bool IsInsideSafeZone(const SE::Math::Vector3& position) const;
     float GetDamagePerSecond() const;
     
@@ -33,7 +35,6 @@ private:
     void EnterNextPhase();
     void CalculateNextZone();
     void ApplyZoneDamage(float deltaTime);
-    void BroadcastZoneStateIfNeeded();
     
 private:
     Room*               ownerRoom_ = nullptr;
