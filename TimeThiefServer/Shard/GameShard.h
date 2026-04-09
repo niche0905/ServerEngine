@@ -2,7 +2,7 @@
 #include <atomic>
 #include <memory>
 #include <functional>
-
+#include "Service/Timer/TimerQueue.h"
 #include "Service/Job/JobQueue.h"
 #include "Service/Room/CreateRoomParams.h"
 #include "Service/Room/ShardRoomManager.h"
@@ -46,20 +46,26 @@ public:
    
    ShardId GetShardId() const { return shardId_; }
    
+public:
+   TimerId ScheduleAt(TimePoint executeAt, Job job);
+   TimerId ScheduleAfter(Duration delay, Job job);
+   bool CancelTimer(TimerId timerId);
+   
 private:
    void ProcessJobs();
+   void ProcessTimers();
    void TickRooms();
    
 private:
-   SessionManager& sessionManager_;
-   RoomDirectory& roomDirectory_;
+   SessionManager&         sessionManager_;
+   RoomDirectory&          roomDirectory_;
    
 private:
-   ShardId shardId_ = 0;
-   std::atomic<bool> running_ = false;
+   ShardId                 shardId_ = 0;
+   std::atomic<bool>       running_ = false;
    
-   ShardRoomManager shardRoomManager_{};
-   JobQueue jobQueue_{};
-   // TODO: Timer Queue 작성하기
+   ShardRoomManager        shardRoomManager_{};
+   JobQueue                jobQueue_{};
+   TimerQueue              timerQueue_{};
     
 };

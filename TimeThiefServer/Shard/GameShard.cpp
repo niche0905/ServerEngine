@@ -1,10 +1,10 @@
 ﻿#include "pch.h"
 #include "GameShard.h"
-
 #include "RoomDirectory.h"
 #include "Core/Thread/ThreadManager.h"
 #include "Network/Session/SessionManager/SessionManager.h"
 #include "Service/Room/Room.h"
+#include "Service/Timer/TimerTask.h"
 
 /*--------------
    GameShard
@@ -41,6 +41,7 @@ void GameShard::Run()
 {
    while (running_.load()) {
       ProcessJobs();
+      ProcessTimers();
       TickRooms();
       
       std::this_thread::sleep_for(std::chrono::milliseconds(1));
@@ -112,6 +113,21 @@ size_t GameShard::GetRoomCount() const
    return shardRoomManager_.GetRoomCount();
 }
 
+TimerId GameShard::ScheduleAt(TimePoint executeAt, Job job)
+{
+   return timerQueue_.ScheduleAt(executeAt, job);
+}
+
+TimerId GameShard::ScheduleAfter(Duration delay, Job job)
+{
+   return timerQueue_.ScheduleAfter(delay, job);
+}
+
+bool GameShard::CancelTimer(TimerId timerId)
+{
+   return timerQueue_.Cancel(timerId);
+}
+
 void GameShard::ProcessJobs()
 {
    std::vector<Job> jobs;
@@ -121,6 +137,19 @@ void GameShard::ProcessJobs()
    for (auto& job : jobs) {
       if (job) {
          job();
+      }
+   }
+}
+
+void GameShard::ProcessTimers()
+{
+   std::vector<TimerTask> tasks;    // TODO: vector 생성을 매번 하지 않고 scratch buffer 같은 걸로 재활용하는 방법도 좋을 듯 하다
+   tasks.reserve(64);
+   timerQueue_.PopExpired(Clock::now(), tasks);
+   
+   for (auto& task : tasks) {
+      if (task.callback) {
+         task.callback();
       }
    }
 }
