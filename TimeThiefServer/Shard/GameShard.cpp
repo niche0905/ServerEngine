@@ -4,7 +4,6 @@
 #include "Core/Thread/ThreadManager.h"
 #include "Network/Session/SessionManager/SessionManager.h"
 #include "Service/Room/Room.h"
-#include "Service/Timer/TimerTask.h"
 
 /*--------------
    GameShard
@@ -143,13 +142,14 @@ void GameShard::ProcessJobs()
 
 void GameShard::ProcessTimers()
 {
-   std::vector<TimerTask> tasks;    // TODO: vector 생성을 매번 하지 않고 scratch buffer 같은 걸로 재활용하는 방법도 좋을 듯 하다
-   tasks.reserve(64);
-   timerQueue_.PopExpired(Clock::now(), tasks);
+   std::vector<Job> jobs;    // TODO: vector 생성을 매번 하지 않고 scratch buffer 같은 걸로 재활용하는 방법도 좋을 듯 하다
+   jobs.reserve(64);
+   timerQueue_.PopExpired(Clock::now(), jobs);
    
-   for (auto& task : tasks) {
-      if (task.callback) {
-         task.callback();
+   // 실행 전에 Timer 관련 metadata를 보고 싶은 경우는 TimerTask를 받아오도록 수정
+   for (auto& job : jobs) {
+      if (job) {
+         job();
       }
    }
 }

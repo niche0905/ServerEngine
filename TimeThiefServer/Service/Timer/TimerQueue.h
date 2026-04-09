@@ -1,4 +1,5 @@
 ﻿#pragma once
+#include "Service/Timer/TimerTask.h"
 
 struct TimerTaskCompare;
 struct TimerTask;
@@ -22,7 +23,7 @@ public:
    
    bool Cancel(TimerId timerId);
    
-   void PopExpired(TimePoint now, std::vector<TimerTask>& outJobs);
+   void PopExpired(TimePoint now, std::vector<Job>& outJobs);
    
    bool Empty() const;
    size_t Size() const;

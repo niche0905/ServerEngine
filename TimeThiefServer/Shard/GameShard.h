@@ -2,6 +2,7 @@
 #include <atomic>
 #include <memory>
 #include <functional>
+#include "Service/Timer/TimerTask.h"
 #include "Service/Timer/TimerQueue.h"
 #include "Service/Job/JobQueue.h"
 #include "Service/Room/CreateRoomParams.h"

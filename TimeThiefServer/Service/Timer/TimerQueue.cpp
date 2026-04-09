@@ -35,7 +35,7 @@ bool TimerQueue::Cancel(TimerId timerId)
    return true;
 }
 
-void TimerQueue::PopExpired(TimePoint now, std::vector<TimerTask>& outJobs)
+void TimerQueue::PopExpired(TimePoint now, std::vector<Job>& outJobs)
 {
    outJobs.clear();
    
@@ -51,7 +51,9 @@ void TimerQueue::PopExpired(TimePoint now, std::vector<TimerTask>& outJobs)
          continue;
       }
       
-      outJobs.push_back(std::move(task));
+      if (task.callback) {
+         outJobs.push_back(std::move(task.callback));
+      }
    }
 }
 
