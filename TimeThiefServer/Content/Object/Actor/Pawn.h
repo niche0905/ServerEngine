@@ -46,7 +46,7 @@ public:
     const Vector3& GetVelocity() const { return velocity_; }
     void SetVelocity(const Vector3& velocity);
     
-    virtual void IntergrateMove(float dt);  // 단순 이동 (물리/충돌 미적용 <- 상속받아서 구현 필요)
+    virtual void IntegrateMove(float dt);  // 단순 이동 (물리/충돌 미적용 <- 상속받아서 구현 필요)
     
 // Damageable
 public:

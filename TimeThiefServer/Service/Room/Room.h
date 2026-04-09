@@ -94,6 +94,18 @@ public:
       
       return objectManager_.RequestDestroy(objectId);
    }
+   
+public:
+   template <typename Func>
+   void ForEachPawn(Func&& func)
+   {
+      for (ObjectId pawnId : pawnObjects_) {
+         Pawn* pawn = objectManager_.FindAs<Pawn>(pawnId);
+         if (pawn) {
+            func(*pawn);
+         }
+      }
+   }
 
 public:
    void UpdateTick();

@@ -23,4 +23,5 @@ bool RoomGameSystem::Init(Room* ownerRoom, const GameDataManager& gameDataManage
 
 void RoomGameSystem::Update(float deltaTime)
 {
+   zoneSystem_.Update(deltaTime);
 }

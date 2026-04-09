@@ -10,6 +10,7 @@ enum class DamageType : int8
     Ranged,
     Explosion,
     Dot,
+    Zone,
     TrueDamage,
 };
 

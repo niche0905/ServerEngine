@@ -13,7 +13,7 @@ void Pawn::SetVelocity(const Vector3& velocity)
    // 필요 시 속도 변경에 따른 추가 작업 수행
 }
 
-void Pawn::IntergrateMove(float dt)
+void Pawn::IntegrateMove(float dt)
 {
    Vector3 pos = GetPosition();
    pos.x += velocity_.x * dt;
@@ -90,7 +90,7 @@ void Pawn::OnPreDestroy()
 
 void Pawn::Tick(float dt)
 {
-   IntergrateMove(dt);
+   IntegrateMove(dt);
 }
 
 void Pawn::OnDeath(ObjectManager& om, const DamageResult& dmgResult)

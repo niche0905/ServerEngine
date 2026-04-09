@@ -963,7 +963,10 @@ bool Room::HandleWireActionEnd(PlayerId playerId, const se::game::C_WireActionEn
 void Room::UpdateTick()
 {
    // Room 정책
-   // NPC만 Tick 진행
+   // GameSystem 진행
+   // NPC Tick 진행
+   
+   // roomGameSystem_.Update();
    
    // NPC Tick
    for (size_t i = 0; i < npcTickList_.size();) {

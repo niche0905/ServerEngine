@@ -1,6 +1,8 @@
 ﻿#include "pch.h"
 #include "ZoneSystem.h"
 #include <random>
+
+#include "Content/Object/Actor/Pawn.h"
 #include "Data/Tables/ZoneTable.h"
 #include "Service/Room/Room.h"
 
@@ -188,8 +190,20 @@ void ZoneSystem::ApplyZoneDamage(float deltaTime)
    if (damage <= 0.0f)
       return;
    
-   // TODO: Room이 제공하는 Pawn 순회 및 자기장 데미지 적용
+   ObjectManager& objectManager = ownerRoom_->GetObjectManager();
    
+   // 안정성 괜찮나..? float라 좀 걱정됨
+   int32 damageInt = static_cast<int32>(std::floor(damage));
+   ownerRoom_->ForEachPawn([this, &objectManager, damageInt](Pawn& pawn)
+   {
+      if (!pawn.IsAlive()) // 이미 죽은 Pawn은 피해를 입힐 필요가 없음
+         return;
+      
+      if (IsInsideSafeZone(pawn.GetPosition())) // 안전지대 안에 있는 Pawn은 피해를 입힐 필요가 없음
+         return;
+      
+      pawn.ApplyDamage(objectManager, damageInt, DamageContext{0, 0, 0, DamageType::Zone, DamageSource::Environment});
+   });
 }
 
 void ZoneSystem::BroadcastZoneChange()
