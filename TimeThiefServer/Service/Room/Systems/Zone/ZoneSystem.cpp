@@ -1,17 +1,21 @@
 ﻿#include "pch.h"
 #include "ZoneSystem.h"
+#include "Data/Tables/ZoneTable.h"
 
 /*--------------
    ZoneSystem
 --------------*/
 
-void ZoneSystem::Init(Room* ownerRoom, const ZoneBounds& bounds)
+bool ZoneSystem::Init(Room* ownerRoom, const ZoneBounds& bounds, const ZoneTable& zoneTable)
 {
    if (ownerRoom == nullptr)
-      return;
+      return false;
    
    ownerRoom_ = ownerRoom;
    zoneBounds_ = bounds;
+   zoneTable_ = &zoneTable;
+   
+   return true;
 }
 
 void ZoneSystem::Update(float deltaTime)

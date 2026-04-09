@@ -4,6 +4,7 @@
 #include <atomic>
 #include "GameShard.h"
 
+class GameDataManager;
 struct CreateRoomParams;
 class GameShard;
 class RoomDirectory;
@@ -27,7 +28,7 @@ public:
    ShardManager& operator=(ShardManager const&) = delete;
    
 public:
-   bool Init(int32 shardCount, SessionManager* sessionManager, RoomDirectory* roomDirectory);
+   bool Init(int32 shardCount, SessionManager* sessionManager, RoomDirectory* roomDirectory, GameDataManager* gameDataManager);
    bool Start(ThreadManager& threadManager);
    void Stop();
    
@@ -44,6 +45,7 @@ public:
 private:
    SessionManager* sessionManager_ = nullptr;    // non-owning
    RoomDirectory* roomDirectory_ = nullptr;      // non-owning
+   GameDataManager* gameDataManager_ = nullptr;  // non-owning
    
 private:
    std::vector<std::unique_ptr<GameShard>> shards_;

@@ -8,7 +8,9 @@
 #include "Physics/Hitbox/HitResult.h"
 #include "Physics/Ray/Ray.h"
 #include "Physics/Ray/RaycastHit.h"
+#include "Systems/RoomGameSystem.h"
 
+class GameDataManager;
 class SessionManager;
 struct DamageContext;
 class Pawn;
@@ -44,6 +46,9 @@ public:
    ~Room();
    
    void PostCreate();
+   
+public:
+   bool Init(const GameDataManager& gameDataManager);
    
 public:
    bool Join(PlayerId playerId, SessionId sessionId);
@@ -147,5 +152,6 @@ private:
    // TODO: ObjectHandle로 가지고 있는 것도 괜찮을 듯...?
    std::unordered_set<ObjectId> pawnObjects_;               // Pawn들
    std::vector<ObjectId> npcTickList_;                      // 매 틱마다 업데이트가 필요한 NPC들의 ID 리스트
+   RoomGameSystem roomGameSystem_{};
     
 };

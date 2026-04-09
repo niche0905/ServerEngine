@@ -9,10 +9,11 @@
    GameShard
 --------------*/
 
-GameShard::GameShard(ShardId shardId, SessionManager& sessionManager, RoomDirectory& roomDirectory)
+GameShard::GameShard(ShardId shardId, SessionManager& sessionManager, RoomDirectory& roomDirectory, const GameDataManager& gameDataManager)
    : shardId_{ shardId }
    , sessionManager_{ sessionManager }
    , roomDirectory_{ roomDirectory }
+   , gameDataManager_{ gameDataManager }
 {
    
 }
@@ -66,6 +67,8 @@ bool GameShard::CreateRoom(CreateRoomParams params)
       // TODO: MatchMaking Fail 처리 해야 할 듯 싶다 (다시 등록 or 매칭 실패 패킷 보내기)
       return false;
    }
+   
+   
    
    // TODO: Room 초기화 (스크립트 읽어와서 Spawn 및 세팅 하는게 좋을듯)
    if (!AddRoom(params.roomId, room)) {

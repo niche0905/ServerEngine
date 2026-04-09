@@ -1,6 +1,7 @@
 ﻿#pragma once
 #include "Zone/ZoneSystem.h"
 
+class GameDataManager;
 class Room;
 
 /*------------------
@@ -15,15 +16,16 @@ class RoomGameSystem
 public:
    RoomGameSystem() = default;
    
-   bool Init(Room* ownerRoom);   // const MapData&...
+   bool Init(Room* ownerRoom, const GameDataManager& gameDataManager);
    void Update(float deltaTime);
    
    ZoneSystem& GetZoneSystem() { return zoneSystem_; }
    const ZoneSystem& GetZoneSystem() const { return zoneSystem_; }
    
-   
 private:
-   Room*                ownerRoom_ = nullptr;
-   ZoneSystem           zoneSystem_{};
+   Room*                   ownerRoom_ = nullptr;
+   const GameDataManager*  gameDataManager_ = nullptr;
+   
+   ZoneSystem              zoneSystem_{};
     
 };

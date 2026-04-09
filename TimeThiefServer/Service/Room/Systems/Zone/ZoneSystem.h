@@ -1,6 +1,7 @@
 ﻿#pragma once
 #include "ZoneTypes.h"
 
+struct ZoneTable;
 struct ZonePhaseData;
 class Room;
 struct ZoneCircle;
@@ -17,7 +18,7 @@ class ZoneSystem
 public:
     ZoneSystem() = default;
     
-    void Init(Room* ownerRoom, const ZoneBounds& bounds);
+    bool Init(Room* ownerRoom, const ZoneBounds& bounds, const ZoneTable& zoneTable);
     void Update(float deltaTime);
     
     bool IsInsideSafeZone(const SE::Math::Vector3& position) const;
@@ -35,18 +36,18 @@ private:
     void BroadcastZoneStateIfNeeded();
     
 private:
-    Room*           ownerRoom_ = nullptr;
+    Room*               ownerRoom_ = nullptr;
     
-    ZoneBounds      zoneBounds_;
-    // ZonePhaseData에 접근 가능한 객체
+    ZoneBounds          zoneBounds_;
+    const ZoneTable*    zoneTable_;
     
-    uint32          currentPhase_ = 0;
+    uint32              currentPhase_ = 0;
  
-    ZoneCircle      currentZone_{};
-    ZoneCircle      startZone_{};
-    ZoneCircle      nextZone_{};
+    ZoneCircle          currentZone_{};
+    ZoneCircle          startZone_{};
+    ZoneCircle          nextZone_{};
     
-    float           phaseElapsedTime_ = 0.0f;
-    bool            isShrinking_ = false;
+    float               phaseElapsedTime_ = 0.0f;
+    bool                isShrinking_ = false;
     
 };

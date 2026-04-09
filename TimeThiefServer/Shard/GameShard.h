@@ -8,6 +8,7 @@
 #include "Service/Room/CreateRoomParams.h"
 #include "Service/Room/ShardRoomManager.h"
 
+class GameDataManager;
 class RoomDirectory;
 class Room;
 class ThreadManager;
@@ -29,7 +30,7 @@ public:
    using RoomRef = std::shared_ptr<Room>;
    
 public:
-   explicit GameShard(ShardId shardId, SessionManager& sessionManager, RoomDirectory& roomDirectory);
+   explicit GameShard(ShardId shardId, SessionManager& sessionManager, RoomDirectory& roomDirectory, const GameDataManager& gameDataManager);
    
    bool Start(ThreadManager& threadManager);
    void Stop();
@@ -60,6 +61,7 @@ private:
 private:
    SessionManager&         sessionManager_;
    RoomDirectory&          roomDirectory_;
+   const GameDataManager&  gameDataManager_;
    
 private:
    ShardId                 shardId_ = 0;
