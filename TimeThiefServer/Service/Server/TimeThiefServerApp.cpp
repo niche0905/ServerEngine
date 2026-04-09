@@ -118,7 +118,7 @@ bool TimeThiefServerApp::CreateManagers()
    shardManager_        = std::make_unique<ShardManager>();
    matchMaker_          = std::make_unique<MatchMaker>();
    
-   if (not gameDataManager_.Init()) {
+   if (not gameDataManager_.Init(configReader_->Get())) {
       consoleLogger->Log(Color::Red, L"[TTSA] GameDataManager init fail\n");
       return false;
    }

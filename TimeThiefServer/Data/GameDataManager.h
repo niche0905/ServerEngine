@@ -1,6 +1,8 @@
 ﻿#pragma once
 #include "Data/Tables/ZoneTable.h"
 
+struct ServerConfig;
+
 /*-------------------
    GameDataManager
 -------------------*/
@@ -11,7 +13,7 @@
 class GameDataManager
 {
 public:
-   bool Init();
+   bool Init(const ServerConfig& config);
    const ZoneTable& GetZoneTable() const { return zoneTable_; }
    
 private:
