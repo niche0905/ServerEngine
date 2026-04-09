@@ -1,8 +1,6 @@
 ﻿#include "pch.h"
 #include "ZoneSystem.h"
-
 #include <random>
-
 #include "Data/Tables/ZoneTable.h"
 
 namespace 
@@ -28,13 +26,16 @@ namespace
    
    SE::Math::Vector3 RandPointInCircle(float radius)
    {
+      // TODO: std::mt19937이 아닌 재현 가능한 Rng를 만들어서 사용하자
+      static thread_local std::mt19937 rng(1004);  // 시드 고정하여 재현 가능하도록
+      static thread_local std::uniform_real_distribution<float> dist(-1.0f, 1.0f);
+      
       SE::Math::Vector3 point{};
       
       do
       {
-         // TODO: rand 말고 std::mt19937과 std::uniform_real_distribution을 사용하여 더 좋은 난수 생성 방식으로 변경하기
-         point.x = (rand() / (float)RAND_MAX) * 2.0f - 1.0f;   // -1.0 ~ 1.0
-         point.y = (rand() / (float)RAND_MAX) * 2.0f - 1.0f;   // -1.0 ~ 1.0
+         point.x = dist(rng);   // -1.0 ~ 1.0
+         point.y = dist(rng);   // -1.0 ~ 1.0
       }
       while (point.LengthSq() > 1.0f);   // 단위 원 안에 있는 점이 나올 때까지 반복
       
