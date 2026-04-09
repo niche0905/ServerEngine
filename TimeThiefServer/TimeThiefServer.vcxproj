@@ -441,6 +441,7 @@
     <ClCompile Include="Service\Room\ShardRoomManager.cpp" />
     <ClCompile Include="Service\Room\Systems\ZoneSystem.cpp" />
     <ClCompile Include="Service\Server\TimeThiefServerApp.cpp" />
+    <ClCompile Include="Service\Timer\TimerQueue.cpp" />
     <ClCompile Include="Shard\GameShard.cpp" />
     <ClCompile Include="Shard\RoomDirectory.cpp" />
     <ClCompile Include="Shard\ShardManager.cpp" />
@@ -619,6 +620,7 @@
     <ClInclude Include="Service\Room\Systems\ZoneSystem.h" />
     <ClInclude Include="Service\Room\Systems\ZoneTypes.h" />
     <ClInclude Include="Service\Server\TimeThiefServerApp.h" />
+    <ClInclude Include="Service\Timer\TimerQueue.h" />
     <ClInclude Include="Service\Timer\TimerTask.h" />
     <ClInclude Include="Shard\GameShard.h" />
     <ClInclude Include="Shard\RoomDirectory.h" />
