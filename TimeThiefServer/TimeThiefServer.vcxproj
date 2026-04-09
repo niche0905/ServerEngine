@@ -345,6 +345,7 @@
     <ClCompile Include="Content\Object\Actor\StaticActor.cpp" />
     <ClCompile Include="Content\Object\Actor\WorldItemActor.cpp" />
     <ClCompile Include="Content\Object\BaseObject.cpp" />
+    <ClCompile Include="Data\GameDataManager.cpp" />
     <ClCompile Include="Data\Loader\ServerMapLoader.cpp" />
     <ClCompile Include="Data\Loader\ServerMapLoaderTest.cpp" />
     <ClCompile Include="Data\Tables\ZoneTableJson.cpp" />

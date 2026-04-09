@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "Data/Tables/ZoneTable.h"
 
 /*-------------------
@@ -11,9 +11,7 @@
 class GameDataManager
 {
 public:
-   static GameDataManager& Instance();
-   
-   bool Initialize();
+   bool Init();
    const ZoneTable& GetZoneTable() const { return zoneTable_; }
    
 private:

@@ -1,5 +1,6 @@
 ﻿#pragma once
 #include "Core/Thread/ThreadManager.h"
+#include "Data/GameDataManager.h"
 #include "Service/Room/RoomIdGenerator.h"
 #include "Shard/ShardManager.h"
 
@@ -51,15 +52,17 @@ private:
    
 private:
    std::shared_ptr<IocpServerService>              networkService_;
+   std::unique_ptr<ServerConfigReader>             configReader_;
    std::unique_ptr<RoomDirectory>                  roomDirectory_;
    std::unique_ptr<MatchMaker>                     matchMaker_;
    std::unique_ptr<SessionManager>                 sessionManager_;
    std::unique_ptr<ShardManager>                   shardManager_;
    std::unique_ptr<PlayerManager>                  playerManager_;
-   std::unique_ptr<ServerConfigReader>             configReader_;
    std::unique_ptr<ServerPacketDispatcher>         packetDispatcher_;
    std::unique_ptr<PlayerSessionLifecycleService>  playerSessionLifecycleService_;
+   
    ThreadManager                                   threadManager_{};
+   GameDataManager                                 gameDataManager_{};
    
    RoomIdGenerator                                 roomIdGenerator_{};
    
