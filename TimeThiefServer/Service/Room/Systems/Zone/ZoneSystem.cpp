@@ -98,9 +98,9 @@ void ZoneSystem::Update(float deltaTime)
    }
    
    damageTickElapsed_ += deltaTime;
-   while (damageTickElapsed_ >= kDefaultDamageTickElapsed) {
-      damageTickElapsed_ -= kDefaultDamageTickElapsed;
-      ApplyZoneDamage(kDefaultDamageTickElapsed);
+   while (damageTickElapsed_ >= kDefaultDamageTickInterval) {
+      damageTickElapsed_ -= kDefaultDamageTickInterval;
+      ApplyZoneDamage(kDefaultDamageTickInterval);
    }
 }
 
@@ -177,7 +177,7 @@ void ZoneSystem::CalculateNextZone()
    BroadcastZoneChange();
 }
 
-void ZoneSystem::ApplyZoneDamage(float deltaTime)
+void ZoneSystem::ApplyZoneDamage(float tickInterval)
 {
    if (ownerRoom_ == nullptr)
       return;
@@ -186,7 +186,7 @@ void ZoneSystem::ApplyZoneDamage(float deltaTime)
    if (damagePerSecond <= 0.0f)
       return;
    
-   const float damage = damagePerSecond * deltaTime;
+   const float damage = damagePerSecond * tickInterval;
    if (damage <= 0.0f)
       return;
    

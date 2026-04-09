@@ -34,12 +34,12 @@ public:
 private:
     void EnterNextPhase();
     void CalculateNextZone();
-    void ApplyZoneDamage(float deltaTime);
+    void ApplyZoneDamage(float tickInterval);
     
     void BroadcastZoneChange();
     
 private:
-    static constexpr float  kDefaultDamageTickElapsed = 1.0f;       // TODO: config 값으로 빼어도 좋음
+    static constexpr float  kDefaultDamageTickInterval = 1.0f;       // TODO: config 값으로 빼어도 좋음
     
 private:
     Room*               ownerRoom_ = nullptr;
