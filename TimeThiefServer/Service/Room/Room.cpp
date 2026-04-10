@@ -211,7 +211,7 @@ bool Room::Join(PlayerId playerId, SessionId sessionId)
       Broadcast(spawnBufferToOthers);   // 입장한 플레이어를 spawn
    
    if (AllPlayerJoined()) {
-      TryTransiteToLoading();
+      TryTransitToLoading();
    }
    
    return true;
@@ -1335,7 +1335,7 @@ bool Room::AllPlayerLoaded() const
    return true;   // 모든 플레이어가 로딩한 경우
 }
 
-void Room::TryTransiteToLoading()
+void Room::TryTransitToLoading()
 {
    if (roomState_ != RoomState::WaitingForPlayers)
       return;

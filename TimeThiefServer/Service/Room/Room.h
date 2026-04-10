@@ -160,7 +160,7 @@ private:
    bool AllPlayerLoaded() const;
    
 private:
-   void TryTransiteToLoading();
+   void TryTransitToLoading();
    
 public:
    SessionManager& sessionManager_;
