@@ -48,7 +48,7 @@ namespace
    ZoneSystem
 --------------*/
 
-bool ZoneSystem::Init(Room* ownerRoom, const ZoneBounds& bounds, const ZoneTable& zoneTable)
+bool ZoneSystem::Init(Room* ownerRoom, const ZoneBounds& bounds, const ZoneTable& zoneTable, float damageTickInterval)
 {
    if (ownerRoom == nullptr)
       return false;
@@ -56,6 +56,7 @@ bool ZoneSystem::Init(Room* ownerRoom, const ZoneBounds& bounds, const ZoneTable
    ownerRoom_ = ownerRoom;
    zoneBounds_ = bounds;
    zoneTable_ = &zoneTable;
+   damageTickInterval_ = damageTickInterval;
    
    return true;
 }
@@ -104,9 +105,9 @@ void ZoneSystem::Update(float deltaTime)
    }
    
    damageTickElapsed_ += deltaTime;
-   while (damageTickElapsed_ >= kDefaultDamageTickInterval) {
-      damageTickElapsed_ -= kDefaultDamageTickInterval;
-      ApplyZoneDamage(kDefaultDamageTickInterval);
+   while (damageTickElapsed_ >= damageTickInterval_) {
+      damageTickElapsed_ -= damageTickInterval_;
+      ApplyZoneDamage(damageTickInterval_);
    }
 }
 

@@ -9,6 +9,7 @@
 #include "Service/Room/RoomTickScheduler.h"
 #include "Service/Room/ShardRoomManager.h"
 
+struct GameConfig;
 class GameDataManager;
 class RoomDirectory;
 class Room;
@@ -29,10 +30,9 @@ class GameShard
 {
 public:
    using RoomRef = std::shared_ptr<Room>;
-   static constexpr Milliseconds kRoomTickInterval{ 50 };   // 20hz -> 50ms/틱 (TEMP)
    
 public:
-   explicit GameShard(ShardId shardId, SessionManager& sessionManager, RoomDirectory& roomDirectory, const GameDataManager& gameDataManager);
+   explicit GameShard(ShardId shardId, SessionManager& sessionManager, RoomDirectory& roomDirectory, const GameDataManager& gameDataManager, const GameConfig& config);
    
    bool Start(ThreadManager& threadManager);
    void Stop();
@@ -67,6 +67,7 @@ private:
    SessionManager&         sessionManager_;
    RoomDirectory&          roomDirectory_;
    const GameDataManager&  gameDataManager_;
+   const GameConfig&       gameConfig_;
    
 private:
    ShardId                 shardId_ = 0;
@@ -76,5 +77,7 @@ private:
    RoomTickScheduler       roomScheduler_{};
    JobQueue                jobQueue_{};
    TimerQueue              timerQueue_{};
+   
+   Milliseconds            roomTickIntervalMs_{};
     
 };

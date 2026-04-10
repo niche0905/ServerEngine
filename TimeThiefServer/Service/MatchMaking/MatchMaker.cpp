@@ -46,13 +46,15 @@ namespace
    MatchMaker
 --------------*/
 
-bool MatchMaker::Init(SessionManager& sessionManager, PlayerManager& playerManager, ShardManager& shardManager, RoomDirectory& roomDirectory, RoomIdFactory roomIdFactory)
+bool MatchMaker::Init(SessionManager& sessionManager, PlayerManager& playerManager, ShardManager& shardManager, RoomDirectory& roomDirectory, RoomIdFactory roomIdFactory, size_t matchSize)
 {
    sessionManager_ = &sessionManager;
    playerManager_ = &playerManager;
    shardManager_ = &shardManager;
    roomDirectory_ = &roomDirectory;
    roomIdFactory_ = std::move(roomIdFactory);
+   
+   matchSize_ = matchSize;
    
    return sessionManager_ && playerManager_ && shardManager_ && roomDirectory_ && roomIdFactory_;
 }
@@ -89,7 +91,7 @@ bool MatchMaker::Cancel(PlayerId playerId)
 
 void MatchMaker::TryMatch()
 {
-   auto poppedIds = queue_.TryPopMatch(kMatchSize);
+   auto poppedIds = queue_.TryPopMatch(matchSize_);
    if (poppedIds.empty())
       return;
    
@@ -120,7 +122,7 @@ void MatchMaker::TryMatch()
    }
    
    // Match Fail (Valid Player Under Size)
-   if (candidates.size() < kMatchSize) {
+   if (candidates.size() < matchSize_) {
       for (const auto& candidate : candidates)
          requeueIds.push_back(candidate.player->id_);
       

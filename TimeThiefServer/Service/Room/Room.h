@@ -12,6 +12,7 @@
 #include "Physics/Ray/RaycastHit.h"
 #include "Systems/RoomGameSystem.h"
 
+struct GameConfig;
 class PlayerPawn;
 class GameShard;
 class GameDataManager;
@@ -52,7 +53,7 @@ public:
    void PostCreate();
    
 public:
-   bool Init(GameShard* ownerShard, const GameDataManager& gameDataManager);
+   bool Init(GameShard* ownerShard, const GameDataManager& gameDataManager, const GameConfig& gameConfig);
    void SetPlayer(const std::vector<PlayerId>& playerIds);
    
 public:

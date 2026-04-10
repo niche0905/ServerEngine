@@ -1,6 +1,8 @@
 ﻿#pragma once
 #include "IPlayerSessionLifecycle.h"
 
+struct GameConfig;
+
 namespace se::common
 {
    enum ErrorCode : int;
@@ -21,7 +23,7 @@ class ServerConfigReader;  // 이거까지 필요한가?
 class PlayerSessionLifecycleService : public IPlayerSessionLifecycle
 {
 public:
-   PlayerSessionLifecycleService(SessionManager& sessionManager, PlayerManager& playerManager, ShardManager& shardManager);
+   PlayerSessionLifecycleService(SessionManager& sessionManager, PlayerManager& playerManager, ShardManager& shardManager, const GameConfig& gameConfig);
    virtual ~PlayerSessionLifecycleService() override = default;
    
 public:
@@ -37,5 +39,9 @@ private:
    SessionManager&   sessionManager_;
    PlayerManager&    playerManager_;
    ShardManager&     shardManager_;
+   
+private:
+   int32 movementUpdateHz_ = 5;
+   int32 pingIntervalMs_ = 2000;
     
 };

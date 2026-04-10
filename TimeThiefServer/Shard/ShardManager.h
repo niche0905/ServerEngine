@@ -28,7 +28,7 @@ public:
    ShardManager& operator=(ShardManager const&) = delete;
    
 public:
-   bool Init(int32 shardCount, SessionManager* sessionManager, RoomDirectory* roomDirectory, GameDataManager* gameDataManager);
+   bool Init(int32 shardCount, SessionManager* sessionManager, RoomDirectory* roomDirectory, GameDataManager* gameDataManager, const GameConfig& gameConfig);
    bool Start(ThreadManager& threadManager);
    void Stop();
    

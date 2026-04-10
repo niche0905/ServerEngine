@@ -35,11 +35,11 @@ void Room::PostCreate()
    objectManager_.SetRoom(shared_from_this());
 }
 
-bool Room::Init(GameShard* ownerShard, const GameDataManager& gameDataManager)
+bool Room::Init(GameShard* ownerShard, const GameDataManager& gameDataManager, const GameConfig& gameConfig)
 {
    ownerShard_ = ownerShard;
    
-   if (!roomGameSystem_.Init(this, gameDataManager))    
+   if (!roomGameSystem_.Init(this, gameDataManager, gameConfig))
       return false;
    
    return true;

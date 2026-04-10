@@ -1,6 +1,7 @@
 ﻿#pragma once
 #include "Zone/ZoneSystem.h"
 
+struct GameConfig;
 class GameDataManager;
 class Room;
 
@@ -16,7 +17,7 @@ class RoomGameSystem
 public:
    RoomGameSystem() = default;
    
-   bool Init(Room* ownerRoom, const GameDataManager& gameDataManager);
+   bool Init(Room* ownerRoom, const GameDataManager& gameDataManager, const GameConfig& gameConfig);
    
    bool Start();
    void Update(float deltaTime);

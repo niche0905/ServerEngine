@@ -3,22 +3,24 @@
 
 #include <Generated/ServerPacketHandler.h>
 #include <Protocol/ProtocolVersion.h>
-
 #include "Network/Session/PlayerSession.h"
 #include "Network/Session/SessionManager/SessionManager.h"
 #include "Network/Session/SessionIdMaker.h"
 #include "Service/Player/PlayerManager/PlayerManager.h"
 #include "Shard/ShardManager.h"
+#include "Network/ServerConfig.h"
 
 /*---------------------------------
    PlayerSessionLifecycleService
 ---------------------------------*/
 
 PlayerSessionLifecycleService::PlayerSessionLifecycleService(SessionManager& sessionManager,
-    PlayerManager& playerManager, ShardManager& shardManager)
+    PlayerManager& playerManager, ShardManager& shardManager, const GameConfig& gameConfig)
         : sessionManager_(sessionManager)
         , playerManager_(playerManager)
         , shardManager_(shardManager)
+        , movementUpdateHz_(gameConfig.movementUpdateHz)
+        , pingIntervalMs_(gameConfig.pingIntervalMs)
 {
 }
 
@@ -110,8 +112,8 @@ void PlayerSessionLifecycleService::SendHandshakeRes(PlayerSession& session, boo
         handshakeRes.set_session_player_id(session.GetPlayerId());
     
     auto* config = handshakeRes.mutable_config();
-    config->set_movement_update_hz(10);   // TODO: config에서 읽어오기
-    config->set_ping_interval_ms(1000);    // TODO: config에서 읽어오기
+    config->set_movement_update_hz(movementUpdateHz_);
+    config->set_ping_interval_ms(pingIntervalMs_);
     
     auto buffer = ServerPacketHandler::MakeSendBuffer(handshakeRes);
     if (buffer) {

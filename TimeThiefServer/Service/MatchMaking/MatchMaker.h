@@ -29,7 +29,7 @@ public:
     MatchMaker& operator=(const MatchMaker&) = delete;
     
 public:
-    bool Init(SessionManager& sessionManager, PlayerManager& playerManager, ShardManager& shardManage, RoomDirectory& roomDirectory, RoomIdFactory roomIdFactory);
+    bool Init(SessionManager& sessionManager, PlayerManager& playerManager, ShardManager& shardManage, RoomDirectory& roomDirectory, RoomIdFactory roomIdFactory, size_t matchSize);
     
 public:
     bool Enqueue(PlayerId playerId);
@@ -44,9 +44,9 @@ private:
     RoomDirectory*          roomDirectory_ = nullptr;        // non-owning   
     
 private:
-    static constexpr size_t kMatchSize = 2; // TODO: 이 값도 밖에서 받아오는 config 값 사용하기
-    
     MatchMakingQueue queue_;
     RoomIdFactory roomIdFactory_;
+    
+    size_t matchSize_ = 4;
     
 };

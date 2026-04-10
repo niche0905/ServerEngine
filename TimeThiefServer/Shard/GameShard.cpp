@@ -2,6 +2,7 @@
 #include "GameShard.h"
 #include "RoomDirectory.h"
 #include "Core/Thread/ThreadManager.h"
+#include "Network/ServerConfig.h"
 #include "Network/Session/SessionManager/SessionManager.h"
 #include "Service/Room/Room.h"
 
@@ -9,11 +10,13 @@
    GameShard
 --------------*/
 
-GameShard::GameShard(ShardId shardId, SessionManager& sessionManager, RoomDirectory& roomDirectory, const GameDataManager& gameDataManager)
+GameShard::GameShard(ShardId shardId, SessionManager& sessionManager, RoomDirectory& roomDirectory, const GameDataManager& gameDataManager, const GameConfig& config)
    : shardId_{ shardId }
    , sessionManager_{ sessionManager }
    , roomDirectory_{ roomDirectory }
    , gameDataManager_{ gameDataManager }
+   , gameConfig_{ config }
+   , roomTickIntervalMs_{ config.roomTickIntervalMs }
 {
    
 }
@@ -68,7 +71,7 @@ bool GameShard::CreateRoom(CreateRoomParams params)
       return false;
    }
    
-   room->Init(this, gameDataManager_);
+   room->Init(this, gameDataManager_, gameConfig_);
    room->SetPlayer(params.playerIds);
    
    // TODO: Room 초기화 (스크립트 읽어와서 Spawn 및 세팅 하는게 좋을듯)
@@ -172,13 +175,13 @@ void GameShard::ProcessRoomTicks()
       if (!room)
          continue;
       
-      room->UpdateTick(kRoomTickInterval);
+      room->UpdateTick(roomTickIntervalMs_);
       
-      roomScheduler_.Schedule(roomTick.roomId, roomTick.executeAt + kRoomTickInterval);
+      roomScheduler_.Schedule(roomTick.roomId, roomTick.executeAt + roomTickIntervalMs_);
    }
 }
 
 void GameShard::ScheduleRoomFirstTick(RoomId roomId)
 {
-   roomScheduler_.Schedule(roomId, Clock::now() + kRoomTickInterval);
+   roomScheduler_.Schedule(roomId, Clock::now() + roomTickIntervalMs_);
 }

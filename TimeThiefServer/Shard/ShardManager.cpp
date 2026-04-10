@@ -9,7 +9,7 @@
    ShardManager
 ----------------*/
 
-bool ShardManager::Init(int32 shardCount, SessionManager* sessionManager, RoomDirectory* roomDirectory, GameDataManager* gameDataManager)
+bool ShardManager::Init(int32 shardCount, SessionManager* sessionManager, RoomDirectory* roomDirectory, GameDataManager* gameDataManager, const GameConfig& gameConfig)
 {
    if (shardCount <= 0 or sessionManager == nullptr or roomDirectory == nullptr or gameDataManager == nullptr)
       return false;
@@ -22,7 +22,7 @@ bool ShardManager::Init(int32 shardCount, SessionManager* sessionManager, RoomDi
    
    for (int32 i = 0; i < shardCount; ++i) {
       ShardId shardId = static_cast<ShardId>(i + 1);
-      shards_.push_back(std::make_unique<GameShard>(shardId, *sessionManager_, *roomDirectory_, *gameDataManager_));
+      shards_.push_back(std::make_unique<GameShard>(shardId, *sessionManager_, *roomDirectory_, *gameDataManager_, gameConfig));
    }
    
    return true;

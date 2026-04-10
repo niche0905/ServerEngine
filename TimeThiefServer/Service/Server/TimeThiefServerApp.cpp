@@ -127,12 +127,12 @@ bool TimeThiefServerApp::CreateManagers()
    const int32 hc = static_cast<int32>(std::thread::hardware_concurrency());
    const int32 shardCount = (hc / 2) > 1 ? (hc / 2) : 1;   // TEMP: Network IO Worker thread의 반절
    
-   if (not shardManager_->Init(shardCount, sessionManager_.get(), roomDirectory_.get(), &gameDataManager_)) {
+   if (not shardManager_->Init(shardCount, sessionManager_.get(), roomDirectory_.get(), &gameDataManager_, configReader_->Get().game)) {
       consoleLogger->Log(Color::Red, L"[TTSA] ShardManager init fail\n");
       return false;
    }
    
-   if (not matchMaker_->Init(*sessionManager_, *playerManager_, *shardManager_, *roomDirectory_, [this](){ return GenerateRoomId(); })) {
+   if (not matchMaker_->Init(*sessionManager_, *playerManager_, *shardManager_, *roomDirectory_, [this](){ return GenerateRoomId(); }, configReader_->Get().game.matchSize)) {
       consoleLogger->Log(Color::Red, L"[TTSA] MatchMaker init fail\n");
       return false;
    }
@@ -148,7 +148,7 @@ bool TimeThiefServerApp::CreateManagers()
 
 bool TimeThiefServerApp::CreateNetworkService()
 {
-   playerSessionLifecycleService_ = std::make_unique<PlayerSessionLifecycleService>(*sessionManager_, *playerManager_, *shardManager_);
+   playerSessionLifecycleService_ = std::make_unique<PlayerSessionLifecycleService>(*sessionManager_, *playerManager_, *shardManager_, configReader_->Get().game);
    
    const auto& cfg = configReader_->Get();
    

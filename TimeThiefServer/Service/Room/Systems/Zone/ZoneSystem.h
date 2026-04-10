@@ -18,7 +18,7 @@ class ZoneSystem
 public:
     ZoneSystem() = default;
     
-    bool Init(Room* ownerRoom, const ZoneBounds& bounds, const ZoneTable& zoneTable);
+    bool Init(Room* ownerRoom, const ZoneBounds& bounds, const ZoneTable& zoneTable, float damageTickInterval);
     
     bool Start();
     void Update(float deltaTime);
@@ -41,9 +41,6 @@ private:
     void BroadcastZoneChange();
     
 private:
-    static constexpr float  kDefaultDamageTickInterval = 1.0f;       // TODO: config 값으로 빼어도 좋음
-    
-private:
     Room*               ownerRoom_ = nullptr;
     
     ZoneBounds          zoneBounds_;
@@ -56,8 +53,10 @@ private:
     ZoneCircle          nextZone_{};
     
     float               phaseElapsedTime_ = 0.0f;
-    bool                isShrinking_ = false;
     
     float               damageTickElapsed_ = 0.0f;
+    float               damageTickInterval_ = 1.0f;
+    
+    bool                isShrinking_ = false;
     
 };
