@@ -55,15 +55,12 @@ void Room::SetPlayer(const std::vector<PlayerId>& playerIds)
       RoomPlayer roomPlayer;
       roomPlayer.playerId = playerId;
 
-      auto playerPawn = SpawnObject<PlayerPawn>(ObjectFlags::Replicable | ObjectFlags::Tickable);
+      // TEMP Spawn Point (나중에 Spawn Point 시스템으로 변경하기)
+      auto playerPawn = CreatePreparedPlayerPawn(playerId, Vector3{static_cast<float>(i * 150), 0.0f, 0.0f });
       if (!playerPawn) {
          consoleLogger->Log(Color::Yellow, L"[Room] Failed to pre-spawn PlayerPawn for playerId %u\n", playerId);
-         continue;
+         continue;   // PlayerPawn 생성 실패한 경우 (정상적이지 않은 상황)
       }
-
-      // TEMP Spawn
-      playerPawn->SetPosition(Vector3{ static_cast<float>(i * 150), 0.0f, 0.0f });
-      playerPawn->SetOwnerPlayerId(playerId);
 
       roomPlayer.pawnObjectId = playerPawn->GetId();
 
@@ -1114,6 +1111,18 @@ ObjectId Room::GetObjectId(PlayerId playerId) const
       return ObjectId{};   // 방에 존재하지 않는 플레이어
    
    return it->second.pawnObjectId;
+}
+
+PlayerPawn* Room::CreatePreparedPlayerPawn(PlayerId playerId, const Vector3& spawnPos)
+{
+   auto playerPawn = SpawnObject<PlayerPawn>(ObjectFlags::Replicable | ObjectFlags::Tickable);
+   if (!playerPawn) {
+      return nullptr;
+   }
+   
+   playerPawn->SetPosition(spawnPos);
+   playerPawn->SetOwnerPlayerId(playerId);
+   return playerPawn;
 }
 
 void Room::Broadcast(std::shared_ptr<SendBuffer> sendBuffer, PlayerId exceptPlayerId)

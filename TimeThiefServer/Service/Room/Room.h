@@ -12,6 +12,7 @@
 #include "Physics/Ray/RaycastHit.h"
 #include "Systems/RoomGameSystem.h"
 
+class PlayerPawn;
 class GameShard;
 class GameDataManager;
 class SessionManager;
@@ -133,6 +134,9 @@ public:
    bool HasPlayer(PlayerId playerId) const;
    SessionId GetSessionId(PlayerId playerId) const;
    ObjectId GetObjectId(PlayerId playerId) const;
+   
+private:
+   PlayerPawn* CreatePreparedPlayerPawn(PlayerId playerId, const Vector3& spawnPos);
    
 private:
    void Broadcast(std::shared_ptr<SendBuffer> sendBuffer, PlayerId exceptPlayerId = 0);
