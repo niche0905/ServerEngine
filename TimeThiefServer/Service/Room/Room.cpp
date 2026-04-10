@@ -54,6 +54,8 @@ void Room::SetPlayer(const std::vector<PlayerId>& playerIds)
       roomPlayer.playerId = playerId;
       roomPlayers_.emplace(playerId, std::move(roomPlayer));
    }
+   
+   // TODO: Player Pawn 여기서 미리 만들기 (Spawn Point도 여기서 세팅하기)
 }
 
 bool Room::Join(PlayerId playerId, SessionId sessionId)
