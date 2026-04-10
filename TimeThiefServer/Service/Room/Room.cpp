@@ -1208,8 +1208,9 @@ void Room::OnZoneChanged(uint32 phase, const ZoneCircle& newZone, float waitDura
    }
    
    SendBufferRef zoneChangeBuffer = ServerPacketHandler::MakeSendBuffer(noti);
-   if (zoneChangeBuffer)
+   if (zoneChangeBuffer) {
       Broadcast(zoneChangeBuffer);
+   }
 }
 
 void Room::IndexObject_OnAdd(BaseObject* object)

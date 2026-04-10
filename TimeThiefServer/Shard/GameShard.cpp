@@ -76,6 +76,8 @@ bool GameShard::CreateRoom(CreateRoomParams params)
       return false;
    }
    
+   room->Init(gameDataManager_);
+   
    roomDirectory_.RegisterRoom(params.roomId, shardId_);
    
    se::lobby::N_MatchFound matchFoundPkt;
