@@ -14,8 +14,21 @@ struct DataFilesConfig
     std::filesystem::path zoneTablePath;
 };
 
+struct GameConfig
+{
+    int32 movementUpdateHz = 10;   // 플레이어 이동 업데이트 주기 (Hz)
+    int32 pingIntervalMs = 1000;   // 클라이언트가 Ping 패킷 보내는 간격 (ms)
+    
+    int32 roomTickIntervalMs = 50;   // Room Tick 간격 (ms) - 20Hz -> 50ms/틱
+    
+    float zoneDamageTickInterval = 1.0f;   // 존 데미지 Tick 간격 (초)
+    
+    int32 matchSize = 8;   // 매치당 필요한 플레이어 수
+};
+
 struct ServerConfig
 {
-    NetworkConfig network;
-    DataFilesConfig dataFiles;
+    NetworkConfig       network;
+    DataFilesConfig     dataFiles;
+    GameConfig          game;
 };

@@ -79,6 +79,27 @@ bool ServerConfigReader::ParseJsonText(const std::string& jsonText, const std::f
       
    }
    
+   // game
+   if (root.isMember("game"))
+   {
+      const Json::Value& game = root["game"];
+      
+      if (game.isMember("movement_update_hz"))
+         newConfig.game.movementUpdateHz = game["movement_update_hz"].asInt();
+      
+      if (game.isMember("ping_interval_ms"))
+         newConfig.game.pingIntervalMs = game["ping_interval_ms"].asInt();
+      
+      if (game.isMember("room_tick_interval_ms"))
+         newConfig.game.roomTickIntervalMs = game["room_tick_interval_ms"].asInt();
+      
+      if (game.isMember("zone_damage_tick_interval"))
+         newConfig.game.zoneDamageTickInterval = game["zone_damage_tick_interval"].asFloat();
+      
+      if (game.isMember("match_size"))
+         newConfig.game.matchSize = game["match_size"].asInt();
+   }
+   
    config_ = std::move(newConfig);
    return true;
 }
