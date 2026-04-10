@@ -445,6 +445,7 @@
     <ClCompile Include="Service\Player\PlayerManager\PlayerManager.cpp" />
     <ClCompile Include="Service\Room\Room.cpp" />
     <ClCompile Include="Service\Room\RoomManager.cpp" />
+    <ClCompile Include="Service\Room\RoomTickScheduler.cpp" />
     <ClCompile Include="Service\Room\ShardRoomManager.cpp" />
     <ClCompile Include="Service\Room\Systems\RoomGameSystem.cpp" />
     <ClCompile Include="Service\Room\Systems\Zone\ZoneSystem.cpp">
@@ -700,6 +701,8 @@
     <ClInclude Include="Service\Room\Room.h" />
     <ClInclude Include="Service\Room\RoomIdGenerator.h" />
     <ClInclude Include="Service\Room\RoomManager.h" />
+    <ClInclude Include="Service\Room\RoomTickScheduler.h" />
+    <ClInclude Include="Service\Room\ScheduledRoomTick.h" />
     <ClInclude Include="Service\Room\ShardRoomManager.h" />
     <ClInclude Include="Service\Room\Systems\RoomGameSystem.h" />
     <ClInclude Include="Service\Room\Systems\Zone\ZoneSystem.h" />
