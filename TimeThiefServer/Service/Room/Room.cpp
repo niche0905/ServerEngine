@@ -960,13 +960,14 @@ bool Room::HandleWireActionEnd(PlayerId playerId, const se::game::C_WireActionEn
 //    return true;
 // }
 
-void Room::UpdateTick()
+void Room::UpdateTick(Milliseconds tickInterval)
 {
    // Room 정책
    // GameSystem 진행
    // NPC Tick 진행
+   const float deltaSeconds = tickInterval.count() / 1000.0f;
    
-   // roomGameSystem_.Update();
+   roomGameSystem_.Update(deltaSeconds);
    
    // NPC Tick
    for (size_t i = 0; i < npcTickList_.size();) {
@@ -983,7 +984,7 @@ void Room::UpdateTick()
       }
       
       // TODO: NPC 업데이트 로직 구현하기 (예: AI 행동, 이동, 상태 변화 등)
-      // npc->Update();
+      npc->__Tick(deltaSeconds);
       
       ++i;
    }

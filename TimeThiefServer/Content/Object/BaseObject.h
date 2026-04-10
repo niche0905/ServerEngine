@@ -71,7 +71,6 @@ public:
         roomId_ = 0;
     }
     
-    // TODO: Tick 기준을 float로 할지 int로 할지 고민 필요
     void __Tick(float dt)
     {
         if (state_ != ObjectState::Alive)

@@ -171,7 +171,7 @@ void GameShard::ProcessRoomTicks()
       if (!room)
          continue;
       
-      room->UpdateTick();
+      room->UpdateTick(kRoomTickInterval);
       
       roomScheduler_.Schedule(roomTick.roomId, roomTick.executeAt + kRoomTickInterval);
    }

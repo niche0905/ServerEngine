@@ -108,7 +108,7 @@ public:
    }
 
 public:
-   void UpdateTick();
+   void UpdateTick(Milliseconds tickInterval);
    bool TraceHit(const SE::Physics::Ray& ray, SE::Physics::Hit::HitResult& outHit) const;   
    
 public:
