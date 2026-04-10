@@ -17,6 +17,8 @@ public:
    RoomGameSystem() = default;
    
    bool Init(Room* ownerRoom, const GameDataManager& gameDataManager);
+   
+   bool Start();
    void Update(float deltaTime);
    
    ZoneSystem& GetZoneSystem() { return zoneSystem_; }

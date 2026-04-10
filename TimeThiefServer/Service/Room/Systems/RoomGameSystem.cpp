@@ -21,6 +21,14 @@ bool RoomGameSystem::Init(Room* ownerRoom, const GameDataManager& gameDataManage
    return true;
 }
 
+bool RoomGameSystem::Start()
+{
+   if (!zoneSystem_.Start())
+      return false;
+   
+   return true;
+}
+
 void RoomGameSystem::Update(float deltaTime)
 {
    zoneSystem_.Update(deltaTime);

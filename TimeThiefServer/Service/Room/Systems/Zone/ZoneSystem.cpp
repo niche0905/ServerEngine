@@ -57,7 +57,13 @@ bool ZoneSystem::Init(Room* ownerRoom, const ZoneBounds& bounds, const ZoneTable
    zoneBounds_ = bounds;
    zoneTable_ = &zoneTable;
    
+   return true;
+}
+
+bool ZoneSystem::Start()
+{
    Reset();
+   CalculateNextZone();
    
    return true;
 }
@@ -113,7 +119,6 @@ void ZoneSystem::Reset()
    
    startZone_ = ZoneCircle{ zoneBounds_.center, 1000000.0f };   // 초기 Zone은 매우 큰 반지름으로 설정하여 사실상 모든 영역이 안전지대가 되도록 함
    currentZone_ = startZone_;
-   CalculateNextZone();
 }
 
 bool ZoneSystem::IsInsideSafeZone(const SE::Math::Vector3& position) const

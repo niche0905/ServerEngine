@@ -68,7 +68,8 @@ bool GameShard::CreateRoom(CreateRoomParams params)
       return false;
    }
    
-   
+   room->Init(this, gameDataManager_);
+   room->SetPlayer(params.playerIds);
    
    // TODO: Room 초기화 (스크립트 읽어와서 Spawn 및 세팅 하는게 좋을듯)
    if (!AddRoom(params.roomId, room)) {
@@ -76,7 +77,6 @@ bool GameShard::CreateRoom(CreateRoomParams params)
       return false;
    }
    
-   room->Init(gameDataManager_);
    
    roomDirectory_.RegisterRoom(params.roomId, shardId_);
    
@@ -101,7 +101,6 @@ bool GameShard::AddRoom(RoomId roomId, RoomRef room)
    if (!shardRoomManager_.AddRoom(roomId, std::move(room)))
       return false;
    
-   ScheduleRoomFirstTick(roomId);
    return true;
 }
 

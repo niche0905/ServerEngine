@@ -701,6 +701,7 @@
     <ClInclude Include="Service\Room\Room.h" />
     <ClInclude Include="Service\Room\RoomIdGenerator.h" />
     <ClInclude Include="Service\Room\RoomManager.h" />
+    <ClInclude Include="Service\Room\RoomState.h" />
     <ClInclude Include="Service\Room\RoomTickScheduler.h" />
     <ClInclude Include="Service\Room\ScheduledRoomTick.h" />
     <ClInclude Include="Service\Room\ShardRoomManager.h" />

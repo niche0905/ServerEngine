@@ -1,5 +1,7 @@
 ﻿#pragma once
 #include <mutex>
+
+#include "RoomState.h"
 #include "Content/Object/ObjectId.h"
 #include "Content/Gameplay/Combat/DamageTypes.h"
 #include "Content/Object/ObjectManager.h"
@@ -10,6 +12,7 @@
 #include "Physics/Ray/RaycastHit.h"
 #include "Systems/RoomGameSystem.h"
 
+class GameShard;
 class GameDataManager;
 class SessionManager;
 struct DamageContext;
@@ -48,7 +51,8 @@ public:
    void PostCreate();
    
 public:
-   bool Init(const GameDataManager& gameDataManager);
+   bool Init(GameShard* ownerShard, const GameDataManager& gameDataManager);
+   void SetPlayer(const std::vector<PlayerId>& playerIds);
    
 public:
    bool Join(PlayerId playerId, SessionId sessionId);
@@ -108,8 +112,12 @@ public:
    }
 
 public:
+   bool Start();
+   
    void UpdateTick(Milliseconds tickInterval);
    bool TraceHit(const SE::Physics::Ray& ray, SE::Physics::Hit::HitResult& outHit) const;   
+   
+   bool IsPlaying() const { return roomState_ == RoomState::Playing; }
    
 public:
    std::shared_ptr<Room> GetRoomRef() { return shared_from_this(); }
@@ -117,7 +125,11 @@ public:
    
    ObjectManager& GetObjectManager() { return objectManager_; }
    const ObjectManager& GetObjectManager() const { return objectManager_; }
+
+   RoomState GetRoomState() const { return roomState_; }
+   void SetRoomState(RoomState state) { roomState_ = state; }
    
+public:
    bool HasPlayer(PlayerId playerId) const;
    SessionId GetSessionId(PlayerId playerId) const;
    ObjectId GetObjectId(PlayerId playerId) const;
@@ -127,6 +139,7 @@ private:
    bool SendToPlayer(PlayerId playerId, SendBufferRef sendBuffer);
    
 public:
+   void BroadcastGameStart();
    void BroadcastDeath(ObjectId objectId);
    void NotifyHealthChange(PlayerId id, int newHealth, int deltaHealth);
    // void BroadcastHit();
@@ -142,8 +155,13 @@ private:
    void IndexObject_OnAdd(BaseObject* object);
    void IndexObject_OnRemove(ObjectId objectId);
    
+private:
+   bool AllPlayerJoined() const;
+   bool AllPlayerLoaded() const;
+   
 public:
    SessionManager& sessionManager_;
+   GameShard* ownerShard_ = nullptr;   // non-owning
    
 private:
    struct RoomPlayer
@@ -152,7 +170,9 @@ private:
       SessionId sessionId = 0;
       
       ObjectId pawnObjectId{};
-      bool loadingComplete = false;
+      
+      bool joined = false;
+      bool loaded = false;
       
       // TODO: Room 로직에서 필요한 추가 정보 (예: 플레이어 상태, 위치, 이동 동기화 시간 등) 캐싱
    };
@@ -168,5 +188,7 @@ private:
    std::unordered_set<ObjectId> pawnObjects_;               // Pawn들
    std::vector<ObjectId> npcTickList_;                      // 매 틱마다 업데이트가 필요한 NPC들의 ID 리스트
    RoomGameSystem roomGameSystem_{};
+   
+   RoomState roomState_{};
     
 };

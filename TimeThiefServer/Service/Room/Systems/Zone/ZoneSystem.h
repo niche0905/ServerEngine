@@ -19,6 +19,8 @@ public:
     ZoneSystem() = default;
     
     bool Init(Room* ownerRoom, const ZoneBounds& bounds, const ZoneTable& zoneTable);
+    
+    bool Start();
     void Update(float deltaTime);
     
     void Reset();

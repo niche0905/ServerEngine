@@ -60,7 +60,7 @@ private:
    void ProcessTimers();
    void ProcessRoomTicks();
    
-private:
+public:
    void ScheduleRoomFirstTick(RoomId roomId);
    
 private:

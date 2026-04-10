@@ -8,6 +8,7 @@
 #include "Content/Object/Actor/PlayerPawn.h"
 #include "Content/Object/Actor/WorldItemActor.h"
 #include "Service/Player/PlayerManager/PlayerManager.h"
+#include "Shard/GameShard.h"
 
 /*---------
    Room
@@ -34,12 +35,25 @@ void Room::PostCreate()
    objectManager_.SetRoom(shared_from_this());
 }
 
-bool Room::Init(const GameDataManager& gameDataManager)
+bool Room::Init(GameShard* ownerShard, const GameDataManager& gameDataManager)
 {
+   ownerShard_ = ownerShard;
+   
    if (!roomGameSystem_.Init(this, gameDataManager))    
       return false;
    
    return true;
+}
+
+void Room::SetPlayer(const std::vector<PlayerId>& playerIds)
+{
+   roomPlayers_.clear();
+   
+   for (const auto& playerId : playerIds) {
+      RoomPlayer roomPlayer;
+      roomPlayer.playerId = playerId;
+      roomPlayers_.emplace(playerId, std::move(roomPlayer));
+   }
 }
 
 bool Room::Join(PlayerId playerId, SessionId sessionId)
@@ -56,12 +70,11 @@ bool Room::Join(PlayerId playerId, SessionId sessionId)
    
    {
       auto it = roomPlayers_.find(playerId);
-      if (it != roomPlayers_.end()) {
-         return false;   // 이미 방에 존재하는 플레이어의 경우 실패 처리
+      if (it == roomPlayers_.end()) {
+         return false;   // 예약 되지 않은 플레이어의 경우 입장 실패 (정상적이지 않은 상황)
       }
       
-      RoomPlayer newPlayer;
-      newPlayer.playerId = playerId;
+      RoomPlayer& newPlayer = it->second;
       newPlayer.sessionId = sessionId;
       
       auto playerPawn = SpawnObject<PlayerPawn>(ObjectFlags::Replicable | ObjectFlags::Tickable);
@@ -72,11 +85,9 @@ bool Room::Join(PlayerId playerId, SessionId sessionId)
       playerPawn->SetPosition(Vector3{0.0f + static_cast<float>(playerId * 100), 0.0f, 0.0f});   // TEMP: 플레이어마다 x축으로 100씩 떨어뜨려서 스폰하기
       
       newPlayer.pawnObjectId = playerPawn->GetId();
+      newPlayer.joined = true;
       
-      auto [insertIt, inserted]= roomPlayers_.emplace(playerId, std::move(newPlayer));
-      if (not inserted) return false;
-      
-      auto& joinedPlayer = insertIt->second;
+      auto& joinedPlayer = newPlayer;
       
       {
          // 입장한 플레이어에게 방 스냅샷 전송
@@ -214,9 +225,6 @@ bool Room::Leave(PlayerId playerId)
    
       const ObjectId pawnId = it->second.pawnObjectId;
       roomPlayers_.erase(it);
-      // TODO: 아래 코드는 Leave을 호출한 상위 로직에서 처리한다
-      // playerRef->roomId_ = 0;    // 플레이어의 현재 방 ID 업데이트
-      // playerRef->pawnId_.value = 0;
       
       if (pawnId != ObjectId{}) {
          DespawnObject(pawnId);   // 플레이어의 Pawn이 존재하면 제거
@@ -259,10 +267,14 @@ bool Room::HandleLoadingComplete(PlayerId playerId)
       if (it == roomPlayers_.end())
          return false;
       
-      if (it->second.loadingComplete)
+      if (it->second.loaded)
          return true;   // 이미 로딩 완료 처리된 플레이어
       
-      it->second.loadingComplete = true;
+      it->second.loaded = true;
+   }
+   
+   if (AllPlayerLoaded()) {
+      Start();
    }
    
    return true;
@@ -284,7 +296,7 @@ bool Room::HandleMove(PlayerId playerId, const se::game::C_MoveReq& pkt)
       if (it == roomPlayers_.end())
          return false;   // 방에 존재하지 않는 플레이어
       
-      if (not it->second.loadingComplete)
+      if (not it->second.loaded)
          return false;
       
       auto* obj = objectManager_.Find(it->second.pawnObjectId);
@@ -350,7 +362,7 @@ bool Room::HandleAim(PlayerId playerId, const se::game::C_AimReq& pkt)
       if (it == roomPlayers_.end())
          return false;   // 방에 존재하지 않는 플레이어
       
-      if (not it->second.loadingComplete)
+      if (not it->second.loaded)
          return false;
       
       auto* obj = objectManager_.Find(it->second.pawnObjectId);
@@ -395,7 +407,7 @@ bool Room::HandleFire(PlayerId playerId, const se::game::C_FireReq& pkt)
       if (it == roomPlayers_.end())
          return false;   // 방에 존재하지 않는 플레이어
       
-      if (not it->second.loadingComplete)
+      if (not it->second.loaded)
          return false;
       
       auto* obj = objectManager_.Find(it->second.pawnObjectId);
@@ -466,7 +478,7 @@ bool Room::HandleThrowGrenade(PlayerId playerId, const se::game::C_ThrowGrenadeR
       if (it == roomPlayers_.end())
          return false;   // 방에 존재하지 않는 플레이어
       
-      if (not it->second.loadingComplete)
+      if (not it->second.loaded)
          return false;
       
       auto* obj = objectManager_.Find(it->second.pawnObjectId);
@@ -531,7 +543,7 @@ bool Room::HandleReload(PlayerId playerId, const se::game::C_ReloadReq& pkt)
       if (it == roomPlayers_.end())
          return false;   // 방에 존재하지 않는 플레이어
       
-      if (not it->second.loadingComplete)
+      if (not it->second.loaded)
          return false;
       
       auto* obj = objectManager_.Find(it->second.pawnObjectId);
@@ -589,7 +601,7 @@ bool Room::HandleWeaponChange(PlayerId playerId, const se::game::C_WeaponChangeR
       if (it == roomPlayers_.end())
          return false;   // 방에 존재하지 않는 플레이어
       
-      if (not it->second.loadingComplete)
+      if (not it->second.loaded)
          return false;
       
       auto* obj = objectManager_.Find(it->second.pawnObjectId);
@@ -643,7 +655,7 @@ bool Room::HandlePickupItem(PlayerId playerId, const se::game::C_PickupItemReq& 
       if (it == roomPlayers_.end())
          return false;   // 방에 존재하지 않는 플레이어
       
-      if (not it->second.loadingComplete)
+      if (not it->second.loaded)
          return false;
       
       const ObjectId& pawnId = it->second.pawnObjectId;
@@ -960,6 +972,22 @@ bool Room::HandleWireActionEnd(PlayerId playerId, const se::game::C_WireActionEn
 //    return true;
 // }
 
+bool Room::Start()
+{
+   if (roomState_ != RoomState::Loading) 
+      return false;
+   
+   if (!roomGameSystem_.Start())
+      return false;
+   
+   roomState_ = RoomState::Playing;
+   if (ownerShard_)
+      ownerShard_->ScheduleRoomFirstTick(roomId_);
+   
+   BroadcastGameStart();
+   return true;
+}
+
 void Room::UpdateTick(Milliseconds tickInterval)
 {
    // Room 정책
@@ -1097,6 +1125,15 @@ bool Room::SendToPlayer(PlayerId playerId, SendBufferRef buffer)
    
    session->Send(buffer);
    return true;
+}
+
+void Room::BroadcastGameStart()
+{
+   se::game::N_GameStart noti;
+   
+   SendBufferRef gameStartBuffer = ServerPacketHandler::MakeSendBuffer(noti);
+   if (gameStartBuffer)
+      Broadcast(gameStartBuffer);   // 모두에게 게임 시작 정보 Broadcast
 }
 
 void Room::BroadcastDeath(ObjectId objectId)
@@ -1244,4 +1281,32 @@ void Room::IndexObject_OnRemove(ObjectId objectId)
          roomPlayer.pawnObjectId = ObjectId{};   // Pawn이 제거된 경우, RoomPlayer의 Pawn Object ID 초기화
       }
    }
+}
+
+bool Room::AllPlayerJoined() const
+{
+   if (roomPlayers_.empty())
+      return false;   // 플레이어가 한 명도 없는 경우
+   
+   for (const auto& [playerId, roomPlayer] : roomPlayers_) {
+      if (!roomPlayer.joined) {
+         return false;   // 한 명이라도 아직 입장하지 않은 플레이어가 있는 경우
+      }
+   }
+   
+   return true;   // 모든 플레이어가 입장한 경우
+}
+
+bool Room::AllPlayerLoaded() const
+{
+   if (roomPlayers_.empty())
+      return false;   // 플레이어가 한 명도 없는 경우
+   
+   for (const auto& [playerId, roomPlayer] : roomPlayers_) {
+      if (!roomPlayer.loaded) {
+         return false;   // 한 명이라도 아직 로딩하지 않은 플레이어가 있는 경우
+      }
+   }
+   
+   return true;   // 모든 플레이어가 로딩한 경우
 }
