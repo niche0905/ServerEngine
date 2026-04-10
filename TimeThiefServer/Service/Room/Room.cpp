@@ -49,13 +49,26 @@ void Room::SetPlayer(const std::vector<PlayerId>& playerIds)
 {
    roomPlayers_.clear();
    
-   for (const auto& playerId : playerIds) {
+   for (size_t i = 0; i < playerIds.size(); ++i) {
+      const PlayerId playerId = playerIds[i];
+
       RoomPlayer roomPlayer;
       roomPlayer.playerId = playerId;
+
+      auto playerPawn = SpawnObject<PlayerPawn>(ObjectFlags::Replicable | ObjectFlags::Tickable);
+      if (!playerPawn) {
+         consoleLogger->Log(Color::Yellow, L"[Room] Failed to pre-spawn PlayerPawn for playerId %u\n", playerId);
+         continue;
+      }
+
+      // TEMP Spawn
+      playerPawn->SetPosition(Vector3{ static_cast<float>(i * 150), 0.0f, 0.0f });
+      playerPawn->SetOwnerPlayerId(playerId);
+
+      roomPlayer.pawnObjectId = playerPawn->GetId();
+
       roomPlayers_.emplace(playerId, std::move(roomPlayer));
    }
-   
-   // TODO: Player Pawn 여기서 미리 만들기 (Spawn Point도 여기서 세팅하기)
 }
 
 bool Room::Join(PlayerId playerId, SessionId sessionId)
@@ -81,17 +94,18 @@ bool Room::Join(PlayerId playerId, SessionId sessionId)
       if (newPlayer.joined) {
          return false;   // 이미 입장한 플레이어가 다시 입장 시도 (정상적이지 않은 상황)
       }
+      
+      if (newPlayer.pawnObjectId == ObjectId{})
+         return false;
+      
+      auto* playerPawn = objectManager_.FindAs<PlayerPawn>(newPlayer.pawnObjectId);
+      if (!playerPawn) {
+         consoleLogger->Log(Color::Yellow, L"[Room] PlayerPawn not exist for playerId %u\n", playerId);
+         return false;   // 예약된 플레이어의 Pawn이 존재하지 않음 (정상적이지 않은 상황)
+      }
+      
       newPlayer.joined = true;
       newPlayer.sessionId = sessionId;
-      
-      auto playerPawn = SpawnObject<PlayerPawn>(ObjectFlags::Replicable | ObjectFlags::Tickable);
-      if (!playerPawn) {
-         consoleLogger->Log(Color::Yellow, L"[Room] Failed to spawn PlayerPawn for playerId %u\n", playerId);
-         return false;   // 플레이어 Pawn 생성 실패
-      }
-      playerPawn->SetPosition(Vector3{0.0f + static_cast<float>(playerId * 100), 0.0f, 0.0f});   // TEMP: 플레이어마다 x축으로 100씩 떨어뜨려서 스폰하기
-      
-      newPlayer.pawnObjectId = playerPawn->GetId();
       
       auto& joinedPlayer = newPlayer;
       
