@@ -159,6 +159,9 @@ private:
    bool AllPlayerJoined() const;
    bool AllPlayerLoaded() const;
    
+private:
+   void TryTransiteToLoading();
+   
 public:
    SessionManager& sessionManager_;
    GameShard* ownerShard_ = nullptr;   // non-owning

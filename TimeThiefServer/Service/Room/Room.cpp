@@ -75,6 +75,11 @@ bool Room::Join(PlayerId playerId, SessionId sessionId)
       }
       
       RoomPlayer& newPlayer = it->second;
+      
+      if (newPlayer.joined) {
+         return false;   // 이미 입장한 플레이어가 다시 입장 시도 (정상적이지 않은 상황)
+      }
+      newPlayer.joined = true;
       newPlayer.sessionId = sessionId;
       
       auto playerPawn = SpawnObject<PlayerPawn>(ObjectFlags::Replicable | ObjectFlags::Tickable);
@@ -85,7 +90,6 @@ bool Room::Join(PlayerId playerId, SessionId sessionId)
       playerPawn->SetPosition(Vector3{0.0f + static_cast<float>(playerId * 100), 0.0f, 0.0f});   // TEMP: 플레이어마다 x축으로 100씩 떨어뜨려서 스폰하기
       
       newPlayer.pawnObjectId = playerPawn->GetId();
-      newPlayer.joined = true;
       
       auto& joinedPlayer = newPlayer;
       
@@ -189,6 +193,10 @@ bool Room::Join(PlayerId playerId, SessionId sessionId)
       sessionRef->Send(buf);   // 입장한 플레이어에게 기존 플레이어들의 스폰 정보 전송
    if (spawnBufferToOthers)
       Broadcast(spawnBufferToOthers);   // 입장한 플레이어를 spawn
+   
+   if (AllPlayerJoined()) {
+      TryTransiteToLoading();
+   }
    
    return true;
 }
@@ -1309,4 +1317,15 @@ bool Room::AllPlayerLoaded() const
    }
    
    return true;   // 모든 플레이어가 로딩한 경우
+}
+
+void Room::TryTransiteToLoading()
+{
+   if (roomState_ != RoomState::WaitingForPlayers)
+      return;
+
+   if (!AllPlayerJoined())
+      return;
+
+   roomState_ = RoomState::Loading;
 }
