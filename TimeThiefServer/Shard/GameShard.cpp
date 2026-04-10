@@ -42,7 +42,7 @@ void GameShard::Run()
    while (running_.load()) {
       ProcessJobs();
       ProcessTimers();
-      TickRooms();
+      ProcessRoomTicks();
       
       std::this_thread::sleep_for(std::chrono::milliseconds(1));
    }
@@ -96,7 +96,11 @@ bool GameShard::CreateRoom(CreateRoomParams params)
 
 bool GameShard::AddRoom(RoomId roomId, RoomRef room)
 {
-   return shardRoomManager_.AddRoom(roomId, std::move(room));
+   if (!shardRoomManager_.AddRoom(roomId, std::move(room)))
+      return false;
+   
+   ScheduleRoomFirstTick(roomId);
+   return true;
 }
 
 bool GameShard::RemoveRoom(RoomId roomId)
@@ -157,16 +161,23 @@ void GameShard::ProcessTimers()
    }
 }
 
-void GameShard::TickRooms()
+void GameShard::ProcessRoomTicks()
 {
-   // TEMP
-   auto rooms = shardRoomManager_.GetRoomSnapshot();
+   const TimePoint now = Clock::now();
    
-   for (const auto& room : rooms) {
+   ScheduledRoomTick roomTick;
+   while (roomScheduler_.PopDue(now, roomTick)){
+      auto room = shardRoomManager_.FindRoom(roomTick.roomId);
       if (!room)
          continue;
       
-      // room->Tick();
+      room->UpdateTick();
+      
+      roomScheduler_.Schedule(roomTick.roomId, roomTick.executeAt + kRoomTickInterval);
    }
-   // TODO: 이 방식이 아니라 Timer Queue에 따라 Tick이 필요한 Room들만 Tick 하는 방식으로 변경하고 싶다
+}
+
+void GameShard::ScheduleRoomFirstTick(RoomId roomId)
+{
+   roomScheduler_.Schedule(roomId, Clock::now() + kRoomTickInterval);
 }

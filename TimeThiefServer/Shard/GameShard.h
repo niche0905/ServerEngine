@@ -6,6 +6,7 @@
 #include "Service/Timer/TimerQueue.h"
 #include "Service/Job/JobQueue.h"
 #include "Service/Room/CreateRoomParams.h"
+#include "Service/Room/RoomTickScheduler.h"
 #include "Service/Room/ShardRoomManager.h"
 
 class GameDataManager;
@@ -28,6 +29,7 @@ class GameShard
 {
 public:
    using RoomRef = std::shared_ptr<Room>;
+   static constexpr Milliseconds kRoomTickInterval{ 50 };   // 20hz -> 50ms/틱 (TEMP)
    
 public:
    explicit GameShard(ShardId shardId, SessionManager& sessionManager, RoomDirectory& roomDirectory, const GameDataManager& gameDataManager);
@@ -56,7 +58,10 @@ public:
 private:
    void ProcessJobs();
    void ProcessTimers();
-   void TickRooms();
+   void ProcessRoomTicks();
+   
+private:
+   void ScheduleRoomFirstTick(RoomId roomId);
    
 private:
    SessionManager&         sessionManager_;
@@ -68,6 +73,7 @@ private:
    std::atomic<bool>       running_ = false;
    
    ShardRoomManager        shardRoomManager_{};
+   RoomTickScheduler       roomScheduler_{};
    JobQueue                jobQueue_{};
    TimerQueue              timerQueue_{};
     
