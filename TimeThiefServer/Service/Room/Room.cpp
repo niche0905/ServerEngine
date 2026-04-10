@@ -1075,7 +1075,9 @@ void Room::Broadcast(std::shared_ptr<SendBuffer> sendBuffer, PlayerId exceptPlay
       if (roomPlayer.sessionId == 0)
          continue;   // 유효하지 않은 세션 ID인 플레이어는 건너뛰기
       
-      sessionManager_.FindBySessionId(roomPlayer.sessionId)->Send(sendBuffer);   // 세션을 찾아서 메시지 전송
+      if (auto session = sessionManager_.FindBySessionId(roomPlayer.sessionId)) {
+         session->Send(sendBuffer);
+      }
    }
 }
 
