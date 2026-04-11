@@ -1,5 +1,6 @@
 ﻿#include "pch.h"
 #include "RoomGameSystem.h"
+#include "Content/Object/ObjectId.h"
 #include "Data/GameDataManager.h"
 #include "Network/ServerConfig.h"
 
@@ -19,6 +20,9 @@ bool RoomGameSystem::Init(Room* ownerRoom, const GameDataManager& gameDataManage
    if (!zoneSystem_.Init(ownerRoom, ZoneBounds{ SE::Math::Vector3{}, SE::Math::Vector3{150000, 150000, 0.0f} }, gameDataManager_->GetZoneTable(), gameConfig.zoneDamageTickInterval))
       return false;
    
+   if (!respawnSystem_.Init(ownerRoom))
+      return false;
+   
    return true;
 }
 
@@ -33,4 +37,9 @@ bool RoomGameSystem::Start()
 void RoomGameSystem::Update(float deltaTime)
 {
    zoneSystem_.Update(deltaTime);
+}
+
+void RoomGameSystem::OnPawnDeath(ObjectId pawnId)
+{
+   respawnSystem_.RequestRespawn(pawnId);
 }

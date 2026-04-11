@@ -1090,6 +1090,16 @@ bool Room::TraceHit(const SE::Physics::Ray& ray, SE::Physics::Hit::HitResult& ou
    return hasHit;
 }
 
+TimerId Room::ScheduleAt(TimePoint executeAt, Job job)
+{
+   return ownerShard_->ScheduleAt(executeAt, std::move(job));
+}
+
+TimerId Room::ScheduleAfter(Duration delay, Job job)
+{
+   return ownerShard_->ScheduleAfter(delay, std::move(job));
+}
+
 bool Room::HasPlayer(PlayerId playerId) const
 {
    return roomPlayers_.contains(playerId);
@@ -1261,6 +1271,12 @@ void Room::HandleDamageResult(Pawn* attacker, Actor* victim, const SE::Physics::
       // Player가 NPC에게 죽은 경우 처리...
       return;
    }
+}
+
+void Room::HandlePawnDeath(ObjectId pawnId, const DamageResult& damageResult)
+{
+   roomGameSystem_.OnPawnDeath(pawnId);
+   BroadcastDeath(pawnId);
 }
 
 void Room::OnZoneChanged(uint32 phase, const ZoneCircle& newZone, float waitDuration, float shrinkDuration)

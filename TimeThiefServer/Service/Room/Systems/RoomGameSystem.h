@@ -1,4 +1,5 @@
 ﻿#pragma once
+#include "Respawn/RespawnSystem.h"
 #include "Zone/ZoneSystem.h"
 
 struct GameConfig;
@@ -22,13 +23,21 @@ public:
    bool Start();
    void Update(float deltaTime);
    
+public:
    ZoneSystem& GetZoneSystem() { return zoneSystem_; }
    const ZoneSystem& GetZoneSystem() const { return zoneSystem_; }
+   
+   RespawnSystem& GetRespawnSystem() { return respawnSystem_; }
+   const RespawnSystem& GetRespawnSystem() const { return respawnSystem_; }
+   
+public:
+   void OnPawnDeath(ObjectId pawnId);
    
 private:
    Room*                   ownerRoom_ = nullptr;
    const GameDataManager*  gameDataManager_ = nullptr;
    
    ZoneSystem              zoneSystem_{};
+   RespawnSystem           respawnSystem_{};
     
 };

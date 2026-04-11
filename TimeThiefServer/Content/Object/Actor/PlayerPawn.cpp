@@ -51,43 +51,6 @@ MoneyChangeResult PlayerPawn::SpendMoney(ObjectManager& om, CurrencyId currency,
    return wallet_.SpendMoney(om, currency, amount, ctx);
 }
 
-Actor::Vector3 PlayerPawn::ResolveRespawnPosition(ObjectManager& om)
-{
-   (void)om;
-   
-   return GetSavedRespawnPosition();
-}
-
-void PlayerPawn::OnPreRespawn(ObjectManager& om)
-{
-   (void)om;
-   // TODO: 리스폰 전 처리 (예: 상태 초기화)
-}
-
-void PlayerPawn::OnPostRespawn(ObjectManager& om)
-{
-   (void)om;
-   // TODO: 리스폰 후 처리 할 게 있는지 확인
-}
-
-void PlayerPawn::ApplyRespawnToWorld(ObjectManager& om, const Vector3& pos)
-{
-   (void)om;
-   (void)pos;
-   
-   SetDead(false);
-   
-   // TODO: Room에 리스폰 알리기
-}
-
-void PlayerPawn::GrantSpawnInvulnerability(ObjectManager& om, uint32 durationMs)
-{
-   health_.SetInvincible(true);
-   // TODO: 일정 시간 후에 invincible 해제하는 로직 추가
-   (void)om;
-   (void)durationMs;
-}
-
 void PlayerPawn::OnSpawn()
 {
    Pawn::OnSpawn();

@@ -69,6 +69,41 @@ int32 Pawn::GetMaxHp() const
    return health_.GetMaxHp();
 }
 
+SE::Math::Vector3 Pawn::ResolveRespawnPosition(ObjectManager& om)
+{
+   return GetSavedRespawnPosition();
+}
+
+void Pawn::OnPreRespawn(ObjectManager& om)
+{
+   (void)om;
+   // TODO: 리스폰 전 처리 (예: 상태 초기화)
+}
+
+void Pawn::OnPostRespawn(ObjectManager& om)
+{
+   (void)om;
+   // TODO: 리스폰 후 처리 할 게 있는지 확인
+}
+
+void Pawn::ApplyRespawnToWorld(ObjectManager& om, const SE::Math::Vector3& pos)
+{
+   (void)om;
+   (void)pos;
+   
+   SetDead(false);
+   
+   // TODO: Room에 리스폰 알리기
+}
+
+void Pawn::GrantSpawnInvulnerability(ObjectManager& om, uint32 durationMs)
+{
+   health_.SetInvincible(true);
+   // TODO: 일정 시간 후에 invincible 해제하는 로직 추가
+   (void)om;
+   (void)durationMs;
+}
+
 void Pawn::OnSpawn()
 {
    Actor::OnSpawn();
@@ -101,6 +136,6 @@ void Pawn::OnDeath(ObjectManager& om, const DamageResult& dmgResult)
    // 사망 시 모든 Client에 사망 사실 Broadcast (Room에서 BroadcastDeath 패킷을 보내는 형태로)
    // 파생 클래스에서 필요에 따라 재정의 (DropOnDeath, RespawnSchedule 등)
    if (auto room = GetRoom()) {
-      room->BroadcastDeath(GetId());
+      room->HandlePawnDeath(GetId(), dmgResult);
    }
 }

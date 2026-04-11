@@ -5,38 +5,6 @@
    MonsterPawn
 ---------------*/
 
-Actor::Vector3 MonsterPawn::ResolveRespawnPosition(ObjectManager& om)
-{
-   (void)om;
-   
-   return GetHomePosition();
-}
-
-void MonsterPawn::OnPreRespawn(ObjectManager& om)
-{
-   (void)om;
-   // TODO: 리스폰 전 처리 (예: 상태 초기화)
-}
-
-void MonsterPawn::OnPostRespawn(ObjectManager& om)
-{
-   (void)om;
-   // TODO: 리스폰 후 처리 (예: AI 재활성화)
-}
-
-void MonsterPawn::ApplyRespawnToWorld(ObjectManager& om, const Vector3& pos)
-{
-   // TODO: Room에 리스폰 알리기
-}
-
-void MonsterPawn::GrantSpawnInvulnerability(ObjectManager& om, uint32 durationMs)
-{
-   health_.SetInvincible(true);
-   // TODO: 일정 시간 후에 invincible 해제하는 로직 추가
-   (void)om;
-   (void)durationMs;
-}
-
 LootSourceResult MonsterPawn::GenerateLoot(ObjectManager& om, LootTableService& service, const LootSourceContext& ctx)
 {
    return loot_.GenerateLoot(om, service, ctx);

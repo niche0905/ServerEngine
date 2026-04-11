@@ -122,11 +122,21 @@ public:
    bool IsPlaying() const { return roomState_ == RoomState::Playing; }
    
 public:
+   TimerId ScheduleAt(TimePoint executeAt, Job job);
+   TimerId ScheduleAfter(Duration delay, Job job);
+   
+public:
    std::shared_ptr<Room> GetRoomRef() { return shared_from_this(); }
    RoomId GetRoomId() const { return roomId_; }
    
    ObjectManager& GetObjectManager() { return objectManager_; }
    const ObjectManager& GetObjectManager() const { return objectManager_; }
+   
+   GameShard* GetOwnerShard() { return ownerShard_; }
+   const GameShard* GetOwnerShard() const { return ownerShard_; }
+   
+   RoomGameSystem& GetRoomGameSystem() { return roomGameSystem_; }
+   const RoomGameSystem& GetRoomGameSystem() const { return roomGameSystem_; }
 
    RoomState GetRoomState() const { return roomState_; }
    void SetRoomState(RoomState state) { roomState_ = state; }
@@ -152,6 +162,7 @@ public:
    
 public:
    void HandleDamageResult(Pawn* attacker, Actor* victim, const SE::Physics::Hit::HitResult& hitResult, const DamageContext& ctx, const DamageResult& damageResult);
+   void HandlePawnDeath(ObjectId pawnId, const DamageResult& damageResult);
    
 public:
    void OnZoneChanged(uint32 phase, const ZoneCircle& newZone, float waitDuration, float shrinkDuration);
@@ -167,7 +178,7 @@ private:
 private:
    void TryTransitToLoading();
    
-public:
+private:
    SessionManager& sessionManager_;
    GameShard* ownerShard_ = nullptr;   // non-owning
    

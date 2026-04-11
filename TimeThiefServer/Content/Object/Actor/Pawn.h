@@ -6,6 +6,8 @@
 #include "Content/Gameplay/Cooldown/CooldownComponent.h"
 #include "Content/Gameplay/Effects/EffectComponent.h"
 #include "Content/Gameplay/Effects/IEffectOwner.h"
+#include "Content/Gameplay/Spawn/IRespawnOwner.h"
+#include "Content/Gameplay/Spawn/RespawnComponent.h"
 
 /*--------
    Pawn
@@ -21,6 +23,7 @@ class CombatComponent;
 class Pawn : public Actor
              , public IDamageable
              , public IEffectOwner
+             , public IRespawnOwner
 {
 public:
     Pawn() = default;
@@ -71,6 +74,21 @@ public:
     
     virtual void OnEffectChanged() override {}
     
+// Respawn
+public:
+    RespawnComponent& GetRespawnComponent() { return respawn_; }
+    const RespawnComponent& GetRespawnComponent() const { return respawn_; }
+    
+    virtual SE::Math::Vector3 ResolveRespawnPosition(ObjectManager& om) override;
+    
+    virtual void OnPreRespawn(ObjectManager& om) override;
+    virtual void OnPostRespawn(ObjectManager& om) override;
+    virtual void ApplyRespawnToWorld(ObjectManager& om, const SE::Math::Vector3& pos) override;
+    virtual void GrantSpawnInvulnerability(ObjectManager& om, uint32 durationMs) override;
+    
+    const Vector3& GetSavedRespawnPosition() const { return respawn_.GetRespawnPosition(); }
+    void SetSavedRespawnPosition(const Vector3& pos) { respawn_.SetRespawnPosition(pos); }
+    
 // Combat
 public:
         CombatComponent* GetCombatComponent() { return combat_.get(); }
@@ -93,12 +111,13 @@ protected:
     void SetDead(bool isDead) { isDead_ = isDead; }
     
 protected:
-    HealthComponent health_;
-    CooldownComponent cooldowns_;
-    EffectComponent effects_;
-    std::unique_ptr<CombatComponent> combat_;
+    HealthComponent                     health_;
+    CooldownComponent                   cooldowns_;
+    EffectComponent                     effects_;
+    RespawnComponent                    respawn_;
+    std::unique_ptr<CombatComponent>    combat_;
     
-    bool isDead_{false};
-    Vector3 velocity_{};
+    Vector3                             velocity_{};
+    bool                                isDead_{false};
     
 };

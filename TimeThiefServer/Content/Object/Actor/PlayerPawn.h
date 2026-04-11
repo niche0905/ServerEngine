@@ -5,10 +5,8 @@
 #include "Content/Gameplay/Drop/IDropOnDeathOwner.h"
 #include "Content/Gameplay/Economy/IWalletOwner.h"
 #include "Content/Gameplay/Inventory/IInventoryOwner.h"
-#include "Content/Gameplay/Spawn/IRespawnOwner.h"
 #include "Content/Gameplay/Inventory/InventoryComponent.h"
 #include "Content/Gameplay/Economy/WalletComponent.h"
-#include "Content/Gameplay/Spawn/RespawnComponent.h"
 #include "Content/Object/Actor/PlayerPawnState.h"
 
 class ObjectManager;
@@ -25,7 +23,6 @@ class PlayerPawn : public Pawn
                     , public IDropOnDeathOwner
                     , public IInventoryOwner
                     , public IWalletOwner
-                    , public IRespawnOwner
 {
 public:
     PlayerPawn() = default;
@@ -39,7 +36,6 @@ public:
     virtual PlayerId GetOwnerPlayerId() const override { return playerId_; }
     
     void SetOwnerPlayerId(PlayerId playerId) { playerId_ = playerId; }
-    
     
 // pitch
 public:
@@ -59,9 +55,6 @@ public:
     
     WalletComponent& GetWallet() override { return wallet_; }
     const WalletComponent& GetWallet() const { return wallet_; }
-    
-    RespawnComponent& GetRespawn() { return respawn_; }
-    const RespawnComponent& GetRespawn() const { return respawn_; }
     
 public:
     virtual void Damaged(const DamageResult& dmgResult) override;
@@ -89,20 +82,6 @@ public:
 
     virtual MoneyChangeResult AddMoney(ObjectManager& om, CurrencyId currency, int64 amount, const MoneyChangeContext& ctx) override;
     virtual MoneyChangeResult SpendMoney(ObjectManager& om, CurrencyId currency, int64 amount, const MoneyChangeContext& ctx) override;
-    
-// Respawn
-public:
-    const Vector3& GetSavedRespawnPosition() const { return respawn_.GetRespawnPosition(); }
-    void SetSavedRespawnPosition(const Vector3& pos) { respawn_.SetRespawnPosition(pos); }
-
-// IRespawnOwner 구현
-public:
-    virtual Vector3 ResolveRespawnPosition(ObjectManager& om) override;
-   
-    virtual void OnPreRespawn(ObjectManager& om) override;
-    virtual void OnPostRespawn(ObjectManager& om) override;
-    virtual void ApplyRespawnToWorld(ObjectManager& om, const Vector3& pos) override;
-    virtual void GrantSpawnInvulnerability(ObjectManager& om, uint32 durationMs) override;
     
 // Player State (Action State)
 public:
@@ -140,7 +119,6 @@ private:
     DropOnDeathComponent dropOnDeath_{};
     InventoryComponent inventory_{};
     WalletComponent wallet_{};
-    RespawnComponent respawn_{};
     
     ActionState actionState_{};
     

@@ -447,6 +447,7 @@
     <ClCompile Include="Service\Room\RoomManager.cpp" />
     <ClCompile Include="Service\Room\RoomTickScheduler.cpp" />
     <ClCompile Include="Service\Room\ShardRoomManager.cpp" />
+    <ClCompile Include="Service\Room\Systems\Respawn\RespawnSystem.cpp" />
     <ClCompile Include="Service\Room\Systems\RoomGameSystem.cpp" />
     <ClCompile Include="Service\Room\Systems\Zone\ZoneSystem.cpp">
       <RuntimeLibrary>MultiThreadedDebugDll</RuntimeLibrary>
@@ -702,6 +703,7 @@
     <ClInclude Include="Service\Room\RoomTickScheduler.h" />
     <ClInclude Include="Service\Room\ScheduledRoomTick.h" />
     <ClInclude Include="Service\Room\ShardRoomManager.h" />
+    <ClInclude Include="Service\Room\Systems\Respawn\RespawnSystem.h" />
     <ClInclude Include="Service\Room\Systems\RoomGameSystem.h" />
     <ClInclude Include="Service\Room\Systems\Zone\ZoneSystem.h" />
     <ClInclude Include="Service\Room\Systems\Zone\ZoneTypes.h" />

@@ -3,7 +3,6 @@
 #include "Content/Gameplay/AI/MonsterAiComponent.h"
 #include "Content/Gameplay/Loot/ILootSource.h"
 #include "Content/Gameplay/Loot/LootSourceComponent.h"
-#include "Content/Gameplay/Spawn/RespawnComponent.h"
 
 class ObjectManager;
 
@@ -20,7 +19,6 @@ class BTBrain;
 //
 
 class MonsterPawn : public Pawn
-                  , public IRespawnOwner
                   , public ILootSource
 {
 public:
@@ -33,23 +31,6 @@ public:
 public:
    int32 GetTemplateId() const { return templateId_; }
    void SetTemplateId(int32 templateId) { templateId_ = templateId; }
-   
-   const Vector3& GetHomePosition() const { return respawn_.GetRespawnPosition(); }
-   void SetHomePosition(const Vector3& pos) { respawn_.SetRespawnPosition(pos); }
-   
-   bool CanRespawn() const { return respawn_.IsEnabled(); }
-   
-   uint32 GetRespawnDelayMs() const { return respawn_.GetPolicy().delayMs; }
-   // void SetRespawnDelayMs(uint32 delayMs) { respawn_.GetPolicy().delayMs = delayMs; }
-   // Respawn 시간을 동적으로 변경하는 것은 제공되지 않음 (몬스터의 경우) RespawnPolicy를 설정할 때 한번만 설정하도록
-   
-public:
-   virtual Vector3 ResolveRespawnPosition(ObjectManager& om) override;
-   
-   virtual void OnPreRespawn(ObjectManager& om) override;
-   virtual void OnPostRespawn(ObjectManager& om) override;
-   virtual void ApplyRespawnToWorld(ObjectManager& om, const Vector3& pos) override;
-   virtual void GrantSpawnInvulnerability(ObjectManager& om, uint32 durationMs) override;
    
 public:
    virtual bool CanGenerateLoot() const override { return loot_.CanGenerateLoot(); }
@@ -79,7 +60,6 @@ private:
    
    BTBrain* brain_{ nullptr };
    
-   RespawnComponent respawn_;
    LootSourceComponent loot_;
    
    MonsterAiComponent ai_;
