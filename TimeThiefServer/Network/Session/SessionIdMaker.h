@@ -1,7 +1,5 @@
 ﻿#pragma once
 
-using SessionId = uint64;
-
 class SessionIdMaker
 {
 public:

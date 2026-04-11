@@ -4,7 +4,6 @@
 #include "Core/Service/ServiceBase.h"
 
 class ServiceBase;
-using SessionId = uint64;
 
 /*---------------
    SessionBase
@@ -15,6 +14,8 @@ using SessionId = uint64;
 
 class SessionBase : public IoObject
 {
+public:
+	using SessionId = uint64;
 	friend class Listener;
 
 	enum

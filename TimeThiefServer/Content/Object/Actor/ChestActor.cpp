@@ -11,7 +11,7 @@ namespace
 {
     // TODO: 구현 필요
     
-    ReplicationSystem* TryGetReplication(Actor::RoomId /*roomId*/)
+    ReplicationSystem* TryGetReplication(RoomId /*roomId*/)
     {
         return nullptr;
     }

@@ -16,9 +16,6 @@ class BaseObject;
 class ObjectManager
 {
 public:
-   using RoomId = uint32;
-   
-public:
    explicit ObjectManager(RoomId roomId)
       : roomId_(roomId)
    {

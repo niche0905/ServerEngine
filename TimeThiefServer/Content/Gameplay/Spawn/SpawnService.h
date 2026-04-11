@@ -15,9 +15,6 @@ struct SE::Math::Vector3;
 class SpawnService
 {
 public:
-   using RoomId = uint32;
-   
-public:
    explicit SpawnService(RoomId roomId)
       : roomId_(roomId)
    {

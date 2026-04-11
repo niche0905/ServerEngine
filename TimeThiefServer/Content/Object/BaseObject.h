@@ -16,9 +16,6 @@ struct ObjectId;
 class BaseObject
 {
 public:
-    using RoomId = uint32;
-    
-public:
     BaseObject() = default;
     virtual ~BaseObject() = default;
     

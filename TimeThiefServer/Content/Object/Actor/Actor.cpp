@@ -11,17 +11,17 @@ namespace
 {
     // TODO: 구현 필요
     
-    ObjectManager* TryGetObjectManager(Actor::RoomId /*roomId*/)
+    ObjectManager* TryGetObjectManager(RoomId /*roomId*/)
     {
         return nullptr;
     }
     
-    SpawnService* TryGetSpawnService(Actor::RoomId /*roomId*/)
+    SpawnService* TryGetSpawnService(RoomId /*roomId*/)
     {
         return nullptr;
     }
     
-    ReplicationSystem* TryGetReplication(Actor::RoomId /*roomId*/)
+    ReplicationSystem* TryGetReplication(RoomId /*roomId*/)
     {
         return nullptr;
     }
