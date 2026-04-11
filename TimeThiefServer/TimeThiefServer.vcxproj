@@ -652,10 +652,7 @@
     <ClInclude Include="Content\Gameplay\Replication\ReplicationSystem.h" />
     <ClInclude Include="Content\Gameplay\Replication\ReplicationTypes.h" />
     <ClInclude Include="Content\Gameplay\Spawn\IRespawnOwner.h" />
-    <ClInclude Include="Content\Gameplay\Spawn\ISpawnable.h" />
-    <ClInclude Include="Content\Gameplay\Spawn\ISpawnFactory.h" />
     <ClInclude Include="Content\Gameplay\Spawn\RespawnComponent.h" />
-    <ClInclude Include="Content\Gameplay\Spawn\RespawnService.h" />
     <ClInclude Include="Content\Gameplay\Spawn\RespawnTypes.h" />
     <ClInclude Include="Content\Gameplay\Spawn\SpawnService.h" />
     <ClInclude Include="Content\Gameplay\Spawn\SpawnTypes.h" />

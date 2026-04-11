@@ -104,17 +104,17 @@ void MonsterPawn::StartDeadState(ObjectManager& om, const DamageResult& dmgResul
    // ScheduleRespawn(om, om.GetTimeMs());
 }
 
-void MonsterPawn::ScheduleRespawn(ObjectManager& om, uint64 nowMs)
-{
-   (void)om;
-   
-   if (not CanRespawn())
-      return;
-   
-   respawn_.Schedule(nowMs, GetRespawnDelayMs());
-}
-
-void MonsterPawn::ExecuteRespawn(ObjectManager& om, uint64 nowMs)
-{
-   respawn_.ExecuteRespawn(om, *this, RespawnContext{ nowMs } );
-}
+// void MonsterPawn::ScheduleRespawn(ObjectManager& om, uint64 nowMs)
+// {
+//    (void)om;
+//    
+//    if (not CanRespawn())
+//       return;
+//    
+//    respawn_.Schedule(nowMs, GetRespawnDelayMs());
+// }
+//
+// void MonsterPawn::ExecuteRespawn(ObjectManager& om, uint64 nowMs)
+// {
+//    respawn_.ExecuteRespawn(om, *this, RespawnContext{ nowMs } );
+// }

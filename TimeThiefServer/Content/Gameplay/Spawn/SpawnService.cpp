@@ -1,6 +1,5 @@
 ﻿#include "pch.h"
 #include "SpawnService.h"
-#include "ISpawnFactory.h"
 #include "Content/Object/ObjectManager.h"
 #include "Utils/Random/WeightedRandom.h"
 

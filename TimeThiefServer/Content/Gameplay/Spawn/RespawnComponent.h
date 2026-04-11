@@ -28,7 +28,6 @@ public:
         policy_ = policy;
         state_ = RespawnState::Alive;
         
-        scheduledAtMs_ = 0;
         deadSinceMs_ = 0;
     }
     
@@ -36,52 +35,44 @@ public:
     void SetPolicy(const RespawnPolicy& policy) { policy_ = policy; }
     
     RespawnState GetState() const { return state_; }
+    bool IsScheduled() const { return state_ == RespawnState::Scheduled; }
     bool IsEnabled() const { return policy_.enabled; }
     
     const Vector3& GetRespawnPosition() const { return respawnPosition_; }
     void SetRespawnPosition(const Vector3& pos) { respawnPosition_ = pos; }
     
     // 사망 시 호출
-    bool OnDeath(uint64 nowMs)
+    bool MarkDead(uint64 nowMs)
     {
-        if (not IsEnabled()) { state_ = RespawnState::Dead; return false; }
-        
-        state_ = RespawnState::Scheduled;
         deadSinceMs_ = nowMs;
         
-        scheduledAtMs_ = nowMs + static_cast<uint64>(policy_.delayMs);
-        state_ = RespawnState::Scheduled;
+        if (not IsEnabled()) {
+            state_ = RespawnState::Dead;
+            return false;
+        }
         
+        state_ = RespawnState::Scheduled;
+        ++respawnToken_;        // 예약 식별용
         return true;
     }
     
-    // 리스폰 예약 처리 (수동)
-    bool Schedule(uint64 nowMs, uint32 delayMs)
+    void CancelScheduled()
     {
-        if (not IsEnabled()) return false;
-        
-        deadSinceMs_ = nowMs;
-        
-        scheduledAtMs_ = nowMs + static_cast<uint64>(delayMs);
-        state_ = RespawnState::Scheduled;
-        
-        return true;
+        if (state_ == RespawnState::Scheduled) {
+            state_ = RespawnState::Dead;
+            ++respawnToken_;    // 이전 예약 무효화
+        }
     }
     
-    bool IsScheduled() const { return state_ == RespawnState::Scheduled; }
-    uint64 GetScheduledAtMs() const { return scheduledAtMs_; }
-    
-    // 시간이 되었는 지 확인
-    bool IsDue(uint64 nowMs) const
+    bool CanExecuteRespawn(uint64 token) const
     {
-        return (IsScheduled() && scheduledAtMs_ <= nowMs);
+        return IsEnabled() && IsScheduled() && respawnToken_ == token;
     }
     
-    bool ExecuteRespawn(ObjectManager& om, IRespawnOwner& owner, const RespawnContext& ctx)
+    bool ExecuteRespawn(ObjectManager& om, IRespawnOwner& owner)
     {
         if (not IsEnabled()) return false;
         if (not IsScheduled()) return false;
-        if (ctx.nowMs < scheduledAtMs_) return false;
         
         state_ = RespawnState::Respawning;
         
@@ -93,18 +84,12 @@ public:
             owner.GrantSpawnInvulnerability(om, policy_.invulMs);
         }
         
-        scheduledAtMs_ = 0;
         state_ = RespawnState::Alive;
-        
         return true;
     }
     
-    void DisableRespawn()
-    {
-        policy_.enabled = false;
-        state_ = RespawnState::Dead;
-        scheduledAtMs_ = 0;
-    }
+    uint32 GetDelayMs() const { return policy_.delayMs; }
+    uint64 GetRespawnToken() const { return respawnToken_; }
     
 private:
     RespawnPolicy policy_{};
@@ -112,7 +97,7 @@ private:
     RespawnState state_{RespawnState::None};
     
     uint64 deadSinceMs_{0};
-    uint64 scheduledAtMs_{0};
+    uint64 respawnToken_{0};
     
     Vector3 respawnPosition_{0.0f, 0.0f, 0.0f};
     

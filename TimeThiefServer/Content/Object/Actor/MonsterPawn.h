@@ -71,8 +71,8 @@ protected:
    
 private:
    void StartDeadState(ObjectManager& om, const DamageResult& dmgResult);
-   void ScheduleRespawn(ObjectManager& om, uint64 nowMs);
-   void ExecuteRespawn(ObjectManager& om, uint64 nowMs);
+   // void ScheduleRespawn(ObjectManager& om, uint64 nowMs);
+   // void ExecuteRespawn(ObjectManager& om, uint64 nowMs);
    
 private:
    int32 templateId_{ 0 };
