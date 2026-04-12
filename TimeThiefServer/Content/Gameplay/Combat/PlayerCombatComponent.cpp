@@ -249,8 +249,10 @@ bool PlayerCombatComponent::FireHitscan(const AttackRequest& request)
     Actor* victim = nullptr;
     SE::Physics::Hit::HitResult hitInfo{};
     
+    consoleLogger->Log(Color::Blue, L"Finding hit victim\n");
     if (room->TraceHit(ray, hitInfo)) {
         if (hitInfo.hit) {
+            consoleLogger->Log(Color::Magenta, L"Victim!!!!\n");
             victim = hitInfo.actor;
         }
     }
