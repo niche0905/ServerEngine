@@ -3,7 +3,7 @@
 #include "Physics/Collider/CollisionResult.h"
 #include "Physics/Collider/AABBCollider.h"
 
-namespace SE::Physics::Narrowphase
+namespace SE::Physics::NarrowPhase
 {
    bool Intersect_AABB_AABB(const Collider& a, const Collider& b, CollisionResult& out)
    {

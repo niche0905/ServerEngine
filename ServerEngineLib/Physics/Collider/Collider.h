@@ -34,6 +34,8 @@ namespace SE::Physics
         virtual ColliderType GetType() const = 0;
         virtual Collider* Clone() const = 0;
         
+        virtual void UpdateWorld(const Math::Vector3& position, float yaw) = 0;
+        
         virtual bool Intersect(const Collider& other, CollisionResult& out) const;
         
         virtual const AABBCollider& GetWorldAABB() const = 0;

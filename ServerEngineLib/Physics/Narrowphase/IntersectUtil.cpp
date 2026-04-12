@@ -6,7 +6,7 @@
    SwapWrapper
 ---------------*/
 
-namespace SE::Physics::Narrowphase
+namespace SE::Physics::NarrowPhase
 {
    bool SwapWrapper(const Collider& a, const Collider& b, CollisionResult& out, IntersectFn fnBA)
    {

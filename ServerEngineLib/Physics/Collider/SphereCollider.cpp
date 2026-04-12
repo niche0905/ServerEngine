@@ -24,17 +24,25 @@ namespace SE::Physics
       return new SphereCollider(*this);
    }
 
+   void SphereCollider::UpdateWorld(const Math::Vector3& position, float yaw)
+   {
+      worldCenter_ = position + RotateYaw(localCenter_, yaw); 
+      worldRadius_ = localRadius_;
+      
+      RecalcWorldAABB();
+   }
+
    void SphereCollider::Set(const Vector3& center, float radius)
    {
       // TODO: 디버그 일 때만 아래를 실행하도록 설정
       {
-         assert(SE::Math::NearlyZero(radius) && "Sphere Radius Zero");
+         assert(radius >= 0.0f && "Sphere Radius must be >= 0");
       }
       
-      center_ = center;
-      radius_ = SE::Math::Abs(radius);
+      localCenter_ = center;
+      localRadius_ = SE::Math::Abs(radius);
       
-      RecalcWorldAABB();
+      UpdateWorld(Vector3{0.0f, 0.0f, 0.0f}, 0.0f);
    }
 
    const AABBCollider& SphereCollider::GetWorldAABB() const
@@ -49,10 +57,10 @@ namespace SE::Physics
          assert(SE::Math::NearlyZero(ray.direction.LengthSq() - 1.0f, 1e-3f) && "Ray direction must be normalized");
       }
       
-      const Vector3 m = ray.origin - center_;
+      const Vector3 m = ray.origin - localCenter_;
       
       const float halfB = m.Dot(ray.direction);
-      const float c = m.Dot(m) - (radius_ * radius_);
+      const float c = m.Dot(m) - (localRadius_ * localRadius_);
       
       const float disc = halfB * halfB - c;
       if (disc < 0.0f)  // 교차 없음
@@ -72,7 +80,7 @@ namespace SE::Physics
       out.t = t;
       out.point = ray.At(t);
       
-      out.normal = (out.point - center_).Normalized(Vector3(0.0f, 1.0f, 0.0f));     // 노멀 단위벡터
+      out.normal = (out.point - localCenter_).Normalized(Vector3(0.0f, 1.0f, 0.0f));     // 노멀 단위벡터
                                                                                           // 만약 중심과 일치하면 Y축 방향으로 설정(임의 설정)
       out.collider = this;
       
@@ -81,16 +89,16 @@ namespace SE::Physics
 
    bool SphereCollider::Contains(const Vector3& point) const
    {
-      const float dist = (point - center_).LengthSq();
+      const float dist = (point - localCenter_).LengthSq();
       return dist <= RadiusSq();
    }
 
    void SphereCollider::RecalcWorldAABB()
    {
-      const Vector3 r{radius_, radius_, radius_};
+      const Vector3 r{worldRadius_, worldRadius_, worldRadius_};
       
-      const Vector3 mn = center_ - r;
-      const Vector3 mx = center_ + r;
+      const Vector3 mn = worldCenter_ - r;
+      const Vector3 mx = worldCenter_ + r;
       
       worldAABB_.SetMinMax(mn, mx);
    }

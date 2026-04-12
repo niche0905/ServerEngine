@@ -5,7 +5,7 @@
 #include "Physics/Collider/CollisionResult.h"
 #include "Physics/Collider/CapsuleCollider.h"
 
-namespace SE::Physics::Narrowphase
+namespace SE::Physics::NarrowPhase
 {
    bool Intersect_Capsule_Capsule(const Collider& a, const Collider& b, CollisionResult& out)
    {

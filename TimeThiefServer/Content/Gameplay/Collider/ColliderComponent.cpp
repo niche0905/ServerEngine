@@ -1,6 +1,7 @@
 ﻿#include "pch.h"
 #include "ColliderComponent.h"
 
+#include "Content/Object/Actor/Actor.h"
 #include "Physics/Ray/RaycastHit.h"
 
 /*---------------------
@@ -29,4 +30,12 @@ SE::Physics::Collider* ColliderComponent::GetCollider()
 const SE::Physics::Collider* ColliderComponent::GetCollider() const
 {
     return collider_.get(); 
+}
+
+void ColliderComponent::UpdateWorldCollider()
+{
+    if (ownerActor_ == nullptr, collider_ == nullptr)
+        return;
+    
+    collider_->UpdateWorld(ownerActor_->GetPosition(), ownerActor_->GetYaw());
 }

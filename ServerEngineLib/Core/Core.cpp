@@ -10,7 +10,7 @@ namespace SE
         static std::once_flag InitFlag;
         std::call_once(InitFlag, []
         {
-            SE::Physics::Narrowphase::InitIntersectTable();
+            SE::Physics::NarrowPhase::InitIntersectTable();
             SocketUtils::Initialize();                // 소켓 유틸리티 초기화
             
             std::atexit([]

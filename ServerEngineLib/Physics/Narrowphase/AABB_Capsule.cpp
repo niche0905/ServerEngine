@@ -6,7 +6,7 @@
 #include "Physics/Collider/CapsuleCollider.h"
 
 
-namespace SE::Physics::Narrowphase
+namespace SE::Physics::NarrowPhase
 {
    using Vector3 = SE::Math::Vector3;
    

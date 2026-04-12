@@ -1,4 +1,5 @@
 ﻿#pragma once
+#include "Vector.h"
 
 /*--------
    Math
@@ -20,4 +21,16 @@ namespace SE::Math
     
     inline bool NearlyZero(float v, float eps = 1e-4f) { return Abs(v) <= eps; }
     inline bool NearlyEqual(float a, float b, float eps = 1e-4f) { return Abs(a - b) <= eps; }
+    
+    inline SE::Math::Vector3 RotateYaw(const SE::Math::Vector3& v, float yawDegrees)
+    {
+        const float c = std::cos(yawDegrees);
+        const float s = std::sin(yawDegrees);
+        
+        return SE::Math::Vector3{
+        v.x * c - v.z * s, 
+        v.y,
+        v.x * s + v.z * c
+        };
+    }
 }

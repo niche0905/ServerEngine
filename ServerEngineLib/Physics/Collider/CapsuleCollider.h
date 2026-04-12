@@ -25,16 +25,18 @@ namespace SE::Physics
         virtual ColliderType GetType() const override;
         virtual Collider* Clone() const override;
         
+        virtual void UpdateWorld(const Math::Vector3& position, float yaw) override;
+        
     public:
         void Set(const Vector3& pointA, const Vector3& pointB, float radius);
         
-        const Vector3& GetPointA() const { return pointA_; }
-        const Vector3& GetPointB() const { return pointB_; }
-        float GetRadius() const { return radius_; }
+        const Vector3& GetPointA() const { return worldPointA_; }
+        const Vector3& GetPointB() const { return worldPointB_; }
+        float GetRadius() const { return worldRadius_; }
         
-        float RadiusSq() const { return radius_ * radius_; }
+        float RadiusSq() const { return worldRadius_ * worldRadius_; }
         
-        Vector3 GetCenter() const { return (pointA_ + pointB_) * 0.5f; }
+        Vector3 GetCenter() const { return (worldPointA_ + worldPointB_) * 0.5f; }
         Vector3 GetAxis() const { return dir_; }
         float GetHalfLen() const { return halfLen_; }
         float GetSegmentLen() const { return halfLen_ * 2; }
@@ -52,9 +54,13 @@ namespace SE::Physics
         void RecalcDerived();
         
     private:
-        Vector3 pointA_{};
-        Vector3 pointB_{};
-        float radius_{};
+        Vector3 localPointA_{};
+        Vector3 localPointB_{};
+        float localRadius_{};
+        
+        Vector3 worldPointA_{};
+        Vector3 worldPointB_{};
+        float worldRadius_{};
         
         Vector3 dir_{};
         float halfLen_{};

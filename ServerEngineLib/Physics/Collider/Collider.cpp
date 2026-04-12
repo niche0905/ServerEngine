@@ -23,7 +23,7 @@ namespace SE::Physics
          return true;
       }
       
-      using namespace SE::Physics::Narrowphase;
+      using namespace SE::Physics::NarrowPhase;
       
       const auto fn = GetIntersectFn(GetType(), other.GetType());
       return fn(*this, other, out);

@@ -4,7 +4,7 @@
 #include "Physics/Collider/CollisionResult.h"
 #include "Physics/Collider/CharacterCapsuleCollider.h"
 
-namespace SE::Physics::Narrowphase
+namespace SE::Physics::NarrowPhase
 {
     bool Intersect_CharacterCapsule_CharacterCapsule(const Collider& a, const Collider& b, CollisionResult& out)
     {

@@ -10,7 +10,7 @@
 // 구현의 편의를 위해 사용됩니다
 //
 
-namespace SE::Physics::Narrowphase
+namespace SE::Physics::NarrowPhase
 {
     using Vector3 = SE::Math::Vector3;
     using IntersectFn = bool(*)(const Collider&, const Collider&, CollisionResult&);

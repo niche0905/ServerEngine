@@ -34,6 +34,22 @@ namespace
 void Actor::SetPosition(const Vector3& position)
 {
     position_ = position;
+    SyncColliders();
+    OnRepDirtyTransform();
+}
+
+void Actor::SetYaw(float yaw)
+{
+    yaw_ = yaw;
+    SyncColliders();
+    OnRepDirtyTransform();
+}
+
+void Actor::SetTransform(const Vector3& position, float yaw)
+{
+    position_ = position;
+    yaw_ = yaw;
+    SyncColliders();
     OnRepDirtyTransform();
 }
 
@@ -41,6 +57,15 @@ void Actor::ForEachCollider(const std::function<void(ColliderComponent*)>& fn) c
 {
     for (const auto& collider : colliders_) {
         fn(collider.get());
+    }
+}
+
+void Actor::SyncColliders()
+{
+    for (auto& collider : colliders_) {
+        if (collider) {
+            collider->UpdateWorldCollider();
+        }
     }
 }
 

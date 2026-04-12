@@ -28,6 +28,16 @@ namespace SE::Physics
       return c;
    }
 
+   void CompoundCollider::UpdateWorld(const Math::Vector3& position, float yaw)
+   {
+      for (auto& child : colliders_) {
+         if (child)
+            child->UpdateWorld(position, yaw);
+      }
+      
+      dirtyAABB_ = true;
+   }
+
    bool CompoundCollider::Intersect(const Collider& other, CollisionResult& out) const
    {
       bool hit = false;

@@ -6,7 +6,7 @@
    Narrowphase
 ---------------*/
 
-namespace SE::Physics::Narrowphase
+namespace SE::Physics::NarrowPhase
 {
    constexpr int kTypeCount = static_cast<int>(ColliderType::Compound) + 1;
    

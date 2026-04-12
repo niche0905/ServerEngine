@@ -29,6 +29,8 @@ namespace SE::Physics
       virtual ColliderType GetType() const override;
       virtual Collider* Clone() const override;
       
+      virtual void UpdateWorld(const Math::Vector3& position, float yaw) override;
+      
    public:
       void Set(const Vector3& center,
          const Vector3& halfExtent,
@@ -36,11 +38,11 @@ namespace SE::Physics
          const Vector3& axisY,
          const Vector3& axisZ);
       
-      const Vector3& GetCenter() const { return  center_; }
-      const Vector3& GetHalfExtent() const { return  half_; }
-      const Vector3& GetAxisX() const { return  axis_[0]; }
-      const Vector3& GetAxisY() const { return  axis_[1]; }
-      const Vector3& GetAxisZ() const { return  axis_[2]; }
+      const Vector3& GetCenter() const { return  worldCenter_; }
+      const Vector3& GetHalfExtent() const { return  worldHalf_; }
+      const Vector3& GetAxisX() const { return  worldAxis_[0]; }
+      const Vector3& GetAxisY() const { return  worldAxis_[1]; }
+      const Vector3& GetAxisZ() const { return  worldAxis_[2]; }
       
       const AABBCollider& GetWorldAABB() const override;
       
@@ -52,9 +54,13 @@ namespace SE::Physics
       void RecalcWorldAABB();
       
    private:
-      Vector3 center_{};
-      Vector3 half_{};
-      Vector3 axis_[3]{};
+      Vector3 localCenter_{};
+      Vector3 localHalf_{};
+      Vector3 localAxis_[3]{};
+      
+      Vector3 worldCenter_{};
+      Vector3 worldHalf_{};
+      Vector3 worldAxis_[3]{};
       
       AABBCollider worldAABB_{};
     

@@ -24,6 +24,8 @@ namespace SE::Physics
         virtual ColliderType GetType() const override;
         virtual Collider* Clone() const override;
         
+        virtual void UpdateWorld(const Math::Vector3& position, float yaw) override;
+        
         virtual bool Intersect(const Collider& other, CollisionResult& out) const override;
         
     public:

@@ -57,6 +57,15 @@ namespace SE::Physics
       return new CharacterCapsuleCollider(*this);
    }
 
+   void CharacterCapsuleCollider::UpdateWorld(const Math::Vector3& position, float yaw)
+   {
+      worldBase_ = position + Math::RotateYaw(localBase_, yaw);
+      worldHeight_ = localHeight_;
+      worldRadius_ = localRadius_;
+      
+      RecalcWorldAABB();
+   }
+
    void CharacterCapsuleCollider::Set(const Vector3& base, float height, float radius)
    {
       // TODO: 디버그 일 때만 아래를 실행하도록 설정
@@ -65,13 +74,13 @@ namespace SE::Physics
          assert(height >= 2.0f * radius && "Character Capsule height must be >= 2*radius");
       }
       
-      base_ = base;
-      height_ = height;
-      radius_ = SE::Math::Abs(radius);
+      localBase_ = base;
+      localHeight_ = height;
+      localRadius_ = SE::Math::Abs(radius);
       
-      if (height_ < 2.0f * radius_) height_ = 2.0f * radius_;  // 캡슐 크기 유효하게
+      if (localHeight_ < 2.0f * localRadius_) localHeight_ = 2.0f * localRadius_;  // 캡슐 크기 유효하게
       
-      RecalcWorldAABB();
+      UpdateWorld(Vector3{0.0f, 0.0f, 0.0f}, 0.0f);
    }
 
    const AABBCollider& CharacterCapsuleCollider::GetWorldAABB() const
@@ -86,22 +95,22 @@ namespace SE::Physics
          assert(SE::Math::NearlyZero(ray.direction.LengthSq() - 1.0f, 1e-3f) && "Ray direction must be normalized");
       }
       
-      const float r = radius_;
+      const float r = worldRadius_;
       if (r <= 0.0f)
          return false;
       
-      const float yA = base_.y + r;
-      const float yB = base_.y + (height_ - r);
+      const float yA = worldBase_.y + r;
+      const float yB = worldBase_.y + (worldHeight_ - r);
       
-      const Vector3 capA{ base_.x, yA, base_.z };
-      const Vector3 capB{ base_.x, yB, base_.z };
+      const Vector3 capA{ worldBase_.x, yA, worldBase_.z };
+      const Vector3 capB{ worldBase_.x, yB, worldBase_.z };
       
       bool hit = false;
       float bestT = ray.tMax;
       Vector3 bestN{0, 0, 0};
       
-      const float ox = ray.origin.x - base_.x;
-      const float oz = ray.origin.z - base_.z;
+      const float ox = ray.origin.x - worldBase_.x;
+      const float oz = ray.origin.z - worldBase_.z;
       const float dx = ray.direction.x;
       const float dz = ray.direction.z;
       
@@ -129,7 +138,7 @@ namespace SE::Physics
                
                const Vector3 p = ray.At(tCand);
                
-               Vector3 n{p.x-base_.x, 0.0f, p.z - base_.z};
+               Vector3 n{p.x-worldBase_.x, 0.0f, p.z - worldBase_.z};
                n = n.Normalized(Vector3{1.0f, 0.0f, 0.0f});
                
                if (!hit or tCand < bestT) {
@@ -180,14 +189,14 @@ namespace SE::Physics
 
    SE::Math::Vector3 CharacterCapsuleCollider::ClosestPointOnSegment(const Vector3& point) const
    {
-      const float yA = base_.y + radius_;
-      const float yB = base_.y + (height_ - radius_);
+      const float yA = worldBase_.y + worldRadius_;
+      const float yB = worldBase_.y + (worldHeight_ - worldRadius_);
       
       float y = point.y;
       if (y < yA) y = yA;
       if (y > yB) y = yB;
       
-      return Vector3{ base_.x, y, base_.z };
+      return Vector3{ worldBase_.x, y, worldBase_.z };
    }
 
    SE::Math::Vector3 CharacterCapsuleCollider::ClosestPoint(const Vector3& point) const
@@ -201,12 +210,12 @@ namespace SE::Physics
       if (distSq <= 1e-12f)
          return c;
       
-      const float rSq = radius_ * radius_;
+      const float rSq = worldRadius_ * worldRadius_;
       if (distSq <= rSq)
          return point;  // 캡슐 내부라면 그대로 반환
       
       const Vector3 n = v.Normalized();
-      return c + (n * radius_);
+      return c + (n * worldRadius_);
    }
 
    float CharacterCapsuleCollider::DistanceSqToSegment(const Vector3& point) const
@@ -218,15 +227,15 @@ namespace SE::Physics
    void CharacterCapsuleCollider::RecalcWorldAABB()
    {
       const Vector3 mn{
-         base_.x - radius_,
-         base_.y,
-         base_.z - radius_
+         worldBase_.x - worldRadius_,
+         worldBase_.y,
+         worldBase_.z - worldRadius_
      };
 
       const Vector3 mx{
-         base_.x + radius_,
-         base_.y + height_,
-         base_.z + radius_
+         worldBase_.x + worldRadius_,
+         worldBase_.y + worldHeight_,
+         worldBase_.z + worldRadius_
      };
 
       worldAABB_.SetMinMax(mn, mx);

@@ -35,6 +35,8 @@ public:
    
    bool HasCollider() const { return collider_ != nullptr; }
    
+   void UpdateWorldCollider();
+   
    void SetRole(ColliderRole role) { role_ = role; }
    ColliderRole GetRole() const { return role_; }
    

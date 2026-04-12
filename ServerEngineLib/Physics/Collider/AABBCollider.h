@@ -24,17 +24,19 @@ namespace SE::Physics
         virtual ColliderType GetType() const override;
         virtual Collider* Clone() const override;
         
+        virtual void UpdateWorld(const Math::Vector3& position, float yaw) override;
+        
     public:
         void SetMinMax(const Vector3& minPoint, const Vector3& maxPoint);
         
         const Vector3& GetMin() const { return min_; }
         const Vector3& GetMax() const { return max_; }
-        const Vector3& GetCenter() const { return center_; }
-        const Vector3& GetExtent() const { return extent_; }
+        const Vector3& GetCenter() const { return worldCenter_; }
+        const Vector3& GetExtent() const { return worldExtent_; }
         
         bool Contains(const Vector3& point) const;
         bool Overlaps(const AABBCollider& other) const;
-        void Expand(float margin);
+        // void Expand(float margin);
         static AABBCollider Union(const AABBCollider& a, const AABBCollider& b);
         
         const AABBCollider& GetWorldAABB() const override;
@@ -42,15 +44,15 @@ namespace SE::Physics
         virtual bool Raycast(const Ray& ray, RaycastHit& out) const override;
         
     private:
-        void RecalcCache();
+        Vector3 localCenter_{};
+        Vector3 localExtent_{};
         
-    private:
         Vector3 min_{};
         Vector3 max_{};
         
         // cache
-        Vector3 center_{};
-        Vector3 extent_{};
+        Vector3 worldCenter_{};
+        Vector3 worldExtent_{};
     
     };
 

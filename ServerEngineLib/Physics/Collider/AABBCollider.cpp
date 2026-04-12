@@ -25,17 +25,33 @@ namespace SE::Physics
       return new AABBCollider(*this);
    }
 
+   void AABBCollider::UpdateWorld(const Math::Vector3& position, float yaw)
+   {
+      worldCenter_ = position + localCenter_;
+      worldExtent_ = localExtent_;
+      
+      min_ = worldCenter_ - worldExtent_;
+      max_ = worldCenter_ + worldExtent_;
+   }
+
    void AABBCollider::SetMinMax(const Vector3& minPoint, const Vector3& maxPoint)
    {
-      min_.x = SE::Math::Min(minPoint.x, maxPoint.x);
-      min_.y = SE::Math::Min(minPoint.y, maxPoint.y);
-      min_.z = SE::Math::Min(minPoint.z, maxPoint.z);
+      const Vector3 mn{
+         SE::Math::Min(minPoint.x, maxPoint.x),
+         SE::Math::Min(minPoint.y, maxPoint.y),
+         SE::Math::Min(minPoint.z, maxPoint.z)
+      };
       
-      max_.x = SE::Math::Max(minPoint.x, maxPoint.x);
-      max_.y = SE::Math::Max(minPoint.y, maxPoint.y);
-      max_.z = SE::Math::Max(minPoint.z, maxPoint.z);
+      const Vector3 mx{
+         SE::Math::Max(minPoint.x, maxPoint.x),
+         SE::Math::Max(minPoint.y, maxPoint.y),
+         SE::Math::Max(minPoint.z, maxPoint.z)
+      };
       
-      RecalcCache();
+      localCenter_ = (mn + mx) * 0.5f;
+      localExtent_ = (mx - mn) * 0.5f;
+      
+      UpdateWorld(Vector3{0.0f, 0.0f, 0.0f}, 0.0f);
    }
 
    bool AABBCollider::Contains(const Vector3& point) const
@@ -52,14 +68,6 @@ namespace SE::Physics
       if (max_.z < other.min_.z or min_.z > other.max_.z) return false;
       
       return true;
-   }
-
-   void AABBCollider::Expand(float margin)
-   {
-      min_.x -= margin; min_.y -= margin; min_.z -= margin;
-      max_.x += margin; max_.y += margin; max_.z += margin;
-      
-      RecalcCache();
    }
 
    AABBCollider AABBCollider::Union(const AABBCollider& a, const AABBCollider& b)
@@ -161,11 +169,5 @@ namespace SE::Physics
       out.collider = this;
       
       return true;
-   }
-
-   void AABBCollider::RecalcCache()
-   {
-      center_ = (min_ + max_) * 0.5f;
-      extent_ = (max_ - min_) * 0.5f;
    }
 }

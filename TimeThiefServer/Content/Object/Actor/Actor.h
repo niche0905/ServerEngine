@@ -45,14 +45,17 @@ public:
    void SetPosition(const Vector3& position);
    
    float GetYaw() const { return yaw_; }
-   void SetYaw(float yaw) { yaw_ = yaw; OnRepDirtyTransform(); }
+   void SetYaw(float yaw);
+   
+   void SetTransform(const Vector3& position, float yaw);
    
 // Collider 관련 함수들
 public:
     virtual void ForEachCollider(const std::function<void(ColliderComponent*)>& fn) const override;
    
    const std::vector<std::unique_ptr<ColliderComponent>>& GetColliders() const { return colliders_; }
-   // std::vector<std::unique_ptr<ColliderComponent>>& GetColliders() { return colliders_; }
+   
+   void SyncColliders();
    
 // Replication 관련 함수들
 public:

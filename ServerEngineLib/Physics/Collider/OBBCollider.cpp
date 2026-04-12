@@ -26,27 +26,39 @@ namespace SE::Physics
       return new OBBCollider(*this);
    }
 
-   void OBBCollider::Set(const Vector3& center, const Vector3& halfExtent, 
-      const Vector3& axisX, const Vector3& axisY, const Vector3& axisZ)
+   void OBBCollider::UpdateWorld(const Math::Vector3& position, float yaw)
    {
-      center_ = center;
+      worldCenter_ = position + Math::RotateYaw(localCenter_, yaw);
+      worldHalf_ = localHalf_;
       
-      half_.x = SE::Math::Abs(halfExtent.x);
-      half_.y = SE::Math::Abs(halfExtent.y);
-      half_.z = SE::Math::Abs(halfExtent.z);
+      worldAxis_[0] = Math::RotateYaw(localAxis_[0], yaw).Normalized(Vector3{1, 0, 0});
+      worldAxis_[1] = Math::RotateYaw(localAxis_[1], yaw).Normalized(Vector3{0, 1, 0});
+      worldAxis_[2] = Math::RotateYaw(localAxis_[2], yaw).Normalized(Vector3{0, 0, 1});
       
-      axis_[0] = axisX.Normalized(Vector3{1, 0, 0});
-      axis_[1] = axisY.Normalized(Vector3{0, 1, 0});
-      axis_[2] = axisZ.Normalized(Vector3{0, 0, 1});
+      RecalcWorldAABB();
+   }
+
+   void OBBCollider::Set(const Vector3& center, const Vector3& halfExtent, 
+                         const Vector3& axisX, const Vector3& axisY, const Vector3& axisZ)
+   {
+      localCenter_ = center;
+      
+      localHalf_.x = SE::Math::Abs(halfExtent.x);
+      localHalf_.y = SE::Math::Abs(halfExtent.y);
+      localHalf_.z = SE::Math::Abs(halfExtent.z);
+      
+      localAxis_[0] = axisX.Normalized(Vector3{1, 0, 0});
+      localAxis_[1] = axisY.Normalized(Vector3{0, 1, 0});
+      localAxis_[2] = axisZ.Normalized(Vector3{0, 0, 1});
       
       // TODO: 디버그 일 때만 아래를 실행하도록 설정
       {
-         assert(SE::Math::NearlyZero(axis_[0].Dot(axis_[1])) && "OBB axes must be orthogonal");
-         assert(SE::Math::NearlyZero(axis_[0].Dot(axis_[2])) && "OBB axes must be orthogonal");
-         assert(SE::Math::NearlyZero(axis_[1].Dot(axis_[2])) && "OBB axes must be orthogonal");
+         assert(SE::Math::NearlyZero(localAxis_[0].Dot(localAxis_[1])) && "OBB axes must be orthogonal");
+         assert(SE::Math::NearlyZero(localAxis_[0].Dot(localAxis_[2])) && "OBB axes must be orthogonal");
+         assert(SE::Math::NearlyZero(localAxis_[1].Dot(localAxis_[2])) && "OBB axes must be orthogonal");
       }
       
-      RecalcWorldAABB();
+      UpdateWorld(Vector3{0.0f, 0.0f, 0.0f}, 0.0f);
    }
 
    const AABBCollider& OBBCollider::GetWorldAABB() const
@@ -58,27 +70,27 @@ namespace SE::Physics
    {
       // TODO: 디버그 일 때만 아래를 실행하도록 설정
       {
-         assert(SE::Math::NearlyZero(axis_[0].LengthSq() - 1.0f, 1e-3f) && "OBB axisX must be normalized");
-         assert(SE::Math::NearlyZero(axis_[1].LengthSq() - 1.0f, 1e-3f) && "OBB axisY must be normalized");
-         assert(SE::Math::NearlyZero(axis_[2].LengthSq() - 1.0f, 1e-3f) && "OBB axisZ must be normalized");
+         assert(SE::Math::NearlyZero(worldAxis_[0].LengthSq() - 1.0f, 1e-3f) && "OBB axisX must be normalized");
+         assert(SE::Math::NearlyZero(worldAxis_[1].LengthSq() - 1.0f, 1e-3f) && "OBB axisY must be normalized");
+         assert(SE::Math::NearlyZero(worldAxis_[2].LengthSq() - 1.0f, 1e-3f) && "OBB axisZ must be normalized");
       }
       
-      const Vector3 o = ray.origin - center_;
+      const Vector3 o = ray.origin - worldCenter_;
       
       const Vector3 oL{
-         o.Dot(axis_[0]),
-         o.Dot(axis_[1]),
-         o.Dot(axis_[2])
+         o.Dot(worldAxis_[0]),
+         o.Dot(worldAxis_[1]),
+         o.Dot(worldAxis_[2])
       };
       
       const Vector3 dL{
-         ray.direction.Dot(axis_[0]),
-         ray.direction.Dot(axis_[1]),
-         ray.direction.Dot(axis_[2])
+         ray.direction.Dot(worldAxis_[0]),
+         ray.direction.Dot(worldAxis_[1]),
+         ray.direction.Dot(worldAxis_[2])
       };
       
-      const Vector3 mn = Vector3{-half_.x, -half_.y, -half_.z};
-      const Vector3 mx = Vector3{ half_.x,  half_.y,  half_.z};
+      const Vector3 mn = Vector3{-worldHalf_.x, -worldHalf_.y, -worldHalf_.z};
+      const Vector3 mx = Vector3{ worldHalf_.x,  worldHalf_.y,  worldHalf_.z};
       
       float tMin = ray.tMin;
       float tMax = ray.tMax;
@@ -138,7 +150,7 @@ namespace SE::Physics
       out.t = tHit;
       out.point = ray.At(tHit);
       
-      Vector3 nW = axis_[0] * nL.x + axis_[1] * nL.y + axis_[2] * nL.z;
+      Vector3 nW = worldAxis_[0] * nL.x + worldAxis_[1] * nL.y + worldAxis_[2] * nL.z;
       out.normal = nW;  // axis_가 정규 직교면 nW도 정규 벡터
       // TODO: 디버그 일 때만 아래를 실행하도록 설정
       {
@@ -152,21 +164,21 @@ namespace SE::Physics
 
    SE::Math::Vector3 OBBCollider::ClosestPoint(const Vector3& point) const
    {
-      const Vector3 d = point - center_;
+      const Vector3 d = point - worldCenter_;
       
-      Vector3 q = center_;
+      Vector3 q = worldCenter_;
       
-      float dist = d.Dot(axis_[0]);
-      dist = SE::Math::Max(-half_.x, SE::Math::Min(dist , half_.x));
-      q = q + (axis_[0] * dist);
+      float dist = d.Dot(worldAxis_[0]);
+      dist = SE::Math::Max(-worldHalf_.x, SE::Math::Min(dist , worldHalf_.x));
+      q = q + (worldAxis_[0] * dist);
       
-      dist = d.Dot(axis_[1]);
-      dist = SE::Math::Max(-half_.y, SE::Math::Min(dist , half_.y));
-      q = q + (axis_[1] * dist);
+      dist = d.Dot(worldAxis_[1]);
+      dist = SE::Math::Max(-worldHalf_.y, SE::Math::Min(dist , worldHalf_.y));
+      q = q + (worldAxis_[1] * dist);
       
-      dist = d.Dot(axis_[2]);
-      dist = SE::Math::Max(-half_.z, SE::Math::Min(dist , half_.z));
-      q = q + (axis_[2] * dist);
+      dist = d.Dot(worldAxis_[2]);
+      dist = SE::Math::Max(-worldHalf_.z, SE::Math::Min(dist , worldHalf_.z));
+      q = q + (worldAxis_[2] * dist);
       
       return q;
    }
@@ -174,12 +186,12 @@ namespace SE::Physics
    void OBBCollider::RecalcWorldAABB()
    {
       Vector3 r;
-      r.x = SE::Math::Abs(axis_[0].x) * half_.x + SE::Math::Abs(axis_[1].x) * half_.y + SE::Math::Abs(axis_[2].x) * half_.z;
-      r.y = SE::Math::Abs(axis_[0].y) * half_.x + SE::Math::Abs(axis_[1].y) * half_.y + SE::Math::Abs(axis_[2].y) * half_.z;
-      r.z = SE::Math::Abs(axis_[0].z) * half_.x + SE::Math::Abs(axis_[1].z) * half_.y + SE::Math::Abs(axis_[2].z) * half_.z;
+      r.x = SE::Math::Abs(worldAxis_[0].x) * worldHalf_.x + SE::Math::Abs(worldAxis_[1].x) * worldHalf_.y + SE::Math::Abs(worldAxis_[2].x) * worldHalf_.z;
+      r.y = SE::Math::Abs(worldAxis_[0].y) * worldHalf_.x + SE::Math::Abs(worldAxis_[1].y) * worldHalf_.y + SE::Math::Abs(worldAxis_[2].y) * worldHalf_.z;
+      r.z = SE::Math::Abs(worldAxis_[0].z) * worldHalf_.x + SE::Math::Abs(worldAxis_[1].z) * worldHalf_.y + SE::Math::Abs(worldAxis_[2].z) * worldHalf_.z;
       
-      const Vector3 mn = center_ - r;
-      const Vector3 mx = center_ + r;
+      const Vector3 mn = worldCenter_ - r;
+      const Vector3 mx = worldCenter_ + r;
       
       worldAABB_.SetMinMax(mn, mx);
    }

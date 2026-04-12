@@ -25,25 +25,30 @@ namespace SE::Physics
         virtual ColliderType GetType() const override;
         virtual Collider* Clone() const override;
         
+        virtual void UpdateWorld(const Math::Vector3& position, float yaw) override;
+        
     public:
         void Set(const Vector3& center, float radius);
         
-        const Vector3& GetCenter() const { return center_; }
-        float GetRadius() const { return radius_; }
+        const Vector3& GetCenter() const { return localCenter_; }
+        float GetRadius() const { return localRadius_; }
         
         const AABBCollider& GetWorldAABB() const override;
         
         virtual bool Raycast(const Ray& ray, RaycastHit& out) const override;
         
         bool Contains(const Vector3& point) const;
-        float RadiusSq() const { return radius_ * radius_; }
+        float RadiusSq() const { return localRadius_ * localRadius_; }
         
     private:
         void RecalcWorldAABB();
         
     private:
-        Vector3 center_{};
-        float radius_{};
+        Vector3 localCenter_{};
+        float localRadius_{};
+        
+        Vector3 worldCenter_{};
+        float worldRadius_{};
         
         AABBCollider worldAABB_{};
     

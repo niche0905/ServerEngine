@@ -26,21 +26,23 @@ namespace SE::Physics
       virtual ColliderType GetType() const override;
       virtual Collider* Clone() const override;
       
+      virtual void UpdateWorld(const Math::Vector3& position, float yaw) override;
+      
    public:
       void Set(const Vector3& base, float height, float radius);
       
-      const Vector3& GetBase() const { return base_; }
-      float GetHeight() const { return height_; }
-      float GetRadius() const { return radius_; }
+      const Vector3& GetBase() const { return worldBase_; }
+      float GetHeight() const { return worldHeight_; }
+      float GetRadius() const { return worldRadius_; }
       
-      float GetCylinderHeight() const { return (height_ - 2.0f * radius_); }
-      Vector3 GetCenter() const { return (base_ + Vector3{0.0f, height_ * 0.5f, 0.0f}); }
+      float GetCylinderHeight() const { return (worldHeight_ - 2.0f * worldRadius_); }
+      Vector3 GetCenter() const { return (worldBase_ + Vector3{0.0f, worldHeight_ * 0.5f, 0.0f}); }
       
-      Vector3 GetPointA() const { return (base_ + Vector3{0.0f, radius_, 0.0f}); }
-      Vector3 GetPointB() const { return (base_ + Vector3{0.0f, height_ - radius_, 0.0f}); }
+      Vector3 GetPointA() const { return (worldBase_ + Vector3{0.0f, worldRadius_, 0.0f}); }
+      Vector3 GetPointB() const { return (worldBase_ + Vector3{0.0f, worldHeight_ - worldRadius_, 0.0f}); }
       
-      float GetBottomY() const { return base_.y; }
-      float GetTopY() const { return base_.y + height_; }
+      float GetBottomY() const { return worldBase_.y; }
+      float GetTopY() const { return worldBase_.y + worldHeight_; }
       
       const AABBCollider& GetWorldAABB() const override;
       
@@ -54,9 +56,13 @@ namespace SE::Physics
       void RecalcWorldAABB();
       
    private:
-      Vector3 base_{}; // pivot
-      float height_{};
-      float radius_{};
+      Vector3 localBase_{}; // pivot
+      float localHeight_{};
+      float localRadius_{};
+      
+      Vector3 worldBase_{};
+      float worldHeight_{};
+      float worldRadius_{};
       
       AABBCollider worldAABB_{};
     

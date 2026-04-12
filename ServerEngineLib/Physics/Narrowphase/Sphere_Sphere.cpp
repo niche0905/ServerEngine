@@ -3,7 +3,7 @@
 #include "Physics/Collider/CollisionResult.h"
 #include "Physics/Collider/SphereCollider.h"
 
-namespace SE::Physics::Narrowphase
+namespace SE::Physics::NarrowPhase
 {
    bool Intersect_Sphere_Sphere(const Collider& a, const Collider& b, CollisionResult& out)
    {

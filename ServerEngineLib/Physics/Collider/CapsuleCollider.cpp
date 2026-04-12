@@ -56,19 +56,28 @@ namespace SE::Physics
       return new CapsuleCollider(*this);
    }
 
+   void CapsuleCollider::UpdateWorld(const Math::Vector3& position, float yaw)
+   {
+      worldPointA_ = position + Math::RotateYaw(localPointA_, yaw);
+      worldPointB_ = position + Math::RotateYaw(localPointB_, yaw);
+      worldRadius_ = localRadius_;
+      
+      RecalcDerived();
+      RecalcWorldAABB();
+   }
+
    void CapsuleCollider::Set(const Vector3& pointA, const Vector3& pointB, float radius)
    {
       // TODO: 디버그 일 때만 아래를 실행하도록 설정
       {
-         assert(radius >= 0.0f && "Capsule Radius must be > 0");
+         assert(radius >= 0.0f && "Capsule Radius must be >= 0");
       }
       
-      pointA_ = pointA;
-      pointB_ = pointB;
-      radius_ = SE::Math::Abs(radius);
+      localPointA_ = pointA;
+      localPointB_ = pointB;
+      localRadius_ = SE::Math::Abs(radius);
       
-      RecalcDerived();
-      RecalcWorldAABB();
+      UpdateWorld(Vector3{0.0f, 0.0f, 0.0f}, 0.0f);
    }
 
    const AABBCollider& CapsuleCollider::GetWorldAABB() const
@@ -83,9 +92,9 @@ namespace SE::Physics
          assert(SE::Math::NearlyZero(ray.direction.LengthSq() - 1.0f, 1e-3f) && "Ray direction must be normalized");
       }
       
-      const Vector3 A = pointA_;
-      const Vector3 B = pointB_;
-      const float r = radius_;
+      const Vector3 A = worldPointA_;
+      const Vector3 B = worldPointB_;
+      const float r = worldRadius_;
       
       const Vector3 AB = B - A;
       const float lenSq = AB.LengthSq();
@@ -220,14 +229,14 @@ namespace SE::Physics
 
    SE::Math::Vector3 CapsuleCollider::ClosestPointOnSegment(const Vector3& point) const
    {
-      const Vector3 ab = pointB_ - pointA_;
+      const Vector3 ab = worldPointB_ - worldPointA_;
       const float abLenSq = ab.LengthSq();
 
       if (abLenSq <= 1e-12f)
-         return pointA_; // A==B면 그냥 그 점
+         return worldPointA_; // A==B면 그냥 그 점
 
-      const float t = SE::Math::Clamp((point - pointA_).Dot(ab) / abLenSq, 0.0f, 1.0f);
-      return pointA_ + (ab * t);
+      const float t = SE::Math::Clamp((point - worldPointA_).Dot(ab) / abLenSq, 0.0f, 1.0f);
+      return worldPointA_ + (ab * t);
    }
 
    SE::Math::Vector3 CapsuleCollider::ClosestPoint(const Vector3& point) const
@@ -246,7 +255,7 @@ namespace SE::Physics
          return point; // 캡슐 내부면 점 그대로(서버 판정에서 자주 쓰는 정책)
 
       const Vector3 n = v.Normalized();     // c->point 방향 단위벡터
-      return c + (n * radius_);  
+      return c + (n * worldRadius_);  
    }
 
    float CapsuleCollider::DistanceSqToSegment(const Vector3& point) const
@@ -258,18 +267,18 @@ namespace SE::Physics
    void CapsuleCollider::RecalcWorldAABB()
    {
       Vector3 mn{
-         SE::Math::Min(pointA_.x, pointB_.x),
-         SE::Math::Min(pointA_.y, pointB_.y),
-         SE::Math::Min(pointA_.z, pointB_.z)
+         SE::Math::Min(worldPointA_.x, worldPointB_.x),
+         SE::Math::Min(worldPointA_.y, worldPointB_.y),
+         SE::Math::Min(worldPointA_.z, worldPointB_.z)
      };
 
       Vector3 mx{
-         SE::Math::Max(pointA_.x, pointB_.x),
-         SE::Math::Max(pointA_.y, pointB_.y),
-         SE::Math::Max(pointA_.z, pointB_.z)
+         SE::Math::Max(worldPointA_.x, worldPointB_.x),
+         SE::Math::Max(worldPointA_.y, worldPointB_.y),
+         SE::Math::Max(worldPointA_.z, worldPointB_.z)
      };
 
-      const Vector3 r{ radius_, radius_, radius_ };
+      const Vector3 r{ worldRadius_, worldRadius_, worldRadius_ };
       mn = mn - r;
       mx = mx + r;
 
@@ -278,7 +287,7 @@ namespace SE::Physics
 
    void CapsuleCollider::RecalcDerived()
    {
-      Vector3 ab = pointB_ - pointA_;
+      Vector3 ab = worldPointB_ - worldPointA_;
       float lenSq = ab.LengthSq();
       if (lenSq <= 1e-12f) {
          dir_ = Vector3{1,0,0};
