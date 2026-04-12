@@ -16,7 +16,7 @@ public:
    virtual ~PlayerCombatComponent() = default;
    
 public:
-   void Init(ObjectId owner, Pawn* ownerPawn);
+   virtual void Init(ObjectId owner, Pawn* ownerPawn) override;
    
    virtual bool CanAttack(const AttackRequest& request) const override;
    virtual bool TryReload();

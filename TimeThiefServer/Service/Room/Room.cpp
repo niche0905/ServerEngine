@@ -446,6 +446,7 @@ bool Room::HandleFire(PlayerId playerId, const se::game::C_FireReq& pkt)
       }
       
       AttackRequest attackReq;
+      attackReq.weaponId = pkt.weapon_id();
       attackReq.type = pkt.weapon_id() != 3 ? AttackType::Hitscan : AttackType::Projectile;   // TEMP: weapon_id가 3이면 투사체, 아니면 히트스캔으로 간주하기 (나중에 Weapon Data로 관리하기)
       attackReq.instigator = playerPawn;
       const auto& startPos = pkt.start_position();

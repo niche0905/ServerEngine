@@ -17,7 +17,7 @@ class CombatComponent : public BaseComponent
 public:
    virtual ~CombatComponent() = default;
    
-   void Init(ObjectId owner, Pawn* ownerPawn);
+   virtual void Init(ObjectId owner, Pawn* ownerPawn);
    
    void SetOwnerPawn(Pawn* pawn);
    Pawn* GetOwnerPawn() const;
