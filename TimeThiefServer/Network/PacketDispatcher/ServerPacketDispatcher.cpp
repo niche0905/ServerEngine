@@ -211,6 +211,11 @@ bool ServerPacketDispatcher::Handle_C_JumpLand(PacketSessionRef& session, const 
     });
 }
 
+bool ServerPacketDispatcher::Handle_C_DoubleJumpReq(PacketSessionRef& session, const se::game::C_DoubleJumpReq& pkt)
+{
+    return false;
+}
+
 bool ServerPacketDispatcher::Handle_C_CrouchReq(PacketSessionRef& session, const se::game::C_CrouchReq& pkt)
 {
     return EnqueueToPlayerRoom(session, pkt, [](Room& room, PlayerId playerId, const se::game::C_CrouchReq& pkt)
@@ -235,6 +240,11 @@ bool ServerPacketDispatcher::Handle_C_WireActionEnd(PacketSessionRef& session, c
     });
 }
 
+bool ServerPacketDispatcher::Handle_C_WireLaunchReq(PacketSessionRef& session, const se::game::C_WireLaunchReq& pkt)
+{
+    return false;
+}
+
 bool ServerPacketDispatcher::Handle_C_AimReq(PacketSessionRef& session, const se::game::C_AimReq& pkt)
 {
     return EnqueueToPlayerRoom(session, pkt, [](Room& room, PlayerId playerId, const se::game::C_AimReq& pkt)
@@ -249,11 +259,6 @@ bool ServerPacketDispatcher::Handle_C_FireReq(PacketSessionRef& session, const s
     {
         room.HandleFire(playerId, pkt);
     });
-}
-
-bool ServerPacketDispatcher::Handle_C_AttackReq(PacketSessionRef& session, const se::game::C_AttackReq& pkt)
-{
-    return false;
 }
 
 bool ServerPacketDispatcher::Handle_C_ThrowGrenadeReq(PacketSessionRef& session, const se::game::C_ThrowGrenadeReq& pkt)

@@ -45,12 +45,13 @@ public:
    bool Handle_C_MoveReq(PacketSessionRef& session, const se::game::C_MoveReq& pkt);
    bool Handle_C_JumpReq(PacketSessionRef& session, const se::game::C_JumpReq& pkt);
    bool Handle_C_JumpLand(PacketSessionRef& session, const se::game::C_JumpLand& pkt);
+   bool Handle_C_DoubleJumpReq(PacketSessionRef& session, const se::game::C_DoubleJumpReq& pkt);
    bool Handle_C_CrouchReq(PacketSessionRef& session, const se::game::C_CrouchReq& pkt);
    bool Handle_C_WireActionReq(PacketSessionRef& session, const se::game::C_WireActionReq& pkt);
    bool Handle_C_WireActionEnd(PacketSessionRef& session, const se::game::C_WireActionEnd& pkt);
+   bool Handle_C_WireLaunchReq(PacketSessionRef& session, const se::game::C_WireLaunchReq& pkt);
    bool Handle_C_AimReq(PacketSessionRef& session, const se::game::C_AimReq& pkt);
    bool Handle_C_FireReq(PacketSessionRef& session, const se::game::C_FireReq& pkt);
-   bool Handle_C_AttackReq(PacketSessionRef& session, const se::game::C_AttackReq& pkt);
    bool Handle_C_ThrowGrenadeReq(PacketSessionRef& session, const se::game::C_ThrowGrenadeReq& pkt);
    bool Handle_C_ReloadReq(PacketSessionRef& session, const se::game::C_ReloadReq& pkt);
    bool Handle_C_WeaponChangeReq(PacketSessionRef& session, const se::game::C_WeaponChangeReq& pkt);

@@ -118,6 +118,12 @@ bool Handle_C_JumpLand(PacketSessionRef& session, const se::game::C_JumpLand& pk
     if (!Dispatcher()) return false;
     return Dispatcher()->Handle_C_JumpLand(session, pkt);
 }
+
+bool Handle_C_DoubleJumpReq(PacketSessionRef& session, const se::game::C_DoubleJumpReq& pkt)
+{
+    if (!Dispatcher()) return false;
+    return Dispatcher()->Handle_C_DoubleJumpReq(session, pkt);
+}
     
 bool Handle_C_CrouchReq(PacketSessionRef& session, const se::game::C_CrouchReq& pkt)
 {
@@ -136,6 +142,12 @@ bool Handle_C_WireActionEnd(PacketSessionRef& session, const se::game::C_WireAct
     if (!Dispatcher()) return false;
     return Dispatcher()->Handle_C_WireActionEnd(session, pkt);
 }
+
+bool Handle_C_WireLaunchReq(PacketSessionRef& session, const se::game::C_WireLaunchReq& pkt)
+{
+    if (!Dispatcher()) return false;
+    return Dispatcher()->Handle_C_WireLaunchReq(session, pkt);
+}
     
 bool Handle_C_AimReq(PacketSessionRef& session, const se::game::C_AimReq& pkt)
 {
@@ -147,12 +159,6 @@ bool Handle_C_FireReq(PacketSessionRef& session, const se::game::C_FireReq& pkt)
 {
     if (!Dispatcher()) return false;
     return Dispatcher()->Handle_C_FireReq(session, pkt);
-}
-    
-bool Handle_C_AttackReq(PacketSessionRef& session, const se::game::C_AttackReq& pkt)
-{
-    if (!Dispatcher()) return false;
-    return Dispatcher()->Handle_C_AttackReq(session, pkt);
 }
     
 bool Handle_C_ThrowGrenadeReq(PacketSessionRef& session, const se::game::C_ThrowGrenadeReq& pkt)
