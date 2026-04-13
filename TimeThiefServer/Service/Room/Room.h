@@ -117,7 +117,7 @@ public:
    bool Start();
    
    void UpdateTick(Milliseconds tickInterval);
-   bool TraceHit(const SE::Physics::Ray& ray, SE::Physics::Hit::HitResult& outHit) const;   
+   bool TraceHit(const SE::Physics::Ray& ray, ObjectId exceptId, SE::Physics::Hit::HitResult& outHit) const;   
    
    bool IsPlaying() const { return roomState_ == RoomState::Playing; }
    

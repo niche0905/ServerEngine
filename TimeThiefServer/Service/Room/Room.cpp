@@ -1042,7 +1042,7 @@ void Room::UpdateTick(Milliseconds tickInterval)
    // objectManager_.SweepDestroy();   // 오브젝트 제거 처리
 }
 
-bool Room::TraceHit(const SE::Physics::Ray& ray, SE::Physics::Hit::HitResult& outHit) const
+bool Room::TraceHit(const SE::Physics::Ray& ray, ObjectId exceptId, SE::Physics::Hit::HitResult& outHit) const
 {
    bool hasHit = false;
    float closestT = std::numeric_limits<float>::max();
@@ -1053,6 +1053,9 @@ bool Room::TraceHit(const SE::Physics::Ray& ray, SE::Physics::Hit::HitResult& ou
    {
       if (!obj)
          return;
+      
+      if (obj->GetId() == exceptId)
+         return;   // 제외할 오브젝트는 건너뛰기
       
       obj->ForEachCollider([&](ColliderComponent* collider)
       {
