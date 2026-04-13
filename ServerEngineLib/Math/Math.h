@@ -1,4 +1,5 @@
 ﻿#pragma once
+#include <numbers>
 #include "Vector.h"
 
 /*--------
@@ -22,7 +23,7 @@ namespace SE::Math
     inline bool NearlyZero(float v, float eps = 1e-4f) { return Abs(v) <= eps; }
     inline bool NearlyEqual(float a, float b, float eps = 1e-4f) { return Abs(a - b) <= eps; }
     
-    inline float DegreesToRadians(float degrees) { return degrees * (3.14159265f / 180.0f); }
+    inline float DegreesToRadians(float degrees) { return degrees * (std::numbers::pi_v<float> / 180.0f); }
     inline SE::Math::Vector3 RotateYaw(const SE::Math::Vector3& v, float yawDegrees)
     {
         const float rad = DegreesToRadians(yawDegrees);
