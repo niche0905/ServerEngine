@@ -57,10 +57,10 @@ namespace SE::Physics
          assert(SE::Math::NearlyZero(ray.direction.LengthSq() - 1.0f, 1e-3f) && "Ray direction must be normalized");
       }
       
-      const Vector3 m = ray.origin - localCenter_;
+      const Vector3 m = ray.origin - worldCenter_;
       
       const float halfB = m.Dot(ray.direction);
-      const float c = m.Dot(m) - (localRadius_ * localRadius_);
+      const float c = m.Dot(m) - (worldRadius_ * worldRadius_);
       
       const float disc = halfB * halfB - c;
       if (disc < 0.0f)  // 교차 없음
@@ -80,7 +80,7 @@ namespace SE::Physics
       out.t = t;
       out.point = ray.At(t);
       
-      out.normal = (out.point - localCenter_).Normalized(Vector3(0.0f, 1.0f, 0.0f));     // 노멀 단위벡터
+      out.normal = (out.point - worldCenter_).Normalized(Vector3(0.0f, 1.0f, 0.0f));     // 노멀 단위벡터
                                                                                           // 만약 중심과 일치하면 Y축 방향으로 설정(임의 설정)
       out.collider = this;
       
@@ -89,7 +89,7 @@ namespace SE::Physics
 
    bool SphereCollider::Contains(const Vector3& point) const
    {
-      const float dist = (point - localCenter_).LengthSq();
+      const float dist = (point - worldCenter_).LengthSq();
       return dist <= RadiusSq();
    }
 

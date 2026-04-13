@@ -99,26 +99,26 @@ namespace SE::Physics
       if (r <= 0.0f)
          return false;
       
-      const float yA = worldBase_.y + r;
-      const float yB = worldBase_.y + (worldHeight_ - r);
+      const float zA = worldBase_.z + r;
+      const float zB = worldBase_.z + (worldHeight_ - r);
       
-      const Vector3 capA{ worldBase_.x, yA, worldBase_.z };
-      const Vector3 capB{ worldBase_.x, yB, worldBase_.z };
+      const Vector3 capA{ worldBase_.x, worldBase_.y, zA };
+      const Vector3 capB{ worldBase_.x, worldBase_.y, zB };
       
       bool hit = false;
       float bestT = ray.tMax;
       Vector3 bestN{0, 0, 0};
       
       const float ox = ray.origin.x - worldBase_.x;
-      const float oz = ray.origin.z - worldBase_.z;
+      const float oy = ray.origin.y - worldBase_.y;
       const float dx = ray.direction.x;
-      const float dz = ray.direction.z;
+      const float dy = ray.direction.y;
       
-      const float a = dx * dx + dz * dz;
+      const float a = dx * dx + dy * dy;
       
       if (a > 1e-12f) {
-         const float b = 2.0f * (ox * dx + oz * dz);
-         const float c = (ox * ox + oz * oz) - r * r;
+         const float b = 2.0f * (ox * dx + oy * dy);
+         const float c = (ox * ox + oy * oy) - r * r;
          
          const float disc = b * b - 4.0f * a * c;
          if (disc >= 0.0f) {
@@ -132,13 +132,13 @@ namespace SE::Physics
                if (tCand < ray.tMin or tCand > ray.tMax)
                   return;
                
-               const float y = ray.origin.y + ray.direction.y * tCand;
-               if (y < yA or y > yB)
+               const float z = ray.origin.z + ray.direction.z * tCand;
+               if (z < zA or z > zB)
                   return;  // 실린더 몸통 밖
                
                const Vector3 p = ray.At(tCand);
                
-               Vector3 n{p.x-worldBase_.x, 0.0f, p.z - worldBase_.z};
+               Vector3 n{p.x-worldBase_.x, p.y - worldBase_.y, 0.0f};
                n = n.Normalized(Vector3{1.0f, 0.0f, 0.0f});
                
                if (!hit or tCand < bestT) {
@@ -189,14 +189,14 @@ namespace SE::Physics
 
    SE::Math::Vector3 CharacterCapsuleCollider::ClosestPointOnSegment(const Vector3& point) const
    {
-      const float yA = worldBase_.y + worldRadius_;
-      const float yB = worldBase_.y + (worldHeight_ - worldRadius_);
+      const float zA = worldBase_.z + worldRadius_;
+      const float zB = worldBase_.z + (worldHeight_ - worldRadius_);
       
-      float y = point.y;
-      if (y < yA) y = yA;
-      if (y > yB) y = yB;
+      float z = point.z;
+      if (z < zA) z = zA;
+      if (z > zB) z = zB;
       
-      return Vector3{ worldBase_.x, y, worldBase_.z };
+      return Vector3{ worldBase_.x, worldBase_.y, z };
    }
 
    SE::Math::Vector3 CharacterCapsuleCollider::ClosestPoint(const Vector3& point) const
@@ -228,14 +228,14 @@ namespace SE::Physics
    {
       const Vector3 mn{
          worldBase_.x - worldRadius_,
-         worldBase_.y,
-         worldBase_.z - worldRadius_
+         worldBase_.y - worldRadius_,
+         worldBase_.z
      };
 
       const Vector3 mx{
          worldBase_.x + worldRadius_,
-         worldBase_.y + worldHeight_,
-         worldBase_.z + worldRadius_
+         worldBase_.y + worldRadius_,
+         worldBase_.z + worldHeight_
      };
 
       worldAABB_.SetMinMax(mn, mx);

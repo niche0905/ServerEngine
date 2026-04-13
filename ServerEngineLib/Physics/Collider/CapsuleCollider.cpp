@@ -290,7 +290,7 @@ namespace SE::Physics
       Vector3 ab = worldPointB_ - worldPointA_;
       float lenSq = ab.LengthSq();
       if (lenSq <= 1e-12f) {
-         dir_ = Vector3{1,0,0};
+         dir_ = Vector3{0,0,1};
          halfLen_ = 0.0f;
       }
       else {

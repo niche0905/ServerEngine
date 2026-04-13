@@ -36,13 +36,13 @@ namespace SE::Physics
       float GetRadius() const { return worldRadius_; }
       
       float GetCylinderHeight() const { return (worldHeight_ - 2.0f * worldRadius_); }
-      Vector3 GetCenter() const { return (worldBase_ + Vector3{0.0f, worldHeight_ * 0.5f, 0.0f}); }
+      Vector3 GetCenter() const { return (worldBase_ + Vector3{0.0f, 0.0f, worldHeight_ * 0.5f}); }
       
-      Vector3 GetPointA() const { return (worldBase_ + Vector3{0.0f, worldRadius_, 0.0f}); }
-      Vector3 GetPointB() const { return (worldBase_ + Vector3{0.0f, worldHeight_ - worldRadius_, 0.0f}); }
+      Vector3 GetPointA() const { return (worldBase_ + Vector3{0.0f, 0.0f, worldRadius_}); }
+      Vector3 GetPointB() const { return (worldBase_ + Vector3{0.0f, 0.0f, worldHeight_ - worldRadius_}); }
       
-      float GetBottomY() const { return worldBase_.y; }
-      float GetTopY() const { return worldBase_.y + worldHeight_; }
+      float GetBottomY() const { return worldBase_.z; }
+      float GetTopY() const { return worldBase_.z + worldHeight_; }
       
       const AABBCollider& GetWorldAABB() const override;
       
