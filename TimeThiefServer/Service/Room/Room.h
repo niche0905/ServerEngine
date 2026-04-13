@@ -161,6 +161,7 @@ public:
    void BroadcastKillPlayer(ObjectId killerId, ObjectId victimId);
    
 public:
+   void HandleHealthChange(Pawn* pawn, int newHealth, int deltaHealth);
    void HandleDamageResult(Pawn* attacker, Actor* victim, const SE::Physics::Hit::HitResult& hitResult, const DamageContext& ctx, const DamageResult& damageResult);
    void HandlePawnDeath(ObjectId pawnId, const DamageResult& damageResult);
    

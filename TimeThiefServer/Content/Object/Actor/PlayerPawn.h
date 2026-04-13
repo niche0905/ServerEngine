@@ -31,6 +31,9 @@ public:
     PlayerPawn(const PlayerPawn&) = delete;
     PlayerPawn& operator=(const PlayerPawn&) = delete;
     
+public:
+   virtual EntityType GetEntityType() const override { return EntityType::Player; }
+    
 // PlayerId (Room 내에서 고유한 플레이어 식별자)
 public:
     virtual PlayerId GetOwnerPlayerId() const override { return playerId_; }

@@ -1228,6 +1228,25 @@ void Room::BroadcastKillPlayer(ObjectId killerId, ObjectId victimId)
       Broadcast(killPlayerBuffer);
 }
 
+void Room::HandleHealthChange(Pawn* pawn, int newHealth, int deltaHealth)
+{
+   if (pawn->GetId() == ObjectId{})
+      return;
+   
+   se::game::N_HealthChanged noti;
+   {
+      auto* entityIdPtr = noti.mutable_entity_id();
+      entityIdPtr->set_value(pawn->GetId().value);
+      
+      noti.set_new_health(newHealth);
+      noti.set_delta(deltaHealth);
+   }
+   
+   SendBufferRef healthChangeBuffer = ServerPacketHandler::MakeSendBuffer(noti);
+   if (healthChangeBuffer)
+      SendToPlayer(pawn->GetOwnerPlayerId(), healthChangeBuffer);
+}
+
 void Room::HandleDamageResult(Pawn* attacker, Actor* victim, const SE::Physics::Hit::HitResult& hitResult,
                               const DamageContext& ctx, const DamageResult& damageResult)
 {
