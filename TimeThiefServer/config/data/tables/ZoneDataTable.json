@@ -1,19 +1,19 @@
 {
   "phases": [
     {
-      "radius": 1000.0,
+      "radius": 45000.0,
       "damagePerSecond": 0.0,
       "waitTimeSeconds": 60.0,
       "shrinkTimeSeconds": 30.0
     },
     {
-      "radius": 700.0,
+      "radius": 30000.0,
       "damagePerSecond": 1.0,
       "waitTimeSeconds": 50.0,
       "shrinkTimeSeconds": 25.0
     },
     {
-      "radius": 400.0,
+      "radius": 15000.0,
       "damagePerSecond": 3.0,
       "waitTimeSeconds": 40.0,
       "shrinkTimeSeconds": 20.0

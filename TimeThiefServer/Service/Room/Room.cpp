@@ -56,7 +56,7 @@ void Room::SetPlayer(const std::vector<PlayerId>& playerIds)
       roomPlayer.playerId = playerId;
 
       // TEMP Spawn Point (나중에 Spawn Point 시스템으로 변경하기)
-      auto playerPawn = CreatePreparedPlayerPawn(playerId, Vector3{static_cast<float>(i * 150), 0.0f, 0.0f });
+      auto playerPawn = CreatePreparedPlayerPawn(playerId, Vector3{static_cast<float>(i * 150), 0.0f, 500.0f });
       if (!playerPawn) {
          consoleLogger->Log(Color::Yellow, L"[Room] Failed to pre-spawn PlayerPawn for playerId %u\n", playerId);
          continue;   // PlayerPawn 생성 실패한 경우 (정상적이지 않은 상황)
