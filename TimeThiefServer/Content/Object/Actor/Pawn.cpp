@@ -51,13 +51,7 @@ DamageResult Pawn::ApplyDamage(ObjectManager& om, int32 amount, const DamageCont
 
 void Pawn::Damaged(const DamageResult& dmgResult)
 {
-   auto room = GetRoom();
-   if (room == nullptr)
-      return;
-   
-   if (IsPlayer()) {
-      room->HandleHealthChange(this, dmgResult.hpAfter, -dmgResult.applied);
-   }
+   // None
 }
 
 bool Pawn::IsAlive() const
