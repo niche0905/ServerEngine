@@ -1135,6 +1135,7 @@ PlayerPawn* Room::CreatePreparedPlayerPawn(PlayerId playerId, const Vector3& spa
    }
    
    playerPawn->SetPosition(spawnPos);
+   playerPawn->SetSavedRespawnPosition(spawnPos);
    playerPawn->SetOwnerPlayerId(playerId);
    return playerPawn;
 }
