@@ -107,8 +107,7 @@ void PlayerPawn::StartDeadState(ObjectManager& om, const DamageResult& dmgResult
    // TODO: 드롭된 아이템과 화폐를 월드에 스폰하는 로직 추가
    // (om, drops);
    
-   // TODO: ObjectManager나 다른 방법으로 nowMs 얻어서 설정하기
-   // respawn_.Schedule(om.GetCurrentTimeMs(), delayMs);
+   respawn_.Schedule(om.GetCurrentTimeMs(), delayMs);
 }
 
 

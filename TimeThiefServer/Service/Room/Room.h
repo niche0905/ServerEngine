@@ -156,6 +156,7 @@ private:
 public:
    void BroadcastGameStart();
    void BroadcastDeath(ObjectId objectId);
+   void BroadcastRespawn(ObjectId objectId);
    void NotifyHealthChange(PlayerId id, int newHealth, int deltaHealth);
    // void BroadcastHit();
    void BroadcastKillPlayer(ObjectId killerId, ObjectId victimId);
@@ -163,6 +164,7 @@ public:
 public:
    void HandleDamageResult(Pawn* attacker, Actor* victim, const SE::Physics::Hit::HitResult& hitResult, const DamageContext& ctx, const DamageResult& damageResult);
    void HandlePawnDeath(ObjectId pawnId, const DamageResult& damageResult);
+   void HandlePawnRespawn(ObjectId pawnId);
    
 public:
    void OnZoneChanged(uint32 phase, const ZoneCircle& newZone, float waitDuration, float shrinkDuration);

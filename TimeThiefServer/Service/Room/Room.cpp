@@ -1197,6 +1197,34 @@ void Room::BroadcastDeath(ObjectId objectId)
       Broadcast(deathBroadcastBuffer);   // 모두에게 사망 정보 Broadcast
 }
 
+void Room::BroadcastRespawn(ObjectId objectId)
+{
+   Pawn* pawn = objectManager_.FindAs<Pawn>(objectId);
+   if (pawn == nullptr)
+      return;   // 유효하지 않은 Pawn 객체
+   
+   const Vector3& respawnPos = pawn->GetSavedRespawnPosition();
+   const float respawnYaw = pawn->GetYaw();
+   
+   se::game::N_EntityRespawned noti;
+   {
+      auto* entityIdPtr = noti.mutable_entity_id();
+      entityIdPtr->set_value(objectId.value);
+      
+      auto* transformPtr = noti.mutable_transform();
+      auto* positionPtr = transformPtr->mutable_position();
+      positionPtr->set_x(respawnPos.x);
+      positionPtr->set_y(respawnPos.y);
+      positionPtr->set_z(respawnPos.z);
+      transformPtr->set_yaw(respawnYaw);
+   }
+   
+   SendBufferRef respawnBuffer = ServerPacketHandler::MakeSendBuffer(noti);
+   if (respawnBuffer)
+      Broadcast(respawnBuffer);     // 모두에게 리스폰 정보 Broadcast
+                                    // Local Control Player의 경우는 Set Position 하도록 (Set Yaw 까지도 가능)
+}
+
 void Room::NotifyHealthChange(PlayerId id, int newHealth, int deltaHealth)
 {
    se::game::N_HealthChanged noti;
@@ -1283,6 +1311,11 @@ void Room::HandlePawnDeath(ObjectId pawnId, const DamageResult& damageResult)
 {
    roomGameSystem_.OnPawnDeath(pawnId);
    BroadcastDeath(pawnId);
+}
+
+void Room::HandlePawnRespawn(ObjectId pawnId)
+{
+   BroadcastRespawn(pawnId);
 }
 
 void Room::OnZoneChanged(uint32 phase, const ZoneCircle& newZone, float waitDuration, float shrinkDuration)

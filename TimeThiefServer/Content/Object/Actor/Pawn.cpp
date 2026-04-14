@@ -93,7 +93,9 @@ void Pawn::ApplyRespawnToWorld(ObjectManager& om, const SE::Math::Vector3& pos)
    
    SetDead(false);
    
-   // TODO: Room에 리스폰 알리기
+   if (auto room = GetRoom()) {
+      room->HandlePawnRespawn(GetId());
+   }
 }
 
 void Pawn::GrantSpawnInvulnerability(ObjectManager& om, uint32 durationMs)
