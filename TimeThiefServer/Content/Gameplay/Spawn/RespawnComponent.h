@@ -27,8 +27,6 @@ public:
         
         policy_ = policy;
         state_ = RespawnState::Alive;
-        
-        deadSinceMs_ = 0;
     }
     
     const RespawnPolicy& GetPolicy() const { return policy_; }
@@ -42,10 +40,8 @@ public:
     void SetRespawnPosition(const Vector3& pos) { respawnPosition_ = pos; }
     
     // 사망 시 호출
-    bool MarkDead(uint64 nowMs)
+    bool MarkDead()
     {
-        deadSinceMs_ = nowMs;
-        
         if (not IsEnabled()) {
             state_ = RespawnState::Dead;
             return false;
@@ -96,7 +92,6 @@ private:
     
     RespawnState state_{RespawnState::None};
     
-    uint64 deadSinceMs_{0};
     uint64 respawnToken_{0};
     
     Vector3 respawnPosition_{0.0f, 0.0f, 0.0f};

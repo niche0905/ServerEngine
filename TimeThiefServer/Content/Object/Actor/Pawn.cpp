@@ -135,6 +135,7 @@ void Pawn::OnDeath(ObjectManager& om, const DamageResult& dmgResult)
    (void)om;
    (void)dmgResult;
    
+   respawn_.MarkDead();
    // 사망 시 모든 Client에 사망 사실 Broadcast (Room에서 BroadcastDeath 패킷을 보내는 형태로)
    // 파생 클래스에서 필요에 따라 재정의 (DropOnDeath, RespawnSchedule 등)
    if (auto room = GetRoom()) {
