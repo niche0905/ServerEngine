@@ -34,15 +34,15 @@ DamageResult Pawn::ApplyDamage(ObjectManager& om, int32 amount, const DamageCont
    DamageResult result = health_.ApplyDamage(amount, ctx);
    if (result.accepted) {
       Damaged(result);
-   }
-   
-   if (not health_.IsAlive() and not isDead_) {
-      isDead_ = true;
-      OnDeath(om, result);
       
-      if (ShouldRequestDestroyOnDeath())
-      {
-         __RequestDestroy();
+      if (not health_.IsAlive() and not isDead_) {
+         isDead_ = true;
+         OnDeath(om, result);
+      
+         if (ShouldRequestDestroyOnDeath())
+         {
+            __RequestDestroy();
+         }
       }
    }
    
@@ -78,6 +78,7 @@ void Pawn::OnPreRespawn(ObjectManager& om)
 {
    (void)om;
    // TODO: 리스폰 전 처리 (예: 상태 초기화)
+   isDead_ = false;
    int32 maxHp = health_.GetMaxHp();
    health_.Revive(maxHp);
 }

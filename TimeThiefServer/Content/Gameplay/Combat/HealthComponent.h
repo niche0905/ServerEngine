@@ -72,14 +72,14 @@ public:
     
     void Revive(int32 hp)
     {
-        hp = std::clamp(hp, 1, maxHp_);
+        hp_ = std::clamp(hp, 1, maxHp_);
         invincible_ = false;
     }
     
     // 디버깅 용도
     void SetHpUnsafe(int32 hp)
     {
-        hp = std::clamp(hp, 0, maxHp_);
+        hp_ = std::clamp(hp, 0, maxHp_);
     }
     
 private:
