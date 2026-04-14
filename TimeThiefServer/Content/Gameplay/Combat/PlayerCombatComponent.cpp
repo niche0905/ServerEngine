@@ -136,12 +136,12 @@ bool PlayerCombatComponent::SwitchWeapon(uint32 newWeaponId)
 
 const WeaponState* PlayerCombatComponent::GetCurrentWeaponState() const
 {
-    return GetWeaponState(combatState_.currentWeaponSlot);
+    return GetWeaponStateBySlot(combatState_.currentWeaponSlot);
 }
 
 WeaponState* PlayerCombatComponent::GetCurrentWeaponState()
 {
-    return GetWeaponState(combatState_.currentWeaponSlot);
+    return GetWeaponStateBySlot(combatState_.currentWeaponSlot);
 }
 
 const WeaponState* PlayerCombatComponent::GetWeaponState(uint32 weaponId) const
