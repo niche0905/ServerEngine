@@ -57,7 +57,7 @@ bool ServerPacketDispatcher::Handle_C_SetNicknameReq(PacketSessionRef& session, 
     }
     else {
         auto* resultPtr = resPkt.mutable_result();
-        resultPtr->set_code(se::common::ERR_INTERNAL_ERROR);    // TODO: ErrCode 추가되면 바꾸기
+        resultPtr->set_code(se::common::ERR_NICKNAME_INVALID);
         resultPtr->set_message("Failed to set nickname");
     }
     
