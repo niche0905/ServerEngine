@@ -35,7 +35,7 @@ void PlayerCombatComponent::Init(ObjectId owner, Pawn* ownerPawn)
     CombatComponent::Init(owner, ownerPawn);
     
     // TEMP: 시작 무기 3개 초기화 예
-    combatState_.weapons[0] = WeaponState{ .weaponId = 1, .ammoInMag = 30, .reserveAmmo = 90, .isReloading = false };
+    combatState_.weapons[0] = WeaponState{ .weaponId = 1, .ammoInMag = 30, .reserveAmmo = 9999, .isReloading = false };
     combatState_.weapons[1] = WeaponState{ .weaponId = 2, .ammoInMag = 8, .reserveAmmo = 25, .isReloading = false };
     combatState_.weapons[2] = WeaponState{ .weaponId = 3, .ammoInMag = 1, .reserveAmmo = 10, .isReloading = false };
     combatState_.currentWeaponSlot = 0;
@@ -246,13 +246,18 @@ bool PlayerCombatComponent::FireHitscan(const AttackRequest& request)
     SE::Math::Vector3 dir = request.direction.Normalized();
     SE::Physics::Ray ray(request.origin, dir, request.range);
     
+    // consoleLogger->Log(Color::Blue, L"[Shot]\n");
+    // consoleLogger->Log(Color::Blue, L"origin(%f, %f, %f), dir(%f, %f, %f)\n", request.origin.x, request.origin.y, request.origin.z, dir.x, dir.y, dir.z);
+    
     Actor* victim = nullptr;
     SE::Physics::Hit::HitResult hitInfo{};
     
-    consoleLogger->Log(Color::Blue, L"Finding hit victim\n");
+    // consoleLogger->Log(Color::Blue, L"Finding hit victim\n");
     if (room->TraceHit(ray, ownerPawn->GetId(), hitInfo)) {
         if (hitInfo.hit) {
-            consoleLogger->Log(Color::Magenta, L"Victim!!!!\n");
+            // consoleLogger->Log(Color::Blue, L"[Hit]\n");
+            // consoleLogger->Log(Color::Blue, L"pos(%f, %f, %f)\n", hitInfo.point.x, hitInfo.point.y, hitInfo.point.z);
+            // consoleLogger->Log(Color::Magenta, L"Victim!!!!\n");
             victim = hitInfo.actor;
         }
     }

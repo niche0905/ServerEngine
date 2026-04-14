@@ -78,6 +78,8 @@ void Pawn::OnPreRespawn(ObjectManager& om)
 {
    (void)om;
    // TODO: 리스폰 전 처리 (예: 상태 초기화)
+   int32 maxHp = health_.GetMaxHp();
+   health_.Revive(maxHp);
 }
 
 void Pawn::OnPostRespawn(ObjectManager& om)
