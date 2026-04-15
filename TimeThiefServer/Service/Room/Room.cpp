@@ -1212,32 +1212,11 @@ void Room::UpdateTick(Milliseconds tickInterval)
    
    roomGameSystem_.Update(deltaSeconds);
 
-   // TODO: 아래를 유효하게...
-   // objectManager_.ForEachTickableAlive([deltaSeconds](BaseObject* obj)
-   // {
-   //    obj->__Tick(deltaSeconds);
-   // });
-   
-   // // NPC Tick
-   // for (size_t i = 0; i < npcTickList_.size();) {
-   //     
-   //    const ObjectId npcId = npcTickList_[i];
-   //    
-   //    BaseObject* npc = objectManager_.Find(npcId);
-   //    
-   //    if (not npc) {
-   //       // NPC가 사라졌는데 Tick 리스트에 남아있는 경우, 리스트에서 제거
-   //       npcTickList_[i] = npcTickList_.back();
-   //       npcTickList_.pop_back();
-   //       continue;
-   //    }
-   //    
-   //    // TODO: NPC 업데이트 로직 구현하기 (예: AI 행동, 이동, 상태 변화 등)
-   //    npc->__Tick(deltaSeconds);
-   //    
-   //    ++i;
-   // }
-   
+   objectManager_.ForEachTickableAlive([deltaSeconds](BaseObject* obj)
+   {
+      obj->__Tick(deltaSeconds);
+   });
+
    // objectManager_.SweepDestroy();   // 오브젝트 제거 처리
 }
 

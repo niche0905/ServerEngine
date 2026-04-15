@@ -152,7 +152,7 @@ public:
          if (!e.ptr->IsAlive()) continue;
          if (!e.ptr->IsTickable()) continue;
          
-         fn(*e.ptr);
+         fn(e.ptr);
       }
    }
    
