@@ -474,6 +474,8 @@ bool Room::HandleFire(PlayerId playerId, const se::game::C_FireReq& pkt)
          dirPtr->set_x(dir.x());
          dirPtr->set_y(dir.y());
          dirPtr->set_z(dir.z());
+         
+         noti.set_shot_seed(pkt.shot_seed());
       }
       
       fireBroadcastBuffer = ServerPacketHandler::MakeSendBuffer(noti);
