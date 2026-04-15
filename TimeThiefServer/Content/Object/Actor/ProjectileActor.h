@@ -51,7 +51,7 @@ private:
     ObjectId ownerId_;
     int32 damage_{ 0 };
     
-    Vector3 velocity_{};
     TimerId lifetimeTimer_{};
+    Vector3 velocity_{};
     
 };

@@ -64,6 +64,7 @@ void ProjectileActor::Tick(float dt)
     UpdateMovement(dt);
     
     // TODO: 충돌 체크 및 처리 (예: Raycast 또는 Collider 간의 충돌 검사)
+    //       충돌 사실 알리기 (OnHit 호출)
 }
 
 void ProjectileActor::HandleLifetimeExpired()
@@ -89,9 +90,8 @@ void ProjectileActor::UpdateMovement(float dt)
 
 void ProjectileActor::OnHit(ObjectManager& om, ObjectId hitObjectId)
 {
+    (void)om;
     (void)hitObjectId;
- 
-    OnExplode(om);
 }
 
 void ProjectileActor::OnLifetimeExpired(ObjectManager& om)
