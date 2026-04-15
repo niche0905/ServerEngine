@@ -27,6 +27,7 @@ struct AttackRequest
     int32 damage = 0;   // 공격이 가할 피해량 (향후 무기 시스템이 구현되면 활용)
     
     uint32 weaponId = 0;   // 공격에 사용된 무기의 ID (향후 무기 시스템이 구현되면 활용)
+    uint32 shotSeed = 0;   // 총알 발사 시의 랜덤 시드 (샷건 총알 궤적 계산 등에 활용)
 };
 
 struct WeaponState

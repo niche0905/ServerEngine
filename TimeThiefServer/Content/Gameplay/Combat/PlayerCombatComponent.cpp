@@ -307,7 +307,7 @@ bool PlayerCombatComponent::FireShotgun(const AttackRequest& request)
     const float spreadAngle = SE::Math::Max(0.0f, kSpread);
     
     bool hit = false;
-    PalletPattern pattern = GeneratePalletPattern(dir, kPelletCount, spreadAngle, 10);      // TODO: 패킷에 seed 값 추가하기
+    PalletPattern pattern = GeneratePalletPattern(dir, kPelletCount, spreadAngle, request.shotSeed);
     for (int i = 0; i < kPelletCount; ++i) { 
         const SE::Math::Vector3& pelletDir = pattern.directions[i];
         SE::Physics::Ray ray(request.origin, pelletDir, request.range);
