@@ -1,6 +1,8 @@
 ﻿#pragma once
 #include "CombatComponent.h"
 #include "CombatTypes.h"
+#include "Physics/Hitbox/HitResult.h"
+#include "Physics/Ray/Ray.h"
 
 /*-------------------------
    PlayerCombatComponent
@@ -12,6 +14,9 @@
 
 class PlayerCombatComponent : public CombatComponent
 {
+private:
+   struct PalletPattern;
+   
 public:
    virtual ~PlayerCombatComponent() = default;
    
@@ -40,12 +45,20 @@ protected:
    virtual bool ExecuteAttack(AttackRequest& request) override;
    
 private:
-   bool FireHitscan(const AttackRequest& request);
-   bool FireMelee(const AttackRequest& request);
+   bool TraceHit(const AttackRequest& request, const SE::Physics::Ray& ray, SE::Physics::Hit::HitResult& outHit);
+   bool FireRifle(const AttackRequest& request);
+   bool FireShotgun(const AttackRequest& request);
+   PalletPattern GeneratePalletPattern(const SE::Math::Vector3& forwardDir, int palletCount, float spreadDegrees, uint32 shotSeed) const;
    
    bool IsValidWeaponSlot(uint8 slotIndex) const;
    bool ConsumeAmmo(uint8 slotIndex, int amount);
    bool CanFireWeapon(uint8 slotIndex) const;
+   
+private:
+   struct PalletPattern
+   {
+      std::vector<SE::Math::Vector3> directions;
+   };
 
 private:
    PlayerCombatState combatState_{};

@@ -6,6 +6,7 @@
 #include "Physics/Ray/Ray.h"
 #include "Physics/Ray/RaycastHit.h"
 #include "Service/Room/Room.h"
+#include "Utils/Random/WeightedRandom.h"
 
 namespace 
 {
@@ -211,9 +212,18 @@ bool PlayerCombatComponent::ExecuteAttack(AttackRequest& request)
                     // TODO: 여기서 무기에 따른 데이터 처리하기 (예: 데미지, 사거리, 탄착 효과 등등)
                     request.damage = 12;
                     request.range = 1000.0f;
-                    hit = FireHitscan(request);
+                    hit = FireRifle(request);
                 }
                 break;
+                
+            case 2:
+                {
+                    request.damage = 4;
+                    request.range = 800.0f;
+                    hit = FireShotgun(request);
+                }
+                break;
+                
             }
         }
         break;
@@ -226,15 +236,8 @@ bool PlayerCombatComponent::ExecuteAttack(AttackRequest& request)
     return hit;
 }
 
-bool PlayerCombatComponent::FireHitscan(const AttackRequest& request)
+bool PlayerCombatComponent::TraceHit(const AttackRequest& request, const SE::Physics::Ray& ray, SE::Physics::Hit::HitResult& outHit)
 {
-    if (request.weaponId == 0 or request.weaponId != GetCurrentWeaponId())
-        return false;   // 무기 ID가 0이거나 현재 무기와 일치하지 않는 경우 유효하지 않음
-    
-    uint8 weaponSlot = WeaponSlotFromWeaponId(request.weaponId);
-    if (!ConsumeAmmo(weaponSlot, 1))
-        return false;
-    
     Pawn* ownerPawn = GetOwnerPawn();
     if (!ownerPawn)
         return false;
@@ -243,22 +246,11 @@ bool PlayerCombatComponent::FireHitscan(const AttackRequest& request)
     if (!room)
         return false;
     
-    SE::Math::Vector3 dir = request.direction.Normalized();
-    SE::Physics::Ray ray(request.origin, dir, request.range);
-    
-    // consoleLogger->Log(Color::Blue, L"[Shot]\n");
-    // consoleLogger->Log(Color::Blue, L"origin(%f, %f, %f), dir(%f, %f, %f)\n", request.origin.x, request.origin.y, request.origin.z, dir.x, dir.y, dir.z);
-    
     Actor* victim = nullptr;
-    SE::Physics::Hit::HitResult hitInfo{};
     
-    // consoleLogger->Log(Color::Blue, L"Finding hit victim\n");
-    if (room->TraceHit(ray, ownerPawn->GetId(), hitInfo)) {
-        if (hitInfo.hit) {
-            // consoleLogger->Log(Color::Blue, L"[Hit]\n");
-            // consoleLogger->Log(Color::Blue, L"pos(%f, %f, %f)\n", hitInfo.point.x, hitInfo.point.y, hitInfo.point.z);
-            // consoleLogger->Log(Color::Magenta, L"Victim!!!!\n");
-            victim = hitInfo.actor;
+    if (room->TraceHit(ray, ownerPawn->GetId(), outHit)) {
+        if (outHit.hit) {
+            victim = outHit.actor;
         }
     }
     
@@ -275,15 +267,94 @@ bool PlayerCombatComponent::FireHitscan(const AttackRequest& request)
     ctx.source = DamageSource::Weapon;
     
     DamageResult damageResult = damageable->ApplyDamage(room->GetObjectManager(), request.damage, ctx);
-    room->HandleDamageResult(GetOwnerPawn(), victim, hitInfo, ctx, damageResult);
+    room->HandleDamageResult(GetOwnerPawn(), victim, outHit, ctx, damageResult);
     
     return true;
 }
 
-bool PlayerCombatComponent::FireMelee(const AttackRequest& request)
+bool PlayerCombatComponent::FireRifle(const AttackRequest& request)
 {
+    if (request.weaponId == 0 or request.weaponId != GetCurrentWeaponId())
+        return false;   // 무기 ID가 0이거나 현재 무기와 일치하지 않는 경우 유효하지 않음
     
-    return false;
+    uint8 weaponSlot = WeaponSlotFromWeaponId(request.weaponId);
+    if (!ConsumeAmmo(weaponSlot, 1))
+        return false;
+    
+    SE::Math::Vector3 dir = request.direction.Normalized();
+    SE::Physics::Ray ray(request.origin, dir, request.range);
+    
+    SE::Physics::Hit::HitResult hitInfo{};
+    if (!TraceHit(request, ray, hitInfo))
+        return false;   // 히트 판정 실패 (예: 사격이 벽에 막히거나, 사격이 빗나간 경우)
+    
+    return true;
+}
+
+bool PlayerCombatComponent::FireShotgun(const AttackRequest& request)
+{
+    constexpr int kPelletCount = 12;   // TEMP: 샷건이 한 발당 12개의 펠릿을 발사한다고 가정
+    constexpr float kSpread = 0.5f;
+    
+    if (request.weaponId == 0 or request.weaponId != GetCurrentWeaponId() or request.weaponId == 2)
+        return false;
+    
+    uint8 weaponSlot = WeaponSlotFromWeaponId(request.weaponId);
+    if (!ConsumeAmmo(weaponSlot, 1))
+        return false;
+    
+    const SE::Math::Vector3 dir = request.direction.Normalized();
+    const float spreadAngle = SE::Math::Max(0.0f, kSpread);
+    
+    bool hit = false;
+    PalletPattern pattern = GeneratePalletPattern(dir, kPelletCount, spreadAngle, 10);      // TODO: 패킷에 seed 값 추가하기
+    for (int i = 0; i < kPelletCount; ++i) { 
+        const SE::Math::Vector3& pelletDir = pattern.directions[i];
+        SE::Physics::Ray ray(request.origin, pelletDir, request.range);
+        
+        SE::Physics::Hit::HitResult hitInfo{};
+        if (TraceHit(request, ray, hitInfo)) {
+            hit = true;    // 펠릿 중 하나라도 히트 판정에 성공하면 전체 공격이 히트한 것으로 간주
+        }
+    }
+    
+    return hit;
+}
+
+PlayerCombatComponent::PalletPattern PlayerCombatComponent::GeneratePalletPattern(const SE::Math::Vector3& forwardDir,
+    int palletCount, float spreadDegrees, uint32 shotSeed) const
+{
+    PalletPattern result;
+    result.directions.reserve(palletCount);
+    
+    Random32 rng{shotSeed};
+    const SE::Math::Vector3& w = forwardDir;
+    
+    const SE::Math::Vector3 helper = (SE::Math::Abs(w.x) > 0.1f) ? SE::Math::Vector3(0, 1, 0) : SE::Math::Vector3(1, 0, 0);
+    const SE::Math::Vector3 u = helper.Cross(w).Normalized();
+    const SE::Math::Vector3 v = w.Cross(u);
+    
+    const float halfAngleRad = SE::Math::DegreesToRadians(spreadDegrees * 0.5f);
+    const float cosMin = std::cos(halfAngleRad);
+    
+    for (int i = 0; i < palletCount; ++i) {
+        float r1 = rng.NextFloat01();
+        float r2 = rng.NextFloat01();
+        
+        float cosTheta = 1.0f - r1 * (1.0f - cosMin);
+        float sinTheta = std::sqrt(std::max(0.0f, 1.0f - cosTheta * cosTheta));
+        float phi = 2.0f * std::numbers::pi_v<float> * r2;
+        
+        SE::Math::Vector3 dir = {
+            u * (std::cos(phi) * sinTheta) +
+            v * (std::sin(phi) * sinTheta) +
+            w * cosTheta
+        };
+        
+        result.directions.push_back(dir.Normalized());
+    }
+    
+    return result;
 }
 
 bool PlayerCombatComponent::IsValidWeaponSlot(uint8 slotIndex) const

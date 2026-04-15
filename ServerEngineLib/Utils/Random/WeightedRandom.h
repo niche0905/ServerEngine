@@ -39,6 +39,11 @@ public:
         return static_cast<double>(NextU32() & 0x00FFFFFFu) / static_cast<double>(0x01000000u);
     }
     
+    float NextFloat01()
+    {
+        return static_cast<float>((NextU32() >> 8) * (1.0 / 16777216.0));
+    }
+    
     bool Chance(double p)
     {
         if (p <= 0.0) return false;

@@ -33,7 +33,7 @@ struct WeaponState
 {
     uint32 weaponId = 0;
     int ammoInMag = 0;
-    int reserveAmmo = 0;
+    int reserveAmmo = 0;    // TODO: 제거핮자 (탄은 무한)
     bool isReloading = false;
 };
 
