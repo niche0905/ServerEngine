@@ -355,8 +355,8 @@ void PlayerCombatComponent::FireLauncher(const AttackRequest& request)
     const SE::Math::Vector3 spawnPos = request.origin;
     const SE::Math::Vector3 spawnDir = request.direction.Normalized();
     
-    // TEMP: 발사체 속도 5m/s, 수명 10초로 가정 (나중에 무기 데이터로 관리하기)
-    room->LaunchRocket(spawnDir, spawnDir, ownerPawn, request.damage, 500.0f, 10000);
+    // TEMP: 발사체 속도 5m/s, 수명 10초, 충돌체 구의 반지름 20cm로 가정 (나중에 무기 데이터로 관리하기)
+    room->LaunchRocket(spawnDir, spawnDir, ownerPawn, request.damage, 500.0f, 10000, 20.0f);
 }
 
 PlayerCombatComponent::PalletPattern PlayerCombatComponent::GeneratePalletPattern(const SE::Math::Vector3& forwardDir,

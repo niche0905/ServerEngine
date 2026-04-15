@@ -1023,10 +1023,12 @@ void Room::UpdateTick(Milliseconds tickInterval)
    
    roomGameSystem_.Update(deltaSeconds);
 
-   objectManager_.ForEachTickableAlive([deltaSeconds](BaseObject* obj)
-   {
-      obj->__Tick(deltaSeconds);
-   });
+   // TODO: 아래를 유효하게...
+   // objectManager_.ForEachTickableAlive([deltaSeconds](BaseObject* obj)
+   // {
+   //    obj->__Tick(deltaSeconds);
+   // });
+   
    // // NPC Tick
    // for (size_t i = 0; i < npcTickList_.size();) {
    //     
@@ -1112,6 +1114,11 @@ TimerId Room::ScheduleAfter(Duration delay, Job job)
    return ownerShard_->ScheduleAfter(delay, std::move(job));
 }
 
+bool Room::CancelScheduled(TimerId timerId)
+{
+   return ownerShard_->CancelTimer(timerId);
+}
+
 bool Room::HasPlayer(PlayerId playerId) const
 {
    return roomPlayers_.contains(playerId);
@@ -1135,7 +1142,7 @@ ObjectId Room::GetObjectId(PlayerId playerId) const
    return it->second.pawnObjectId;
 }
 
-bool Room::LaunchRocket(const Vector3& pos, const Vector3& dir, Pawn* ownerPawn, int32 damage, float speed, uint32 lifetimeMs)
+bool Room::LaunchRocket(const Vector3& pos, const Vector3& dir, Pawn* ownerPawn, int32 damage, float speed, uint32 lifetimeMs, float radius)
 {
    if (!ownerPawn)
       return false;   // 유효하지 않은 발사체 소유자 Pawn
@@ -1144,7 +1151,7 @@ bool Room::LaunchRocket(const Vector3& pos, const Vector3& dir, Pawn* ownerPawn,
    if (!rocket)
       return false;  // 발사체 생성 실패
    
-   rocket->Init(ownerPawn->GetId(), pos, dir * speed, damage, lifetimeMs, false);
+   rocket->Init(ownerPawn->GetId(), pos, dir * speed, damage, lifetimeMs, radius);
    
    BroadcastSpawn(rocket->GetId(), se::common::OJB_PROJECTILE, /*templateId=*/0);      // TODO: templateId는 나중에 생각하기
    return true;

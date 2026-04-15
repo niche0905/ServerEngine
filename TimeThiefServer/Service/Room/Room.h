@@ -124,6 +124,7 @@ public:
 public:
    TimerId ScheduleAt(TimePoint executeAt, Job job);
    TimerId ScheduleAfter(Duration delay, Job job);
+   bool CancelScheduled(TimerId timerId);
    
 public:
    std::shared_ptr<Room> GetRoomRef() { return shared_from_this(); }
@@ -147,7 +148,7 @@ public:
    ObjectId GetObjectId(PlayerId playerId) const;
    
 public:
-   bool LaunchRocket(const Vector3& pos, const Vector3& dir, Pawn* ownerPawn, int32 damage, float speed, uint32 lifetimeMs);
+   bool LaunchRocket(const Vector3& pos, const Vector3& dir, Pawn* ownerPawn, int32 damage, float speed, uint32 lifetimeMs, float radius);
    
 private:
    PlayerPawn* CreatePreparedPlayerPawn(PlayerId playerId, const Vector3& spawnPos);

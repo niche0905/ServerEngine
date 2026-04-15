@@ -31,26 +31,27 @@ public:
     const Vector3& GetVelocity() const { return velocity_; }
     void SetVelocity(const Vector3& velocity) { velocity_ = velocity; }
     
-    uint32 GetLifetimeMs() const { return lifetimeMs_; }
-    void SetLifetimeMs(uint32 lifetimeMs) { lifetimeMs_ = lifetimeMs; }
-    
 public:
-    void Init(ObjectId ownerId, const Vector3& startPos, const Vector3& velocity, int32 damage, uint32 lifetimeMs, bool gravityEnabled);
+    void Init(ObjectId ownerId, const Vector3& startPos, const Vector3& velocity, int32 damage, uint32 lifetimeMs, float radius);
     
 protected:
     virtual void OnSpawn() override;
     virtual void Tick(float dt) override;
     
+public:
+    void HandleLifetimeExpired();
+    
 protected:
+    virtual void UpdateMovement(float dt);
     virtual void OnHit(ObjectManager& om, ObjectId hitObjectId);
+    virtual void OnLifetimeExpired(ObjectManager& om);
+    virtual void OnExplode(ObjectManager& om);
     
 private:
     ObjectId ownerId_;
     int32 damage_{ 0 };
     
     Vector3 velocity_{};
-    uint32 lifetimeMs_{ 0 };
-    
-    bool gravityEnabled_{ false };
+    TimerId lifetimeTimer_{};
     
 };
