@@ -60,6 +60,11 @@ public:
     virtual int32 GetHp() const override;
     virtual int32 GetMaxHp() const override;
     
+protected:
+    virtual int32 ModifyIncomingDamage(int32 amount, const DamageContext& ctx) { return amount; }
+    virtual void OnBeforeApplyDamage(const DamageContext& ctx, int32& amount) {}
+    virtual void OnAfterApplyDamage(const DamageResult& dmgResult, const DamageContext& ctx) {}
+    
 // Cooldown
 public:
     CooldownComponent& GetCooldowns() { return cooldowns_; }

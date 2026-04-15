@@ -9,6 +9,43 @@
    PlayerPawn
 --------------*/
 
+int32 PlayerPawn::ModifyIncomingDamage(int32 amount, const DamageContext& ctx)
+{
+   constexpr int32 kMultiplierForZoneDamage = 10;   // TEMP: 존 데미지에 대한 데미지 배율 (예: 1 데미지당 10 화폐 삭제)
+   
+   if (ctx.type == DamageType::Zone) {
+      auto room = GetRoom();
+      if (!room)
+         return amount;   // 방이 없는 경우에는 존 데미지 처리하지 않음
+      
+      const CurrencyId timePoint = static_cast<CurrencyId>(CurrencyType::TimePoint);
+      
+      int32 deleteMoney = amount * kMultiplierForZoneDamage;
+      
+      if (wallet_.CanSpend(timePoint, deleteMoney)) {
+         wallet_.SpendMoney(room->GetObjectManager(), timePoint, deleteMoney, MoneyChangeContext{
+            .reason = MoneyChangeReason::ZoneDamage,
+         });
+         return 0;   // 존 데미지로 삭제할 재화가 충분하면 체력에는 데미지를 주지 않음
+      }
+      
+      // TODO: 존 데미지는 체력이 아니라 재화를 달게 한다 
+      //       만약 재화의 차감으로도 죽을 수 있다면 사망 처리 진행
+      //       재화가 모두 삭제되었더라도 죽이지 않을 것이라면 차감된 재화 양에 따라 amount 수정
+      
+      int64 currentMoney = wallet_.GetBalance(timePoint);
+      wallet_.SpendMoney(room->GetObjectManager(), timePoint, currentMoney, MoneyChangeContext{
+           .reason = MoneyChangeReason::ZoneDamage,
+        });
+      int64 remainDelete = deleteMoney - currentMoney;
+      int32 remainAmount = static_cast<int32>((remainDelete + kMultiplierForZoneDamage - 1) / kMultiplierForZoneDamage);
+      
+      return remainAmount;   // 존 데미지로 삭제할 재화가 부족해서 체력에도 데미지를 줘야 하는 경우 남은 데미지 양 반환
+   }
+   
+   return Pawn::ModifyIncomingDamage(amount, ctx);
+}
+
 void PlayerPawn::Damaged(const DamageResult& dmgResult)
 {
    Pawn::Damaged(dmgResult);

@@ -20,6 +20,7 @@ enum class MoneyChangeReason : uint8
     // Sell,
     Cheat,
     System,
+    ZoneDamage,
 };
 
 struct MoneyChangeContext

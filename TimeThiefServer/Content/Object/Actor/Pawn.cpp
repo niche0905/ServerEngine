@@ -31,9 +31,22 @@ DamageResult Pawn::ApplyDamage(ObjectManager& om, int32 amount, const DamageCont
       return result;
    }
    
+   amount = ModifyIncomingDamage(amount, ctx);
+   OnBeforeApplyDamage(ctx, amount);
+   
+   if (amount <= 0) {
+      DamageResult result;
+      result.requested = amount;
+      result.applied = 0;
+      result.accepted = false;
+      
+      return result;
+   }
+   
    DamageResult result = health_.ApplyDamage(amount, ctx);
    if (result.accepted) {
       Damaged(result);
+      OnAfterApplyDamage(result, ctx);
       
       if (not health_.IsAlive() and not isDead_) {
          isDead_ = true;
