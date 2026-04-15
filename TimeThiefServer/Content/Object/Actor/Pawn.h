@@ -61,8 +61,7 @@ public:
     virtual int32 GetMaxHp() const override;
     
 protected:
-    virtual int32 ModifyIncomingDamage(int32 amount, const DamageContext& ctx) { return amount; }
-    virtual void OnBeforeApplyDamage(const DamageContext& ctx, int32& amount) {}
+    virtual int32 ResolveIncomingDamage(int32 amount, const DamageContext& ctx) { return amount; }
     virtual void OnAfterApplyDamage(const DamageResult& dmgResult, const DamageContext& ctx) {}
     
 // Cooldown

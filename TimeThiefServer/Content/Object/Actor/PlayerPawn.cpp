@@ -9,7 +9,7 @@
    PlayerPawn
 --------------*/
 
-int32 PlayerPawn::ModifyIncomingDamage(int32 amount, const DamageContext& ctx)
+int32 PlayerPawn::ResolveIncomingDamage(int32 amount, const DamageContext& ctx)
 {
    constexpr int32 kMultiplierForZoneDamage = 10;   // TEMP: 존 데미지에 대한 데미지 배율 (예: 1 데미지당 10 화폐 삭제)
    
@@ -20,7 +20,7 @@ int32 PlayerPawn::ModifyIncomingDamage(int32 amount, const DamageContext& ctx)
       
       const CurrencyId timePoint = static_cast<CurrencyId>(CurrencyType::TimePoint);
       
-      int32 deleteMoney = amount * kMultiplierForZoneDamage;
+      const int64 deleteMoney = static_cast<int>(amount) * kMultiplierForZoneDamage;
       
       if (wallet_.CanSpend(timePoint, deleteMoney)) {
          wallet_.SpendMoney(room->GetObjectManager(), timePoint, deleteMoney, MoneyChangeContext{
@@ -43,7 +43,7 @@ int32 PlayerPawn::ModifyIncomingDamage(int32 amount, const DamageContext& ctx)
       return remainAmount;   // 존 데미지로 삭제할 재화가 부족해서 체력에도 데미지를 줘야 하는 경우 남은 데미지 양 반환
    }
    
-   return Pawn::ModifyIncomingDamage(amount, ctx);
+   return Pawn::ResolveIncomingDamage(amount, ctx);
 }
 
 void PlayerPawn::Damaged(const DamageResult& dmgResult)

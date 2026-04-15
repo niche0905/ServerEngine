@@ -31,7 +31,7 @@ DamageResult Pawn::ApplyDamage(ObjectManager& om, int32 amount, const DamageCont
       return result;
    }
    
-   amount = ModifyIncomingDamage(amount, ctx);
+   amount = ResolveIncomingDamage(amount, ctx);
    OnBeforeApplyDamage(ctx, amount);
    
    if (amount <= 0) {

@@ -41,7 +41,7 @@ public:
     void SetOwnerPlayerId(PlayerId playerId) { playerId_ = playerId; }
     
 protected:
-    virtual int32 ModifyIncomingDamage(int32 amount, const DamageContext& ctx) override;
+    virtual int32 ResolveIncomingDamage(int32 amount, const DamageContext& ctx) override;
     
 // pitch
 public:
