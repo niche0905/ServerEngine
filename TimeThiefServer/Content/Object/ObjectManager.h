@@ -4,6 +4,7 @@
 #include "BaseObject.h"
 
 class BaseObject;
+class Room;
 
 /*-----------------
    ObjectManager

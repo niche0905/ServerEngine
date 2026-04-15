@@ -339,7 +339,6 @@
       <LinkCompiled>true</LinkCompiled>
       <AdditionalIncludeDirectories>;$(SolutionDir)\vcpkg_installed;\x64-windows\include</AdditionalIncludeDirectories>
     </ClCompile>
-    <ClCompile Include="Content\Gameplay\Replication\ReplicationSystem.cpp" />
     <ClCompile Include="Content\Gameplay\Spawn\SpawnService.cpp" />
     <ClCompile Include="Content\Object\Actor\Actor.cpp" />
     <ClCompile Include="Content\Object\Actor\ChestActor.cpp" />
@@ -448,6 +447,83 @@
     <ClCompile Include="Service\Room\RoomManager.cpp" />
     <ClCompile Include="Service\Room\RoomTickScheduler.cpp" />
     <ClCompile Include="Service\Room\ShardRoomManager.cpp" />
+    <ClCompile Include="Service\Room\Systems\Replication\ReplicationSystem.cpp">
+      <RuntimeLibrary>MultiThreadedDebugDll</RuntimeLibrary>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <Optimization>Disabled</Optimization>
+      <SupportJustMyCode>true</SupportJustMyCode>
+      <AssemblerOutput>NoListing</AssemblerOutput>
+      <AssemblerListingLocation>D:\GitHub\ServerEngine\_out\obj\TimeThiefServer\</AssemblerListingLocation>
+      <UndefineAllPreprocessorDefinitions>false</UndefineAllPreprocessorDefinitions>
+      <BrowseInformation>false</BrowseInformation>
+      <BrowseInformationFile>D:\GitHub\ServerEngine\_out\obj\TimeThiefServer\</BrowseInformationFile>
+      <CompileAs>Default</CompileAs>
+      <UseDynamicDebugging>false</UseDynamicDebugging>
+      <ConformanceMode>true</ConformanceMode>
+      <DiagnosticsFormat>Column</DiagnosticsFormat>
+      <DisableLanguageExtensions>false</DisableLanguageExtensions>
+      <ErrorReporting>Prompt</ErrorReporting>
+      <ExpandAttributedSource>false</ExpandAttributedSource>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <EnableASAN>false</EnableASAN>
+      <EnableFuzzer>false</EnableFuzzer>
+      <EnableFiberSafeOptimizations>false</EnableFiberSafeOptimizations>
+      <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
+      <EnableVectorLength>NotSet</EnableVectorLength>
+      <FloatingPointModel>Precise</FloatingPointModel>
+      <ForceConformanceInForLoopScope>true</ForceConformanceInForLoopScope>
+      <GenerateModuleDependencies>false</GenerateModuleDependencies>
+      <GenerateSourceDependencies>false</GenerateSourceDependencies>
+      <GenerateXMLDocumentationFiles>false</GenerateXMLDocumentationFiles>
+      <InlineFunctionExpansion>Default</InlineFunctionExpansion>
+      <IntrinsicFunctions>false</IntrinsicFunctions>
+      <IgnoreStandardIncludePath>false</IgnoreStandardIncludePath>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <LanguageStandard_C>Default</LanguageStandard_C>
+      <MinimalRebuild>false</MinimalRebuild>
+      <ModuleDependenciesFile>D:\GitHub\ServerEngine\_out\obj\TimeThiefServer\</ModuleDependenciesFile>
+      <ModuleOutputFile>D:\GitHub\ServerEngine\_out\obj\TimeThiefServer\</ModuleOutputFile>
+      <OmitDefaultLibName>false</OmitDefaultLibName>
+      <FavorSizeOrSpeed>Neither</FavorSizeOrSpeed>
+      <WholeProgramOptimization>false</WholeProgramOptimization>
+      <ObjectFileName>D:\GitHub\ServerEngine\_out\obj\TimeThiefServer\</ObjectFileName>
+      <CallingConvention>Cdecl</CallingConvention>
+      <ProgramDataBaseFileName>D:\GitHub\ServerEngine\_out\obj\TimeThiefServer\vc143.pdb</ProgramDataBaseFileName>
+      <PrecompiledHeader>Create</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderOutputFile>D:\GitHub\ServerEngine\_out\obj\TimeThiefServer\TimeThiefServer.pch</PrecompiledHeaderOutputFile>
+      <PreprocessToFile>false</PreprocessToFile>
+      <PreprocessKeepComments>false</PreprocessKeepComments>
+      <PreprocessSuppressLineNumbers>false</PreprocessSuppressLineNumbers>
+      <RemoveUnreferencedCodeData>true</RemoveUnreferencedCodeData>
+      <ScanSourceForModuleDependencies>false</ScanSourceForModuleDependencies>
+      <ShowIncludes>false</ShowIncludes>
+      <SourceDependenciesFile>D:\GitHub\ServerEngine\_out\obj\TimeThiefServer\</SourceDependenciesFile>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <BufferSecurityCheck>true</BufferSecurityCheck>
+      <SmallerTypeCheck>false</SmallerTypeCheck>
+      <SpectreMitigation>false</SpectreMitigation>
+      <StructMemberAlignment>Default</StructMemberAlignment>
+      <TrackerLogDirectory>D:\GitHub\ServerEngine\_out\obj\TimeThiefServer\TimeThiefServer.tlog\</TrackerLogDirectory>
+      <TranslateIncludes>false</TranslateIncludes>
+      <MinimalRebuildFromTracking>true</MinimalRebuildFromTracking>
+      <TreatWarningAsError>false</TreatWarningAsError>
+      <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
+      <UseFullPaths>true</UseFullPaths>
+      <WarningLevel>Level3</WarningLevel>
+      <XMLDocumentationFileName>D:\GitHub\ServerEngine\_out\obj\TimeThiefServer\</XMLDocumentationFileName>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+      <IntelJCCErratum>false</IntelJCCErratum>
+      <BuildStlModules>false</BuildStlModules>
+      <TreatAngleIncludeAsExternal>false</TreatAngleIncludeAsExternal>
+      <ExternalWarningLevel>InheritWarningLevel</ExternalWarningLevel>
+      <TreatExternalTemplatesAsInternal>true</TreatExternalTemplatesAsInternal>
+      <DisableAnalyzeExternal>false</DisableAnalyzeExternal>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;_UNICODE;UNICODE;</PreprocessorDefinitions>
+      <SDLCheck>true</SDLCheck>
+      <LinkCompiled>true</LinkCompiled>
+      <AdditionalIncludeDirectories>;D:\GitHub\ServerEngine\vcpkg_installed\x64-windows\include</AdditionalIncludeDirectories>
+    </ClCompile>
     <ClCompile Include="Service\Room\Systems\Respawn\RespawnSystem.cpp" />
     <ClCompile Include="Service\Room\Systems\RoomGameSystem.cpp" />
     <ClCompile Include="Service\Room\Systems\Zone\ZoneSystem.cpp">
@@ -647,11 +723,8 @@
     <ClInclude Include="Content\Gameplay\Loot\LootTableSchema.h" />
     <ClInclude Include="Content\Gameplay\Loot\LootTableService.h" />
     <ClInclude Include="Content\Gameplay\Loot\LootTypes.h" />
-    <ClInclude Include="Content\Gameplay\Replication\InterestManager.h" />
     <ClInclude Include="Content\Gameplay\Replication\ReplicatedState.h" />
     <ClInclude Include="Content\Gameplay\Replication\ReplicationEvent.h" />
-    <ClInclude Include="Content\Gameplay\Replication\ReplicationMask.h" />
-    <ClInclude Include="Content\Gameplay\Replication\ReplicationSystem.h" />
     <ClInclude Include="Content\Gameplay\Replication\ReplicationTypes.h" />
     <ClInclude Include="Content\Gameplay\Spawn\IRespawnOwner.h" />
     <ClInclude Include="Content\Gameplay\Spawn\RespawnComponent.h" />
@@ -705,6 +778,7 @@
     <ClInclude Include="Service\Room\RoomTickScheduler.h" />
     <ClInclude Include="Service\Room\ScheduledRoomTick.h" />
     <ClInclude Include="Service\Room\ShardRoomManager.h" />
+    <ClInclude Include="Service\Room\Systems\Replication\ReplicationSystem.h" />
     <ClInclude Include="Service\Room\Systems\Respawn\RespawnSystem.h" />
     <ClInclude Include="Service\Room\Systems\RoomGameSystem.h" />
     <ClInclude Include="Service\Room\Systems\Zone\ZoneSystem.h" />

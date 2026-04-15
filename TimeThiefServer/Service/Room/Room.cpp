@@ -1203,12 +1203,12 @@ bool Room::Start()
    return true;
 }
 
-void Room::UpdateTick(Milliseconds tickInterval)
+void Room::UpdateTick(const RepFrame& frame)
 {
    // Room 정책
    // GameSystem 진행
    // Object Tick 진행
-   const float deltaSeconds = tickInterval.count() / 1000.0f;
+   const float deltaSeconds = frame.dt.count() / 1000.0f;
    
    roomGameSystem_.Update(deltaSeconds);
 
@@ -1217,6 +1217,9 @@ void Room::UpdateTick(Milliseconds tickInterval)
       obj->__Tick(deltaSeconds);
    });
 
+   // roomGameSystem_.GetReplicationSystem().FlushImmediate(frame);
+   // roomGameSystem_.GetReplicationSystem().FlushPeriodic(frame);
+   
    // objectManager_.SweepDestroy();   // 오브젝트 제거 처리
 }
 

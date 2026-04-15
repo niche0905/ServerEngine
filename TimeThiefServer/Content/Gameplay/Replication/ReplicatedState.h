@@ -1,16 +1,23 @@
 ﻿#pragma once
-#include "ReplicationMask.h"
 #include "ReplicationTypes.h"
 
-struct ReplicatedState
+
+class ReplicatedState
 {
-    RepObjectId object{};
-    RepMask dirtyMask{0};
+public:
+    void MarkDirty(ReplicationDirty flag) { dirtyFlags_ |= flag; }
+    void ClearDirty() { dirtyFlags_ = ReplicationDirty::None; }
     
-    TickSeq lastFlushSeq{0};    // 마지막으로 flush한 Tick
+    bool IsDirty() const { return dirtyFlags_ != ReplicationDirty::None; }
+    bool Has(ReplicationDirty flag) const { return HasDirty(dirtyFlags_, flag); }
     
-    bool IsDirty() const { return dirtyMask != 0; }
+    ReplicationDirty GetFlags() const { return dirtyFlags_; }
     
-    void MarkDirty(RepField f) { RepMaskSet(dirtyMask, f); }
-    void ClearDirty() { dirtyMask = 0; }  // 전체 초기화
+public:
+    uint64 replicationVersion = 0;
+    uint64 lastReplicatedTick = 0;
+    
+private:
+    ReplicationDirty dirtyFlags_ = ReplicationDirty::None;
+    
 };

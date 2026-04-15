@@ -1,6 +1,6 @@
 ﻿#include "pch.h"
 #include "Actor.h"
-#include "Content/Gameplay/Replication/ReplicationSystem.h"
+#include "Service/Room/Systems/Replication/ReplicationSystem.h"
 #include "Content/Gameplay/Spawn/SpawnService.h"
 
 /*-----------------
@@ -35,14 +35,12 @@ void Actor::SetPosition(const Vector3& position)
 {
     position_ = position;
     SyncColliders();
-    OnRepDirtyTransform();
 }
 
 void Actor::SetYaw(float yaw)
 {
     yaw_ = yaw;
     SyncColliders();
-    OnRepDirtyTransform();
 }
 
 void Actor::SetTransform(const Vector3& position, float yaw)
@@ -50,7 +48,6 @@ void Actor::SetTransform(const Vector3& position, float yaw)
     position_ = position;
     yaw_ = yaw;
     SyncColliders();
-    OnRepDirtyTransform();
 }
 
 void Actor::ForEachCollider(const std::function<void(ColliderComponent*)>& fn) const
@@ -66,13 +63,6 @@ void Actor::SyncColliders()
         if (collider) {
             collider->UpdateWorldCollider();
         }
-    }
-}
-
-void Actor::OnRepDirtyTransform()
-{
-    if (auto* rep = TryGetReplication(GetRoomId())) {
-        rep->MarkDirty(GetId(), RepField::Transform);
     }
 }
 

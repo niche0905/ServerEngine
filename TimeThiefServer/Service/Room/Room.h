@@ -122,7 +122,7 @@ public:
 public:
    bool Start();
    
-   void UpdateTick(Milliseconds tickInterval);
+   void UpdateTick(const RepFrame& frame);
    bool TraceHit(const SE::Physics::Ray& ray, ObjectId exceptId, SE::Physics::Hit::HitResult& outHit) const;
    
    bool IsPlaying() const { return roomState_ == RoomState::Playing; }
@@ -147,6 +147,10 @@ public:
 
    RoomState GetRoomState() const { return roomState_; }
    void SetRoomState(RoomState state) { roomState_ = state; }
+   
+public:
+   TickSeq GetTickSeq() const { return tickSeq_; }
+   TickSeq AdvanceTick() { return ++tickSeq_; }
    
 public:
    bool HasPlayer(PlayerId playerId) const;
@@ -211,6 +215,7 @@ private:
 
 private:
    RoomId roomId_;
+   TickSeq tickSeq_{0};
    
    ObjectManager objectManager_;                            // Room 내의 모든 오브젝트를 관리하는 ObjectManager (정본 컨테이너)
    

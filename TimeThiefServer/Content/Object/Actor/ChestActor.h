@@ -68,7 +68,6 @@ protected:
     
 private:
     bool CheckOpenPermission(ObjectManager& om, PlayerPawn& byPlayer, int32& outError) const;
-    void MarkInventoryDirty();
     
     
 private:

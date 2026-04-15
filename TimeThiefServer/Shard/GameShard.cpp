@@ -175,7 +175,12 @@ void GameShard::ProcessRoomTicks()
       if (!room)
          continue;
       
-      room->UpdateTick(roomTickIntervalMs_);
+      RepFrame frame;
+      frame.roomTick = room->AdvanceTick();  // TODO: 이거 추가하기 (몇번의 Tick이 진행 되었는지)
+      frame.now = now;
+      frame.dt = roomTickIntervalMs_;
+      
+      room->UpdateTick(frame);
       
       roomScheduler_.Schedule(roomTick.roomId, roomTick.executeAt + roomTickIntervalMs_);
    }

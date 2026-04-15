@@ -1,21 +1,6 @@
 ﻿#include "pch.h"
 #include "ChestActor.h"
 #include "PlayerPawn.h"
-#include "Content/Gameplay/Replication/ReplicationSystem.h"
-
-/*-----------------
-   Local Helper
------------------*/
-
-namespace 
-{
-    // TODO: 구현 필요
-    
-    ReplicationSystem* TryGetReplication(RoomId /*roomId*/)
-    {
-        return nullptr;
-    }
-}
 
 /*--------------
    ChestActor
@@ -79,8 +64,6 @@ ContainerTakeResult ChestActor::TryTakeFromContainer(ObjectManager& om, PlayerPa
     result.ok = true;
     result.moveCount = moved;
     
-    MarkInventoryDirty();
-    
     return result;
 }
 
@@ -119,8 +102,6 @@ ContainerTakeResult ChestActor::TryTakeAll(ObjectManager& om, PlayerPawn& byPlay
     result.ok = true;
     result.moveCount = totalMoved;
     
-    MarkInventoryDirty();
-    
     return result;
 }
 
@@ -146,19 +127,16 @@ int32 ChestActor::GetItemCount(ItemId itemId) const
 
 InventoryOpResult ChestActor::AddItem(ObjectManager& om, ItemId itemId, int32 count, const ItemChangeContext& ctx)
 {
-    MarkInventoryDirty();
     return inventory_.AddItem(om, itemId, count, ctx);
 }
 
 InventoryOpResult ChestActor::RemoveItem(ObjectManager& om, ItemId itemId, int32 count, const ItemChangeContext& ctx)
 {
-    MarkInventoryDirty();
     return inventory_.RemoveItem(om, itemId, count, ctx);
 }
 
 InventoryOpResult ChestActor::ConsumeItem(ObjectManager& om, ItemId itemId, int32 count, const ItemChangeContext& ctx)
 {
-    MarkInventoryDirty();
     return inventory_.ConsumeItem(om, itemId, count, ctx);
 }
 
@@ -184,11 +162,4 @@ bool ChestActor::CheckOpenPermission(ObjectManager& om, PlayerPawn& byPlayer, in
     // 오픈에 성공
     outError = 0;
     return true;
-}
-
-void ChestActor::MarkInventoryDirty()
-{
-    if (auto* rep = TryGetReplication(GetRoomId())) {
-        rep->MarkDirty(GetId(), RepField::Inventory);
-    }
 }

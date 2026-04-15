@@ -2,6 +2,7 @@
 #include "ObjectId.h"
 #include "ObjectEnum.h"
 #include "Content/Gameplay/Collider/ColliderComponent.h"
+#include "Content/Gameplay/Replication/ReplicatedState.h"
 
 class Room;
 struct ObjectId;
@@ -29,10 +30,23 @@ public:
     
     ObjectState GetState() const { return state_; }
     bool IsAlive() const { return state_ == ObjectState::Alive; }
-    bool IsPendingDestory() const { return state_ == ObjectState::PendingDestroy; }
+    bool IsPendingDestroy() const { return state_ == ObjectState::PendingDestroy; }
     
     ObjectFlags GetFlags() const { return flags_; }
     bool IsTickable() const { return HasFlag(flags_, ObjectFlags::Tickable); }
+    
+    ReplicatedState& GetReplicatedState() { return replicated_; }
+    const ReplicatedState& GetReplicatedState() const { return replicated_; }
+    
+    void MarkReplicationDirty(ReplicationDirty dirtyFlag)
+    {
+        replicated_.MarkDirty(dirtyFlag);
+        
+        if (auto room = GetRoom()) {
+            // TODO: RoomGameSystem에 ReplicationSystem 추가하기
+            // room->GetRoomGameSystem().GetReplicationSystem().MarkDirty(GetId());
+        }
+    }
     
 public:
     virtual void ForEachCollider(const std::function<void(ColliderComponent*)>& fn) const {}
@@ -87,5 +101,6 @@ private:
     std::weak_ptr<Room>     room_;
     ObjectFlags             flags_{ ObjectFlags::None };
     ObjectState             state_{ ObjectState::Destroyed };
+    ReplicatedState         replicated_{};
     
 };
