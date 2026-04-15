@@ -38,15 +38,7 @@ public:
     ReplicatedState& GetReplicatedState() { return replicated_; }
     const ReplicatedState& GetReplicatedState() const { return replicated_; }
     
-    void MarkReplicationDirty(ReplicationDirty dirtyFlag)
-    {
-        replicated_.MarkDirty(dirtyFlag);
-        
-        if (auto room = GetRoom()) {
-            // TODO: RoomGameSystem에 ReplicationSystem 추가하기
-            // room->GetRoomGameSystem().GetReplicationSystem().MarkDirty(GetId());
-        }
-    }
+    void MarkReplicationDirty(ReplicationDirty dirtyFlag);
     
 public:
     virtual void ForEachCollider(const std::function<void(ColliderComponent*)>& fn) const {}

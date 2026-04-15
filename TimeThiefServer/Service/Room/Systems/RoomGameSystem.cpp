@@ -23,6 +23,9 @@ bool RoomGameSystem::Init(Room* ownerRoom, const GameDataManager& gameDataManage
    if (!respawnSystem_.Init(ownerRoom))
       return false;
    
+   if (!replicationSystem_.Init(ownerRoom))
+      return false;
+   
    return true;
 }
 

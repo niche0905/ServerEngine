@@ -1,4 +1,5 @@
 ﻿#pragma once
+#include "Replication/ReplicationSystem.h"
 #include "Respawn/RespawnSystem.h"
 #include "Zone/ZoneSystem.h"
 
@@ -30,6 +31,9 @@ public:
    RespawnSystem& GetRespawnSystem() { return respawnSystem_; }
    const RespawnSystem& GetRespawnSystem() const { return respawnSystem_; }
    
+   ReplicationSystem& GetReplicationSystem() { return replicationSystem_; }
+   const ReplicationSystem& GetReplicationSystem() const { return replicationSystem_; }
+   
 public:
    void OnPawnDeath(ObjectId pawnId);
    
@@ -39,5 +43,6 @@ private:
    
    ZoneSystem              zoneSystem_{};
    RespawnSystem           respawnSystem_{};
+   ReplicationSystem       replicationSystem_{};
     
 };
