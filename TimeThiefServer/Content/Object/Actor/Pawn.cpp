@@ -41,7 +41,7 @@ DamageResult Pawn::ApplyDamage(ObjectManager& om, int32 amount, const DamageCont
       
          if (ShouldRequestDestroyOnDeath())
          {
-            __RequestDestroy();
+            om.RequestDestroy(GetId());
          }
       }
    }
