@@ -228,6 +228,20 @@ bool PlayerCombatComponent::ExecuteAttack(AttackRequest& request)
         }
         break;
     case AttackType::Projectile:
+        {
+            switch (request.weaponId)
+            {
+            // TODO: 무기 ID Enum 값으로 변경...
+            case 3:
+                {
+                    request.damage = 80;
+                    request.range = 1500.0f;
+                    FireLauncher(request);
+                    hit = false;    // 발사체 공격의 경우 발사 시점에는 히트 판정이 없고, 투사체가 폭발할 때 히트 판정이 이루어지도록 구현할 예정이므로, 일단 여기서는 false로 설정
+                }
+                break;
+            }
+        }
         break;
     default:
         break;
@@ -321,8 +335,32 @@ bool PlayerCombatComponent::FireShotgun(const AttackRequest& request)
     return hit;
 }
 
+void PlayerCombatComponent::FireLauncher(const AttackRequest& request)
+{
+    if (request.weaponId == 0 or request.weaponId != GetCurrentWeaponId() or request.weaponId == 2)
+        return;
+    
+    uint8 weaponSlot = WeaponSlotFromWeaponId(request.weaponId);
+    if (!ConsumeAmmo(weaponSlot, 1))
+        return;
+    
+    Pawn* ownerPawn = GetOwnerPawn();
+    if (!ownerPawn)
+        return;
+    
+    auto room = ownerPawn->GetRoom();
+    if (!room)
+        return;
+    
+    const SE::Math::Vector3 spawnPos = request.origin;
+    const SE::Math::Vector3 spawnDir = request.direction.Normalized();
+    
+    // TEMP: 발사체 속도 5m/s, 수명 10초로 가정 (나중에 무기 데이터로 관리하기)
+    room->LaunchRocket(spawnDir, spawnDir, ownerPawn, request.damage, 500.0f, 10000);
+}
+
 PlayerCombatComponent::PalletPattern PlayerCombatComponent::GeneratePalletPattern(const SE::Math::Vector3& forwardDir,
-    int palletCount, float spreadDegrees, uint32 shotSeed) const
+                                                                                  int palletCount, float spreadDegrees, uint32 shotSeed) const
 {
     PalletPattern result;
     result.directions.reserve(palletCount);

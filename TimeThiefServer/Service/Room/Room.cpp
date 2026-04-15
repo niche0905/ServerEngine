@@ -6,6 +6,7 @@
 #include "Content/Object/Actor/Pawn.h"
 #include "Network/Session/SessionManager/SessionManager.h"
 #include "Content/Object/Actor/PlayerPawn.h"
+#include "Content/Object/Actor/ProjectileActor.h"
 #include "Content/Object/Actor/WorldItemActor.h"
 #include "Service/Player/PlayerManager/PlayerManager.h"
 #include "Shard/GameShard.h"
@@ -1017,30 +1018,34 @@ void Room::UpdateTick(Milliseconds tickInterval)
 {
    // Room 정책
    // GameSystem 진행
-   // NPC Tick 진행
+   // Object Tick 진행
    const float deltaSeconds = tickInterval.count() / 1000.0f;
    
    roomGameSystem_.Update(deltaSeconds);
-   
-   // NPC Tick
-   for (size_t i = 0; i < npcTickList_.size();) {
-       
-      const ObjectId npcId = npcTickList_[i];
-      
-      BaseObject* npc = objectManager_.Find(npcId);
-      
-      if (not npc) {
-         // NPC가 사라졌는데 Tick 리스트에 남아있는 경우, 리스트에서 제거
-         npcTickList_[i] = npcTickList_.back();
-         npcTickList_.pop_back();
-         continue;
-      }
-      
-      // TODO: NPC 업데이트 로직 구현하기 (예: AI 행동, 이동, 상태 변화 등)
-      npc->__Tick(deltaSeconds);
-      
-      ++i;
-   }
+
+   objectManager_.ForEachTickableAlive([deltaSeconds](BaseObject* obj)
+   {
+      obj->__Tick(deltaSeconds);
+   });
+   // // NPC Tick
+   // for (size_t i = 0; i < npcTickList_.size();) {
+   //     
+   //    const ObjectId npcId = npcTickList_[i];
+   //    
+   //    BaseObject* npc = objectManager_.Find(npcId);
+   //    
+   //    if (not npc) {
+   //       // NPC가 사라졌는데 Tick 리스트에 남아있는 경우, 리스트에서 제거
+   //       npcTickList_[i] = npcTickList_.back();
+   //       npcTickList_.pop_back();
+   //       continue;
+   //    }
+   //    
+   //    // TODO: NPC 업데이트 로직 구현하기 (예: AI 행동, 이동, 상태 변화 등)
+   //    npc->__Tick(deltaSeconds);
+   //    
+   //    ++i;
+   // }
    
    // objectManager_.SweepDestroy();   // 오브젝트 제거 처리
 }
@@ -1130,6 +1135,21 @@ ObjectId Room::GetObjectId(PlayerId playerId) const
    return it->second.pawnObjectId;
 }
 
+bool Room::LaunchRocket(const Vector3& pos, const Vector3& dir, Pawn* ownerPawn, int32 damage, float speed, uint32 lifetimeMs)
+{
+   if (!ownerPawn)
+      return false;   // 유효하지 않은 발사체 소유자 Pawn
+   
+   ProjectileActor* rocket = SpawnObject<ProjectileActor>(ObjectFlags::Replicable | ObjectFlags::Tickable);
+   if (!rocket)
+      return false;  // 발사체 생성 실패
+   
+   rocket->Init(ownerPawn->GetId(), pos, dir * speed, damage, lifetimeMs, false);
+   
+   BroadcastSpawn(rocket->GetId(), se::common::OJB_PROJECTILE, /*templateId=*/0);      // TODO: templateId는 나중에 생각하기
+   return true;
+}
+
 PlayerPawn* Room::CreatePreparedPlayerPawn(PlayerId playerId, const Vector3& spawnPos)
 {
    auto playerPawn = SpawnObject<PlayerPawn>(ObjectFlags::Replicable | ObjectFlags::Tickable);
@@ -1185,6 +1205,42 @@ void Room::BroadcastGameStart()
    SendBufferRef gameStartBuffer = ServerPacketHandler::MakeSendBuffer(noti);
    if (gameStartBuffer)
       Broadcast(gameStartBuffer);   // 모두에게 게임 시작 정보 Broadcast
+}
+
+void Room::BroadcastSpawn(ObjectId objectId, se::common::ObjectType objectType, uint32 templateId)
+{
+   auto* obj = objectManager_.Find(objectId);
+   if (!obj)
+      return;
+   
+   auto* actor = dynamic_cast<Actor*>(obj);
+   if (!actor)
+      return;
+   
+   se::room::N_EntitySpawn spawnPkt;
+   {
+      auto* spawnInfo = spawnPkt.mutable_info();
+               
+      spawnInfo->set_type(objectType);
+      spawnInfo->set_template_id(templateId);
+      auto* entityIdPtr = spawnInfo->mutable_entity_id();
+      entityIdPtr->set_value(objectId.value);
+               
+      auto* movementPtr = spawnInfo->mutable_movement();
+      auto* positionPtr = movementPtr->mutable_position();
+               
+      const auto& exPos = actor->GetPosition();
+      positionPtr->set_x(exPos.x);
+      positionPtr->set_y(exPos.y);
+      positionPtr->set_z(exPos.z);
+               
+      movementPtr->set_yaw(actor->GetYaw());
+      movementPtr->set_pitch(0.0f);
+   }
+   
+   SendBufferRef spawnBuffer = ServerPacketHandler::MakeSendBuffer(spawnPkt);
+   if (spawnBuffer)
+      Broadcast(spawnBuffer);   // 모두에게 스폰 정보 Broadcast
 }
 
 void Room::BroadcastDeath(ObjectId objectId)

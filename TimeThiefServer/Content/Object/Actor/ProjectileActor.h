@@ -35,7 +35,7 @@ public:
     void SetLifetimeMs(uint32 lifetimeMs) { lifetimeMs_ = lifetimeMs; }
     
 public:
-    void Init(ObjectId ownerId, const Vector3& startPos, const Vector3& velocity, int32 damage, uint32 lifetimeMs);
+    void Init(ObjectId ownerId, const Vector3& startPos, const Vector3& velocity, int32 damage, uint32 lifetimeMs, bool gravityEnabled);
     
 protected:
     virtual void OnSpawn() override;
@@ -50,5 +50,7 @@ private:
     
     Vector3 velocity_{};
     uint32 lifetimeMs_{ 0 };
+    
+    bool gravityEnabled_{ false };
     
 };

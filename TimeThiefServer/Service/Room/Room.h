@@ -117,7 +117,7 @@ public:
    bool Start();
    
    void UpdateTick(Milliseconds tickInterval);
-   bool TraceHit(const SE::Physics::Ray& ray, ObjectId exceptId, SE::Physics::Hit::HitResult& outHit) const;   
+   bool TraceHit(const SE::Physics::Ray& ray, ObjectId exceptId, SE::Physics::Hit::HitResult& outHit) const;
    
    bool IsPlaying() const { return roomState_ == RoomState::Playing; }
    
@@ -146,6 +146,9 @@ public:
    SessionId GetSessionId(PlayerId playerId) const;
    ObjectId GetObjectId(PlayerId playerId) const;
    
+public:
+   bool LaunchRocket(const Vector3& pos, const Vector3& dir, Pawn* ownerPawn, int32 damage, float speed, uint32 lifetimeMs);
+   
 private:
    PlayerPawn* CreatePreparedPlayerPawn(PlayerId playerId, const Vector3& spawnPos);
    
@@ -155,6 +158,7 @@ private:
    
 public:
    void BroadcastGameStart();
+   void BroadcastSpawn(ObjectId objectId, se::common::ObjectType objectType, uint32 templateId);
    void BroadcastDeath(ObjectId objectId);
    void BroadcastRespawn(ObjectId objectId);
    void NotifyHealthChange(PlayerId id, int newHealth, int deltaHealth);

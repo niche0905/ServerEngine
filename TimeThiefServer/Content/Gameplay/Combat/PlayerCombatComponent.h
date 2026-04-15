@@ -48,6 +48,7 @@ private:
    bool TraceHit(const AttackRequest& request, const SE::Physics::Ray& ray, SE::Physics::Hit::HitResult& outHit);
    bool FireRifle(const AttackRequest& request);
    bool FireShotgun(const AttackRequest& request);
+   void FireLauncher(const AttackRequest& request);
    PalletPattern GeneratePalletPattern(const SE::Math::Vector3& forwardDir, int palletCount, float spreadDegrees, uint32 shotSeed) const;
    
    bool IsValidWeaponSlot(uint8 slotIndex) const;

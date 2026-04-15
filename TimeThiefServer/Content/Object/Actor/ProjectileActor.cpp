@@ -6,12 +6,13 @@
 -------------------*/
 
 void ProjectileActor::Init(ObjectId ownerId, const Vector3& startPos, const Vector3& velocity, int32 damage,
-    uint32 lifetimeMs)
+    uint32 lifetimeMs, bool gravityEnabled)
 {
     ownerId_ = ownerId;
     damage_ = damage;
     velocity_ = velocity;
     lifetimeMs_ = lifetimeMs;
+    gravityEnabled_ = gravityEnabled;
     
     SetPosition(startPos);
 }
