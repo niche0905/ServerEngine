@@ -72,13 +72,19 @@ public:
    bool HandleThrowGrenade(PlayerId playerId, const se::game::C_ThrowGrenadeReq& pkt);
    bool HandleReload(PlayerId playerId, const se::game::C_ReloadReq& pkt);
    bool HandleWeaponChange(PlayerId playerId, const se::game::C_WeaponChangeReq& pkt);
+   bool HandleUseAbility(PlayerId playerId, const se::game::C_UseAbilityReq& pkt);
+   bool HandleUseItem(PlayerId playerId, const se::game::C_UseItemReq& pkt);
+   bool HandleChestInteract(PlayerId playerId, const se::game::C_ChestInteractReq& pkt);
    bool HandlePickupItem(PlayerId playerId, const se::game::C_PickupItemReq& pkt);
+   bool HandleUseStore(PlayerId playerId, const se::game::C_UseStoreReq& pkt);
    bool HandleSetSavePoint(PlayerId playerId, const se::game::C_SetSavePointReq& pkt);
    bool HandleJump(PlayerId playerId, const se::game::C_JumpReq& pkt);
    bool HandleJumpLand(PlayerId playerId, const se::game::C_JumpLand& pkt);
+   bool HandleDoubleJump(PlayerId playerId, const se::game::C_DoubleJumpReq& pkt);
    bool HandleCrouch(PlayerId playerId, const se::game::C_CrouchReq& pkt);
    bool HandleWireAction(PlayerId playerId, const se::game::C_WireActionReq& pkt);
    bool HandleWireActionEnd(PlayerId playerId, const se::game::C_WireActionEnd& pkt);
+   bool HandleWireLaunch(PlayerId playerId, const se::game::C_WireLaunchReq& pkt);
    
 public:
    template<typename T, typename... Args>

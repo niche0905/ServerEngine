@@ -94,6 +94,9 @@ public:
     bool IsJumping() const { return actionState_.isJumping; }
     void SetJumping(bool isJumping) { actionState_.isJumping = isJumping; }
     
+    bool IsDoubleJumping() const { return actionState_.isDoubleJumping; }
+    void SetDoubleJumping(bool isDoubleJumping) { actionState_.isDoubleJumping = isDoubleJumping; }
+    
     bool IsCrouching() const { return actionState_.isCrouching; }
     void SetCrouching(bool isCrouching) { actionState_.isCrouching = isCrouching; }
     

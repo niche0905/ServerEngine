@@ -5,6 +5,7 @@ struct ActionState
 {
     bool isAiming = false;
     bool isJumping = false;
+    bool isDoubleJumping = false;
     bool isCrouching = false;
     bool isWireActing = false;
 };

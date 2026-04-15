@@ -321,11 +321,7 @@ bool Room::HandleMove(PlayerId playerId, const se::game::C_MoveReq& pkt)
       if (not it->second.loaded)
          return false;
       
-      auto* obj = objectManager_.Find(it->second.pawnObjectId);
-      if (!obj)
-         return false;
-      
-      auto* playerPawn = dynamic_cast<PlayerPawn*>(obj);
+      auto* playerPawn = objectManager_.FindAs<PlayerPawn>(it->second.pawnObjectId);
       if (!playerPawn)
          return false;
       
@@ -384,14 +380,7 @@ bool Room::HandleAim(PlayerId playerId, const se::game::C_AimReq& pkt)
       if (it == roomPlayers_.end())
          return false;   // 방에 존재하지 않는 플레이어
       
-      if (not it->second.loaded)
-         return false;
-      
-      auto* obj = objectManager_.Find(it->second.pawnObjectId);
-      if (!obj)
-         return false;
-      
-      auto* playerPawn = dynamic_cast<PlayerPawn*>(obj);
+      auto* playerPawn = objectManager_.FindAs<PlayerPawn>(it->second.pawnObjectId);
       if (!playerPawn)
          return false;
       
@@ -432,11 +421,7 @@ bool Room::HandleFire(PlayerId playerId, const se::game::C_FireReq& pkt)
       if (not it->second.loaded)
          return false;
       
-      auto* obj = objectManager_.Find(it->second.pawnObjectId);
-      if (!obj)
-         return false;
-      
-      auto* playerPawn = dynamic_cast<PlayerPawn*>(obj);
+      auto* playerPawn = objectManager_.FindAs<PlayerPawn>(it->second.pawnObjectId);
       if (!playerPawn)
          return false;
       
@@ -507,11 +492,7 @@ bool Room::HandleThrowGrenade(PlayerId playerId, const se::game::C_ThrowGrenadeR
       if (not it->second.loaded)
          return false;
       
-      auto* obj = objectManager_.Find(it->second.pawnObjectId);
-      if (!obj)
-         return false;
-      
-      auto* playerPawn = dynamic_cast<PlayerPawn*>(obj);
+      auto* playerPawn = objectManager_.FindAs<PlayerPawn>(it->second.pawnObjectId);
       if (!playerPawn)
          return false;
       
@@ -572,11 +553,7 @@ bool Room::HandleReload(PlayerId playerId, const se::game::C_ReloadReq& pkt)
       if (not it->second.loaded)
          return false;
       
-      auto* obj = objectManager_.Find(it->second.pawnObjectId);
-      if (!obj)
-         return false;
-      
-      auto* playerPawn = dynamic_cast<PlayerPawn*>(obj);
+      auto* playerPawn = objectManager_.FindAs<PlayerPawn>(it->second.pawnObjectId);
       if (!playerPawn)
          return false;
       
@@ -630,11 +607,7 @@ bool Room::HandleWeaponChange(PlayerId playerId, const se::game::C_WeaponChangeR
       if (not it->second.loaded)
          return false;
       
-      auto* obj = objectManager_.Find(it->second.pawnObjectId);
-      if (!obj)
-         return false;
-      
-      auto* playerPawn = dynamic_cast<PlayerPawn*>(obj);
+      auto* playerPawn = objectManager_.FindAs<PlayerPawn>(it->second.pawnObjectId);
       if (!playerPawn)
          return false;
       
@@ -664,6 +637,127 @@ bool Room::HandleWeaponChange(PlayerId playerId, const se::game::C_WeaponChangeR
    return true;
 }
 
+bool Room::HandleUseAbility(PlayerId playerId, const se::game::C_UseAbilityReq& pkt)
+{
+   SendBufferRef abilityUseBroadcastBuffer;
+   std::shared_ptr<PlayerSession> sessionRef = sessionManager_.FindByPlayerId(playerId);
+   
+   if (!sessionRef) return false;   // 세션이 존재하지 않음 (정상적이지 않은 상황)
+   
+   {
+      if (playerId == 0)
+         return false;
+      
+      auto it = roomPlayers_.find(playerId);
+      if (it == roomPlayers_.end())
+         return false;   // 방에 존재하지 않는 플레이어
+      
+      if (not it->second.loaded)
+         return false;
+      
+      auto* playerPawn = objectManager_.FindAs<PlayerPawn>(it->second.pawnObjectId);
+      if (!playerPawn)
+         return false;
+      
+      // TODO: Player Ability 사용 처리 로직 (예: Ability 효과 적용, 쿨타임 체크 등)
+      //       유효 하다면 다음으로
+      
+      se::game::N_UseAbility noti;
+      {
+         auto* entityIdPtr = noti.mutable_entity_id();
+         entityIdPtr->set_value(it->second.pawnObjectId.value);
+         
+         // TODO: 추가되는 정보가 있다면 noti에 더 넣어주기 (예: 타겟 정보, Direction 등)
+         noti.set_ability_id(pkt.ability_id());
+      }
+      
+      abilityUseBroadcastBuffer = ServerPacketHandler::MakeSendBuffer(noti);
+   }
+   
+   if (abilityUseBroadcastBuffer)
+      Broadcast(abilityUseBroadcastBuffer);   // 모두에게 Ability 사용 정보 Broadcast
+                                              // 본인에게도 보내는 이유는 버프형 스킬의 경우 이 패킷을 받은 뒤 부터 적용되도록
+   
+   return true;
+}
+
+bool Room::HandleUseItem(PlayerId playerId, const se::game::C_UseItemReq& pkt)
+{
+   SendBufferRef itemUseBroadcastBuffer;
+   std::shared_ptr<PlayerSession> sessionRef = sessionManager_.FindByPlayerId(playerId);
+   
+   if (!sessionRef) return false;   // 세션이 존재하지 않음 (정상적이지 않은 상황)
+   
+   {
+      if (playerId == 0)
+         return false;
+      
+      auto it = roomPlayers_.find(playerId);
+      if (it == roomPlayers_.end())
+         return false;   // 방에 존재하지 않는 플레이어
+      
+      if (not it->second.loaded)
+         return false;
+      
+      auto* playerPawn = objectManager_.FindAs<PlayerPawn>(it->second.pawnObjectId);
+      if (!playerPawn)
+         return false;
+      
+      // TODO: 아이템 사용 처리 로직 (예: 아이템 효과 적용, 인벤토리에서 아이템 제거 등)
+      //       유효 하다면 다음으로
+      //       그리고 여기서 만족하는 게 아니라 배그와 같이 사용하는 모션동안 사용이 취소될 수 있는 구조로 변경하기 (예: 회복 아이템 사용 중에 캔슬하면 아이템이 사용되지 않도록)
+      
+      se::game::N_UseItem noti;
+      {
+         auto* entityIdPtr = noti.mutable_entity_id();
+         entityIdPtr->set_value(it->second.pawnObjectId.value);
+         
+         noti.set_item_id(pkt.item_id());
+      }
+      
+      itemUseBroadcastBuffer = ServerPacketHandler::MakeSendBuffer(noti);
+   }
+   
+   if (itemUseBroadcastBuffer)
+      Broadcast(itemUseBroadcastBuffer, playerId);   // 본인 제외 모두에게 아이템 사용 정보 Broadcast 
+   
+   return true;
+}
+
+bool Room::HandleChestInteract(PlayerId playerId, const se::game::C_ChestInteractReq& pkt)
+{
+   std::shared_ptr<PlayerSession> sessionRef = sessionManager_.FindByPlayerId(playerId);
+   
+   if (!sessionRef) return false;   // 세션이 존재하지 않음 (정상적이지 않은 상황)
+   
+   {
+      if (playerId == 0)
+         return false;
+      
+      auto it = roomPlayers_.find(playerId);
+      if (it == roomPlayers_.end())
+         return false;   // 방에 존재하지 않는 플레이어
+      
+      if (not it->second.loaded)
+         return false;
+      
+      auto* playerPawn = objectManager_.FindAs<PlayerPawn>(it->second.pawnObjectId);
+      if (!playerPawn)
+         return false;
+      
+      const ObjectId chestId{pkt.chest_entity_id().value()};
+      // TODO: Chest과의 상호작용 처리 로직 (예: Chest 열기, 아이템 획득 등)
+      //       로직에 따라 아이템이 우수수 떨어지게 (이는 Chest에서 아이템을 생성하고 Room에 생성된 아이템 정보를 Broadcast하는 구조로)
+      //       상호작용 모션이 Broadcast의 필요성이 있다면 패킷을 추가하고 세팅 (PlayerId, ChestId)
+      // auto* chestObj = objectManager_.FindAs(chestId);
+   }
+   
+   // if (ChestInteractBroadcastBuffer)
+   //    Broadcast(ChestInteractBroadcastBuffer, playerId);   // Chest과 상호작용한
+   
+   return true;
+}
+
 bool Room::HandlePickupItem(PlayerId playerId, const se::game::C_PickupItemReq& pkt)
 {
    SendBufferRef pickupResultBuffer;
@@ -685,11 +779,7 @@ bool Room::HandlePickupItem(PlayerId playerId, const se::game::C_PickupItemReq& 
          return false;
       
       const ObjectId& pawnId = it->second.pawnObjectId;
-      auto* obj = objectManager_.Find(pawnId);
-      if (!obj)
-         return false;
-      
-      auto* playerPawn = dynamic_cast<PlayerPawn*>(obj);
+      auto* playerPawn = objectManager_.FindAs<PlayerPawn>(pawnId);
       if (!playerPawn)
          return false;
       
@@ -746,6 +836,54 @@ bool Room::HandlePickupItem(PlayerId playerId, const se::game::C_PickupItemReq& 
    return true;
 }
 
+bool Room::HandleUseStore(PlayerId playerId, const se::game::C_UseStoreReq& pkt)
+{
+   SendBufferRef useStoreResultBuffer;
+   std::shared_ptr<PlayerSession> sessionRef = sessionManager_.FindByPlayerId(playerId);
+   
+   if (!sessionRef) return false;   // 세션이 존재하지 않음 (정상적이지 않은 상황)
+   
+   {
+      if (playerId == 0)
+         return false;
+      
+      auto it = roomPlayers_.find(playerId);
+      if (it == roomPlayers_.end())
+         return false;   // 방에 존재하지 않는 플레이어
+      
+      if (not it->second.loaded)
+         return false;
+      
+      auto* playerPawn = objectManager_.FindAs<PlayerPawn>(it->second.pawnObjectId);
+      if (!playerPawn)
+         return false;
+      
+      // TODO: 상점 이용 및 구매 처리 로직 (예: 구매 가능한 아이템 목록 전송, 아이템 구매 처리 등)
+      //       구매 결과에 따라 구매 성공 여부와 구매한 아이템 정보를 담은 패킷을 만들어서 useStoreResultBuffer에 세팅하기
+      //       아이템 뿐만 아니라 능력이나 아이템 강화도 처리해야 한다
+      //       추가적으로 변동되는 상태 (TimePoint 변화, 인벤토리 변화 등)가 있다면 그건 별도의 패킷으로 만들어서 세팅하기 (예: S_TimePointUpdate, S_InventoryUpdate 등)
+      bool purchaseSuccess = true;   // TEMP: 구매 성공 여부 (실제 로직에서는 구매 처리 결과에 따라 결정되어야 함)
+      
+      se::game::S_UseStoreRes res;
+      {
+         res.set_success(purchaseSuccess);
+         
+         if (not purchaseSuccess) {
+            auto* resultPtr = res.mutable_result();
+            resultPtr->set_message("Failed to purchase item.");   
+            resultPtr->set_code(se::common::ERR_INSUFFICIENT_TIME_POINTS);    // 구매 실패 사유 (예: 아이템 부족, 인벤토리 공간 부족 등) 올바르게 적기
+         }
+      }
+      
+      useStoreResultBuffer = ServerPacketHandler::MakeSendBuffer(res);
+   }
+   
+   if (useStoreResultBuffer)
+      sessionRef->Send(useStoreResultBuffer);   // 상점 이용 결과를 해당 플레이어에게 전송
+   
+   return true;
+}
+
 bool Room::HandleSetSavePoint(PlayerId playerId, const se::game::C_SetSavePointReq& pkt)
 {
    // THINK: 안전상 쿨타임이 존재해야 하지만 우선은 쿨타임 없이 바로 적용하는 구조로 (현재는 패킷이 너무 자주 요청 될 수 있음...)
@@ -757,11 +895,7 @@ bool Room::HandleSetSavePoint(PlayerId playerId, const se::game::C_SetSavePointR
       if (it == roomPlayers_.end())
          return false;   // 방에 존재하지 않는 플레이어
       
-      auto* obj = objectManager_.Find(it->second.pawnObjectId);
-      if (!obj)
-         return false;
-      
-      auto* playerPawn = dynamic_cast<PlayerPawn*>(obj);
+      auto* playerPawn = objectManager_.FindAs<PlayerPawn>(it->second.pawnObjectId);
       if (!playerPawn)
          return false;
       
@@ -784,11 +918,7 @@ bool Room::HandleJump(PlayerId playerId, const se::game::C_JumpReq& pkt)
       if (it == roomPlayers_.end())
          return false;   // 방에 존재하지 않는 플레이어
       
-      auto* obj = objectManager_.Find(it->second.pawnObjectId);
-      if (!obj)
-         return false;
-      
-      auto* playerPawn = dynamic_cast<PlayerPawn*>(obj);
+      auto* playerPawn = objectManager_.FindAs<PlayerPawn>(it->second.pawnObjectId);
       if (!playerPawn)
          return false;
       
@@ -820,15 +950,12 @@ bool Room::HandleJumpLand(PlayerId playerId, const se::game::C_JumpLand& pkt)
       if (it == roomPlayers_.end())
          return false;   // 방에 존재하지 않는 플레이어
       
-      auto* obj = objectManager_.Find(it->second.pawnObjectId);
-      if (!obj)
-         return false;
-      
-      auto* playerPawn = dynamic_cast<PlayerPawn*>(obj);
+      auto* playerPawn = objectManager_.FindAs<PlayerPawn>(it->second.pawnObjectId);
       if (!playerPawn)
          return false;
       
       playerPawn->SetJumping(false);
+      playerPawn->SetDoubleJumping(false);
       
       se::game::N_JumpLand noti;
       {
@@ -844,6 +971,40 @@ bool Room::HandleJumpLand(PlayerId playerId, const se::game::C_JumpLand& pkt)
    return true;
 }
 
+bool Room::HandleDoubleJump(PlayerId playerId, const se::game::C_DoubleJumpReq& pkt)
+{
+   SendBufferRef doubleJumpBroadcastBuffer;
+   
+   {
+      if (playerId == 0)
+         return false;
+      
+      auto it = roomPlayers_.find(playerId);
+      if (it == roomPlayers_.end())
+         return false;   // 방에 존재하지 않는 플레이어
+      
+      auto* playerPawn = objectManager_.FindAs<PlayerPawn>(it->second.pawnObjectId);
+      if (!playerPawn)
+         return false;
+      
+      playerPawn->SetJumping(false);
+      playerPawn->SetDoubleJumping(true);
+      
+      se::game::N_DoubleJump noti;
+      {
+         auto* entityIdPtr = noti.mutable_entity_id();
+         entityIdPtr->set_value(it->second.pawnObjectId.value);
+      }
+      
+      doubleJumpBroadcastBuffer = ServerPacketHandler::MakeSendBuffer(noti);
+   }
+   
+   if (doubleJumpBroadcastBuffer)
+      Broadcast(doubleJumpBroadcastBuffer, playerId);   // 더블 점프한 플레이어를 제외한 나머지 플레이어들에게 더블 점프 정보 Broadcast
+
+   return true;
+}
+
 bool Room::HandleCrouch(PlayerId playerId, const se::game::C_CrouchReq& pkt)
 {
    SendBufferRef crouchBroadcastBuffer;
@@ -856,11 +1017,7 @@ bool Room::HandleCrouch(PlayerId playerId, const se::game::C_CrouchReq& pkt)
       if (it == roomPlayers_.end())
          return false;   // 방에 존재하지 않는 플레이어
       
-      auto* obj = objectManager_.Find(it->second.pawnObjectId);
-      if (!obj)
-         return false;
-      
-      auto* playerPawn = dynamic_cast<PlayerPawn*>(obj);
+      auto* playerPawn = objectManager_.FindAs<PlayerPawn>(it->second.pawnObjectId);
       if (!playerPawn)
          return false;
       
@@ -895,11 +1052,7 @@ bool Room::HandleWireAction(PlayerId playerId, const se::game::C_WireActionReq& 
       if (it == roomPlayers_.end())
          return false;
       
-      auto* obj = objectManager_.Find(it->second.pawnObjectId);
-      if (!obj)
-         return false;
-      
-      auto* playerPawn = dynamic_cast<PlayerPawn*>(obj);
+      auto* playerPawn = objectManager_.FindAs<PlayerPawn>(it->second.pawnObjectId);
       if (!playerPawn)
          return false;
       
@@ -934,11 +1087,7 @@ bool Room::HandleWireActionEnd(PlayerId playerId, const se::game::C_WireActionEn
       if (it == roomPlayers_.end())
          return false;
       
-      auto* obj = objectManager_.Find(it->second.pawnObjectId);
-      if (!obj)
-         return false;
-      
-      auto* playerPawn = dynamic_cast<PlayerPawn*>(obj);
+      auto* playerPawn = objectManager_.FindAs<PlayerPawn>(it->second.pawnObjectId);
       if (!playerPawn)
          return false;
       
@@ -958,6 +1107,46 @@ bool Room::HandleWireActionEnd(PlayerId playerId, const se::game::C_WireActionEn
    return true;
 }
 
+bool Room::HandleWireLaunch(PlayerId playerId, const se::game::C_WireLaunchReq& pkt)
+{
+   SendBufferRef wireLaunchBuffer;
+   
+   {
+      if (playerId == 0)
+         return false;
+      
+      auto it = roomPlayers_.find(playerId);
+      if (it == roomPlayers_.end())
+         return false;
+      
+      auto* playerPawn = objectManager_.FindAs<PlayerPawn>(it->second.pawnObjectId);
+      if (!playerPawn)
+         return false;
+      
+      se::game::N_WireLaunch noti;
+      {
+         auto* entityIdPtr = noti.mutable_entity_id();
+         entityIdPtr->set_value(it->second.pawnObjectId.value);
+         
+         auto* launchStartPtr = noti.mutable_start_position();
+         launchStartPtr->set_x(pkt.start_position().x());
+         launchStartPtr->set_y(pkt.start_position().y());
+         launchStartPtr->set_z(pkt.start_position().z());
+         
+         auto* launchDirPtr = noti.mutable_direction();
+         launchDirPtr->set_x(pkt.direction().x());
+         launchDirPtr->set_y(pkt.direction().y());
+         launchDirPtr->set_z(pkt.direction().z());
+      }
+      
+      wireLaunchBuffer = ServerPacketHandler::MakeSendBuffer(noti);
+   }
+   
+   if (wireLaunchBuffer)
+      Broadcast(wireLaunchBuffer, playerId);   // 와이어 런치를 시작한 플레이어를 제외한 나머지 플레이어들에게 와이어 런치 정보 Broadcast
+   
+   return true;
+}
 
 // bool Room::HandleMove(PlayerId playerId, const se::room::C_MoveInput& pkt)
 // {

@@ -22,6 +22,7 @@ ServerPacketDispatcher::ServerPacketDispatcher(SessionManager& sessionManager, P
 
 bool ServerPacketDispatcher::Handle_C_HandshakeReq(PacketSessionRef& session, const se::auth::C_HandshakeReq& pkt)
 {
+    // Session 레벨에서 진행하기에 이 함수가 불릴 일은 없다
     return false;
 }
 
@@ -32,6 +33,7 @@ bool ServerPacketDispatcher::Handle_C_LoginReq(PacketSessionRef& session, const 
 
 bool ServerPacketDispatcher::Handle_C_Ping(PacketSessionRef& session, const se::auth::C_Ping& pkt)
 {
+    // 바로 Pong 응답 보내기에 이 함수가 불릴 일은 없다
     return false;
 }
 
@@ -213,7 +215,10 @@ bool ServerPacketDispatcher::Handle_C_JumpLand(PacketSessionRef& session, const 
 
 bool ServerPacketDispatcher::Handle_C_DoubleJumpReq(PacketSessionRef& session, const se::game::C_DoubleJumpReq& pkt)
 {
-    return false;
+    return EnqueueToPlayerRoom(session, pkt, [](Room& room, PlayerId playerId, const se::game::C_DoubleJumpReq& pkt)
+    {
+        room.HandleDoubleJump(playerId, pkt);
+    });
 }
 
 bool ServerPacketDispatcher::Handle_C_CrouchReq(PacketSessionRef& session, const se::game::C_CrouchReq& pkt)
@@ -242,7 +247,10 @@ bool ServerPacketDispatcher::Handle_C_WireActionEnd(PacketSessionRef& session, c
 
 bool ServerPacketDispatcher::Handle_C_WireLaunchReq(PacketSessionRef& session, const se::game::C_WireLaunchReq& pkt)
 {
-    return false;
+    return EnqueueToPlayerRoom(session, pkt, [](Room& room, PlayerId playerId, const se::game::C_WireLaunchReq& pkt)
+    {
+        room.HandleWireLaunch(playerId, pkt);
+    });
 }
 
 bool ServerPacketDispatcher::Handle_C_AimReq(PacketSessionRef& session, const se::game::C_AimReq& pkt)
@@ -287,18 +295,27 @@ bool ServerPacketDispatcher::Handle_C_WeaponChangeReq(PacketSessionRef& session,
 
 bool ServerPacketDispatcher::Handle_C_UseAbilityReq(PacketSessionRef& session, const se::game::C_UseAbilityReq& pkt)
 {
-    return false;
+    return EnqueueToPlayerRoom(session, pkt, [](Room& room, PlayerId playerId, const se::game::C_UseAbilityReq& pkt)
+    {
+        room.HandleUseAbility(playerId, pkt);
+    });
 }
 
 bool ServerPacketDispatcher::Handle_C_UseItemReq(PacketSessionRef& session, const se::game::C_UseItemReq& pkt)
 {
-    return false;
+    return EnqueueToPlayerRoom(session, pkt, [](Room& room, PlayerId playerId, const se::game::C_UseItemReq& pkt)
+    {
+        room.HandleUseItem(playerId, pkt);
+    });
 }
 
 bool ServerPacketDispatcher::Handle_C_ChestInteractReq(PacketSessionRef& session,
     const se::game::C_ChestInteractReq& pkt)
 {
-    return false;
+    return EnqueueToPlayerRoom(session, pkt, [](Room& room, PlayerId playerId, const se::game::C_ChestInteractReq& pkt)
+    {
+        room.HandleChestInteract(playerId, pkt);
+    });
 }
 
 bool ServerPacketDispatcher::Handle_C_PickupItemReq(PacketSessionRef& session, const se::game::C_PickupItemReq& pkt)
@@ -311,7 +328,10 @@ bool ServerPacketDispatcher::Handle_C_PickupItemReq(PacketSessionRef& session, c
 
 bool ServerPacketDispatcher::Handle_C_UseStoreReq(PacketSessionRef& session, const se::game::C_UseStoreReq& pkt)
 {
-    return false;
+    return EnqueueToPlayerRoom(session, pkt, [](Room& room, PlayerId playerId, const se::game::C_UseStoreReq& pkt)
+    {
+        room.HandleUseStore(playerId, pkt);
+    });
 }
 
 bool ServerPacketDispatcher::Handle_C_SetSavePointReq(PacketSessionRef& session, const se::game::C_SetSavePointReq& pkt)
