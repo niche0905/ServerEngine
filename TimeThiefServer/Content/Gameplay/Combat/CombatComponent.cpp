@@ -34,7 +34,7 @@ bool CombatComponent::CanAttack(const AttackRequest& request) const
    if (ownerPawn_ == nullptr)
       return false;
    
-   if (!ownerPawn_->IsAlive())
+   if (!ownerPawn_->IsHpAlive())
       return false;   // 죽은 Pawn은 공격할 수 없음
    
    return true;

@@ -54,7 +54,7 @@ void Pawn::Damaged(const DamageResult& dmgResult)
    // None
 }
 
-bool Pawn::IsAlive() const
+bool Pawn::IsHpAlive() const
 {
    return health_.IsAlive();
 }

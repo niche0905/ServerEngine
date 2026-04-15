@@ -87,7 +87,7 @@ public:
    {
       BaseObject* obj = Find(id);
       if (!obj) return false;
-      if (not obj->IsAlive()) return false;
+      if (not obj->IsActive()) return false;
       
       const uint16 idx = id.Index();
       Entry& e = entries_[idx];
@@ -139,7 +139,7 @@ public:
    {
       for (const Entry& e : entries_) {
          if (!e.ptr) continue;
-         if (!e.ptr->IsAlive()) continue;
+         if (!e.ptr->IsActive()) continue;
          
          fn(e.ptr);
       }
@@ -150,7 +150,7 @@ public:
    {
       for (const Entry& e : entries_) {
          if (!e.ptr) continue;
-         if (!e.ptr->IsAlive()) continue;
+         if (!e.ptr->IsActive()) continue;
          if (!e.ptr->IsTickable()) continue;
          
          fn(e.ptr);

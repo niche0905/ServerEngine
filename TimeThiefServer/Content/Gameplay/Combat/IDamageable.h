@@ -18,7 +18,7 @@ public:
    
    virtual DamageResult ApplyDamage(ObjectManager& om, int32 amount, const DamageContext& ctx) = 0;
    
-   virtual bool IsAlive() const = 0;
+   virtual bool IsHpAlive() const = 0;
    virtual int32 GetHp() const = 0;
    virtual int32 GetMaxHp() const = 0;
    

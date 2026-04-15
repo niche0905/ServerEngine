@@ -69,7 +69,7 @@ void ProjectileActor::Tick(float dt)
 
 void ProjectileActor::HandleLifetimeExpired()
 {
-    if (not IsAlive())
+    if (not IsActive())
         return;
     
     auto room = GetRoom();

@@ -202,7 +202,7 @@ void ZoneSystem::ApplyZoneDamage(float tickInterval)
    int32 damageInt = static_cast<int32>(std::floor(damage));
    ownerRoom_->ForEachPawn([this, &objectManager, damageInt](Pawn& pawn)
    {
-      if (!pawn.IsAlive()) // 이미 죽은 Pawn은 피해를 입힐 필요가 없음
+      if (!pawn.IsHpAlive()) // 이미 죽은 Pawn은 피해를 입힐 필요가 없음
          return;
       
       if (IsInsideSafeZone(pawn.GetPosition())) // 안전지대 안에 있는 Pawn은 피해를 입힐 필요가 없음

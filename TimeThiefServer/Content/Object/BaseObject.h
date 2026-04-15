@@ -29,7 +29,7 @@ public:
     std::shared_ptr<Room> GetRoom() const { return room_.lock(); }
     
     ObjectState GetState() const { return state_; }
-    bool IsAlive() const { return state_ == ObjectState::Alive; }
+    bool IsActive() const { return state_ == ObjectState::Alive; }
     bool IsPendingDestroy() const { return state_ == ObjectState::PendingDestroy; }
     
     ObjectFlags GetFlags() const { return flags_; }
