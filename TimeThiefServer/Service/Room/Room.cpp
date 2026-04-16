@@ -1216,11 +1216,11 @@ void Room::UpdateTick(const RepFrame& frame)
    {
       obj->__Tick(deltaSeconds);
    });
-
-   // roomGameSystem_.GetReplicationSystem().FlushImmediate(frame);
-   // roomGameSystem_.GetReplicationSystem().FlushPeriodic(frame);
    
    // objectManager_.SweepDestroy();   // 오브젝트 제거 처리
+
+   roomGameSystem_.GetReplicationSystem().FlushImmediate(frame);
+   roomGameSystem_.GetReplicationSystem().FlushPeriodic(frame);
 }
 
 bool Room::TraceHit(const SE::Physics::Ray& ray, ObjectId exceptId, SE::Physics::Hit::HitResult& outHit) const
