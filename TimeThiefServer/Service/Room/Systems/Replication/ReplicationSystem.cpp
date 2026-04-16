@@ -192,7 +192,7 @@ bool ReplicationSystem::FlushProjectilePeriodic(ProjectileActor* projectile, Rep
       positionPtr->set_y(pos.y);
       positionPtr->set_z(pos.z);
       
-      auto* directionPtr = projectileMoveNoti.mutable_direction();
+      auto* directionPtr = projectileMoveNoti.mutable_velocity();
       const auto& velocity = projectile->GetVelocity();
       directionPtr->set_x(velocity.x);
       directionPtr->set_y(velocity.y);

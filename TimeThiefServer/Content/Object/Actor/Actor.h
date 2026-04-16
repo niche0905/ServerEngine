@@ -30,12 +30,6 @@ public:
    
    Actor(const Actor&) = delete;
    Actor& operator=(const Actor&) = delete;
-
-public:
-   virtual EntityType GetEntityType() const { return EntityType::None; }
-   
-   bool IsPlayer() const { return GetEntityType() == EntityType::Player; }
-   bool IsNPC() const { return GetEntityType() == EntityType::NPC; }
    
 // Transform 관련 함수들
 public:

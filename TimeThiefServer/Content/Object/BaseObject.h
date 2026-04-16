@@ -23,6 +23,7 @@ public:
     BaseObject(const BaseObject&) = delete;
     BaseObject& operator=(const BaseObject&) = delete;
     
+public:
     ObjectId GetId() const { return id_; }
     RoomId GetRoomId() const { return roomId_; }
     
@@ -39,6 +40,14 @@ public:
     const ReplicatedState& GetReplicatedState() const { return replicated_; }
     
     void MarkReplicationDirty(ReplicationDirty dirtyFlag);
+    
+public:
+    virtual se::common::ObjectType GetObjectType() const { return se::common::OBJ_NONE; }
+   
+    bool IsPlayer() const { return GetObjectType() == ObjectType::OBJ_PLAYER; }
+    bool IsNPC() const { return GetObjectType() == ObjectType::OBJ_NPC; }
+    bool IsItem() const { return GetObjectType() == ObjectType::OBJ_ITEM; }
+    bool IsProjectile() const { return GetObjectType() == ObjectType::OBJ_PROJECTILE; }
     
 public:
     virtual void ForEachCollider(const std::function<void(ColliderComponent*)>& fn) const {}

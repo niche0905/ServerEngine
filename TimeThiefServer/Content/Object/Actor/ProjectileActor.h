@@ -22,6 +22,9 @@ public:
     ProjectileActor& operator=(const ProjectileActor&) = delete;
     
 public:
+   virtual se::common::ObjectType GetObjectType() const override { return se::common::OBJ_PROJECTILE; }
+    
+public:
     ObjectId GetOwner() const { return ownerId_; }
     void SetOwner(ObjectId ownerId) { ownerId_ = ownerId; }
     

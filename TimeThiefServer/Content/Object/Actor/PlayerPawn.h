@@ -32,7 +32,7 @@ public:
     PlayerPawn& operator=(const PlayerPawn&) = delete;
     
 public:
-   virtual EntityType GetEntityType() const override { return EntityType::Player; }
+   virtual se::common::ObjectType GetObjectType() const override { return se::common::OBJ_PLAYER; }
     
 // PlayerId (Room 내에서 고유한 플레이어 식별자)
 public:

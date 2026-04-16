@@ -11,6 +11,113 @@
 #include "Service/Player/PlayerManager/PlayerManager.h"
 #include "Shard/GameShard.h"
 
+/*-----------------
+   Local Helper
+-----------------*/
+
+namespace 
+{
+   void FillSpawnInfoBase(BaseObject* obj, uint32 templateId, se::room::SpawnInfo* outInfo);
+   bool BuildPlayerSpawnInfo(PlayerPawn* playerPawn, se::room::SpawnInfo* outInfo);
+   bool BuildMonsterSpawnInfo(MonsterPawn* monsterPawn, se::room::SpawnInfo* outInfo);
+   bool BuildItemSpawnInfo(WorldItemActor* item, se::room::SpawnInfo* outInfo);
+   bool BuildProjectileSpawnInfo(ProjectileActor* projectile, se::room::SpawnInfo* outInfo);
+   
+   bool BuildSpawnInfo(BaseObject* obj, se::room::SpawnInfo* outInfo)
+   {
+      if (!obj or !outInfo)
+         return false;
+      
+      switch (obj->GetObjectType())
+      {
+      case ObjectType::OBJ_PLAYER:
+         return BuildPlayerSpawnInfo(static_cast<PlayerPawn*>(obj), outInfo);
+         
+      case ObjectType::OBJ_NPC:
+         return BuildMonsterSpawnInfo(static_cast<MonsterPawn*>(obj), outInfo);
+         
+      case ObjectType::OBJ_ITEM:
+         return BuildItemSpawnInfo(static_cast<WorldItemActor*>(obj), outInfo);
+         
+      case ObjectType::OBJ_PROJECTILE:
+         return BuildProjectileSpawnInfo(static_cast<ProjectileActor*>(obj), outInfo);
+         
+      default:
+         return false;
+      }
+   }
+   
+   void FillSpawnInfoBase(BaseObject* obj, uint32 templateId, se::room::SpawnInfo* outInfo)
+   {
+      outInfo->set_type(obj->GetObjectType());
+      outInfo->set_template_id(templateId);
+      outInfo->mutable_entity_id()->set_value(obj->GetId().value);
+   }
+   
+   bool BuildPlayerSpawnInfo(PlayerPawn* playerPawn, se::room::SpawnInfo* outInfo)
+   {
+      if (!playerPawn or !outInfo)
+         return false;
+      
+      FillSpawnInfoBase(playerPawn, 1, outInfo);   // TEMP: 플레이어는 templateId 1로 고정
+      
+      auto* detailPtr = outInfo->mutable_player_info();
+      auto* movementPtr = detailPtr->mutable_movement();
+      
+      auto* posPtr = movementPtr->mutable_position();
+      const SE::Math::Vector3& pos = playerPawn->GetPosition();
+      posPtr->set_x(pos.x);
+      posPtr->set_y(pos.y);
+      posPtr->set_z(pos.z);
+      
+      movementPtr->set_yaw(playerPawn->GetYaw());
+      movementPtr->set_pitch(playerPawn->GetPitch());
+      
+      // 초기 속도는 없음
+      
+      // 초기 movement move는 없음 (곧 바로 MoveReq가 올 것이라 생각)
+      
+      return true;
+   }
+   
+   bool BuildMonsterSpawnInfo(MonsterPawn* monsterPawn, se::room::SpawnInfo* outInfo)
+   {
+      // TODO: 몬스터 필요한거 SpawnInfo 작성하기 (NPC 코드 부터 작성하고)
+      consoleLogger->Log(Color::Yellow, L"[Room] You Don't have Monster Spawn Build\n");
+      return false;
+   }
+   
+   bool BuildItemSpawnInfo(WorldItemActor* item, se::room::SpawnInfo* outInfo)
+   {
+      // TODO: Item 스폰 인포 가져와서 연결하기
+      consoleLogger->Log(Color::Yellow, L"[Room] You Don't have Item Spawn Build\n");
+      return false;
+   }
+   
+   bool BuildProjectileSpawnInfo(ProjectileActor* projectile, se::room::SpawnInfo* outInfo)
+   {
+      if (!projectile or !outInfo)
+         return false;
+      
+      FillSpawnInfoBase(projectile, 1, outInfo);   // TODO: Projectile templateId 어떻게 할 지 고민 (Getter 하나 추가해도 좋고)
+      
+      auto* detailPtr = outInfo->mutable_projectile_info();
+      auto* posPtr = detailPtr->mutable_position();
+      const SE::Math::Vector3& pos = projectile->GetPosition();
+      posPtr->set_x(pos.x);
+      posPtr->set_y(pos.y);
+      posPtr->set_z(pos.z);
+      
+      auto* velocityPtr = detailPtr->mutable_velocity();
+      const SE::Math::Vector3& velo = projectile->GetVelocity();
+      velocityPtr->set_x(velo.x);
+      velocityPtr->set_y(velo.y);
+      velocityPtr->set_z(velo.z);
+      
+      return true;
+   }
+}
+
 /*---------
    Room
 ---------*/
@@ -137,67 +244,21 @@ bool Room::Join(PlayerId playerId, SessionId sessionId)
             if (exPlayerId == playerId)
                continue;   // 자기 자신은 제외
             
+            auto* object = objectManager_.Find(exPlayer.pawnObjectId);
+            
+            
             se::room::N_EntitySpawn spawnPkt;
-            {
-               auto* spawnInfo = spawnPkt.mutable_info();
-               
-               spawnInfo->set_type(se::common::OBJ_PLAYER);
-               spawnInfo->set_template_id(1);   // TEMP (기본 플레이어...?)
-               auto* entityIdPtr = spawnInfo->mutable_entity_id();
-               entityIdPtr->set_value(exPlayer.pawnObjectId.value);
-               
-               auto* movementPtr = spawnInfo->mutable_movement();
-               auto* positionPtr = movementPtr->mutable_position();
-               
-               auto* exPawn = objectManager_.Find(exPlayer.pawnObjectId);
-               if (!exPawn) {
-	               consoleLogger->Log(Color::Yellow, L"[Room] PlayerPawn not exist\n");
-                  continue;
-               }
-               
-               auto* exPlayerPawn = dynamic_cast<PlayerPawn*>(exPawn);
-               if (!exPlayerPawn) {
-                  consoleLogger->Log(Color::Yellow, L"[Room] PlayerPawn is not PlayerPawn\n");
-                  continue;
-               }
-               
-               const auto& exPos = exPlayerPawn->GetPosition();
-               positionPtr->set_x(exPos.x);
-               positionPtr->set_y(exPos.y);
-               positionPtr->set_z(exPos.z);
-               
-               movementPtr->set_yaw(exPlayerPawn->GetYaw());
-               movementPtr->set_pitch(exPlayerPawn->GetPitch());
-               
+            if (BuildSpawnInfo(object, spawnPkt.mutable_info())) {
+               SendBufferRef sendBuffer = ServerPacketHandler::MakeSendBuffer(spawnPkt);
+               spawnBuffersToNewPlayer.push_back(sendBuffer);
             }
-            SendBufferRef sendBuffer = ServerPacketHandler::MakeSendBuffer(spawnPkt);
-            spawnBuffersToNewPlayer.push_back(sendBuffer);
          }
       }
       {
          se::room::N_EntitySpawn spawnPkt;
-         {
-            auto* spawnInfo = spawnPkt.mutable_info();
-               
-            spawnInfo->set_type(se::common::OBJ_PLAYER);
-            spawnInfo->set_template_id(1);   // TEMP (기본 플레이어...?)
-            auto* entityIdPtr = spawnInfo->mutable_entity_id();
-            entityIdPtr->set_value(joinedPlayer.pawnObjectId.value);
-            
-            // TODO: 아래 SpawnPoint 부분을 나중에 Spawn 지점으로 변경하기 (미리 Spawn Point에 Pawn 값을 설정하기)
-            auto* movementPtr = spawnInfo->mutable_movement();
-            auto* positionPtr = movementPtr->mutable_position();
-               
-            const auto& JoinerPos = playerPawn->GetPosition();
-            positionPtr->set_x(JoinerPos.x);
-            positionPtr->set_y(JoinerPos.y);
-            positionPtr->set_z(JoinerPos.z);
-               
-            movementPtr->set_yaw(playerPawn->GetYaw());
-            movementPtr->set_pitch(playerPawn->GetPitch());
+         if (BuildSpawnInfo(playerPawn, spawnPkt.mutable_info())) {
+            spawnBufferToOthers = ServerPacketHandler::MakeSendBuffer(spawnPkt);
          }
-         
-         spawnBufferToOthers = ServerPacketHandler::MakeSendBuffer(spawnPkt);
       }
    }
    
@@ -1324,7 +1385,7 @@ bool Room::LaunchRocket(const Vector3& pos, const Vector3& dir, Pawn* ownerPawn,
    
    rocket->Init(ownerPawn->GetId(), pos, dir * speed, damage, lifetimeMs, radius);
    
-   BroadcastSpawn(rocket->GetId(), se::common::OJB_PROJECTILE, /*templateId=*/0);      // TODO: templateId는 나중에 생각하기
+   BroadcastSpawn(rocket->GetId(), se::common::OBJ_PROJECTILE, /*templateId=*/0);      // TODO: templateId는 나중에 생각하기
    return true;
 }
 
@@ -1396,34 +1457,12 @@ void Room::BroadcastSpawn(ObjectId objectId, se::common::ObjectType objectType, 
    if (!obj)
       return;
    
-   auto* actor = dynamic_cast<Actor*>(obj);
-   if (!actor)
-      return;
-   
    se::room::N_EntitySpawn spawnPkt;
-   {
-      auto* spawnInfo = spawnPkt.mutable_info();
-               
-      spawnInfo->set_type(objectType);
-      spawnInfo->set_template_id(templateId);
-      auto* entityIdPtr = spawnInfo->mutable_entity_id();
-      entityIdPtr->set_value(objectId.value);
-               
-      auto* movementPtr = spawnInfo->mutable_movement();
-      auto* positionPtr = movementPtr->mutable_position();
-               
-      const auto& exPos = actor->GetPosition();
-      positionPtr->set_x(exPos.x);
-      positionPtr->set_y(exPos.y);
-      positionPtr->set_z(exPos.z);
-               
-      movementPtr->set_yaw(actor->GetYaw());
-      movementPtr->set_pitch(0.0f);
+   if (BuildSpawnInfo(obj, spawnPkt.mutable_info())) {
+      SendBufferRef spawnBuffer = ServerPacketHandler::MakeSendBuffer(spawnPkt);
+      if (spawnBuffer)
+         Broadcast(spawnBuffer);   // 모두에게 스폰 정보 Broadcast
    }
-   
-   SendBufferRef spawnBuffer = ServerPacketHandler::MakeSendBuffer(spawnPkt);
-   if (spawnBuffer)
-      Broadcast(spawnBuffer);   // 모두에게 스폰 정보 Broadcast
 }
 
 void Room::BroadcastDeath(ObjectId objectId)

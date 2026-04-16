@@ -24,6 +24,9 @@ public:
    WorldItemActor& operator=(const WorldItemActor&) = delete;
    
 public:
+   virtual se::common::ObjectType GetObjectType() const override { return se::common::OBJ_ITEM; }
+   
+public:
    const ItemStack& GetItemStack() const { return stack_; }
    void SetItemStack(const ItemStack& stack) { stack_ = stack; }
    
