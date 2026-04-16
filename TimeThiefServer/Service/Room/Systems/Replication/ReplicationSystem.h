@@ -35,7 +35,7 @@ public:
    void FlushPeriodic(const RepFrame& frame);
    
 public:
-   bool FlushProjectilePeriodic(ProjectileActor* projectile, ReplicationDirty flags, const RepFrame& frame);
+   bool FlushProjectilePeriodic(ProjectileActor* projectile, ReplicationDirty flags, const RepFrame& frame, uint64 nowTimeMs);
    
 private:
    Room* ownerRoom_ = nullptr;   // non-owning

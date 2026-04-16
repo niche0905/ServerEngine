@@ -110,6 +110,8 @@ void ReplicationSystem::FlushPeriodic(const RepFrame& frame)
    if (dirtyObjects_.empty())
       return;
    
+   const uint64 nowMs = std::chrono::duration_cast<Milliseconds>(frame.now.time_since_epoch()).count();
+   
    std::vector<ObjectId> nextDirtyObjects;
    nextDirtyObjects.reserve(dirtyObjects_.size());
    
@@ -141,11 +143,12 @@ void ReplicationSystem::FlushPeriodic(const RepFrame& frame)
       if (auto* pawn = dynamic_cast<Pawn*>(obj)) {
       }
       else if (auto* projectile = dynamic_cast<ProjectileActor*>(obj)) {
-         sent = FlushProjectilePeriodic(projectile, repState.GetFlags(), frame);
+         sent = FlushProjectilePeriodic(projectile, repState.GetFlags(), frame, nowMs);
       }
       
       if (sent) {
          repState.lastReplicatedTick = frame.roomTick;
+         repState.lastReplicatedTimeMs = nowMs;
          ++repState.replicationVersion;
          repState.ClearDirty();
          
@@ -166,7 +169,7 @@ void ReplicationSystem::FlushPeriodic(const RepFrame& frame)
    dirtyObjectSet_.swap(nextDirtySet);
 }
 
-bool ReplicationSystem::FlushProjectilePeriodic(ProjectileActor* projectile, ReplicationDirty flags, const RepFrame& frame)
+bool ReplicationSystem::FlushProjectilePeriodic(ProjectileActor* projectile, ReplicationDirty flags, const RepFrame& frame, uint64 nowTimeMs)
 {
    if (!projectile)
       return false;
@@ -174,10 +177,8 @@ bool ReplicationSystem::FlushProjectilePeriodic(ProjectileActor* projectile, Rep
    if (!(HasDirty(flags, ReplicationDirty::Transform) || HasDirty(flags, ReplicationDirty::Velocity)))
       return false;   // Transform이나 Velocity가 변경되지 않았다면 패킷 생성할 필요 없음
    
-   const uint64 nowMs = std::chrono::duration_cast<Milliseconds>(frame.now.time_since_epoch()).count();
-   if (nowMs < projectile->GetReplicatedState().lastReplicatedTick + 100) { // TODO: 100ms이거 상수나 config 값으로 빼기
-      // lastReplicated Tick은 TickSeq라서 frame now랑 비교하면 안되지 않나?
-      return false;  // 아직 복제할 만한 시간이 아님
+   if (nowTimeMs < projectile->GetReplicatedState().lastReplicatedTimeMs + 100) {   // TODO: 100ms이거 상수나 config 값으로 빼기
+      return false;
    }
    
    se::game::N_ProjectileMove projectileMoveNoti;
