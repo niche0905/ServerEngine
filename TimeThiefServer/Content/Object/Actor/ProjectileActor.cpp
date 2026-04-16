@@ -81,11 +81,18 @@ void ProjectileActor::HandleLifetimeExpired()
 
 void ProjectileActor::UpdateMovement(float dt)
 {
-    Vector3 pos = GetPosition();
-    pos.x += velocity_.x * dt;
-    pos.y += velocity_.y * dt;
-    pos.z += velocity_.z * dt;
-    SetPosition(pos);
+    const Vector3 oldPos = GetPosition();
+    const Vector3 delta = velocity_ * dt;
+    const Vector3 newPos = oldPos + delta;
+    
+    if (SE::Math::NearlyEqual(oldPos.x, newPos.x)
+        and SE::Math::NearlyEqual(oldPos.y, newPos.y)
+        and SE::Math::NearlyEqual(oldPos.z, newPos.z)) {
+        
+        return;
+    }
+    
+    SetPosition(newPos);
 }
 
 void ProjectileActor::OnHit(ObjectManager& om, ObjectId hitObjectId)
