@@ -2,6 +2,7 @@
 #include "Pawn.h"
 #include "Data/Tables/ZoneTableJson.h"
 #include "Service/Room/Room.h"
+#include "Shard/GameShard.h"
 
 /*--------
    Pawn
@@ -32,7 +33,6 @@ DamageResult Pawn::ApplyDamage(ObjectManager& om, int32 amount, const DamageCont
    }
    
    amount = ResolveIncomingDamage(amount, ctx);
-   OnBeforeApplyDamage(ctx, amount);
    
    if (amount <= 0) {
       DamageResult result;
@@ -116,8 +116,29 @@ void Pawn::ApplyRespawnToWorld(ObjectManager& om, const SE::Math::Vector3& pos)
 
 void Pawn::GrantSpawnInvulnerability(ObjectManager& om, uint32 durationMs)
 {
+   auto room = GetRoom();
+   if (!room)
+      return;   // Room이 없는 경우, 유효하지 않은 상태
+   
+   auto* ownerShard = room->GetOwnerShard();
+   if (!ownerShard)
+      return;  // Room이 소속된 샤드가 없는 경우, 유효하지 않은 상태
+   
+   RoomId roomId = room->GetRoomId();
+   ObjectId objectId = GetId();
+   
    health_.SetInvincible(true);
-   // TODO: 일정 시간 후에 invincible 해제하는 로직 추가
+   room->ScheduleAfter(Milliseconds(durationMs), [ownerShard, roomId, objectId]()
+        {
+            auto room = ownerShard->FindRoom(roomId);
+            if (!room)
+               return;   // Room이 없는 경우, 유효하지 않은 상태
+      
+            if (Pawn* pawn = room->GetObjectManager().FindAs<Pawn>(objectId)) {
+               pawn->GetHealth().SetInvincible(false);
+            }
+       });
+   
    (void)om;
    (void)durationMs;
 }

@@ -77,7 +77,7 @@ public:
         owner.OnPostRespawn(om);
         
         if (policy_.invulMs > 0) {
-            // owner.GrantSpawnInvulnerability(om, policy_.invulMs);
+            owner.GrantSpawnInvulnerability(om, policy_.invulMs);
         }
         
         state_ = RespawnState::Alive;

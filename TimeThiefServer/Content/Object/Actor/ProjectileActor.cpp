@@ -29,7 +29,7 @@ void ProjectileActor::Init(ObjectId ownerId, const Vector3& startPos, const Vect
         return;
     
     // lifetime 타이머 설정 (발사체가 일정 시간이 지나면 자동으로 제거되도록)
-    lifetimeTimer_ = room->ScheduleAfter(std::chrono::milliseconds(lifetimeMs), [ownerShard, roomId, objectId]()
+    lifetimeTimer_ = room->ScheduleAfter(Milliseconds(lifetimeMs), [ownerShard, roomId, objectId]()
         {
             auto room = ownerShard->FindRoom(roomId);
             if (!room)
