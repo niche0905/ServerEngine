@@ -4,9 +4,9 @@
 #include "Content/Object/ObjectId.h"
 
 struct RepFrame;
+struct RepEvent;
 class BaseObject;
 class Room;
-enum class RepEvent;  // 아직 없다
 
 /*---------------------
    ReplicationSystem
