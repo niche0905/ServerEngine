@@ -1,31 +1,6 @@
 ﻿#include "pch.h"
 #include "Actor.h"
-#include "Service/Room/Systems/Replication/ReplicationSystem.h"
-#include "Content/Gameplay/Spawn/SpawnService.h"
-
-/*-----------------
-   Local Helper
------------------*/
-
-namespace 
-{
-    // TODO: 구현 필요
-    
-    ObjectManager* TryGetObjectManager(RoomId /*roomId*/)
-    {
-        return nullptr;
-    }
-    
-    SpawnService* TryGetSpawnService(RoomId /*roomId*/)
-    {
-        return nullptr;
-    }
-    
-    ReplicationSystem* TryGetReplication(RoomId /*roomId*/)
-    {
-        return nullptr;
-    }
-}
+#include "Service/Room/Room.h"
 
 /*---------
    Actor
@@ -66,14 +41,5 @@ void Actor::SyncColliders()
         if (collider) {
             collider->UpdateWorldCollider();
         }
-    }
-}
-
-void Actor::RegisterLifetimeMs(uint64 nowMs, uint32 lifetimeMs)
-{
-    if (lifetimeMs == 0) return;
-    
-    if (auto* ss = TryGetSpawnService(GetRoomId())) {
-        ss->RegisterLifetimeMs(GetId(), nowMs, lifetimeMs);
     }
 }

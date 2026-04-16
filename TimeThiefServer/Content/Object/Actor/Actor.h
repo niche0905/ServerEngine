@@ -7,8 +7,6 @@
 
 struct SE::Math::Vector3;
 class ObjectManager;
-class SpawnService;
-class ReplicationSystem;
 class ColliderComponent;
 
 /*---------
@@ -60,9 +58,6 @@ public:
 // Replication 관련 함수들
 public:
    virtual bool IsReplicated() const { return true; } // 기본적으로 모든 Actor는 Replicated 대상입니다. 예외 시 재정의
-   
-protected:
-   void RegisterLifetimeMs(uint64 nowMs, uint32 lifetimeMs);   // 파생 클래스가 수명이 있는 Actor일 경우 호출하여 수명 등록
    
 protected:
    Vector3  position_{};

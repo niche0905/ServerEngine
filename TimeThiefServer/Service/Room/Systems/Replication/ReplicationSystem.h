@@ -2,6 +2,7 @@
 #include <vector>
 #include <unordered_set>
 #include "Content/Object/ObjectId.h"
+#include "Content/Gameplay/Replication/ReplicationEvent.h"
 
 struct RepFrame;
 struct RepEvent;
