@@ -4,6 +4,7 @@
 #include "Content/Object/ObjectId.h"
 #include "Content/Gameplay/Replication/ReplicationEvent.h"
 
+class ProjectileActor;
 struct RepFrame;
 struct RepEvent;
 class BaseObject;
@@ -32,6 +33,9 @@ public:
    
    void FlushImmediate(const RepFrame& frame);
    void FlushPeriodic(const RepFrame& frame);
+   
+public:
+   bool FlushProjectilePeriodic(ProjectileActor* projectile, ReplicationDirty flags, const RepFrame& frame);
    
 private:
    Room* ownerRoom_ = nullptr;   // non-owning

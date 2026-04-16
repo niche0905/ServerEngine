@@ -176,7 +176,7 @@ void GameShard::ProcessRoomTicks()
          continue;
       
       RepFrame frame;
-      frame.roomTick = room->AdvanceTick();  // TODO: 이거 추가하기 (몇번의 Tick이 진행 되었는지)
+      frame.roomTick = room->AdvanceTick();
       frame.now = now;
       frame.dt = roomTickIntervalMs_;
       

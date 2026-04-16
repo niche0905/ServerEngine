@@ -35,6 +35,9 @@ struct ObjectId;
 
 class Room : public std::enable_shared_from_this<Room>
 {
+private:
+   friend class ReplicationSystem;
+   
 public:
    using Vector3 = SE::Math::Vector3;
    
@@ -164,8 +167,10 @@ private:
    PlayerPawn* CreatePreparedPlayerPawn(PlayerId playerId, const Vector3& spawnPos);
    
 private:
-   void Broadcast(std::shared_ptr<SendBuffer> sendBuffer, PlayerId exceptPlayerId = 0);
+   void Broadcast(SendBufferRef sendBuffer, PlayerId exceptPlayerId = 0);
    bool SendToPlayer(PlayerId playerId, SendBufferRef sendBuffer);
+   
+   void BroadcastReplication(SendBufferRef sendBuffer, PlayerId exceptPlayerId = 0);
    
 public:
    void BroadcastGameStart();

@@ -1,9 +1,12 @@
 ﻿#include "pch.h"
 #include "ReplicationSystem.h"
 #include <algorithm>
+#include <chrono>
 #include "Content/Gameplay/Replication/ReplicationEvent.h"
 #include "Content/Object/BaseObject.h"
 #include "Content/Object/ObjectManager.h"
+#include "Content/Object/Actor/Pawn.h"
+#include "Content/Object/Actor/ProjectileActor.h"
 #include "Service/Room/Room.h"
 
 /*---------------------
@@ -133,14 +136,27 @@ void ReplicationSystem::FlushPeriodic(const RepFrame& frame)
       // 예:
       // if (repState.Has(ReplicationDirty::Transform)) { ... }
       // if (repState.Has(ReplicationDirty::Velocity))  { ... }
+      bool sent = false;
       
-      repState.lastReplicatedTick = frame.roomTick;
-      ++repState.replicationVersion;
-      repState.ClearDirty();
+      if (auto* pawn = dynamic_cast<Pawn*>(obj)) {
+      }
+      else if (auto* projectile = dynamic_cast<ProjectileActor*>(obj)) {
+         sent = FlushProjectilePeriodic(projectile, repState.GetFlags(), frame);
+      }
       
-      // 아직 dirty가 남아있다면 다음 periodic flush에서도 유지
-      if (repState.IsDirty())
-      {
+      if (sent) {
+         repState.lastReplicatedTick = frame.roomTick;
+         ++repState.replicationVersion;
+         repState.ClearDirty();
+         
+         // 아직 dirty가 남아있다면 다음 periodic flush에서도 유지
+         if (repState.IsDirty())
+         {
+            nextDirtyObjects.push_back(objectId);
+            nextDirtySet.insert(objectId);
+         }
+      }
+      else {
          nextDirtyObjects.push_back(objectId);
          nextDirtySet.insert(objectId);
       }
@@ -148,4 +164,44 @@ void ReplicationSystem::FlushPeriodic(const RepFrame& frame)
    
    dirtyObjects_.swap(nextDirtyObjects);
    dirtyObjectSet_.swap(nextDirtySet);
+}
+
+bool ReplicationSystem::FlushProjectilePeriodic(ProjectileActor* projectile, ReplicationDirty flags, const RepFrame& frame)
+{
+   if (!projectile)
+      return false;
+   
+   if (!(HasDirty(flags, ReplicationDirty::Transform) || HasDirty(flags, ReplicationDirty::Velocity)))
+      return false;   // Transform이나 Velocity가 변경되지 않았다면 패킷 생성할 필요 없음
+   
+   const uint64 nowMs = std::chrono::duration_cast<Milliseconds>(frame.now.time_since_epoch()).count();
+   if (nowMs < projectile->GetReplicatedState().lastReplicatedTick + 100) { // TODO: 100ms이거 상수나 config 값으로 빼기
+      // lastReplicated Tick은 TickSeq라서 frame now랑 비교하면 안되지 않나?
+      return false;  // 아직 복제할 만한 시간이 아님
+   }
+   
+   se::game::N_ProjectileMove projectileMoveNoti;
+   {
+      auto* entityIdPtr = projectileMoveNoti.mutable_projectile_id();
+      entityIdPtr->set_value(projectile->GetId().value);
+      
+      auto* positionPtr = projectileMoveNoti.mutable_position();
+      const auto& pos = projectile->GetPosition();
+      positionPtr->set_x(pos.x);
+      positionPtr->set_y(pos.y);
+      positionPtr->set_z(pos.z);
+      
+      auto* directionPtr = projectileMoveNoti.mutable_direction();
+      const auto& velocity = projectile->GetVelocity();
+      directionPtr->set_x(velocity.x);
+      directionPtr->set_y(velocity.y);
+      directionPtr->set_z(velocity.z);
+   }
+   
+   SendBufferRef moveNotiBuffer = ServerPacketHandler::MakeSendBuffer(projectileMoveNoti);
+   if (!moveNotiBuffer)
+      return false;
+   
+   ownerRoom_->BroadcastReplication(moveNotiBuffer);
+   return true;
 }

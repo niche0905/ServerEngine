@@ -1376,6 +1376,11 @@ bool Room::SendToPlayer(PlayerId playerId, SendBufferRef buffer)
    return true;
 }
 
+void Room::BroadcastReplication(SendBufferRef sendBuffer, PlayerId exceptPlayerId)
+{
+   Broadcast(std::move(sendBuffer), exceptPlayerId);
+}
+
 void Room::BroadcastGameStart()
 {
    se::game::N_GameStart noti;
