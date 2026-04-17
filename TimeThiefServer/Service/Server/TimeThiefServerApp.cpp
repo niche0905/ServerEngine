@@ -206,13 +206,6 @@ bool TimeThiefServerApp::StartServices()
       }
    }
    
-   if (!CreateInitialRooms()) {
-      consoleLogger->Log(Color::Red, L"[TTSA] initial room bootstrap FAIL\n");
-      networkService_->StopService();
-      if (shardManager_) shardManager_->Stop();
-      return false;
-   }
-   
    consoleLogger->Log(Color::Green, L"[TTSA] services started\n");
    return true;
 }
@@ -243,26 +236,6 @@ void TimeThiefServerApp::LaunchMatchThread()
    });
    
    consoleLogger->Log(Color::Green, L"[TTSA] match thread launched\n");
-}
-
-bool TimeThiefServerApp::CreateInitialRooms()
-{
-   if (!shardManager_ || !roomDirectory_)
-      return false;
-   
-   const RoomId initialRoomId = GenerateRoomId();
-   const ShardId initialShardId = shardManager_->SelectShardForNewRoom();
-   if (initialRoomId == 0 or initialShardId == 0)
-      return false;
-   
-   bool ok = shardManager_->RequestCreateRoom(initialShardId, CreateRoomParams{ initialRoomId, {} });
-   if (!ok) {
-      consoleLogger->Log(Color::Red, L"[TTSA] initial room creation fail\n");
-      return false;
-   }
-   
-   consoleLogger->Log(Color::Green, L"[TTSA] initial room created\n");
-   return true;
 }
 
 RoomId TimeThiefServerApp::GenerateRoomId()

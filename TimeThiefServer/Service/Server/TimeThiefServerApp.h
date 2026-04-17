@@ -43,7 +43,6 @@ private:
    void LaunchMatchThread();
    
 private:
-   bool CreateInitialRooms();
    RoomId GenerateRoomId();
    
 private:
