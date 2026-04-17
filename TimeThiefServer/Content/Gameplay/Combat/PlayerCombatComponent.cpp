@@ -382,7 +382,7 @@ PlayerCombatComponent::PalletPattern PlayerCombatComponent::GeneratePalletPatter
         
         float cosTheta = 1.0f - r1 * (1.0f - cosMin);
         float sinTheta = std::sqrt(std::max(0.0f, 1.0f - cosTheta * cosTheta));
-        float phi = 2.0f * std::numbers::pi_v<float> * r2;
+        float phi = 2.0f * Pi * r2;
         
         SE::Math::Vector3 dir = {
             u * (std::cos(phi) * sinTheta) +

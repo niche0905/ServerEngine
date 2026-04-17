@@ -46,3 +46,9 @@ struct LootRollContext
     uint32 playerLevel{1};
     float luckFactor{1.0f};
 };
+
+struct LootResult
+{
+    bool generated{false};
+    LootBundle bundle;
+};

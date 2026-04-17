@@ -10,6 +10,7 @@
 #include "Content/Object/Actor/WorldItemActor.h"
 #include "Service/Player/PlayerManager/PlayerManager.h"
 #include "Shard/GameShard.h"
+#include "Content/Gameplay/Drop/DropTypes.h"
 
 /*-----------------
    Local Helper
@@ -1400,6 +1401,19 @@ PlayerPawn* Room::CreatePreparedPlayerPawn(PlayerId playerId, const Vector3& spa
    playerPawn->SetSavedRespawnPosition(spawnPos);
    playerPawn->SetOwnerPlayerId(playerId);
    return playerPawn;
+}
+
+WorldItemActor* Room::SpawnItem(const SpawnWorldItemParams& params)
+{
+   WorldItemActor* item = SpawnObject<WorldItemActor>(ObjectFlags::Replicable);
+   if (!item) {
+      return nullptr;
+   }
+   
+   item->SetPosition(params.position);
+   BroadcastSpawn(item->GetId(), se::common::OBJ_ITEM, params.itemStack.id);
+   // TODO: Replication으로 옮길 생각도 하기
+   return item;
 }
 
 void Room::Broadcast(std::shared_ptr<SendBuffer> sendBuffer, PlayerId exceptPlayerId)

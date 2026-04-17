@@ -1,6 +1,8 @@
 ﻿#include "pch.h"
 #include "MonsterPawn.h"
 
+#include "Service/Room/Room.h"
+
 /*---------------
    MonsterPawn
 ---------------*/
@@ -8,6 +10,22 @@
 LootSourceResult MonsterPawn::GenerateLoot(ObjectManager& om, LootTableService& service, const LootSourceContext& ctx)
 {
    return loot_.GenerateLoot(om, service, ctx);
+}
+
+LootBundle MonsterPawn::GenerateDrops()
+{
+   // TODO: Loot (확률에 의한 아이템 드롭) 반환하기
+   //       지금 코드에서 문제가 없는지 검토 필요
+   
+   if (not loot_.CanGenerateLoot())
+      return LootBundle{};
+   
+   auto room = GetRoom();
+   if (room == nullptr)
+      return LootBundle{};
+
+   // TODO: LootTableService에서 몬스터의 LootTable을 찾아서 드랍 생성하기 Loot Service 연동 필요...
+   return LootBundle{};
 }
 
 void MonsterPawn::UpdateAI(ObjectManager& om, float dt)

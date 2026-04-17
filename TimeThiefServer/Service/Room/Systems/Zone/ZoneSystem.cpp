@@ -34,7 +34,7 @@ namespace
       static thread_local std::uniform_real_distribution<float> dist01(0.0f, 1.0f);
 
       float r = std::sqrt(dist01(rng)) * radius;
-      float theta = dist01(rng) * 2.0f * 3.1415926535f;
+      float theta = dist01(rng) * 2.0f * Pi;
 
       return SE::Math::Vector3{
          r * std::cos(theta),

@@ -12,6 +12,8 @@
 #include "Physics/Ray/RaycastHit.h"
 #include "Systems/RoomGameSystem.h"
 
+struct SpawnWorldItemParams;
+class WorldItemActor;
 struct GameConfig;
 class PlayerPawn;
 class GameShard;
@@ -165,6 +167,9 @@ public:
    
 private:
    PlayerPawn* CreatePreparedPlayerPawn(PlayerId playerId, const Vector3& spawnPos);
+   
+public:
+   WorldItemActor* SpawnItem(const SpawnWorldItemParams& params);
    
 private:
    void Broadcast(SendBufferRef sendBuffer, PlayerId exceptPlayerId = 0);

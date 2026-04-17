@@ -446,6 +446,7 @@
     <ClCompile Include="Service\Room\RoomManager.cpp" />
     <ClCompile Include="Service\Room\RoomTickScheduler.cpp" />
     <ClCompile Include="Service\Room\ShardRoomManager.cpp" />
+    <ClCompile Include="Service\Room\Systems\Drop\DropSystem.cpp" />
     <ClCompile Include="Service\Room\Systems\Replication\ReplicationSystem.cpp">
       <RuntimeLibrary>MultiThreadedDebugDll</RuntimeLibrary>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -699,10 +700,8 @@
     <ClInclude Include="Content\Gameplay\Container\IContainerAccess.h" />
     <ClInclude Include="Content\Gameplay\Cooldown\CooldownComponent.h" />
     <ClInclude Include="Content\Gameplay\Cooldown\CooldownTypes.h" />
-    <ClInclude Include="Content\Gameplay\Drop\DropOnDeathComponent.h" />
-    <ClInclude Include="Content\Gameplay\Drop\DropSpawnService.h" />
     <ClInclude Include="Content\Gameplay\Drop\DropTypes.h" />
-    <ClInclude Include="Content\Gameplay\Drop\IDropOnDeathOwner.h" />
+    <ClInclude Include="Content\Gameplay\Drop\IDropOwner.h" />
     <ClInclude Include="Content\Gameplay\Economy\IWalletOwner.h" />
     <ClInclude Include="Content\Gameplay\Economy\WalletComponent.h" />
     <ClInclude Include="Content\Gameplay\Economy\WalletTypes.h" />
@@ -775,6 +774,7 @@
     <ClInclude Include="Service\Room\RoomTickScheduler.h" />
     <ClInclude Include="Service\Room\ScheduledRoomTick.h" />
     <ClInclude Include="Service\Room\ShardRoomManager.h" />
+    <ClInclude Include="Service\Room\Systems\Drop\DropSystem.h" />
     <ClInclude Include="Service\Room\Systems\Replication\ReplicationSystem.h" />
     <ClInclude Include="Service\Room\Systems\Respawn\RespawnSystem.h" />
     <ClInclude Include="Service\Room\Systems\RoomGameSystem.h" />

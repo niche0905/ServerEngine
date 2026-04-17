@@ -1,4 +1,6 @@
 ﻿#pragma once
+#include "Content/Gameplay/Loot/LootTypes.h"
+#include "Content/Object/ObjectId.h"
 
 enum class DropMode : uint8
 {
@@ -9,25 +11,33 @@ enum class DropMode : uint8
 enum class DropReason : uint8
 {
     Unknown = 0,        // 알 수 없음
-    Death,
+    
+    Chest,
+    Death,  // Player Death, Monster Death
+    
     Manual,
     Script,
 };
 
-struct DropOnDeathPolicy
+struct DropSpawnContext
 {
-    DropMode mode{DropMode::CorpseBox};     // 드롭 모드: 기본은 시체 상자
-    
-    float moneyDropRate{0.7f};              // 돈 드롭률: 기본 70% <- 보유 총 재화에서 계산
-    bool dropConsumables{true};             // 소모품 드롭 여부: 기본 true
-    
-    int32 maxScatterItemSpawns{12};         // 흩뿌리기 모드에서 최대 아이템 스폰 개수: 기본 12개
-    float scatterRadius{120.0f};            // 흩뿌리기 모드에서 아이템 스폰 반경: 기본 120 유닛
+    DropMode        mode{DropMode::Scatter};            // 드롭 생성 방식 (CorpseBox, Scatter)
+    DropReason      reason{DropReason::Unknown};        // 드롭 생성 이유 (Pawn의 사망, Chest의 Open)
+    ObjectId        owner{};                            // 드롭을 생성하는 오브젝트 (죽은 플레이어/몬스터/상자)
+    ObjectId        instigator{};                       // 킬러/원인
+    LootBundle      lootBundle;                         // 드롭할 아이템 정보 (Pawn, Chest가 주체적으로 판단하여 생성)
 };
 
-struct DropSpawnPolicy  // DropSpawnService에 전달되는 스폰 정책(표현 관련)
+struct DropSpawnResult
 {
-    DropMode mode{DropMode::CorpseBox};
-    int32 maxScatterItemSpawns{12};
-    float scatterRadius{120.0f};
+    bool spawned{false};
+    int32 spawnedCount{0};      // 생성된 드롭 아이템의 개수
+};
+
+struct SpawnWorldItemParams
+{
+    ItemStack itemStack{};             // 생성할 아이템의 정보 (템플릿 ID, 수량)
+    SE::Math::Vector3 position{};
+    SE::Math::Vector3 initialVelocity{};
+    DropReason reason{DropReason::Unknown};
 };

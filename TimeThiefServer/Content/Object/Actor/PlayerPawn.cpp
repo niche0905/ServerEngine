@@ -52,11 +52,22 @@ void PlayerPawn::Damaged(const DamageResult& dmgResult)
    }
 }
 
-bool PlayerPawn::IsConsumable(ItemId itemId) const
+LootBundle PlayerPawn::GenerateDrops()
+// 플레이어의 경우는 죽었을 때 인벤토리에 있는 아이템을 전부 드롭한다
 {
-   // TODO: 아이템 데이터베이스 조회 후 소모품 여부 확인
-   (void)itemId;
-   return true;
+   if (inventory_.GetUsedSlots() == 0)
+      return LootBundle{};   // 드롭할 아이템이 없는 경우 빈 LootBundle 반환
+   
+   auto slots = inventory_.GetSlots();
+   LootBundle bundle;
+   
+   for (const auto& slot : slots) {
+      if (slot.IsValid()) {
+         bundle.AddItem(slot.id, slot.count);
+      }
+   }
+   
+   return bundle;
 }
 
 InventoryOpResult PlayerPawn::AddItem(ObjectManager& om, ItemId itemId, int32 count, const ItemChangeContext& ctx)
@@ -103,10 +114,11 @@ void PlayerPawn::OnSpawn()
       colliders_.push_back(std::move(bodyCollider));
    }
    
-   dropOnDeath_.Init(GetId(), DropOnDeathPolicy{});
    respawn_.Init(GetId(), RespawnPolicy{});
    inventory_.Init(GetId(), 20);
-   wallet_.Init(GetId());
+   wallet_.Init(GetId());     
+   wallet_.SetBalanceUnsafe(CurrencyType::TimePoint, 1000);      // TEMP: 초기 재화 1000
+                                                                        // TODO: 이 값 Config로 빼기
 }
 
 void PlayerPawn::OnPreDestroy()
@@ -131,13 +143,6 @@ void PlayerPawn::OnDeath(ObjectManager& om, const DamageResult& dmgResult)
 void PlayerPawn::StartDeadState(ObjectManager& om, const DamageResult& dmgResult)
 {
    SetVelocity(Vector3{});
-   
-   DropOnDeathResult drops = dropOnDeath_.Generate(om, *this, DropOnDeathContext{
-      .owner = GetId(),
-      // .killer = dmgResult.instigator,
-      // .nowMs = om.GetCurrentTimeMs(),
-      .reason = DropReason::Death
-   });
    
    // TODO: 드롭된 아이템과 화폐를 월드에 스폰하는 로직 추가
    // (om, drops);

@@ -39,6 +39,10 @@ public:
    virtual bool CanGenerateLoot() const override { return loot_.CanGenerateLoot(); }
    virtual LootSourceResult GenerateLoot(ObjectManager& om, LootTableService& service, const LootSourceContext& ctx) override;
    
+// IDropOwner
+public:
+   virtual LootBundle GenerateDrops() override;
+   
 public:
    // Update 룰에 따라 처리 (룸 Tick, 혹은 Pawn Tick)
    void UpdateAI(ObjectManager& om, float dt);

@@ -6,8 +6,12 @@
    ChestActor
 --------------*/
 
-void ChestActor::FillFromCorpse(ObjectManager& om, const LootBundle& bundle)
+LootBundle ChestActor::GenerateDrops()
 {
+    // TODO: Loot 이용해서 처리 해도 되고
+    //       Init 시점에서 미리 아이템을 채워 놓는 방식으로 해도 될 듯
+    
+     return LootBundle{};
 }
 
 ContainerOpenResult ChestActor::TryOpen(ObjectManager& om, PlayerPawn& byPlayer)

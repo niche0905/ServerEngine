@@ -1,8 +1,6 @@
 ﻿#pragma once
 #include "Pawn.h"
 #include "Content/Gameplay/Combat/PlayerCombatComponent.h"
-#include "Content/Gameplay/Drop/DropOnDeathComponent.h"
-#include "Content/Gameplay/Drop/IDropOnDeathOwner.h"
 #include "Content/Gameplay/Economy/IWalletOwner.h"
 #include "Content/Gameplay/Inventory/IInventoryOwner.h"
 #include "Content/Gameplay/Inventory/InventoryComponent.h"
@@ -20,7 +18,6 @@ class ObjectManager;
 //
 
 class PlayerPawn : public Pawn
-                    , public IDropOnDeathOwner
                     , public IInventoryOwner
                     , public IWalletOwner
 {
@@ -53,22 +50,18 @@ public:
     PlayerCombatComponent* GetPlayerCombat() { return static_cast<PlayerCombatComponent*>(combat_.get()); }
     const PlayerCombatComponent* GetPlayerCombat() const { return static_cast<const PlayerCombatComponent*>(combat_.get()); }
     
-    DropOnDeathComponent& GetDropOnDeath() { return dropOnDeath_; }
-    const DropOnDeathComponent& GetDropOnDeath() const { return dropOnDeath_; }
-    
-    InventoryComponent& GetInventory() override { return inventory_; }
+    InventoryComponent& GetInventory() { return inventory_; }
     const InventoryComponent& GetInventory() const { return inventory_; }
     
-    WalletComponent& GetWallet() override { return wallet_; }
+    WalletComponent& GetWallet() { return wallet_; }
     const WalletComponent& GetWallet() const { return wallet_; }
     
 public:
     virtual void Damaged(const DamageResult& dmgResult) override;
 
-// IDropOnDeath
+// IDropOwner
 public:
-    virtual bool IsConsumable(ItemId itemId) const override;
-    virtual bool CanDropOnDeath() const override { return dropOnDeath_.IsEnabled(); }
+    virtual LootBundle GenerateDrops() override;
 
 // IInventoryOwner
 public:
@@ -125,7 +118,6 @@ private:
     
     float pitch_{0.0f};
     
-    DropOnDeathComponent dropOnDeath_{};
     InventoryComponent inventory_{};
     WalletComponent wallet_{};
     

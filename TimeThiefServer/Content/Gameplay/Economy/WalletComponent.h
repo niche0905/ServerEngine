@@ -19,9 +19,6 @@ public:
    void Init(ObjectId owner)
    {
       SetOwner(owner);
-      
-      SetBalanceUnsafe(CurrencyType::TimePoint, 1000);     // TEMP: 초기 재화 1000
-                                                                  // TODO: 이 값 Config로 빼기
    }
    
    CurrencyAmount GetBalance(CurrencyType currency) const

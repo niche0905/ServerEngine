@@ -1,6 +1,7 @@
 #pragma once
 #include <cstdint>
 #include <chrono>
+#include <numbers>
 
 using int8          = std::int8_t;
 using int16         = std::int16_t;
@@ -21,3 +22,5 @@ using Clock         = std::chrono::steady_clock;
 using TimePoint     = Clock::time_point;
 using Duration      = Clock::duration;
 using Milliseconds  = std::chrono::milliseconds;
+
+constexpr float Pi = std::numbers::pi_v<float>;

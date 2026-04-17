@@ -4,6 +4,7 @@
 #include "Content/Gameplay/Combat/HealthComponent.h"
 #include "Content/Gameplay/Combat/CombatComponent.h"
 #include "Content/Gameplay/Cooldown/CooldownComponent.h"
+#include "Content/Gameplay/Drop/IDropOwner.h"
 #include "Content/Gameplay/Effects/EffectComponent.h"
 #include "Content/Gameplay/Effects/IEffectOwner.h"
 #include "Content/Gameplay/Spawn/IRespawnOwner.h"
@@ -24,6 +25,7 @@ class Pawn : public Actor
              , public IDamageable
              , public IEffectOwner
              , public IRespawnOwner
+             , public IDropOwner
 {
 public:
     Pawn() = default;

@@ -2,7 +2,7 @@
 #include "StaticActor.h"
 #include "Content/Gameplay/Inventory/InventoryComponent.h"
 #include "Content/Gameplay/Container/IContainerAccess.h"
-#include "Content/Gameplay/Drop/DropOnDeathComponent.h"
+#include "Content/Gameplay/Drop/IDropOwner.h"
 #include "Content/Gameplay/Inventory/IInventoryOwner.h"
 
 class ObjectManager;
@@ -22,6 +22,7 @@ enum class ChestKind : uint8
 //
 
 class ChestActor : public StaticActor
+                    , public IDropOwner
                    , public IContainerAccess
                    , public IInventoryOwner
 {
@@ -39,7 +40,9 @@ public:
     InventoryComponent& GetInventory() { return inventory_; }
     const InventoryComponent& GetInventory() const { return inventory_; }
     
-    void FillFromCorpse(ObjectManager& om, const LootBundle& bundle);
+// IDropOwner
+public:
+    virtual LootBundle GenerateDrops() override;
     
 // IContainerAccess
 public:
