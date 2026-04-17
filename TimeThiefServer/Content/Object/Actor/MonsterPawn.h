@@ -29,7 +29,7 @@ public:
    MonsterPawn& operator=(const MonsterPawn&) = delete;
    
 public:
-   virtual se::common::ObjectType GetObjectType() const override { return se::common::OBJ_NPC; }
+   virtual se::common::ObjectType GetObjectType() const override { return se::common::OBJ_MONSTER; }
    
 public:
    int32 GetTemplateId() const { return templateId_; }

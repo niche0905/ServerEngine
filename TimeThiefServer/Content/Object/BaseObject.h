@@ -45,7 +45,7 @@ public:
     virtual se::common::ObjectType GetObjectType() const { return se::common::OBJ_NONE; }
    
     bool IsPlayer() const { return GetObjectType() == ObjectType::OBJ_PLAYER; }
-    bool IsNPC() const { return GetObjectType() == ObjectType::OBJ_NPC; }
+    bool IsMonster() const { return GetObjectType() == ObjectType::OBJ_MONSTER; }
     bool IsItem() const { return GetObjectType() == ObjectType::OBJ_ITEM; }
     bool IsProjectile() const { return GetObjectType() == ObjectType::OBJ_PROJECTILE; }
     

@@ -181,18 +181,21 @@ bool ReplicationSystem::FlushProjectilePeriodic(ProjectileActor* projectile, Rep
       return false;
    }
    
-   se::game::N_ProjectileMove projectileMoveNoti;
+   se::game::N_Move projectileMoveNoti;
    {
-      auto* entityIdPtr = projectileMoveNoti.mutable_projectile_id();
+      auto* entityIdPtr = projectileMoveNoti.mutable_entity_id();
       entityIdPtr->set_value(projectile->GetId().value);
       
-      auto* positionPtr = projectileMoveNoti.mutable_position();
+      auto* transformPtr = projectileMoveNoti.mutable_transform();
+      auto* positionPtr = transformPtr->mutable_position();
       const auto& pos = projectile->GetPosition();
       positionPtr->set_x(pos.x);
       positionPtr->set_y(pos.y);
       positionPtr->set_z(pos.z);
+      transformPtr->set_yaw(projectile->GetYaw());    // 의미 없는 정보이긴 함 (velocity 방향으로 날아가게 할 것이기에) 
       
-      auto* directionPtr = projectileMoveNoti.mutable_velocity();
+      auto* projectileMovementPtr = projectileMoveNoti.mutable_projectile_movement();
+      auto* directionPtr = projectileMovementPtr->mutable_velocity();
       const auto& velocity = projectile->GetVelocity();
       directionPtr->set_x(velocity.x);
       directionPtr->set_y(velocity.y);

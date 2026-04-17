@@ -33,7 +33,7 @@ namespace
       case ObjectType::OBJ_PLAYER:
          return BuildPlayerSpawnInfo(static_cast<PlayerPawn*>(obj), outInfo);
          
-      case ObjectType::OBJ_NPC:
+      case ObjectType::OBJ_MONSTER:
          return BuildMonsterSpawnInfo(static_cast<MonsterPawn*>(obj), outInfo);
          
       case ObjectType::OBJ_ITEM:
@@ -401,20 +401,20 @@ bool Room::HandleMove(PlayerId playerId, const se::game::C_MoveReq& pkt)
          auto* entityIdPtr = noti.mutable_entity_id();
          entityIdPtr->set_value(it->second.pawnObjectId.value);
          
-         auto* movementPtr = noti.mutable_movement();
-         auto* positionPtr = movementPtr->mutable_position();
-         
+         auto* transformPtr = noti.mutable_transform();
+         auto* positionPtr = transformPtr->mutable_position();
          const auto& newPos = playerPawn->GetPosition();
          positionPtr->set_x(newPos.x);
          positionPtr->set_y(newPos.y);
          positionPtr->set_z(newPos.z);
+         transformPtr->set_yaw(playerPawn->GetYaw());
          
-         movementPtr->set_yaw(playerPawn->GetYaw());
-         movementPtr->set_pitch(playerPawn->GetPitch());
-         auto* velocityPtr = movementPtr->mutable_velocity();
+         auto* playerMovementPtr = noti.mutable_player_movement();
+         playerMovementPtr->set_pitch(playerPawn->GetPitch());
+         auto* velocityPtr = playerMovementPtr->mutable_velocity();
          velocityPtr->set_x(move.velocity().x());
          velocityPtr->set_y(move.velocity().y());
-         movementPtr->set_movement_mode(move.movement_mode());
+         playerMovementPtr->set_movement_mode(move.movement_mode());
       }
       
       moveBroadcastBuffer = ServerPacketHandler::MakeSendBuffer(noti);
@@ -1578,12 +1578,12 @@ void Room::HandleDamageResult(Pawn* attacker, Actor* victim, const SE::Physics::
       return;
    }
    
-   if (KillerIsPlayer and victim->IsNPC()) {
+   if (KillerIsPlayer and victim->IsMonster()) {
       // NPC Kill 처리...
       return;
    }
    
-   if (attacker->IsNPC() and VictimIsPlayer) {
+   if (attacker->IsMonster() and VictimIsPlayer) {
       // Player가 NPC에게 죽은 경우 처리...
       return;
    }
