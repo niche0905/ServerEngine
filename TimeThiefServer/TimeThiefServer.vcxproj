@@ -262,83 +262,6 @@
     <ClCompile Include="Content\Gameplay\Collider\ColliderComponent.cpp" />
     <ClCompile Include="Content\Gameplay\Combat\CombatComponent.cpp" />
     <ClCompile Include="Content\Gameplay\Combat\PlayerCombatComponent.cpp" />
-    <ClCompile Include="Content\Gameplay\Loot\LootTableService.cpp">
-      <RuntimeLibrary>MultiThreadedDebugDll</RuntimeLibrary>
-      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
-      <Optimization>Disabled</Optimization>
-      <SupportJustMyCode>true</SupportJustMyCode>
-      <AssemblerOutput>NoListing</AssemblerOutput>
-      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
-      <UndefineAllPreprocessorDefinitions>false</UndefineAllPreprocessorDefinitions>
-      <BrowseInformation>false</BrowseInformation>
-      <BrowseInformationFile>$(IntDir)</BrowseInformationFile>
-      <CompileAs>Default</CompileAs>
-      <UseDynamicDebugging>false</UseDynamicDebugging>
-      <ConformanceMode>true</ConformanceMode>
-      <DiagnosticsFormat>Column</DiagnosticsFormat>
-      <DisableLanguageExtensions>false</DisableLanguageExtensions>
-      <ErrorReporting>Prompt</ErrorReporting>
-      <ExpandAttributedSource>false</ExpandAttributedSource>
-      <ExceptionHandling>Sync</ExceptionHandling>
-      <EnableASAN>false</EnableASAN>
-      <EnableFuzzer>false</EnableFuzzer>
-      <EnableFiberSafeOptimizations>false</EnableFiberSafeOptimizations>
-      <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
-      <EnableVectorLength>NotSet</EnableVectorLength>
-      <FloatingPointModel>Precise</FloatingPointModel>
-      <ForceConformanceInForLoopScope>true</ForceConformanceInForLoopScope>
-      <GenerateModuleDependencies>false</GenerateModuleDependencies>
-      <GenerateSourceDependencies>false</GenerateSourceDependencies>
-      <GenerateXMLDocumentationFiles>false</GenerateXMLDocumentationFiles>
-      <InlineFunctionExpansion>Default</InlineFunctionExpansion>
-      <IntrinsicFunctions>false</IntrinsicFunctions>
-      <IgnoreStandardIncludePath>false</IgnoreStandardIncludePath>
-      <LanguageStandard>stdcpp20</LanguageStandard>
-      <LanguageStandard_C>Default</LanguageStandard_C>
-      <MinimalRebuild>false</MinimalRebuild>
-      <ModuleDependenciesFile>$(IntDir)</ModuleDependenciesFile>
-      <ModuleOutputFile>$(IntDir)</ModuleOutputFile>
-      <OmitDefaultLibName>false</OmitDefaultLibName>
-      <FavorSizeOrSpeed>Neither</FavorSizeOrSpeed>
-      <WholeProgramOptimization>false</WholeProgramOptimization>
-      <ObjectFileName>$(IntDir)</ObjectFileName>
-      <CallingConvention>Cdecl</CallingConvention>
-      <ProgramDataBaseFileName>$(IntDir)\vc143.pdb</ProgramDataBaseFileName>
-      <PrecompiledHeader>Create</PrecompiledHeader>
-      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderOutputFile>$(IntDir)\TimeThiefServer.pch</PrecompiledHeaderOutputFile>
-      <PreprocessToFile>false</PreprocessToFile>
-      <PreprocessKeepComments>false</PreprocessKeepComments>
-      <PreprocessSuppressLineNumbers>false</PreprocessSuppressLineNumbers>
-      <RemoveUnreferencedCodeData>true</RemoveUnreferencedCodeData>
-      <ScanSourceForModuleDependencies>false</ScanSourceForModuleDependencies>
-      <ShowIncludes>false</ShowIncludes>
-      <SourceDependenciesFile>$(IntDir)\</SourceDependenciesFile>
-      <SuppressStartupBanner>true</SuppressStartupBanner>
-      <BufferSecurityCheck>true</BufferSecurityCheck>
-      <SmallerTypeCheck>false</SmallerTypeCheck>
-      <SpectreMitigation>false</SpectreMitigation>
-      <StructMemberAlignment>Default</StructMemberAlignment>
-      <TrackerLogDirectory>$(IntDir)\TimeThiefServer.tlog\</TrackerLogDirectory>
-      <TranslateIncludes>false</TranslateIncludes>
-      <MinimalRebuildFromTracking>true</MinimalRebuildFromTracking>
-      <TreatWarningAsError>false</TreatWarningAsError>
-      <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
-      <UseFullPaths>true</UseFullPaths>
-      <WarningLevel>Level3</WarningLevel>
-      <XMLDocumentationFileName>$(IntDir)</XMLDocumentationFileName>
-      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
-      <IntelJCCErratum>false</IntelJCCErratum>
-      <BuildStlModules>false</BuildStlModules>
-      <TreatAngleIncludeAsExternal>false</TreatAngleIncludeAsExternal>
-      <ExternalWarningLevel>InheritWarningLevel</ExternalWarningLevel>
-      <TreatExternalTemplatesAsInternal>true</TreatExternalTemplatesAsInternal>
-      <DisableAnalyzeExternal>false</DisableAnalyzeExternal>
-      <PreprocessorDefinitions>_DEBUG;_CONSOLE;_UNICODE;UNICODE;</PreprocessorDefinitions>
-      <SDLCheck>true</SDLCheck>
-      <LinkCompiled>true</LinkCompiled>
-      <AdditionalIncludeDirectories>;$(SolutionDir)\vcpkg_installed;\x64-windows\include</AdditionalIncludeDirectories>
-    </ClCompile>
     <ClCompile Include="Content\Object\Actor\Actor.cpp" />
     <ClCompile Include="Content\Object\Actor\ChestActor.cpp" />
     <ClCompile Include="Content\Object\Actor\EffectAreaActor.cpp" />
@@ -353,6 +276,7 @@
     <ClCompile Include="Data\GameDataManager.cpp" />
     <ClCompile Include="Data\Loader\ServerMapLoader.cpp" />
     <ClCompile Include="Data\Loader\ServerMapLoaderTest.cpp" />
+    <ClCompile Include="Data\Tables\LootTableJson.cpp" />
     <ClCompile Include="Data\Tables\ZoneTableJson.cpp" />
     <ClCompile Include="Main\main.cpp">
       <RuntimeLibrary>MultiThreadedDebugDll</RuntimeLibrary>
@@ -715,11 +639,7 @@
     <ClInclude Include="Content\Gameplay\Inventory\IInventoryOwner.h" />
     <ClInclude Include="Content\Gameplay\Inventory\InventoryComponent.h" />
     <ClInclude Include="Content\Gameplay\Inventory\ItemTypes.h" />
-    <ClInclude Include="Content\Gameplay\Loot\ILootSource.h" />
     <ClInclude Include="Content\Gameplay\Loot\LootSourceComponent.h" />
-    <ClInclude Include="Content\Gameplay\Loot\LootSourceTypes.h" />
-    <ClInclude Include="Content\Gameplay\Loot\LootTableSchema.h" />
-    <ClInclude Include="Content\Gameplay\Loot\LootTableService.h" />
     <ClInclude Include="Content\Gameplay\Loot\LootTypes.h" />
     <ClInclude Include="Content\Gameplay\Replication\ReplicatedState.h" />
     <ClInclude Include="Content\Gameplay\Replication\ReplicationEvent.h" />
@@ -748,6 +668,8 @@
     <ClInclude Include="Data\Loader\ServerMapLoader.h" />
     <ClInclude Include="Data\Loader\ServerMapLoaderTest.h" />
     <ClInclude Include="Data\Map\ServerMapFormat.h" />
+    <ClInclude Include="Data\Tables\LootTableJson.h" />
+    <ClInclude Include="Data\Tables\LootTableTypes.h" />
     <ClInclude Include="Data\Tables\ZoneTable.h" />
     <ClInclude Include="Data\Tables\ZoneTableJson.h" />
     <ClInclude Include="Network\PacketDispatcher\Routing\PlayerRoute.h" />

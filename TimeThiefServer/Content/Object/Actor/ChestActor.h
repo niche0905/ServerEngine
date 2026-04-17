@@ -4,6 +4,7 @@
 #include "Content/Gameplay/Container/IContainerAccess.h"
 #include "Content/Gameplay/Drop/IDropOwner.h"
 #include "Content/Gameplay/Inventory/IInventoryOwner.h"
+#include "Content/Gameplay/Loot/LootSourceComponent.h"
 
 class ObjectManager;
 class PlayerPawn;
@@ -23,8 +24,6 @@ enum class ChestKind : uint8
 
 class ChestActor : public StaticActor
                     , public IDropOwner
-                   , public IContainerAccess
-                   , public IInventoryOwner
 {
 public:
     ChestActor() = default;
@@ -37,33 +36,9 @@ public:
     ChestKind GetChestKind() const { return chestKind_; }
     void SetChestKind(ChestKind kind) { chestKind_ = kind; }
     
-    InventoryComponent& GetInventory() { return inventory_; }
-    const InventoryComponent& GetInventory() const { return inventory_; }
-    
 // IDropOwner
 public:
     virtual LootBundle GenerateDrops() override;
-    
-// IContainerAccess
-public:
-    ContainerOpenResult TryOpen(ObjectManager& om, PlayerPawn& byPlayer) override;
-    void Close(ObjectManager& om, PlayerPawn& byPlayer) override;
-    
-    ContainerTakeResult TryTakeFromContainer(ObjectManager& om, PlayerPawn& byPlayer, int32 containerSlot, int32 takeCount) override;
-    ContainerTakeResult TryTakeAll(ObjectManager& om, PlayerPawn& byPlayer) override;
-    
-    bool IsEmpty() const override;
-    
-// IInventoryOwner
-public:
-    virtual int32 GetCapacity() const override;
-    virtual int32 GetUsedSlots() const override;
-
-    virtual int32 GetItemCount(ItemId itemId) const override;
-
-    virtual InventoryOpResult AddItem(ObjectManager& om, ItemId itemId, int32 count, const ItemChangeContext& ctx) override;
-    virtual InventoryOpResult RemoveItem(ObjectManager& om, ItemId itemId, int32 count, const ItemChangeContext& ctx) override;
-    virtual InventoryOpResult ConsumeItem(ObjectManager& om, ItemId itemId, int32 count, const ItemChangeContext& ctx) override;
     
 protected:
     void OnSpawn() override;
@@ -72,12 +47,13 @@ protected:
 private:
     bool CheckOpenPermission(ObjectManager& om, PlayerPawn& byPlayer, int32& outError) const;
     
-    
 private:
     ChestKind chestKind_{ChestKind::Normal};
     
-    InventoryComponent inventory_;
+    LootSourceComponent lootSource_;
     
-    std::unordered_set<ObjectId> openedByPlayers_;
+    // 변경 전 방식
+    // InventoryComponent inventory_;
+    // std::unordered_set<ObjectId> openedByPlayers_;
     
 };

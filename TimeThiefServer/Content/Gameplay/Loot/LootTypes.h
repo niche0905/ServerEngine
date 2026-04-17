@@ -38,17 +38,3 @@ struct LootBundle
     }
     
 };
-
-// MEMO: 추가적인 룰렛 컨텍스트 정보가 필요할 경우 여기에 확장합니다. (ex. 레벨 보정 혹은 럭 요인)
-struct LootRollContext
-{
-    uint32 monsterLevel{1};
-    uint32 playerLevel{1};
-    float luckFactor{1.0f};
-};
-
-struct LootResult
-{
-    bool generated{false};
-    LootBundle bundle;
-};

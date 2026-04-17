@@ -7,18 +7,10 @@
    MonsterPawn
 ---------------*/
 
-LootSourceResult MonsterPawn::GenerateLoot(ObjectManager& om, LootTableService& service, const LootSourceContext& ctx)
-{
-   return loot_.GenerateLoot(om, service, ctx);
-}
-
 LootBundle MonsterPawn::GenerateDrops()
 {
    // TODO: Loot (확률에 의한 아이템 드롭) 반환하기
    //       지금 코드에서 문제가 없는지 검토 필요
-   
-   if (not loot_.CanGenerateLoot())
-      return LootBundle{};
    
    auto room = GetRoom();
    if (room == nullptr)

@@ -1,7 +1,6 @@
 ﻿#pragma once
 #include "Pawn.h"
 #include "Content/Gameplay/AI/MonsterAiComponent.h"
-#include "Content/Gameplay/Loot/ILootSource.h"
 #include "Content/Gameplay/Loot/LootSourceComponent.h"
 
 class ObjectManager;
@@ -19,7 +18,6 @@ class BTBrain;
 //
 
 class MonsterPawn : public Pawn
-                  , public ILootSource
 {
 public:
    MonsterPawn() = default;
@@ -34,10 +32,6 @@ public:
 public:
    int32 GetTemplateId() const { return templateId_; }
    void SetTemplateId(int32 templateId) { templateId_ = templateId; }
-   
-public:
-   virtual bool CanGenerateLoot() const override { return loot_.CanGenerateLoot(); }
-   virtual LootSourceResult GenerateLoot(ObjectManager& om, LootTableService& service, const LootSourceContext& ctx) override;
    
 // IDropOwner
 public:
@@ -68,7 +62,6 @@ private:
    BTBrain* brain_{ nullptr };
    
    LootSourceComponent loot_;
-   
    MonsterAiComponent ai_;
     
 };

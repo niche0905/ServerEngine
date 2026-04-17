@@ -77,6 +77,9 @@ bool ServerConfigReader::ParseJsonText(const std::string& jsonText, const std::f
       if (dataFiles.isMember("zone_table"))
          newConfig.dataFiles.zoneTablePath = ResolvePath(dataFiles["zone_table"].asString(), baseDir);
       
+      if (dataFiles.isMember("loot_table"))
+         newConfig.dataFiles.lootTablePath = ResolvePath(dataFiles["loot_table"].asString(), baseDir);
+      
    }
    
    // game

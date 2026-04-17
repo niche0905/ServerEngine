@@ -12,6 +12,7 @@ struct NetworkConfig
 struct DataFilesConfig
 {
     std::filesystem::path zoneTablePath;
+    std::filesystem::path lootTablePath;
 };
 
 struct GameConfig
