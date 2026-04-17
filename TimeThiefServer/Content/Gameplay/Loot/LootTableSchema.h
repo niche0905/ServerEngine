@@ -32,7 +32,7 @@ struct LootEntry
     ItemId itemId{0};
     IntRange itemCount{1, 1};
     
-    CurrencyId currencyId{0};
+    CurrencyType currencyId{0};
     Int64Range moneyAmount{0, 0};
     
     int32 weight{1};
@@ -40,7 +40,7 @@ struct LootEntry
     Chance chance{1.0};
     
     bool IsItem() const { return itemId != 0; }
-    bool IsMoney() const { return currencyId != 0; }
+    bool IsMoney() const { return currencyId == CurrencyType::TimePoint; }
     bool IsValid() const
     {
         if (weight <= 0) return false;

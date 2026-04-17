@@ -19,29 +19,32 @@ public:
    void Init(ObjectId owner)
    {
       SetOwner(owner);
+      
+      SetBalanceUnsafe(CurrencyType::TimePoint, 1000);     // TEMP: 초기 재화 1000
+                                                                  // TODO: 이 값 Config로 빼기
    }
    
-   int64 GetBalance(CurrencyId currency) const
+   CurrencyAmount GetBalance(CurrencyType currency) const
    {
       auto it = balances_.find(currency);
       return (it != balances_.end()) ? it->second : 0;
    }
    
-   bool CanSpend(CurrencyId currency, int64 amount) const
+   bool CanSpend(CurrencyType currency, CurrencyAmount amount) const
    {
       if (amount <= 0) return true;
       return GetBalance(currency) >= amount;
    }
    
-   MoneyChangeResult AddMoney(ObjectManager& om, CurrencyId currency, int64 amount, const MoneyChangeContext& ctx)
+   MoneyChangeResult AddMoney(ObjectManager& om, CurrencyType currency, CurrencyAmount amount, const MoneyChangeContext& ctx)
    {
       MoneyChangeResult result{};
       result.currency = currency;
       
       if (amount <= 0) return result;
       
-      const int64 before = GetBalance(currency);
-      const int64 after = before + amount;
+      const CurrencyAmount before = GetBalance(currency);
+      const CurrencyAmount after = before + amount;
       
       balances_[currency] = after;
       
@@ -54,19 +57,19 @@ public:
       return result;
    }
    
-   MoneyChangeResult SpendMoney(ObjectManager& om, CurrencyId currency, int64 amount, const MoneyChangeContext& ctx)
+   MoneyChangeResult SpendMoney(ObjectManager& om, CurrencyType currency, CurrencyAmount amount, const MoneyChangeContext& ctx)
    {
       MoneyChangeResult result{};
       result.currency = currency;
       
       if (amount <= 0) return result;
       
-      const int64 before = GetBalance(currency);
+      const CurrencyAmount before = GetBalance(currency);
       if (before < amount) {
          return result; // 잔액 부족
       }
       
-      const int64 after = before - amount;
+      const CurrencyAmount after = before - amount;
       
       balances_[currency] = after;
       
@@ -80,7 +83,7 @@ public:
    }
    
    // --- utility ---
-   void SetBalanceUnsafe(CurrencyId currency, int64 amount)
+   void SetBalanceUnsafe(CurrencyType currency, CurrencyAmount amount)
    {
       balances_[currency] = amount;
    }
@@ -91,6 +94,6 @@ public:
    }
    
 private:
-   std::unordered_map<CurrencyId, int64> balances_;
+   std::unordered_map<CurrencyType, CurrencyAmount> balances_;
    
 };

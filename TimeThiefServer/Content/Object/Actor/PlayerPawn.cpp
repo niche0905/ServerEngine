@@ -18,12 +18,10 @@ int32 PlayerPawn::ResolveIncomingDamage(int32 amount, const DamageContext& ctx)
       if (!room)
          return amount;   // 방이 없는 경우에는 존 데미지 처리하지 않음
       
-      const CurrencyId timePoint = static_cast<CurrencyId>(CurrencyType::TimePoint);
-      
       const int64 deleteMoney = static_cast<int>(amount) * kMultiplierForZoneDamage;
       
-      if (wallet_.CanSpend(timePoint, deleteMoney)) {
-         wallet_.SpendMoney(room->GetObjectManager(), timePoint, deleteMoney, MoneyChangeContext{
+      if (wallet_.CanSpend(CurrencyType::TimePoint, deleteMoney)) {
+         wallet_.SpendMoney(room->GetObjectManager(), CurrencyType::TimePoint, deleteMoney, MoneyChangeContext{
             .reason = MoneyChangeReason::ZoneDamage,
          });
          return 0;   // 존 데미지로 삭제할 재화가 충분하면 체력에는 데미지를 주지 않음
@@ -33,8 +31,8 @@ int32 PlayerPawn::ResolveIncomingDamage(int32 amount, const DamageContext& ctx)
       //       만약 재화의 차감으로도 죽을 수 있다면 사망 처리 진행
       //       재화가 모두 삭제되었더라도 죽이지 않을 것이라면 차감된 재화 양에 따라 amount 수정
       
-      int64 currentMoney = wallet_.GetBalance(timePoint);
-      wallet_.SpendMoney(room->GetObjectManager(), timePoint, currentMoney, MoneyChangeContext{
+      int64 currentMoney = wallet_.GetBalance(CurrencyType::TimePoint);
+      wallet_.SpendMoney(room->GetObjectManager(), CurrencyType::TimePoint, currentMoney, MoneyChangeContext{
            .reason = MoneyChangeReason::ZoneDamage,
         });
       int64 remainDelete = deleteMoney - currentMoney;
@@ -76,13 +74,13 @@ InventoryOpResult PlayerPawn::ConsumeItem(ObjectManager& om, ItemId itemId, int3
    return inventory_.ConsumeItem(om, itemId, count, ctx);
 }
 
-MoneyChangeResult PlayerPawn::AddMoney(ObjectManager& om, CurrencyId currency, int64 amount,
+MoneyChangeResult PlayerPawn::AddMoney(ObjectManager& om, CurrencyType currency, CurrencyAmount amount,
    const MoneyChangeContext& ctx)
 {
    return wallet_.AddMoney(om, currency, amount, ctx);
 }
 
-MoneyChangeResult PlayerPawn::SpendMoney(ObjectManager& om, CurrencyId currency, int64 amount,
+MoneyChangeResult PlayerPawn::SpendMoney(ObjectManager& om, CurrencyType currency, CurrencyAmount amount,
    const MoneyChangeContext& ctx)
 {
    return wallet_.SpendMoney(om, currency, amount, ctx);

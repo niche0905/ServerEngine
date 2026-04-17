@@ -176,7 +176,7 @@ bool LootTableService::LoadFromFile(const std::string& filepath)
                      entry.itemCount = ReadIntRange(eobj, "count", 1, 1);
                   }
                   else if (Has(eobj, "currencyId")) {
-                     entry.currencyId = static_cast<CurrencyId>(AsU32(eobj["currencyId"], 0));
+                     entry.currencyId = static_cast<CurrencyType>(AsU32(eobj["currencyId"], 0));
                      entry.moneyAmount = ReadInt64Range(eobj, "amount", 0, 0);
                   }
                   else {

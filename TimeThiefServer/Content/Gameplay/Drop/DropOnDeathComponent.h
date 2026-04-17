@@ -67,10 +67,8 @@ public:
       // 화폐 드롭 처리
       if (policy_.moneyDropRate > 0.0f) {
          // 화폐 드롭 로직
-         // 우선은 TimePoint만 사용한다고 가정
-         const CurrencyId timePoint = static_cast<CurrencyId>(CurrencyType::TimePoint);
          
-         const int64 before = owner.GetWallet().GetBalance(timePoint);
+         const int64 before = owner.GetWallet().GetBalance(CurrencyType::TimePoint);
          if (before > 0) {
             // const double rate = std::max(0.0, std::min(1.0, static_cast<double>(policy_.moneyDropRate)));
             const double rate = std::clamp(static_cast<double>(policy_.moneyDropRate), 0.0, 1.0);
@@ -79,9 +77,9 @@ public:
                MoneyChangeContext mctx{};
                mctx.reason = MoneyChangeReason::DropOnDeath;
                
-               auto spend = owner.GetWallet().SpendMoney(om, timePoint, dropAmount, mctx);
+               auto spend = owner.GetWallet().SpendMoney(om, CurrencyType::TimePoint, dropAmount, mctx);
                if (spend.accepted)
-                  result.bundle.AddMoney(timePoint, dropAmount);
+                  result.bundle.AddMoney(CurrencyType::TimePoint, dropAmount);
             }
          }
       }

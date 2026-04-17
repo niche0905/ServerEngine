@@ -83,11 +83,11 @@ public:
     
 // IWalletOwner
 public:
-    virtual int64 GetBalance(CurrencyId currency) const override { return wallet_.GetBalance(currency); }
-    virtual bool CanSpend(CurrencyId currency, int64 amount) const override { return wallet_.CanSpend(currency, amount); }
+    virtual CurrencyAmount GetBalance(CurrencyType currency) const override { return wallet_.GetBalance(currency); }
+    virtual bool CanSpend(CurrencyType currency, CurrencyAmount amount) const override { return wallet_.CanSpend(currency, amount); }
 
-    virtual MoneyChangeResult AddMoney(ObjectManager& om, CurrencyId currency, int64 amount, const MoneyChangeContext& ctx) override;
-    virtual MoneyChangeResult SpendMoney(ObjectManager& om, CurrencyId currency, int64 amount, const MoneyChangeContext& ctx) override;
+    virtual MoneyChangeResult AddMoney(ObjectManager& om, CurrencyType currency, CurrencyAmount amount, const MoneyChangeContext& ctx) override;
+    virtual MoneyChangeResult SpendMoney(ObjectManager& om, CurrencyType currency, CurrencyAmount amount, const MoneyChangeContext& ctx) override;
     
 // Player State (Action State)
 public:

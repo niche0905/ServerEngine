@@ -6,7 +6,7 @@
 struct ItemStack;
 struct MoneyDrop
 {
-    CurrencyId currency{0};
+    CurrencyType currency{0};
     int64 amount{0};
 };
 
@@ -31,9 +31,9 @@ struct LootBundle
         items.push_back(ItemStack{ id, count });
     }
     
-    void AddMoney(CurrencyId currency, int64 amount)
+    void AddMoney(CurrencyType currency, int64 amount)
     {
-        if (currency == 0 or amount <= 0) return;
+        if (currency == CurrencyType::None or amount <= 0) return;
         money.push_back(MoneyDrop{ currency, amount });
     }
     

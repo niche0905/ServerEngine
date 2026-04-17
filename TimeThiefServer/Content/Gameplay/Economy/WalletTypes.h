@@ -1,9 +1,12 @@
 ﻿#pragma once
 
 using CurrencyId = uint16;
+using CurrencyAmount = int64;
 
 enum class CurrencyType : CurrencyId
 {
+    None = 0,
+    
     TimePoint = 1,
     // Gold,
     // Silver,
@@ -34,10 +37,10 @@ struct MoneyChangeContext
 
 struct MoneyChangeResult
 {
-    CurrencyId currency{0};
-    int64 before{0};
-    int64 after{0};
-    int64 delta{0};
+    CurrencyType currency{0};
+    CurrencyAmount before{0};
+    CurrencyAmount after{0};
+    CurrencyAmount delta{0};
 
     bool accepted{false}; // 변경이 실제로 적용되었는지
 };

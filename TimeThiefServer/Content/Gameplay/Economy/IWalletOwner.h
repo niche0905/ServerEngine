@@ -15,16 +15,16 @@ class IWalletOwner
 public:
     virtual ~IWalletOwner() = default;
 
-    virtual int64 GetBalance(CurrencyId currency) const = 0;
-    virtual bool CanSpend(CurrencyId currency, int64 amount) const = 0;
+    virtual CurrencyAmount GetBalance(CurrencyType currency) const = 0;
+    virtual bool CanSpend(CurrencyType currency, CurrencyAmount amount) const = 0;
 
     virtual MoneyChangeResult AddMoney(ObjectManager& om,
-                                       CurrencyId currency,
-                                       int64 amount,
+                                       CurrencyType currency,
+                                       CurrencyAmount amount,
                                        const MoneyChangeContext& ctx) = 0;
 
     virtual MoneyChangeResult SpendMoney(ObjectManager& om,
-                                         CurrencyId currency,
-                                         int64 amount,
+                                         CurrencyType currency,
+                                         CurrencyAmount amount,
                                          const MoneyChangeContext& ctx) = 0;
 };
