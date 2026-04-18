@@ -18,7 +18,8 @@ public:
    
    bool Init(Room* ownerRoom, const LootTable& lootTable);
    
-   LootBundle GenerateLootBundle(int32 lootTableId, uint32 rngSeed) const;
+   LootBundle GenerateLootBundle(int32 tableId) const;
+   LootBundle GenerateLootBundle(int32 tableId, uint32 rngSeed) const;
    
 private:
    Room* ownerRoom_;

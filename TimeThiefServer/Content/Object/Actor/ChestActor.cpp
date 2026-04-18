@@ -1,6 +1,7 @@
 ﻿#include "pch.h"
 #include "ChestActor.h"
 #include "PlayerPawn.h"
+#include "Service/Room/Room.h"
 
 /*--------------
    ChestActor
@@ -8,17 +9,18 @@
 
 LootBundle ChestActor::GenerateDrops()
 {
-    // TODO: Loot 이용해서 처리 해도 되고
-    //       Init 시점에서 미리 아이템을 채워 놓는 방식으로 해도 될 듯
+    auto room = GetRoom();
+    if (room == nullptr)
+        return LootBundle{};
     
-     return LootBundle{};
+    return room->GetRoomGameSystem().GetLootSystem().GenerateLootBundle(lootSource_.GetTableId());
 }
 
 void ChestActor::OnSpawn()
 {
     StaticActor::OnSpawn();
     
-    lootSource_.Init(GetId(), 0);
+    lootSource_.Init(GetId(), 1);       // TEMP: LootSourceComponent의 tableId는 1로 고정
 }
 
 void ChestActor::OnPreDestroy()

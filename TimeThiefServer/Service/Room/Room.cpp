@@ -127,6 +127,7 @@ Room::Room(RoomId roomId, SessionManager& sessionManager)
    : roomId_(roomId)
    , objectManager_(roomId)
    , sessionManager_(sessionManager)
+   , rng_(static_cast<uint32>(roomId))
 {
 }
 

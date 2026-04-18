@@ -36,6 +36,12 @@ public:
    ReplicationSystem& GetReplicationSystem() { return replicationSystem_; }
    const ReplicationSystem& GetReplicationSystem() const { return replicationSystem_; }
    
+   DropSystem& GetDropSystem() { return dropSystem_; }
+   const DropSystem& GetDropSystem() const { return dropSystem_; }
+   
+   LootSystem& GetLootSystem() { return lootSystem_; }
+   const LootSystem& GetLootSystem() const { return lootSystem_; }
+   
 public:
    void OnPawnDeath(ObjectId pawnId);
    

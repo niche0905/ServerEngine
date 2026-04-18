@@ -1,6 +1,6 @@
 ﻿#include "pch.h"
 #include "LootSystem.h"
-
+#include "Service/Room/Room.h"
 #include "Data/Tables/LootTableTypes.h"
 
 /*---------------
@@ -18,7 +18,13 @@ bool LootSystem::Init(Room* ownerRoom, const LootTable& lootTable)
    return true;
 }
 
-LootBundle LootSystem::GenerateLootBundle(int32 lootTableId, uint32 rngSeed) const
+LootBundle LootSystem::GenerateLootBundle(int32 tableId) const
 {
-   return lootTable_->Roll(lootTableId, rngSeed);
+   Random32& rng = ownerRoom_->GetRandom();
+   return GenerateLootBundle(tableId, rng.NextU32());
+}
+
+LootBundle LootSystem::GenerateLootBundle(int32 tableId, uint32 rngSeed) const
+{
+   return lootTable_->Roll(tableId, rngSeed);
 }

@@ -9,15 +9,11 @@
 
 LootBundle MonsterPawn::GenerateDrops()
 {
-   // TODO: Loot (확률에 의한 아이템 드롭) 반환하기
-   //       지금 코드에서 문제가 없는지 검토 필요
-   
    auto room = GetRoom();
    if (room == nullptr)
       return LootBundle{};
 
-   // TODO: LootTableService에서 몬스터의 LootTable을 찾아서 드랍 생성하기 Loot Service 연동 필요...
-   return LootBundle{};
+   return room->GetRoomGameSystem().GetLootSystem().GenerateLootBundle(loot_.GetTableId());
 }
 
 void MonsterPawn::UpdateAI(ObjectManager& om, float dt)
@@ -35,7 +31,7 @@ void MonsterPawn::OnSpawn()
    Pawn::OnSpawn();
 
    respawn_.Init(GetId(), RespawnPolicy{});
-   loot_.Init(GetId(), 0);
+   loot_.Init(GetId(), 1);    // TEMP: LootSourceComponent의 tableId는 1로 고정
    // TODO: AI 컴포넌트 초기화 (BT 트리 로드)
    // ai_.Initialize(this, objectManager_, "path...");
    

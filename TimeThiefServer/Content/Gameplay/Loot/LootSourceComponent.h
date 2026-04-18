@@ -18,6 +18,8 @@ public:
       
         tableId_ = tableId;
     }
+    
+    int32 GetTableId() const { return tableId_; }
    
 private:
     int32 tableId_{0};
