@@ -34,5 +34,10 @@ bool GameDataManager::Init(const ServerConfig& config)
    //    consoleLogger->Log(Color::Green, L"[GDM] LootTable loaded successfully.\n");
    // }
    
+   if (!lootTable_.IsValid()) {
+      consoleLogger->Log(Color::Red, L"[GDM] Loaded LootTable is invalid.\n");
+      return false;
+   }
+   
    return true;
 }
