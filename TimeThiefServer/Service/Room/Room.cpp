@@ -950,6 +950,12 @@ bool Room::HandleUseStore(PlayerId playerId, const se::game::C_UseStoreReq& pkt)
 bool Room::HandleSetSavePoint(PlayerId playerId, const se::game::C_SetSavePointReq& pkt)
 {
    // THINK: 안전상 쿨타임이 존재해야 하지만 우선은 쿨타임 없이 바로 적용하는 구조로 (현재는 패킷이 너무 자주 요청 될 수 있음...)
+   
+   SendBufferRef setSavePointResultBuffer;
+   std::shared_ptr<PlayerSession> sessionRef = sessionManager_.FindByPlayerId(playerId);
+   
+   if (!sessionRef) return false;   // 세션이 존재하지 않음 (정상적이지 않은 상황)
+   
    {
       if (playerId == 0)
          return false;
@@ -963,8 +969,26 @@ bool Room::HandleSetSavePoint(PlayerId playerId, const se::game::C_SetSavePointR
          return false;
       
       const auto& savePointPos = pkt.position();
+      const auto& playerPos = playerPawn->GetPosition();
+
       playerPawn->SetSavedRespawnPosition(Vector3{savePointPos.x(), savePointPos.y(), savePointPos.z()});
+      
+      // TODO: 세이브 포인트 설정 유효성 판정 (예: 플레이어가 특정 지역 내에 있는지, 너무 자주 요청하는 것은 아닌지 등)
+      //       유효성 판정 결과에 따라 setSavePointResultBuffer에 결과 패킷 세팅하기 (예: 성공 여부, 메시지 등)
+      
+      se::game::S_SetSavePointRes res;
+      {
+         res.set_success(true);   // TEMP: 세이브 포인트 설정 성공 여부 (실제 로직에서는 유효성 판정 결과에 따라 결정되어야 함)
+         auto* savePosPtr = res.mutable_position();
+         savePosPtr->set_x(savePointPos.x());
+         savePosPtr->set_y(savePointPos.y());
+         savePosPtr->set_z(savePointPos.z());
+      }
+      setSavePointResultBuffer = ServerPacketHandler::MakeSendBuffer(res);
    }
+   
+   if (setSavePointResultBuffer)
+      sessionRef->Send(setSavePointResultBuffer);   // 세이브 포인트 설정 결과를 해당 플레이어에게 전송
    
    return true;
 }
