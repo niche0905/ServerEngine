@@ -26,6 +26,12 @@ bool RoomGameSystem::Init(Room* ownerRoom, const GameDataManager& gameDataManage
    if (!replicationSystem_.Init(ownerRoom))
       return false;
    
+   if (!dropSystem_.Init(ownerRoom))
+      return false;
+   
+   if (!lootSystem_.Init(ownerRoom, gameDataManager_->GetLootTable()))
+      return false;
+   
    return true;
 }
 

@@ -1,4 +1,6 @@
 ﻿#pragma once
+#include "Drop/DropSystem.h"
+#include "Loot/LootSystem.h"
 #include "Replication/ReplicationSystem.h"
 #include "Respawn/RespawnSystem.h"
 #include "Zone/ZoneSystem.h"
@@ -44,5 +46,7 @@ private:
    ZoneSystem              zoneSystem_{};
    RespawnSystem           respawnSystem_{};
    ReplicationSystem       replicationSystem_{};
+   DropSystem              dropSystem_{};
+   LootSystem              lootSystem_{};
     
 };

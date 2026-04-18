@@ -371,6 +371,7 @@
     <ClCompile Include="Service\Room\RoomTickScheduler.cpp" />
     <ClCompile Include="Service\Room\ShardRoomManager.cpp" />
     <ClCompile Include="Service\Room\Systems\Drop\DropSystem.cpp" />
+    <ClCompile Include="Service\Room\Systems\Loot\LootSystem.cpp" />
     <ClCompile Include="Service\Room\Systems\Replication\ReplicationSystem.cpp">
       <RuntimeLibrary>MultiThreadedDebugDll</RuntimeLibrary>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -697,6 +698,7 @@
     <ClInclude Include="Service\Room\ScheduledRoomTick.h" />
     <ClInclude Include="Service\Room\ShardRoomManager.h" />
     <ClInclude Include="Service\Room\Systems\Drop\DropSystem.h" />
+    <ClInclude Include="Service\Room\Systems\Loot\LootSystem.h" />
     <ClInclude Include="Service\Room\Systems\Replication\ReplicationSystem.h" />
     <ClInclude Include="Service\Room\Systems\Respawn\RespawnSystem.h" />
     <ClInclude Include="Service\Room\Systems\RoomGameSystem.h" />
