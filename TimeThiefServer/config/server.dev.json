@@ -6,7 +6,8 @@
         "db_port": 3306
     },
     "data_files": {
-        "zone_table": "data/tables/ZoneDataTable.json"
+        "zone_table": "data/tables/ZoneDataTable.json",
+        "loot_table": "data/tables/LootTables.json"
     },
     "game": {
         "movement_update_hz": 10,
