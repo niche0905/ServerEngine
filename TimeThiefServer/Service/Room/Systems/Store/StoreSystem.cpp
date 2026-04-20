@@ -224,8 +224,11 @@ bool StoreSystem::CanPurchaseReward(PlayerPawn* playerPawn, const StoreEntryDef*
 
 bool StoreSystem::TryApplyItemReward(const StoreBuyContext& ctx)
 {
-   // TODO: Inventory 시스템이 구현되면 아이템 추가 로직 작성하기
-   return false;
+   InventoryComponent& inventoryComp = ctx.playerPawn->GetInventory();
+   const StoreEntryDef* entryDef = ctx.entryDef;
+   ItemChangeContext changeCtx{ ItemChangeReason::Purchase, ctx.entryId };
+   InventoryOpResult result = inventoryComp.AddItem(ownerRoom_->GetObjectManager(), entryDef->itemId, entryDef->itemCount, changeCtx);
+   return result.accepted;
 }
 
 bool StoreSystem::TryApplySkillReward(const StoreBuyContext& ctx)

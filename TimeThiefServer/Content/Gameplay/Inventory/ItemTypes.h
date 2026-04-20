@@ -37,7 +37,7 @@ enum class ItemChangeReason : uint8
 struct ItemChangeContext
 {
     ItemChangeReason reason{ItemChangeReason::Unknown};
-    int32 relatedActionId{0};
+    uint32 relatedActionId{0};
 };
 
 struct InventoryOpResult
