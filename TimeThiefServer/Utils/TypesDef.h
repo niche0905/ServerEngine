@@ -8,6 +8,7 @@ using ShardId = uint32;
 using RoomId = uint32;
 
 using ItemId = uint32;
+using SkillId = uint32;
 
 using TimerId = uint64;
 
