@@ -7,6 +7,8 @@ using PawnId = uint32;
 using ShardId = uint32;
 using RoomId = uint32;
 
+using ItemId = uint32;
+
 using TimerId = uint64;
 
 using Job = std::function<void()>;

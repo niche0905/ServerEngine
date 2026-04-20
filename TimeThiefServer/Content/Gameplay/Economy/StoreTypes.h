@@ -1,4 +1,5 @@
 ﻿#pragma once
+#include "TypesDef.h"
 #include "WalletTypes.h"
 #include "Content/Object/ObjectId.h"
 
@@ -26,6 +27,34 @@ enum class StoreBuyResultCode : uint8
     ApplyFailed,                    // 구매 적용에 실패 (예: 인벤토리 공간 부족, 아이템 적용 중 오류 등)
 };
 
+enum class StoreRewardType : uint8
+{
+    None = 0,
+    
+    Item,                           // 아이템 보상
+    Skill,                          // 스킬 보상(해금)
+    WeaponUpgrade,                  // 무기 강화 보상
+    StatUpgrade,                    // 스텟 강화 보상
+};
+
+struct StoreEntryDef
+{
+    uint32 entryId{0};
+    int64 cost{0};
+    
+    StoreRewardType rewardType{StoreRewardType::None};
+    
+    ItemId itemId{0};               // 아이템이라면...
+    int32 itemCount{0};             // 아이템 보상 개수
+    
+    uint32 skillId{0};              // 스킬이라면...
+    
+    uint32 weaponUpgradeType{0};    // 무기 강화라면... (강화할 종류)
+    
+    uint32 statUpgradeType{0};      // 스텟 강화라면... (강화할 종류)
+    int32 statUpgradeAmount{0};     // 스텟 강화라면... (강화할 수치)
+};
+
 struct StoreBuyResult
 {
     bool success{false};
@@ -38,9 +67,9 @@ struct StoreBuyResult
 
 struct StoreBuyContext
 {
-    PlayerPawn* playerPawn;
-    Actor* storeActor;
-    uint32 entryId;
+    PlayerPawn* playerPawn{nullptr};
+    Actor* storeActor{nullptr};
     
-    int64 cost;
+    const StoreEntryDef* entryDef{nullptr};
+    uint32 entryId{0};
 };

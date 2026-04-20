@@ -90,8 +90,8 @@ StoreBuyResult StoreSystem::ValidateBuyRequest(const StoreBuyRequest& req, Store
       return result;
    }
    
-   int64 cost = FindStoreEntry(req.entryId);
-   if (cost <= 0) {
+   const StoreEntryDef* entryDef = FindStoreEntry(req.entryId);
+   if (entryDef == nullptr) {
       result.resultCode = StoreBuyResultCode::InvalidEntry;
       return result;
    }
@@ -111,7 +111,7 @@ StoreBuyResult StoreSystem::ValidateBuyRequest(const StoreBuyRequest& req, Store
    ctx.playerPawn = player;
    ctx.storeActor = store;
    ctx.entryId = req.entryId;
-   ctx.cost = cost;
+   ctx.entryDef = entryDef;
    
    result.success = true;
    result.resultCode = StoreBuyResultCode::Success;
@@ -124,7 +124,7 @@ bool StoreSystem::TryConsumeCost(StoreBuyContext& ctx)
       return false;
    
    auto& walletComp = ctx.playerPawn->GetWallet();
-   MoneyChangeResult result = walletComp.SpendMoney(ownerRoom_->GetObjectManager(), CurrencyType::TimePoint, ctx.cost, MoneyChangeContext{MoneyChangeReason::Purchase, ctx.entryId});
+   MoneyChangeResult result = walletComp.SpendMoney(ownerRoom_->GetObjectManager(), CurrencyType::TimePoint, ctx.entryDef->cost, MoneyChangeContext{MoneyChangeReason::Purchase, ctx.entryId});
    
    return result.accepted;
 }
@@ -135,15 +135,35 @@ bool StoreSystem::TryApplyReward(StoreBuyContext& ctx)
       return false;
    
    // TODO: 아이템 적용 필요 (아이템은 Inventory 추가, 스킬은 소유, 무기 강화, 스텟 강화 처리 등)
-   return false;
+   switch (ctx.entryDef->rewardType)
+   {
+   case StoreRewardType::Item:
+      // 아이템 보상 처리 (인벤토리에 아이템 추가)
+      return TryApplyItemReward(ctx);
+      
+   case StoreRewardType::Skill:
+      // 스킬 보상 처리 (스킬 해금)
+      return TryApplySkillReward(ctx);
+      
+   case StoreRewardType::WeaponUpgrade:
+      // 무기 강화 보상 처리 (무기 강화)
+      return TryApplyWeaponUpgradeReward(ctx);
+      
+   case StoreRewardType::StatUpgrade:
+      // 스텟 강화 보상 처리 (스텟 강화)
+      return TryApplyStatUpgradeReward(ctx);
+      
+   default:
+      return false;
+   }
 }
 
-int64 StoreSystem::FindStoreEntry(uint32 entryId) const
+const StoreEntryDef* StoreSystem::FindStoreEntry(uint32 entryId) const
 {
-   if (entryId == 0)
-      return -1;  // 유효하지 않은 entryId
-
-   return storeEntryTable_->GetCost(entryId);
+   if (entryId == 0 or !storeEntryTable_)
+      return nullptr;
+   
+   return storeEntryTable_->GetStoreEntry(entryId);
 }
 
 bool StoreSystem::CanInteractStore(PlayerPawn* playerPawn, Actor* storeActor) const
@@ -169,4 +189,24 @@ bool StoreSystem::CanBuy(PlayerPawn* playerPawn) const
    // 다른 Player 상태 체크도 필요하다면 추가하기
    
    return true;
+}
+
+bool StoreSystem::TryApplyItemReward(const StoreBuyContext& ctx)
+{
+   return false;
+}
+
+bool StoreSystem::TryApplySkillReward(const StoreBuyContext& ctx)
+{
+   return false;
+}
+
+bool StoreSystem::TryApplyWeaponUpgradeReward(const StoreBuyContext& ctx)
+{
+   return false;
+}
+
+bool StoreSystem::TryApplyStatUpgradeReward(const StoreBuyContext& ctx)
+{
+   return false;
 }

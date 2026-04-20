@@ -25,9 +25,15 @@ private:
    bool TryConsumeCost(StoreBuyContext& ctx);
    bool TryApplyReward(StoreBuyContext& ctx);
    
-   int64 FindStoreEntry(uint32 entryId) const;
+   const StoreEntryDef* FindStoreEntry(uint32 entryId) const;
    bool CanInteractStore(PlayerPawn* playerPawn, Actor* storeActor) const;
    bool CanBuy(PlayerPawn* playerPawn) const;
+   
+private:
+   bool TryApplyItemReward(const StoreBuyContext& ctx);
+   bool TryApplySkillReward(const StoreBuyContext& ctx);
+   bool TryApplyWeaponUpgradeReward(const StoreBuyContext& ctx);
+   bool TryApplyStatUpgradeReward(const StoreBuyContext& ctx);
    
 private:
    Room*                   ownerRoom_ = nullptr;   // non-owning
