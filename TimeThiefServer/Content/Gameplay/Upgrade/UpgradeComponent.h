@@ -1,0 +1,43 @@
+﻿#pragma once
+#include "Content/Shared/BaseComponent.h"
+#include <unordered_set>
+#include <unordered_map>
+
+// TEMP
+using WeaponUpgradeCode = uint32;
+using StatUpgradeCode = uint32;
+
+/*--------------------
+   UpgradeComponent
+--------------------*/
+//
+// UpgradeComponent는 플레이어가 게임 내에서 업그레이드를 획득하고 적용할 수 있도록 하는 컴포넌트입니다.
+//
+
+class UpgradeComponent : public BaseComponent
+{
+public:
+   virtual void Init(ObjectId owner);
+   
+// Weapon
+public:
+   bool HasWeaponUpgrade(WeaponUpgradeCode code) const;
+   bool CanApplyWeaponUpgrade(WeaponUpgradeCode code) const;
+   bool ApplyWeaponUpgrade(WeaponUpgradeCode code);
+   
+// Stat
+public:
+   int32 GetStatUpgradeLevel(StatUpgradeCode code) const;
+   bool CanApplyStatUpgrade(StatUpgradeCode Code, int32 maxLevel) const;
+   bool ApplyStatUpgrade(StatUpgradeCode code, int32 maxLevel, int32 deltaLevel = 1);
+   
+// Util
+public:
+   void Clear();
+   
+   
+private:
+   std::unordered_set<WeaponUpgradeCode>           weaponUpgradeCodes_;    // 플레이어가 획득한 무기 업그레이드 코드들의 집합
+   std::unordered_map<StatUpgradeCode, int32>      statUpgradeLevels_;     // 플레이어가 획득한 스탯 업그레이드 코드와 해당 레벨의 맵
+   
+};

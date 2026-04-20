@@ -6,6 +6,7 @@
 #include "Content/Gameplay/Inventory/InventoryComponent.h"
 #include "Content/Gameplay/Economy/WalletComponent.h"
 #include "Content/Gameplay/Skill/SkillComponent.h"
+#include "Content/Gameplay/Upgrade/UpgradeComponent.h"
 #include "Content/Object/Actor/PlayerPawnState.h"
 
 class ObjectManager;
@@ -59,6 +60,9 @@ public:
     
     SkillComponent& GetSkill() { return skill_; }
     const SkillComponent& GetSkill() const { return skill_; }
+    
+    UpgradeComponent& GetUpgrade() { return upgrade_; }
+    const UpgradeComponent& GetUpgrade() const { return upgrade_; }
     
 public:
     virtual void Damaged(const DamageResult& dmgResult) override;
@@ -125,6 +129,7 @@ private:
     InventoryComponent          inventory_{};
     WalletComponent             wallet_{};
     SkillComponent              skill_{};
+    UpgradeComponent            upgrade_{};
     
     ActionState                 actionState_{};
     

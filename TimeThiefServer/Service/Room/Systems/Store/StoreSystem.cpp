@@ -208,9 +208,15 @@ bool StoreSystem::CanPurchaseReward(PlayerPawn* playerPawn, const StoreEntryDef*
       }
       
    case StoreRewardType::WeaponUpgrade:
-      // TODO: Upgrade Comp 작성
+      {
+         auto& upgradeComp = playerPawn->GetUpgrade();
+         return upgradeComp.ApplyWeaponUpgrade(entryDef->weaponUpgradeType);
+      }
    case StoreRewardType::StatUpgrade:
-      
+      {
+         auto& upgradeComp = playerPawn->GetUpgrade();
+         return upgradeComp.ApplyStatUpgrade(entryDef->statUpgradeType, entryDef->statUpgradeAmount);
+      }
    default:
       return false;
    }

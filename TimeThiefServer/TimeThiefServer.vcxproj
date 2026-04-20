@@ -263,6 +263,7 @@
     <ClCompile Include="Content\Gameplay\Combat\CombatComponent.cpp" />
     <ClCompile Include="Content\Gameplay\Combat\PlayerCombatComponent.cpp" />
     <ClCompile Include="Content\Gameplay\Skill\SkillComponent.cpp" />
+    <ClCompile Include="Content\Gameplay\Upgrade\UpgradeComponent.cpp" />
     <ClCompile Include="Content\Object\Actor\Actor.cpp" />
     <ClCompile Include="Content\Object\Actor\ChestActor.cpp" />
     <ClCompile Include="Content\Object\Actor\EffectAreaActor.cpp" />
@@ -652,6 +653,7 @@
     <ClInclude Include="Content\Gameplay\Spawn\IRespawnOwner.h" />
     <ClInclude Include="Content\Gameplay\Spawn\RespawnComponent.h" />
     <ClInclude Include="Content\Gameplay\Spawn\RespawnTypes.h" />
+    <ClInclude Include="Content\Gameplay\Upgrade\UpgradeComponent.h" />
     <ClInclude Include="Content\Object\Actor\Actor.h" />
     <ClInclude Include="Content\Object\Actor\ChestActor.h" />
     <ClInclude Include="Content\Object\Actor\EffectAreaActor.h" />
