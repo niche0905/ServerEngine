@@ -52,7 +52,7 @@ struct StoreEntryDef
     uint32 weaponUpgradeType{0};    // 무기 강화라면... (강화할 종류)
     
     uint32 statUpgradeType{0};      // 스텟 강화라면... (강화할 종류)
-    int32 statUpgradeAmount{0};     // 스텟 강화라면... (강화할 수치)
+    int32 statUpgradeMaxLevel{0};     // 스텟 강화라면... (강화 가능한 최대 Level)
 };
 
 struct StoreBuyResult

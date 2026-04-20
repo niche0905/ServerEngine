@@ -210,12 +210,12 @@ bool StoreSystem::CanPurchaseReward(PlayerPawn* playerPawn, const StoreEntryDef*
    case StoreRewardType::WeaponUpgrade:
       {
          auto& upgradeComp = playerPawn->GetUpgrade();
-         return upgradeComp.ApplyWeaponUpgrade(entryDef->weaponUpgradeType);
+         return upgradeComp.CanApplyWeaponUpgrade(entryDef->weaponUpgradeType);
       }
    case StoreRewardType::StatUpgrade:
       {
          auto& upgradeComp = playerPawn->GetUpgrade();
-         return upgradeComp.ApplyStatUpgrade(entryDef->statUpgradeType, entryDef->statUpgradeAmount);
+         return upgradeComp.CanApplyStatUpgrade(entryDef->statUpgradeType, entryDef->statUpgradeMaxLevel);
       }
    default:
       return false;
@@ -224,6 +224,7 @@ bool StoreSystem::CanPurchaseReward(PlayerPawn* playerPawn, const StoreEntryDef*
 
 bool StoreSystem::TryApplyItemReward(const StoreBuyContext& ctx)
 {
+   // TODO: Inventory 시스템이 구현되면 아이템 추가 로직 작성하기
    return false;
 }
 
@@ -236,10 +237,14 @@ bool StoreSystem::TryApplySkillReward(const StoreBuyContext& ctx)
 
 bool StoreSystem::TryApplyWeaponUpgradeReward(const StoreBuyContext& ctx)
 {
-   return false;
+   UpgradeComponent& upgradeComp = ctx.playerPawn->GetUpgrade();
+   const StoreEntryDef* entryDef = ctx.entryDef;
+   return upgradeComp.ApplyWeaponUpgrade(entryDef->weaponUpgradeType);
 }
 
 bool StoreSystem::TryApplyStatUpgradeReward(const StoreBuyContext& ctx)
 {
-   return false;
+   UpgradeComponent& upgradeComp = ctx.playerPawn->GetUpgrade();
+   const StoreEntryDef* entryDef = ctx.entryDef;
+   return upgradeComp.ApplyStatUpgrade(entryDef->statUpgradeType, entryDef->statUpgradeMaxLevel);
 }
