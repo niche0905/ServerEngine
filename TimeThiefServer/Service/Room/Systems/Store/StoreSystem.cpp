@@ -13,12 +13,13 @@ namespace
    StoreSystem
 ----------------*/
 
-bool StoreSystem::Init(Room* ownerRoom)
+bool StoreSystem::Init(Room* ownerRoom, const StoreEntryTable& storeEntryTable)
 {
    if (!ownerRoom)
       return false;   // 유효하지 않은 ownerRoom
    
    ownerRoom_ = ownerRoom;
+   storeEntryTable_ = &storeEntryTable;
    return true;
 }
 
@@ -32,15 +33,9 @@ StoreBuyResult StoreSystem::Buy(const StoreBuyRequest& req)
    if (!ownerRoom_)
       return result;
    
-   // TODO: 구매 로직 구현 (예: 플레이어의 골드 확인, 아이템 재고 확인, 구매 처리 등)
-   //       1. 객체 찾기
    //       2. 상점 엔트리 찾기
-   //       3. 거리 검사
-   //       4. 상태 검사
    //       5. 비용 계산
-   //       6. 재화 차감
    //       7. 아이템 지급
-   //       8. 결과 반환
    StoreBuyContext ctx{};
    StoreBuyResult validateResult = ValidateBuyRequest(req, ctx);
    if (!validateResult.success)
@@ -85,6 +80,11 @@ StoreBuyResult StoreSystem::ValidateBuyRequest(const StoreBuyRequest& req, Store
       return result;
    }
    // TODO: store가 상점이 맞는지 확인하는 로직 필요 (예: 특정 컴포넌트 존재 여부 혹은 EntityType 등)
+   
+   if (!storeEntryTable_->IsValidEntry(result.entryId)) {
+      result.resultCode = StoreBuyResultCode::InvalidEntry;
+      return result;
+   }
    
    int64 cost = FindStoreEntry(req.entryId);
    if (cost <= 0) {
@@ -138,9 +138,8 @@ int64 StoreSystem::FindStoreEntry(uint32 entryId) const
 {
    if (entryId == 0)
       return -1;  // 유효하지 않은 entryId
-   
-   // TODO: Store DataTable에 접근하여 조회
-   return -1;
+
+   return storeEntryTable_->GetCost(entryId);
 }
 
 bool StoreSystem::CanInteractStore(PlayerPawn* playerPawn, Actor* storeActor) const

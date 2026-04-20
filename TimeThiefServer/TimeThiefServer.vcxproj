@@ -673,6 +673,7 @@
     <ClInclude Include="Data\Map\ServerMapFormat.h" />
     <ClInclude Include="Data\Tables\LootTableJson.h" />
     <ClInclude Include="Data\Tables\LootTableTypes.h" />
+    <ClInclude Include="Data\Tables\StoreEntryTable.h" />
     <ClInclude Include="Data\Tables\ZoneTable.h" />
     <ClInclude Include="Data\Tables\ZoneTableJson.h" />
     <ClInclude Include="Network\PacketDispatcher\Routing\PlayerRoute.h" />

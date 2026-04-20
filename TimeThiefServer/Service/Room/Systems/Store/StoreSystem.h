@@ -1,5 +1,6 @@
 ﻿#pragma once
 #include "Content/Gameplay/Economy/StoreTypes.h"
+#include "Data/Tables/StoreEntryTable.h"
 
 class Room;
 
@@ -15,7 +16,7 @@ class StoreSystem
 public:
    StoreSystem() = default;
    
-   bool Init(Room* ownerRoom);
+   bool Init(Room* ownerRoom, const StoreEntryTable& storeEntryTable);
    
    StoreBuyResult Buy(const StoreBuyRequest& req);
    
@@ -29,6 +30,7 @@ private:
    bool CanBuy(PlayerPawn* playerPawn) const;
    
 private:
-   Room* ownerRoom_ = nullptr;   // non-owning
+   Room*                   ownerRoom_ = nullptr;   // non-owning
+   const StoreEntryTable*  storeEntryTable_ = nullptr;
     
 };

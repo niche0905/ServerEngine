@@ -32,6 +32,9 @@ bool RoomGameSystem::Init(Room* ownerRoom, const GameDataManager& gameDataManage
    if (!lootSystem_.Init(ownerRoom, gameDataManager_->GetLootTable()))
       return false;
    
+   if (!storeSystem_.Init(ownerRoom, gameDataManager_->GetStoreEntryTable()))
+      return false;
+   
    return true;
 }
 

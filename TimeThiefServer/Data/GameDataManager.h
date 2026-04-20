@@ -1,6 +1,7 @@
 ﻿#pragma once
 #include "Data/Tables/ZoneTable.h"
 #include "Tables/LootTableTypes.h"
+#include "Tables/StoreEntryTable.h"
 
 struct ServerConfig;
 
@@ -17,9 +18,11 @@ public:
    bool Init(const ServerConfig& config);
    const ZoneTable& GetZoneTable() const { return zoneTable_; }
    const LootTable& GetLootTable() const { return lootTable_; }
+   const StoreEntryTable& GetStoreEntryTable() const { return storeEntryTable_; }
    
 private:
-   ZoneTable zoneTable_;
-   LootTable lootTable_;
+   ZoneTable                  zoneTable_;
+   LootTable                  lootTable_;
+   StoreEntryTable            storeEntryTable_;
    
 };

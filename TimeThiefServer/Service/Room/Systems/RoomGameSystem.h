@@ -3,6 +3,7 @@
 #include "Loot/LootSystem.h"
 #include "Replication/ReplicationSystem.h"
 #include "Respawn/RespawnSystem.h"
+#include "Store/StoreSystem.h"
 #include "Zone/ZoneSystem.h"
 
 struct GameConfig;
@@ -42,6 +43,9 @@ public:
    LootSystem& GetLootSystem() { return lootSystem_; }
    const LootSystem& GetLootSystem() const { return lootSystem_; }
    
+   StoreSystem& GetStoreSystem() { return storeSystem_; }
+   const StoreSystem& GetStoreSystem() const { return storeSystem_; }
+   
 public:
    void OnPawnDeath(ObjectId pawnId);
    
@@ -54,5 +58,6 @@ private:
    ReplicationSystem       replicationSystem_{};
    DropSystem              dropSystem_{};
    LootSystem              lootSystem_{};
+   StoreSystem             storeSystem_{};
     
 };
