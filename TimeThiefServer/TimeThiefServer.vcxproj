@@ -451,6 +451,7 @@
     </ClCompile>
     <ClCompile Include="Service\Room\Systems\Respawn\RespawnSystem.cpp" />
     <ClCompile Include="Service\Room\Systems\RoomGameSystem.cpp" />
+    <ClCompile Include="Service\Room\Systems\Store\StoreSystem.cpp" />
     <ClCompile Include="Service\Room\Systems\Zone\ZoneSystem.cpp">
       <RuntimeLibrary>MultiThreadedDebugDll</RuntimeLibrary>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -628,6 +629,7 @@
     <ClInclude Include="Content\Gameplay\Drop\DropTypes.h" />
     <ClInclude Include="Content\Gameplay\Drop\IDropOwner.h" />
     <ClInclude Include="Content\Gameplay\Economy\IWalletOwner.h" />
+    <ClInclude Include="Content\Gameplay\Economy\StoreTypes.h" />
     <ClInclude Include="Content\Gameplay\Economy\WalletComponent.h" />
     <ClInclude Include="Content\Gameplay\Economy\WalletTypes.h" />
     <ClInclude Include="Content\Gameplay\Effects\EffectComponent.h" />
@@ -702,6 +704,7 @@
     <ClInclude Include="Service\Room\Systems\Replication\ReplicationSystem.h" />
     <ClInclude Include="Service\Room\Systems\Respawn\RespawnSystem.h" />
     <ClInclude Include="Service\Room\Systems\RoomGameSystem.h" />
+    <ClInclude Include="Service\Room\Systems\Store\StoreSystem.h" />
     <ClInclude Include="Service\Room\Systems\Zone\ZoneSystem.h" />
     <ClInclude Include="Service\Room\Systems\Zone\ZoneTypes.h" />
     <ClInclude Include="Service\Server\TimeThiefServerApp.h" />

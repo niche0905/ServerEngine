@@ -31,7 +31,7 @@ struct MoneyChangeContext
     MoneyChangeReason reason{MoneyChangeReason::Unknown};
 
     // 선택적 추적 정보
-    int32 relatedItemId{0};
+    uint32 relatedItemId{0};
     // ObjectId source; // 필요하면 공격자/몬스터 등
 };
 
