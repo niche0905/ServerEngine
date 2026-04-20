@@ -921,20 +921,21 @@ bool Room::HandleUseStore(PlayerId playerId, const se::game::C_UseStoreReq& pkt)
       if (!playerPawn)
          return false;
       
-      // TODO: 상점 이용 및 구매 처리 로직 (예: 구매 가능한 아이템 목록 전송, 아이템 구매 처리 등)
-      //       구매 결과에 따라 구매 성공 여부와 구매한 아이템 정보를 담은 패킷을 만들어서 useStoreResultBuffer에 세팅하기
-      //       아이템 뿐만 아니라 능력이나 아이템 강화도 처리해야 한다
-      //       추가적으로 변동되는 상태 (TimePoint 변화, 인벤토리 변화 등)가 있다면 그건 별도의 패킷으로 만들어서 세팅하기 (예: S_TimePointUpdate, S_InventoryUpdate 등)
-      bool purchaseSuccess = true;   // TEMP: 구매 성공 여부 (실제 로직에서는 구매 처리 결과에 따라 결정되어야 함)
+      StoreBuyRequest request;
+      request.playerId = playerPawn->GetId();
+      request.storeId = ObjectId{pkt.store_entity_id().value()};
+      request.entryId = pkt.store_item_id();
+      StoreBuyResult result = roomGameSystem_.GetStoreSystem().Buy(request);
       
       se::game::S_UseStoreRes res;
       {
-         res.set_success(purchaseSuccess);
+         res.set_success(result.success);
          
-         if (not purchaseSuccess) {
+         if (not result.success) {
             auto* resultPtr = res.mutable_result();
-            resultPtr->set_message("Failed to purchase item.");   
-            resultPtr->set_code(se::common::ERR_INSUFFICIENT_TIME_POINTS);    // 구매 실패 사유 (예: 아이템 부족, 인벤토리 공간 부족 등) 올바르게 적기
+            resultPtr->set_message("Failed to purchase item.");
+            resultPtr->set_code(se::common::ERR_INSUFFICIENT_TIME_POINTS);        // TODO: 구매 실패 사유 (예: 아이템 부족, 인벤토리 공간 부족 등) 올바르게 적기
+                                                                                       //       Protocol Enum 확장 필요
          }
       }
       
