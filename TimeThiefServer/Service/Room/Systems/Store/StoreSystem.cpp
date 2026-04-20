@@ -79,7 +79,11 @@ StoreBuyResult StoreSystem::ValidateBuyRequest(const StoreBuyRequest& req, Store
       result.resultCode = StoreBuyResultCode::InvalidStore;
       return result;
    }
-   // TODO: store가 상점이 맞는지 확인하는 로직 필요 (예: 특정 컴포넌트 존재 여부 혹은 EntityType 등)
+   
+   if (!store->IsStore()) {
+      result.resultCode = StoreBuyResultCode::InvalidStore;
+      return result;
+   }
    
    if (!storeEntryTable_->IsValidEntry(result.entryId)) {
       result.resultCode = StoreBuyResultCode::InvalidEntry;
