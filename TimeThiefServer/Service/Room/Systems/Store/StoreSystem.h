@@ -30,6 +30,8 @@ private:
    bool CanBuy(PlayerPawn* playerPawn) const;
    
 private:
+   bool CanPurchaseReward(PlayerPawn* playerPawn, const StoreEntryDef* entryDef) const;
+   
    bool TryApplyItemReward(const StoreBuyContext& ctx);
    bool TryApplySkillReward(const StoreBuyContext& ctx);
    bool TryApplyWeaponUpgradeReward(const StoreBuyContext& ctx);

@@ -16,7 +16,7 @@ public:
 public:
     virtual void Init(ObjectId owner);
    
-private:
+public:
     bool HasSkill(SkillId skillId) const;
     bool CanUnlockSkill(SkillId skillId) const;
     bool UnlockSkill(SkillId skillId);

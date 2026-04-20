@@ -5,6 +5,7 @@
 #include "Content/Gameplay/Inventory/IInventoryOwner.h"
 #include "Content/Gameplay/Inventory/InventoryComponent.h"
 #include "Content/Gameplay/Economy/WalletComponent.h"
+#include "Content/Gameplay/Skill/SkillComponent.h"
 #include "Content/Object/Actor/PlayerPawnState.h"
 
 class ObjectManager;
@@ -55,6 +56,9 @@ public:
     
     WalletComponent& GetWallet() { return wallet_; }
     const WalletComponent& GetWallet() const { return wallet_; }
+    
+    SkillComponent& GetSkill() { return skill_; }
+    const SkillComponent& GetSkill() const { return skill_; }
     
 public:
     virtual void Damaged(const DamageResult& dmgResult) override;
@@ -114,13 +118,14 @@ private:
     void StartDeadState(ObjectManager& om, const DamageResult& dmgResult);
     
 private:
-    PlayerId playerId_;
+    PlayerId                    playerId_;
     
-    float pitch_{0.0f};
+    float                       pitch_{0.0f};
     
-    InventoryComponent inventory_{};
-    WalletComponent wallet_{};
+    InventoryComponent          inventory_{};
+    WalletComponent             wallet_{};
+    SkillComponent              skill_{};
     
-    ActionState actionState_{};
+    ActionState                 actionState_{};
     
 };

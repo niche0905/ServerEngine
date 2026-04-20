@@ -119,6 +119,7 @@ void PlayerPawn::OnSpawn()
    wallet_.Init(GetId());     
    wallet_.SetBalanceUnsafe(CurrencyType::TimePoint, 1000);      // TEMP: 초기 재화 1000
                                                                         // TODO: 이 값 Config로 빼기
+   skill_.Init(GetId());
 }
 
 void PlayerPawn::OnPreDestroy()

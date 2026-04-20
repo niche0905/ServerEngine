@@ -33,9 +33,6 @@ StoreBuyResult StoreSystem::Buy(const StoreBuyRequest& req)
    if (!ownerRoom_)
       return result;
    
-   //       2. 상점 엔트리 찾기
-   //       5. 비용 계산
-   //       7. 아이템 지급
    StoreBuyContext ctx{};
    StoreBuyResult validateResult = ValidateBuyRequest(req, ctx);
    if (!validateResult.success)
@@ -106,7 +103,10 @@ StoreBuyResult StoreSystem::ValidateBuyRequest(const StoreBuyRequest& req, Store
       return result;
    }
    
-   // TODO: 구매 제한 체크 (구매 횟수)
+   if (!CanPurchaseReward(player, entryDef)) {
+      result.resultCode = StoreBuyResultCode::PurchaseLimitExceeded;
+      return result;
+   }
    
    ctx.playerPawn = player;
    ctx.storeActor = store;
@@ -131,7 +131,7 @@ bool StoreSystem::TryConsumeCost(StoreBuyContext& ctx)
 
 bool StoreSystem::TryApplyReward(StoreBuyContext& ctx)
 {
-   if (!ctx.playerPawn)
+   if (!ctx.playerPawn or !ctx.entryDef)
       return false;
    
    // TODO: 아이템 적용 필요 (아이템은 Inventory 추가, 스킬은 소유, 무기 강화, 스텟 강화 처리 등)
@@ -191,6 +191,31 @@ bool StoreSystem::CanBuy(PlayerPawn* playerPawn) const
    return true;
 }
 
+bool StoreSystem::CanPurchaseReward(PlayerPawn* playerPawn, const StoreEntryDef* entryDef) const
+{
+   if (!playerPawn or !entryDef)
+      return false;
+   
+   switch (entryDef->rewardType)
+   {
+   case StoreRewardType::Item:
+      return true;      // 아이템은 항상 구매 가능
+      
+   case StoreRewardType::Skill:
+      {
+         auto& skillComp = playerPawn->GetSkill();
+         return skillComp.CanUnlockSkill(entryDef->skillId);
+      }
+      
+   case StoreRewardType::WeaponUpgrade:
+      // TODO: Upgrade Comp 작성
+   case StoreRewardType::StatUpgrade:
+      
+   default:
+      return false;
+   }
+}
+
 bool StoreSystem::TryApplyItemReward(const StoreBuyContext& ctx)
 {
    return false;
@@ -198,7 +223,9 @@ bool StoreSystem::TryApplyItemReward(const StoreBuyContext& ctx)
 
 bool StoreSystem::TryApplySkillReward(const StoreBuyContext& ctx)
 {
-   return false;
+   SkillComponent& skillComp = ctx.playerPawn->GetSkill();
+   const StoreEntryDef* entryDef = ctx.entryDef;
+   return skillComp.UnlockSkill(entryDef->skillId);
 }
 
 bool StoreSystem::TryApplyWeaponUpgradeReward(const StoreBuyContext& ctx)
