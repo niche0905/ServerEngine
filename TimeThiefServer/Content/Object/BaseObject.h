@@ -42,12 +42,14 @@ public:
     void MarkReplicationDirty(ReplicationDirty dirtyFlag);
     
 public:
-    virtual se::common::ObjectType GetObjectType() const { return se::common::OBJ_NONE; }
+    virtual ObjectType GetObjectType() const { return ObjectType::OBJ_NONE; }
    
     bool IsPlayer() const { return GetObjectType() == ObjectType::OBJ_PLAYER; }
     bool IsMonster() const { return GetObjectType() == ObjectType::OBJ_MONSTER; }
     bool IsItem() const { return GetObjectType() == ObjectType::OBJ_ITEM; }
     bool IsProjectile() const { return GetObjectType() == ObjectType::OBJ_PROJECTILE; }
+    bool IsChest() const { return GetObjectType() == ObjectType::OBJ_CHEST; }
+    bool IsStore() const { return GetObjectType() == ObjectType::OBJ_STORE; }
     
 public:
     virtual void ForEachCollider(const std::function<void(ColliderComponent*)>& fn) const {}
