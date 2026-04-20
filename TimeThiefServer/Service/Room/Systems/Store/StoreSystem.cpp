@@ -68,13 +68,13 @@ StoreBuyResult StoreSystem::ValidateBuyRequest(const StoreBuyRequest& req, Store
    
    auto& om = ownerRoom_->GetObjectManager();
    
-   auto* player = ownerRoom_->GetObjectManager().FindAs<PlayerPawn>(req.playerId);
+   auto* player = om.FindAs<PlayerPawn>(req.playerId);
    if (!player) {
       result.resultCode = StoreBuyResultCode::InvalidPlayer;
       return result;
    }
    
-   auto* store = ownerRoom_->GetObjectManager().FindAs<Actor>(req.storeId);
+   auto* store = om.FindAs<Actor>(req.storeId);
    if (!store) {
       result.resultCode = StoreBuyResultCode::InvalidStore;
       return result;
