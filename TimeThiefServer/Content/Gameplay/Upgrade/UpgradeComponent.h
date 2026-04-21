@@ -31,7 +31,7 @@ public:
 // Util
 public:
    void Clear();
-   
+   const std::unordered_set<WeaponUpgradeCode>& GetAllWeaponUpgrades() const { return weaponUpgradeCodes_; }
    
 private:
    std::unordered_set<WeaponUpgradeCode>           weaponUpgradeCodes_;    // 플레이어가 획득한 무기 업그레이드 코드들의 집합

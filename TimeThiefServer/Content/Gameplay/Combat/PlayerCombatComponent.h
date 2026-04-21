@@ -41,6 +41,8 @@ public:
    uint8 GetCurrentWeaponIndex() const;
    uint32 GetCurrentWeaponId() const;
    
+   size_t GetWeaponSlotCount() const { return combatState_.slots.size(); }
+   
 protected:
    virtual bool ExecuteAttack(AttackRequest& request) override;
    

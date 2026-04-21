@@ -10,8 +10,8 @@ enum class UpgradeTargetType : uint8
 
 struct UpgradeTarget
 {
-    UpgradeTargetType       type = UpgradeTargetType::AllWeapons;
-    WeaponCategory          category = WeaponCategory::None;
+    // UpgradeTargetType       type = UpgradeTargetType::AllWeapons;
+    // WeaponCategory          category = WeaponCategory::None;
     uint32                  weaponId = 0;
 };
 
@@ -20,7 +20,7 @@ struct WeaponStatModifier
     int                     damageDelta = 0;
     int                     magCapacityDelta = 0;
     float                   fireIntervalSecDelta = 0.0f;
-    float                   reloadTimeDelta = 0.0f;
+    float                   reloadTimeSecDelta = 0.0f;
     float                   rangeDelta = 0.0f;
     
     int                     palletCountDelta = 0;
@@ -32,7 +32,6 @@ struct WeaponStatModifier
 
 struct WeaponUpgradeDef
 {
-    WeaponUpgradeCode       upgradeCode = 0;
     UpgradeTarget           target{};
     WeaponStatModifier      modifier{};
 };
