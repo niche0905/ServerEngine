@@ -1,4 +1,5 @@
 ﻿#pragma once
+#include "Data/Tables/WeaponTable.h"
 
 class Actor;
 
@@ -30,12 +31,24 @@ struct AttackRequest
     uint32 shotSeed = 0;   // 총알 발사 시의 랜덤 시드 (샷건 총알 궤적 계산 등에 활용)
 };
 
+struct WeaponStat
+{
+    WeaponCommonStat            common{};
+    WeaponExtraStat             extra;
+};
+
 struct WeaponState
 {
     uint32 weaponId = 0;
     int ammoInMag = 0;
-    int reserveAmmo = 0;    // TODO: 제거핮자 (탄은 무한)
     bool isReloading = false;
+};
+
+struct WeaponSlotState
+{
+    WeaponState         runtime{};
+    WeaponStat          stat{};
+    bool                dirty = true;
 };
 
 // TODO: WeaponConfig 추가하기 (아마 GameShared로 빼야할 듯)
@@ -45,8 +58,8 @@ struct WeaponState
 
 struct PlayerCombatState
 {
-    static constexpr size_t MaxWeaponSlots = 3;
+    static constexpr size_t kMaxWeaponSlots = 3;
     
-    std::array<WeaponState, MaxWeaponSlots> weapons{};
+    std::array<WeaponSlotState, kMaxWeaponSlots> slots{};
     uint8 currentWeaponSlot = 0;
 };

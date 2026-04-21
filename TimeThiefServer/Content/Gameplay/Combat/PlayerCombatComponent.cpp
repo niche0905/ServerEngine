@@ -21,7 +21,7 @@ namespace
         case 3:
             return 2;
         default:
-            return PlayerCombatState::MaxWeaponSlots;  // 유효하지 않은 슬롯 인덱스 반환
+            return PlayerCombatState::kMaxWeaponSlots;  // 유효하지 않은 슬롯 인덱스 반환
         }
     }
     
@@ -36,9 +36,33 @@ void PlayerCombatComponent::Init(BaseObject* owner)
     CombatComponent::Init(owner);
     
     // TEMP: 시작 무기 3개 초기화 예
-    combatState_.weapons[0] = WeaponState{ .weaponId = 1, .ammoInMag = 30, .reserveAmmo = 9999, .isReloading = false };
-    combatState_.weapons[1] = WeaponState{ .weaponId = 2, .ammoInMag = 8, .reserveAmmo = 25, .isReloading = false };
-    combatState_.weapons[2] = WeaponState{ .weaponId = 3, .ammoInMag = 1, .reserveAmmo = 10, .isReloading = false };
+    combatState_.slots[0] = WeaponSlotState{
+        WeaponState{1, 30, false},
+        WeaponStat{
+            WeaponCommonStat{WeaponCategory::Rifle, WeaponFireType::HitScan, 12, 30, 0.1f, 1.5f, 1000.0f},
+            WeaponExtraStat{RifleStat{}}
+        },
+        false
+    };
+    
+    combatState_.slots[1] = WeaponSlotState{
+        WeaponState{2, 8, false},
+        WeaponStat{
+            WeaponCommonStat{WeaponCategory::Shotgun, WeaponFireType::HitScan, 8, 8, 1.0f, 2.5f, 500.0f},
+            WeaponExtraStat{ShotgunStat{8, 30.0f}}
+        },
+        false
+    };
+    
+    combatState_.slots[2] = WeaponSlotState{
+        WeaponState{3, 1, false},
+        WeaponStat{
+            WeaponCommonStat{WeaponCategory::Launcher, WeaponFireType::Projectile, 80, 1, 1.5f, 3.0f, 800.0f},
+            WeaponExtraStat{LauncherStat{600.0f, 200.0f}}
+        },
+        false
+    };
+    
     combatState_.currentWeaponSlot = 0;
 }
 
@@ -63,14 +87,14 @@ bool PlayerCombatComponent::CanAttack(const AttackRequest& request) const
             if (!IsValidWeaponSlot(weaponSlot))
                 return false;
     
-            const WeaponState* weaponState = GetWeaponStateBySlot(weaponSlot);
-            if (!weaponState || weaponState->weaponId == 0)
+            const WeaponSlotState* weaponState = GetWeaponSlotByIndex(weaponSlot);
+            if (!weaponState || weaponState->runtime.weaponId == 0)
                 return false;   // 해당 슬롯에 무기가 없거나 유효하지 않은 무기
     
-            if (weaponState->isReloading)
+            if (weaponState->runtime.isReloading)
                 return false;   // 재장전 중인 무기는 공격할 수 없음
             
-            if (weaponState->ammoInMag <= 0)
+            if (weaponState->runtime.ammoInMag <= 0)
                 return false;   // 탄약이 없는 무기는 공격할 수 없음
         }
         break;
@@ -87,38 +111,34 @@ bool PlayerCombatComponent::CanAttack(const AttackRequest& request) const
 
 bool PlayerCombatComponent::TryReload()
 {
-    WeaponState* currentWeapon = GetCurrentWeaponState();
+    WeaponSlotState* currentWeapon = GetCurrentWeaponSlot();
     if (!currentWeapon)
         return false;
     
-    if (currentWeapon->isReloading)
+    if (currentWeapon->runtime.isReloading)
         return false;   // 이미 재장전 중인 경우
     
     constexpr int kTempMagazineCapacity = 30;   // TEMP: 모든 총의 탄창 용량을 30으로 가정
     
-    if (currentWeapon->ammoInMag >= kTempMagazineCapacity)
+    if (currentWeapon->runtime.ammoInMag >= kTempMagazineCapacity)
         return false;   // 탄창이 이미 가득 찬 경우
     
-    if (currentWeapon->reserveAmmo <= 0)
-        return false;   // 예비 탄약이 없는 경우
+    const int needAmmo = kTempMagazineCapacity - currentWeapon->runtime.ammoInMag;
+    const int reloadAmmo = needAmmo;
     
-    const int needAmmo = kTempMagazineCapacity - currentWeapon->ammoInMag;
-    const int reloadAmmo = std::min(needAmmo, currentWeapon->reserveAmmo);
-    
-    currentWeapon->ammoInMag += reloadAmmo;
-    currentWeapon->reserveAmmo -= reloadAmmo;
-    currentWeapon->isReloading = false;   // TODO: 실제 재장전 시간과 애니메이션이 필요하다면, 재장전 시작 시점에 true로 설정하고, 일정 시간 후에 false로 변경하는 로직 추가
+    currentWeapon->runtime.ammoInMag += reloadAmmo;
+    currentWeapon->runtime.isReloading = false;   // TODO: 실제 재장전 시간과 애니메이션이 필요하다면, 재장전 시작 시점에 true로 설정하고, 일정 시간 후에 false로 변경하는 로직 추가
     
     return true;
 }
 
 uint32 PlayerCombatComponent::GetHandWeaponId() const
 {
-    const WeaponState* currentWeapon = GetCurrentWeaponState();
+    const WeaponSlotState* currentWeapon = GetCurrentWeaponSlot();
     if (!currentWeapon)
         return 0;   // 현재 무기가 없는 경우 유효하지 않은 무기 ID 반환
     
-    return currentWeapon->weaponId;
+    return currentWeapon->runtime.weaponId;
 }
 
 bool PlayerCombatComponent::SwitchWeapon(uint32 newWeaponId)
@@ -127,62 +147,62 @@ bool PlayerCombatComponent::SwitchWeapon(uint32 newWeaponId)
     if (!IsValidWeaponSlot(newSlotIndex))
         return false;   // 유효하지 않은 슬롯 인덱스
     
-    const WeaponState* weaponState = GetWeaponState(newSlotIndex);
-    if (!weaponState || weaponState->weaponId == 0)
+    const WeaponSlotState* weaponState = GetWeaponSlotByIndex(newSlotIndex);
+    if (!weaponState || weaponState->runtime.weaponId == 0)
         return false;
     
     combatState_.currentWeaponSlot = newSlotIndex;
     return true;
 }
 
-const WeaponState* PlayerCombatComponent::GetCurrentWeaponState() const
+const WeaponSlotState* PlayerCombatComponent::GetCurrentWeaponSlot() const
 {
-    return GetWeaponStateBySlot(combatState_.currentWeaponSlot);
+    return GetWeaponSlotByIndex(combatState_.currentWeaponSlot);
 }
 
-WeaponState* PlayerCombatComponent::GetCurrentWeaponState()
+WeaponSlotState* PlayerCombatComponent::GetCurrentWeaponSlot()
 {
-    return GetWeaponStateBySlot(combatState_.currentWeaponSlot);
+    return GetWeaponSlotByIndex(combatState_.currentWeaponSlot);
 }
 
-const WeaponState* PlayerCombatComponent::GetWeaponState(uint32 weaponId) const
+const WeaponSlotState* PlayerCombatComponent::GetWeaponSlot(uint32 weaponId) const
 {
     const uint8 slotIndex = WeaponSlotFromWeaponId(weaponId);
     if (!IsValidWeaponSlot(slotIndex)) 
         return nullptr;
     
-    return &combatState_.weapons[slotIndex];
+    return &combatState_.slots[slotIndex];
 }
 
-WeaponState* PlayerCombatComponent::GetWeaponState(uint32 weaponId)
+WeaponSlotState* PlayerCombatComponent::GetWeaponSlot(uint32 weaponId)
 {
     const uint8 slotIndex = WeaponSlotFromWeaponId(weaponId);
     if (!IsValidWeaponSlot(slotIndex))
         return nullptr;
     
-    return &combatState_.weapons[slotIndex];
+    return &combatState_.slots[slotIndex];
 }
 
-const WeaponState* PlayerCombatComponent::GetWeaponStateBySlot(uint8 slotIndex) const
+const WeaponSlotState* PlayerCombatComponent::GetWeaponSlotByIndex(uint8 slotIndex) const
 {
     if (!IsValidWeaponSlot(slotIndex))
         return nullptr;    // 유효하지 않은 슬롯 인덱스
     
-    return &combatState_.weapons[slotIndex];
+    return &combatState_.slots[slotIndex];
 }
 
-WeaponState* PlayerCombatComponent::GetWeaponStateBySlot(uint8 slotIndex)
+WeaponSlotState* PlayerCombatComponent::GetWeaponSlotByIndex(uint8 slotIndex)
 {
     if (!IsValidWeaponSlot(slotIndex))
         return nullptr;    // 유효하지 않은 슬롯 인덱스
     
-    return &combatState_.weapons[slotIndex];
+    return &combatState_.slots[slotIndex];
 }
 
-uint8 PlayerCombatComponent::GetCurrentWeaponSlot() const
+uint8 PlayerCombatComponent::GetCurrentWeaponIndex() const
 {
     if (!IsValidWeaponSlot(combatState_.currentWeaponSlot))
-        return PlayerCombatState::MaxWeaponSlots;  // 유효하지 않은 슬롯 인덱스 반환
+        return PlayerCombatState::kMaxWeaponSlots;  // 유효하지 않은 슬롯 인덱스 반환
     
     return combatState_.currentWeaponSlot;
 }
@@ -192,7 +212,7 @@ uint32 PlayerCombatComponent::GetCurrentWeaponId() const
     if (!IsValidWeaponSlot(combatState_.currentWeaponSlot))
         return 0;   // 유효하지 않은 무기 ID 반환
     
-    return combatState_.weapons[combatState_.currentWeaponSlot].weaponId;
+    return combatState_.slots[combatState_.currentWeaponSlot].runtime.weaponId;
 }
 
 bool PlayerCombatComponent::ExecuteAttack(AttackRequest& request)
@@ -398,33 +418,33 @@ PlayerCombatComponent::PalletPattern PlayerCombatComponent::GeneratePalletPatter
 
 bool PlayerCombatComponent::IsValidWeaponSlot(uint8 slotIndex) const
 {
-    return slotIndex < combatState_.weapons.size();
+    return slotIndex < combatState_.slots.size();
 }
 
 bool PlayerCombatComponent::ConsumeAmmo(uint8 slotIndex, int amount)
 {
-    WeaponState* weaponState = GetWeaponStateBySlot(slotIndex);
+    WeaponSlotState* weaponState = GetWeaponSlotByIndex(slotIndex);
     if (!weaponState)
         return false;
     
-    if (weaponState->ammoInMag < amount)
+    if (weaponState->runtime.ammoInMag < amount)
         return false;
     
-    weaponState->ammoInMag -= amount;
+    weaponState->runtime.ammoInMag -= amount;
     return true;
 }
 
 bool PlayerCombatComponent::CanFireWeapon(uint8 slotIndex) const
 {
-    const WeaponState* weaponState = GetWeaponStateBySlot(slotIndex);
+    const WeaponSlotState* weaponState = GetWeaponSlotByIndex(slotIndex);
     if (!weaponState)
         return false;
     
-    if (weaponState->weaponId == 0)
+    if (weaponState->runtime.weaponId == 0)
         return false;
     
-    if (weaponState->isReloading)
+    if (weaponState->runtime.isReloading)
         return false;
     
-    return weaponState->ammoInMag > 0;
+    return weaponState->runtime.ammoInMag > 0;
 }

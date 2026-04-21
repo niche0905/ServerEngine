@@ -29,16 +29,16 @@ public:
    uint32 GetHandWeaponId() const;
    bool SwitchWeapon(uint32 newWeaponId);
    
-   const WeaponState* GetCurrentWeaponState() const;
-   WeaponState* GetCurrentWeaponState();
+   const WeaponSlotState* GetCurrentWeaponSlot() const;
+   WeaponSlotState* GetCurrentWeaponSlot();
    
-   const WeaponState* GetWeaponState(uint32 weaponId) const;
-   WeaponState* GetWeaponState(uint32 weaponId);
+   const WeaponSlotState* GetWeaponSlot(uint32 weaponId) const;
+   WeaponSlotState* GetWeaponSlot(uint32 weaponId);
    
-   const WeaponState* GetWeaponStateBySlot(uint8 slotIndex) const;
-   WeaponState* GetWeaponStateBySlot(uint8 slotIndex);
+   const WeaponSlotState* GetWeaponSlotByIndex(uint8 slotIndex) const;
+   WeaponSlotState* GetWeaponSlotByIndex(uint8 slotIndex);
    
-   uint8 GetCurrentWeaponSlot() const;
+   uint8 GetCurrentWeaponIndex() const;
    uint32 GetCurrentWeaponId() const;
    
 protected:

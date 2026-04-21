@@ -6,6 +6,7 @@
 
 class Room;
 struct ObjectId;
+class ColliderComponent;
 
 /*--------------
    BaseObject

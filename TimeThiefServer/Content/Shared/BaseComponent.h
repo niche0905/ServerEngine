@@ -1,10 +1,10 @@
 ﻿#pragma once
 #include "Content/Object/ObjectId.h"
-#include "Content/Object/ObjectManager.h"
 
 class Room;
 class BaseObject;
 struct ObjectId;
+class ObjectManager;
 
 /*-----------------
    BaseComponent
