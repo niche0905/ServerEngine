@@ -54,13 +54,9 @@ bool PlayerCombatComponent::CanAttack(const AttackRequest& request) const
         {
             if (request.weaponId == 0)
                 return false;   // 무기 ID가 0인 경우 유효하지 않음
-            
-            uint8 weaponSlot = WeaponSlotFromWeaponId(request.weaponId);
-            if (!IsValidWeaponSlot(weaponSlot))
-                return false;
     
-            const WeaponSlotState* weaponState = GetWeaponSlotByIndex(weaponSlot);
-            if (!weaponState || weaponState->runtime.weaponId == 0)
+            const WeaponSlotState* weaponState = GetCurrentWeaponSlot();
+            if (!weaponState || weaponState->runtime.weaponId == request.weaponId or weaponState->stat.common.fireType != WeaponFireType::HitScan)
                 return false;   // 해당 슬롯에 무기가 없거나 유효하지 않은 무기
     
             if (weaponState->runtime.isReloading)
@@ -72,9 +68,20 @@ bool PlayerCombatComponent::CanAttack(const AttackRequest& request) const
         break;
         
     case AttackType::Projectile:
-        // TODO: 발사체 공격에 대한 추가 조건이 있다면 여기에 작성
-        //       발사체(투사체)는 폭파 상황이 아닌 발사(던지는) 상황에서의 공격이고, 투사체 공격은 발사 시점에 탄약이 소비되고,
-        //       폭발 시점에는 해당 Object가 직접 Damage 처리를 하는 형태로 구현할 수 있을 것...
+        {
+            if (request.weaponId != 3)
+                return false;   // 무기 ID가 3이 아닌 경우 유효하지 않음
+            
+            const WeaponSlotState* weaponState = GetCurrentWeaponSlot();
+            if (!weaponState or weaponState->runtime.weaponId != request.weaponId or weaponState->stat.common.fireType != WeaponFireType::Projectile)
+                return false;   // 현재 무기가 발사체 무기가 아닌 경우
+            
+            if (weaponState->runtime.isReloading)
+                return false;   // 재장전 중인 무기는 공격할 수 없음
+            
+            if (weaponState->runtime.ammoInMag <= 0)
+                return false;   // 탄약이 없는 무기는 공격할 수 없음
+        }
         break;
     }
     
@@ -90,12 +97,11 @@ bool PlayerCombatComponent::TryReload()
     if (currentWeapon->runtime.isReloading)
         return false;   // 이미 재장전 중인 경우
     
-    constexpr int kTempMagazineCapacity = 30;   // TEMP: 모든 총의 탄창 용량을 30으로 가정
-    
-    if (currentWeapon->runtime.ammoInMag >= kTempMagazineCapacity)
+    const int magCapacity = currentWeapon->stat.common.magCapacity;
+    if (currentWeapon->runtime.ammoInMag >= magCapacity)
         return false;   // 탄창이 이미 가득 찬 경우
     
-    const int needAmmo = kTempMagazineCapacity - currentWeapon->runtime.ammoInMag;
+    const int needAmmo = magCapacity - currentWeapon->runtime.ammoInMag;
     const int reloadAmmo = needAmmo;
     
     currentWeapon->runtime.ammoInMag += reloadAmmo;
@@ -190,6 +196,18 @@ uint32 PlayerCombatComponent::GetCurrentWeaponId() const
 bool PlayerCombatComponent::ExecuteAttack(AttackRequest& request)
 {
     bool hit = false;
+    
+    const auto* currentWeapon = GetCurrentWeaponSlot();
+    if (!currentWeapon)
+        return false;   // 현재 무기가 없는 경우 공격할 수 없음
+    
+    if (request.weaponId == 0 or request.weaponId != currentWeapon->runtime.weaponId) {
+        consoleLogger->Log(Color::Red, L"PlayerCombatComp: Execcute Attack failed - Invalid weaponId in request (weaponId: %u, currentWeaponId: %u)\n", request.weaponId, currentWeapon->runtime.weaponId);
+        return false;   // 무기 ID가 0이거나 현재 무기와 일치하지 않는 경우 유효하지 않음
+    }
+    request.damage = currentWeapon->stat.common.damage;
+    request.range = currentWeapon->stat.common.range;
+    
     switch (request.type)
     {
     case AttackType::Melee:
@@ -201,17 +219,12 @@ bool PlayerCombatComponent::ExecuteAttack(AttackRequest& request)
             // TODO: 무기 ID Enum 값으로 변경...
             case 1:
                 {
-                    // TODO: 여기서 무기에 따른 데이터 처리하기 (예: 데미지, 사거리, 탄착 효과 등등)
-                    request.damage = 12;
-                    request.range = 1000.0f;
                     hit = FireRifle(request);
                 }
                 break;
                 
             case 2:
                 {
-                    request.damage = 4;
-                    request.range = 800.0f;
                     hit = FireShotgun(request);
                 }
                 break;
@@ -226,8 +239,6 @@ bool PlayerCombatComponent::ExecuteAttack(AttackRequest& request)
             // TODO: 무기 ID Enum 값으로 변경...
             case 3:
                 {
-                    request.damage = 80;
-                    request.range = 1500.0f;
                     FireLauncher(request);
                     hit = false;    // 발사체 공격의 경우 발사 시점에는 히트 판정이 없고, 투사체가 폭발할 때 히트 판정이 이루어지도록 구현할 예정이므로, 일단 여기서는 false로 설정
                 }
@@ -299,8 +310,18 @@ bool PlayerCombatComponent::FireRifle(const AttackRequest& request)
 
 bool PlayerCombatComponent::FireShotgun(const AttackRequest& request)
 {
-    constexpr int kPelletCount = 12;   // TEMP: 샷건이 한 발당 12개의 펠릿을 발사한다고 가정
-    constexpr float kSpread = 0.5f;
+    const auto* currentWeapon = GetCurrentWeaponSlot();
+    if (!currentWeapon)
+        return false;
+    if (currentWeapon->stat.common.category != WeaponCategory::Shotgun)
+        return false;   // 현재 무기가 샷건이 아닌 경우
+    
+    const auto* shotgun = std::get_if<ShotgunStat>(&currentWeapon->stat.extra);
+    if (!shotgun)
+        return false;   // 샷건 무기의 추가 정보가 없는 경우
+    
+    const int pelletCount = shotgun->pelletCount;
+    const float spread = shotgun->coneAngleDegrees;
     
     if (request.weaponId == 0 or request.weaponId != GetCurrentWeaponId() or request.weaponId == 2)
         return false;
@@ -310,11 +331,11 @@ bool PlayerCombatComponent::FireShotgun(const AttackRequest& request)
         return false;
     
     const SE::Math::Vector3 dir = request.direction.Normalized();
-    const float spreadAngle = SE::Math::Max(0.0f, kSpread);
+    const float spreadAngle = SE::Math::Max(0.0f, spread);
     
     bool hit = false;
-    PalletPattern pattern = GeneratePalletPattern(dir, kPelletCount, spreadAngle, request.shotSeed);
-    for (int i = 0; i < kPelletCount; ++i) { 
+    PalletPattern pattern = GeneratePalletPattern(dir, pelletCount, spreadAngle, request.shotSeed);
+    for (int i = 0; i < pelletCount; ++i) { 
         const SE::Math::Vector3& pelletDir = pattern.directions[i];
         SE::Physics::Ray ray(request.origin, pelletDir, request.range);
         
@@ -329,6 +350,19 @@ bool PlayerCombatComponent::FireShotgun(const AttackRequest& request)
 
 void PlayerCombatComponent::FireLauncher(const AttackRequest& request)
 {
+    const auto* currentWeapon = GetCurrentWeaponSlot();
+    if (!currentWeapon)
+        return;
+    if (currentWeapon->stat.common.category != WeaponCategory::Launcher)
+        return;
+    
+    const auto* launcher = std::get_if<LauncherStat>(&currentWeapon->stat.extra);
+    if (!launcher)
+        return;   // 런처 무기의 추가 정보가 없는 경우
+    
+    const float projectileSpeed = launcher->projectileSpeed;
+    const float explosionRadius = launcher->explosionRadius;
+    
     // TEMP: 무기 ID가 3이면서 현재 무기와 일치하는 경우에만 발사 가능하도록 간단히 구현 (나중에 Weapon Data로 관리하기)
     if (request.weaponId == 0 or request.weaponId != GetCurrentWeaponId() or request.weaponId != 3)
         return;
@@ -348,8 +382,7 @@ void PlayerCombatComponent::FireLauncher(const AttackRequest& request)
     const SE::Math::Vector3 spawnPos = request.origin;
     const SE::Math::Vector3 spawnDir = request.direction.Normalized();
     
-    // TEMP: 발사체 속도 5m/s, 수명 10초, 충돌체 구의 반지름 20cm로 가정 (나중에 무기 데이터로 관리하기)
-    room->LaunchRocket(spawnDir, spawnDir, ownerPawn, request.damage, 500.0f, 10000, 20.0f);
+    room->LaunchRocket(spawnDir, spawnDir, ownerPawn, request.damage, projectileSpeed, 10000, explosionRadius);
 }
 
 PlayerCombatComponent::PalletPattern PlayerCombatComponent::GeneratePalletPattern(const SE::Math::Vector3& forwardDir,

@@ -50,11 +50,11 @@ bool GameDataManager::Init(const ServerConfig& config)
    };
    weaponTable_.tables[2] = {
       WeaponCommonStat{WeaponCategory::Shotgun, WeaponFireType::HitScan, 8, 8, 1.0f, 2.5f, 500.0f},
-      ShotgunStat{8, 30.0f}
+      ShotgunStat{12, 0.5f}
    };
    weaponTable_.tables[3] = {
       WeaponCommonStat{WeaponCategory::Launcher, WeaponFireType::Projectile, 80, 1, 1.5f, 3.0f, 800.0f},
-      LauncherStat{600.0f, 200.0f}
+      LauncherStat{500.0f, 20.0f}
    };
    
    return true;
