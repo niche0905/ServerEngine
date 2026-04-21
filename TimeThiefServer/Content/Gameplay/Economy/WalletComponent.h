@@ -33,7 +33,7 @@ public:
       return GetBalance(currency) >= amount;
    }
    
-   MoneyChangeResult AddMoney(ObjectManager& om, CurrencyType currency, CurrencyAmount amount, const MoneyChangeContext& ctx)
+   MoneyChangeResult AddMoney(CurrencyType currency, CurrencyAmount amount, const MoneyChangeContext& ctx)
    {
       MoneyChangeResult result{};
       result.currency = currency;
@@ -54,7 +54,7 @@ public:
       return result;
    }
    
-   MoneyChangeResult SpendMoney(ObjectManager& om, CurrencyType currency, CurrencyAmount amount, const MoneyChangeContext& ctx)
+   MoneyChangeResult SpendMoney(CurrencyType currency, CurrencyAmount amount, const MoneyChangeContext& ctx)
    {
       MoneyChangeResult result{};
       result.currency = currency;

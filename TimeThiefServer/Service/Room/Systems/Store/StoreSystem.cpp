@@ -124,7 +124,7 @@ bool StoreSystem::TryConsumeCost(StoreBuyContext& ctx)
       return false;
    
    auto& walletComp = ctx.playerPawn->GetWallet();
-   MoneyChangeResult result = walletComp.SpendMoney(ownerRoom_->GetObjectManager(), CurrencyType::TimePoint, ctx.entryDef->cost, MoneyChangeContext{MoneyChangeReason::Purchase, ctx.entryId});
+   MoneyChangeResult result = walletComp.SpendMoney(CurrencyType::TimePoint, ctx.entryDef->cost, MoneyChangeContext{MoneyChangeReason::Purchase, ctx.entryId});
    
    return result.accepted;
 }

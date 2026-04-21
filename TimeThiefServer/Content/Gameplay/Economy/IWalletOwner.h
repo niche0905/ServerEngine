@@ -18,13 +18,11 @@ public:
     virtual CurrencyAmount GetBalance(CurrencyType currency) const = 0;
     virtual bool CanSpend(CurrencyType currency, CurrencyAmount amount) const = 0;
 
-    virtual MoneyChangeResult AddMoney(ObjectManager& om,
-                                       CurrencyType currency,
+    virtual MoneyChangeResult AddMoney(CurrencyType currency,
                                        CurrencyAmount amount,
                                        const MoneyChangeContext& ctx) = 0;
 
-    virtual MoneyChangeResult SpendMoney(ObjectManager& om,
-                                         CurrencyType currency,
+    virtual MoneyChangeResult SpendMoney(CurrencyType currency,
                                          CurrencyAmount amount,
                                          const MoneyChangeContext& ctx) = 0;
 };
