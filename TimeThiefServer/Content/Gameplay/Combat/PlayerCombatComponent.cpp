@@ -3,6 +3,7 @@
 #include "Content/Object/Actor/Actor.h"
 #include "IDamageable.h"
 #include "Content/Object/Actor/Pawn.h"
+#include "Content/Object/Actor/PlayerPawn.h"
 #include "Physics/Ray/Ray.h"
 #include "Physics/Ray/RaycastHit.h"
 #include "Service/Room/Room.h"
@@ -34,35 +35,6 @@ namespace
 void PlayerCombatComponent::Init(BaseObject* owner)
 {
     CombatComponent::Init(owner);
-    
-    // TEMP: 시작 무기 3개 초기화 예
-    combatState_.slots[0] = WeaponSlotState{
-        WeaponState{1, 30, false},
-        WeaponStat{
-            WeaponCommonStat{WeaponCategory::Rifle, WeaponFireType::HitScan, 12, 30, 0.1f, 1.5f, 1000.0f},
-            WeaponExtraStat{RifleStat{}}
-        },
-        false
-    };
-    
-    combatState_.slots[1] = WeaponSlotState{
-        WeaponState{2, 8, false},
-        WeaponStat{
-            WeaponCommonStat{WeaponCategory::Shotgun, WeaponFireType::HitScan, 8, 8, 1.0f, 2.5f, 500.0f},
-            WeaponExtraStat{ShotgunStat{8, 30.0f}}
-        },
-        false
-    };
-    
-    combatState_.slots[2] = WeaponSlotState{
-        WeaponState{3, 1, false},
-        WeaponStat{
-            WeaponCommonStat{WeaponCategory::Launcher, WeaponFireType::Projectile, 80, 1, 1.5f, 3.0f, 800.0f},
-            WeaponExtraStat{LauncherStat{600.0f, 200.0f}}
-        },
-        false
-    };
-    
     combatState_.currentWeaponSlot = 0;
 }
 

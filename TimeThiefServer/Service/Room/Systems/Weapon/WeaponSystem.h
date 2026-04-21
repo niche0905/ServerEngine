@@ -1,6 +1,7 @@
 ﻿#pragma once
 #include "Data/Tables/UpgradeTable.h"
 
+struct WeaponSlotState;
 class PlayerPawn;
 struct WeaponStat;
 struct WeaponTable;
@@ -21,6 +22,8 @@ public:
    bool Init(Room* ownerRoom, const WeaponTable& weaponTable, const UpgradeTable& upgradeTable);
    
    const WeaponStat* GetBaseWeaponStat(uint32 weaponId) const;
+   
+   bool CreateInitialWeaponSlot(PlayerPawn* player,uint32 weaponId, WeaponSlotState& outSlot) const;
    
    bool BuildFinalWeaponStat(PlayerPawn* player, uint32 weaponId, WeaponStat& outStat) const;
    

@@ -25,7 +25,26 @@ const WeaponStat* WeaponSystem::GetBaseWeaponStat(uint32 weaponId) const
    return weaponTable_ ? weaponTable_->GetWeaponStat(weaponId) : nullptr;
 }
 
-bool WeaponSystem::BuildFinalWeaponStat(PlayerPawn*player, uint32 weaponId, WeaponStat& outStat) const
+bool WeaponSystem::CreateInitialWeaponSlot(PlayerPawn* player, uint32 weaponId, WeaponSlotState& outSlot) const
+{
+   if (!player or !weaponTable_)
+      return false;
+   
+   WeaponStat finalStat;
+   if (!BuildFinalWeaponStat(player, weaponId, finalStat))
+      return false;
+   
+   outSlot.runtime.weaponId = weaponId;
+   outSlot.runtime.ammoInMag = finalStat.common.magCapacity;
+   outSlot.runtime.isReloading = false;
+   
+   outSlot.stat = finalStat;
+   outSlot.dirty = false;
+   
+   return true;
+}
+
+bool WeaponSystem::BuildFinalWeaponStat(PlayerPawn* player, uint32 weaponId, WeaponStat& outStat) const
 {
    const WeaponStat* base = GetBaseWeaponStat(weaponId);
    if (!base or !player)

@@ -137,6 +137,8 @@ void PlayerPawn::OnSpawn()
                                                                         // TODO: 이 값 Config로 빼기
    skill_.Init(this);
    upgrade_.Init(this);
+   
+   InitDefaultLoadout();
 }
 
 void PlayerPawn::OnPreDestroy()
@@ -166,4 +168,16 @@ void PlayerPawn::StartDeadState(ObjectManager& om, const DamageResult& dmgResult
    // (om, drops);
 }
 
-
+void PlayerPawn::InitDefaultLoadout()
+{
+   auto room = GetRoom();
+   auto* playerCombat = GetPlayerCombat();
+   if (!room or !playerCombat)
+      return;
+   
+   auto& weaponSystem = room->GetRoomGameSystem().GetWeaponSystem();
+   
+   weaponSystem.CreateInitialWeaponSlot(this, 1, *playerCombat->GetWeaponSlot(1));
+   weaponSystem.CreateInitialWeaponSlot(this, 2, *playerCombat->GetWeaponSlot(2));
+   weaponSystem.CreateInitialWeaponSlot(this, 3, *playerCombat->GetWeaponSlot(3));
+}

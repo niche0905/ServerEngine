@@ -134,6 +134,9 @@ private:
     void StartDeadState(ObjectManager& om, const DamageResult& dmgResult);
     
 private:
+    void InitDefaultLoadout();
+    
+private:
     PlayerId                    playerId_;
     
     float                       pitch_{0.0f};
