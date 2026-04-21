@@ -18,30 +18,24 @@ enum class AttackType
 
 struct AttackRequest
 {
-    AttackType type = AttackType::None;
-    Actor* instigator = nullptr;   // 공격을 가한 Actor (공격자)
+    AttackType          type = AttackType::None;
+    Actor*              instigator = nullptr;   // 공격을 가한 Actor (공격자)
    
-    SE::Math::Vector3 origin{};
-    SE::Math::Vector3 direction{};
+    SE::Math::Vector3   origin{};
+    SE::Math::Vector3   direction{};
    
-    float range = 0.0f;
-    int32 damage = 0;   // 공격이 가할 피해량 (향후 무기 시스템이 구현되면 활용)
+    float               range = 0.0f;
+    int32               damage = 0;   // 공격이 가할 피해량 (향후 무기 시스템이 구현되면 활용)
     
-    uint32 weaponId = 0;   // 공격에 사용된 무기의 ID (향후 무기 시스템이 구현되면 활용)
-    uint32 shotSeed = 0;   // 총알 발사 시의 랜덤 시드 (샷건 총알 궤적 계산 등에 활용)
-};
-
-struct WeaponStat
-{
-    WeaponCommonStat            common{};
-    WeaponExtraStat             extra;
+    uint32              weaponId = 0;   // 공격에 사용된 무기의 ID (향후 무기 시스템이 구현되면 활용)
+    uint32              shotSeed = 0;   // 총알 발사 시의 랜덤 시드 (샷건 총알 궤적 계산 등에 활용)
 };
 
 struct WeaponState
 {
-    uint32 weaponId = 0;
-    int ammoInMag = 0;
-    bool isReloading = false;
+    uint32              weaponId = 0;
+    int                 ammoInMag = 0;
+    bool                isReloading = false;
 };
 
 struct WeaponSlotState

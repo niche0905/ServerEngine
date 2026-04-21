@@ -45,4 +45,28 @@ struct LauncherStat
     float                       explosionRadius = 0.0f;
 };
 
-using WeaponExtraStat = std::variant<RifleStat, ShotgunStat, LauncherStat>;
+using WeaponExtraStat = std::variant<std::monostate, RifleStat, ShotgunStat, LauncherStat>;
+
+struct WeaponStat
+{
+    WeaponCommonStat            common{};
+    WeaponExtraStat             extra;
+};
+
+struct WeaponTable
+{
+    using WeaponId = uint32;
+    
+    std::unordered_map<WeaponId, WeaponStat> tables;
+    
+    const WeaponStat* GetWeaponStat(WeaponId id) const
+    {
+        auto it = tables.find(id);
+        if (it != tables.end()) {
+            return &it->second;
+        }
+        
+        return nullptr;
+    }
+    
+};
