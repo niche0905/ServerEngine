@@ -455,6 +455,7 @@
     <ClCompile Include="Service\Room\Systems\Respawn\RespawnSystem.cpp" />
     <ClCompile Include="Service\Room\Systems\RoomGameSystem.cpp" />
     <ClCompile Include="Service\Room\Systems\Store\StoreSystem.cpp" />
+    <ClCompile Include="Service\Room\Systems\Weapon\WeaponSystem.cpp" />
     <ClCompile Include="Service\Room\Systems\Zone\ZoneSystem.cpp">
       <RuntimeLibrary>MultiThreadedDebugDll</RuntimeLibrary>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -712,6 +713,7 @@
     <ClInclude Include="Service\Room\Systems\Respawn\RespawnSystem.h" />
     <ClInclude Include="Service\Room\Systems\RoomGameSystem.h" />
     <ClInclude Include="Service\Room\Systems\Store\StoreSystem.h" />
+    <ClInclude Include="Service\Room\Systems\Weapon\WeaponSystem.h" />
     <ClInclude Include="Service\Room\Systems\Zone\ZoneSystem.h" />
     <ClInclude Include="Service\Room\Systems\Zone\ZoneTypes.h" />
     <ClInclude Include="Service\Server\TimeThiefServerApp.h" />
