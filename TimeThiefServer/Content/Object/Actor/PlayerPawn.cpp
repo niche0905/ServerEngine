@@ -70,19 +70,19 @@ LootBundle PlayerPawn::GenerateDrops()
    return bundle;
 }
 
-InventoryOpResult PlayerPawn::AddItem(ObjectManager& om, ItemId itemId, int32 count, const ItemChangeContext& ctx)
+InventoryOpResult PlayerPawn::AddItem(ItemId itemId, int32 count, const ItemChangeContext& ctx)
 {
-   return inventory_.AddItem(om, itemId, count, ctx);
+   return inventory_.AddItem(itemId, count, ctx);
 }
 
-InventoryOpResult PlayerPawn::RemoveItem(ObjectManager& om, ItemId itemId, int32 count, const ItemChangeContext& ctx)
+InventoryOpResult PlayerPawn::RemoveItem(ItemId itemId, int32 count, const ItemChangeContext& ctx)
 {
-   return inventory_.RemoveItem(om, itemId, count, ctx);
+   return inventory_.RemoveItem(itemId, count, ctx);
 }
 
-InventoryOpResult PlayerPawn::ConsumeItem(ObjectManager& om, ItemId itemId, int32 count, const ItemChangeContext& ctx)
+InventoryOpResult PlayerPawn::ConsumeItem(ItemId itemId, int32 count, const ItemChangeContext& ctx)
 {
-   return inventory_.ConsumeItem(om, itemId, count, ctx);
+   return inventory_.ConsumeItem(itemId, count, ctx);
 }
 
 MoneyChangeResult PlayerPawn::AddMoney(CurrencyType currency, CurrencyAmount amount,

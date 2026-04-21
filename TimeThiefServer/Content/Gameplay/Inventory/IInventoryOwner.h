@@ -20,9 +20,9 @@ public:
 
     virtual int32 GetItemCount(ItemId itemId) const = 0;
 
-    virtual InventoryOpResult AddItem(ObjectManager& om, ItemId itemId, int32 count, const ItemChangeContext& ctx) = 0;
-    virtual InventoryOpResult RemoveItem(ObjectManager& om, ItemId itemId, int32 count, const ItemChangeContext& ctx) = 0;
+    virtual InventoryOpResult AddItem(ItemId itemId, int32 count, const ItemChangeContext& ctx) = 0;
+    virtual InventoryOpResult RemoveItem(ItemId itemId, int32 count, const ItemChangeContext& ctx) = 0;
 
     // 소비(=Remove의 의미 확정 버전)
-    virtual InventoryOpResult ConsumeItem(ObjectManager& om, ItemId itemId, int32 count, const ItemChangeContext& ctx) = 0;
+    virtual InventoryOpResult ConsumeItem(ItemId itemId, int32 count, const ItemChangeContext& ctx) = 0;
 };

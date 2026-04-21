@@ -78,9 +78,9 @@ public:
 
     virtual int32 GetItemCount(ItemId itemId) const override { return inventory_.GetItemCount(itemId); }
 
-    virtual InventoryOpResult AddItem(ObjectManager& om, ItemId itemId, int32 count, const ItemChangeContext& ctx) override;
-    virtual InventoryOpResult RemoveItem(ObjectManager& om, ItemId itemId, int32 count, const ItemChangeContext& ctx) override;
-    virtual InventoryOpResult ConsumeItem(ObjectManager& om, ItemId itemId, int32 count, const ItemChangeContext& ctx) override;
+    virtual InventoryOpResult AddItem(ItemId itemId, int32 count, const ItemChangeContext& ctx) override;
+    virtual InventoryOpResult RemoveItem(ItemId itemId, int32 count, const ItemChangeContext& ctx) override;
+    virtual InventoryOpResult ConsumeItem(ItemId itemId, int32 count, const ItemChangeContext& ctx) override;
     
 // IWalletOwner
 public:

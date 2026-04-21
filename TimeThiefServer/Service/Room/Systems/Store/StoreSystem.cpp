@@ -227,7 +227,7 @@ bool StoreSystem::TryApplyItemReward(const StoreBuyContext& ctx)
    InventoryComponent& inventoryComp = ctx.playerPawn->GetInventory();
    const StoreEntryDef* entryDef = ctx.entryDef;
    ItemChangeContext changeCtx{ ItemChangeReason::Purchase, ctx.entryId };
-   InventoryOpResult result = inventoryComp.AddItem(ownerRoom_->GetObjectManager(), entryDef->itemId, entryDef->itemCount, changeCtx);
+   InventoryOpResult result = inventoryComp.AddItem(entryDef->itemId, entryDef->itemCount, changeCtx);
    return result.accepted;
 }
 

@@ -66,7 +66,7 @@ public:
       return GetItemCount(itemId) >= count;
    }
    
-   InventoryOpResult AddItem(ObjectManager& om, ItemId itemId, int32 count, const ItemChangeContext& ctx)
+   InventoryOpResult AddItem(ItemId itemId, int32 count, const ItemChangeContext& ctx)
    {
       InventoryOpResult result;
       if (itemId == 0) { result.code = InventoryOpCode::InvalidItem; return result; }
@@ -103,7 +103,7 @@ public:
       return result;
    }
    
-   InventoryOpResult RemoveItem(ObjectManager& om, ItemId itemId, int32 count, const ItemChangeContext& ctx)
+   InventoryOpResult RemoveItem(ItemId itemId, int32 count, const ItemChangeContext& ctx)
    {
       InventoryOpResult result;
       if (itemId == 0) { result.code = InventoryOpCode::InvalidItem; return result; }
@@ -136,12 +136,12 @@ public:
       return result;
    }
    
-   InventoryOpResult ConsumeItem(ObjectManager& om, ItemId itemId, int32 count, const ItemChangeContext& ctx)
+   InventoryOpResult ConsumeItem(ItemId itemId, int32 count, const ItemChangeContext& ctx)
    {
-      return RemoveItem(om, itemId, count, ctx);
+      return RemoveItem(itemId, count, ctx);
    }
    
-   InventoryOpResult RemoveItemSlot(ObjectManager& om, int32 slotIndex, int32 count, const ItemChangeContext& ctx)
+   InventoryOpResult RemoveItemSlot(int32 slotIndex, int32 count, const ItemChangeContext& ctx)
    {
       InventoryOpResult result;
       if (slotIndex < 0 or slotIndex >= capacity_) { result.code = InventoryOpCode::InvalidItem; return result; }
