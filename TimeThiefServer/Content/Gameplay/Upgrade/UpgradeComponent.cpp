@@ -5,7 +5,7 @@
    UpgradeComponent
 --------------------*/
 
-void UpgradeComponent::Init(ObjectId owner)
+void UpgradeComponent::Init(BaseObject* owner)
 {
    SetOwner(owner);
    Clear();

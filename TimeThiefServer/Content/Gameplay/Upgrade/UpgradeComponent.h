@@ -17,7 +17,7 @@ using StatUpgradeCode = uint32;
 class UpgradeComponent : public BaseComponent
 {
 public:
-   virtual void Init(ObjectId owner);
+   virtual void Init(BaseObject* owner);
    
 // Weapon
 public:

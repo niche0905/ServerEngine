@@ -14,7 +14,7 @@ public:
     static constexpr int32 kMaxActiveSkills = 2;   // 플레이어가 동시에 장착할 수 있는 스킬 개수
     
 public:
-    virtual void Init(ObjectId owner);
+    virtual void Init(BaseObject* owner);
    
 public:
     bool HasSkill(SkillId skillId) const;

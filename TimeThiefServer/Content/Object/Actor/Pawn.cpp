@@ -147,9 +147,9 @@ void Pawn::OnSpawn()
 {
    Actor::OnSpawn();
    
-   health_.Init(GetId(), 100);
-   cooldowns_.Init(GetId());
-   effects_.Init(GetId());
+   health_.Init(this, 100);
+   cooldowns_.Init(this);
+   effects_.Init(this);
    
    isDead_ = false;
    velocity_ = Vector3{};

@@ -20,7 +20,7 @@ void ChestActor::OnSpawn()
 {
     StaticActor::OnSpawn();
     
-    lootSource_.Init(GetId(), 1);       // TEMP: LootSourceComponent의 tableId는 1로 고정
+    lootSource_.Init(this, 1);       // TEMP: LootSourceComponent의 tableId는 1로 고정
 }
 
 void ChestActor::OnPreDestroy()

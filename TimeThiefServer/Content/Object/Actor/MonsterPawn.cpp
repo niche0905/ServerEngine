@@ -30,8 +30,8 @@ void MonsterPawn::OnSpawn()
 {
    Pawn::OnSpawn();
 
-   respawn_.Init(GetId(), RespawnPolicy{});
-   loot_.Init(GetId(), 1);    // TEMP: LootSourceComponent의 tableId는 1로 고정
+   respawn_.Init(this, RespawnPolicy{});
+   loot_.Init(this, 1);    // TEMP: LootSourceComponent의 tableId는 1로 고정
    // TODO: AI 컴포넌트 초기화 (BT 트리 로드)
    // ai_.Initialize(this, objectManager_, "path...");
    

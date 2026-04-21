@@ -1,11 +1,12 @@
 ﻿#include "pch.h"
 #include "SkillComponent.h"
+#include "Content/Object/Actor/PlayerPawn.h"
 
 /*-------------------
    SkillComponent
 -------------------*/
 
-void SkillComponent::Init(ObjectId owner)
+void SkillComponent::Init(BaseObject* owner)
 {
    SetOwner(owner);
    

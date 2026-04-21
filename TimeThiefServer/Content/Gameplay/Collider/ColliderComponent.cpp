@@ -8,11 +8,11 @@
    ColliderComponent
 ---------------------*/
 
-void ColliderComponent::Init(ObjectId owner, Actor* ownerActor, ColliderRole role,
+void ColliderComponent::Init(BaseObject* owner, ColliderRole role,
     std::unique_ptr<SE::Physics::Collider> collider)
 {
     SetOwner(owner);
-    SetOwnerActor(ownerActor);
+    SetOwnerActor(static_cast<Actor*>(owner));
     SetRole(role);
     SetCollider(std::move(collider));
 }

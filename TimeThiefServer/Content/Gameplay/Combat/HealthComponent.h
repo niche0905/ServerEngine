@@ -16,7 +16,7 @@ class ObjectManager;
 class HealthComponent : public BaseComponent
 {
 public:
-    void Init(ObjectId owner, int32 maxHp, int32 startHp = -1)
+    void Init(BaseObject* owner, int32 maxHp, int32 startHp = -1)
     {
         SetOwner(owner);
         

@@ -44,7 +44,7 @@ void ProjectileActor::Init(ObjectId ownerId, const Vector3& startPos, const Vect
     {
         auto collider = std::make_unique<ColliderComponent>();
         auto sphereCollider = std::make_unique<SE::Physics::SphereCollider>(SE::Math::Vector3{0.0f, 0.0f, 0.0f}, radius);
-        collider->Init(GetId(), this, ColliderRole::Hitbox, std::move(sphereCollider));
+        collider->Init(this, ColliderRole::Hitbox, std::move(sphereCollider));
         
         colliders_.push_back(std::move(collider));
     }

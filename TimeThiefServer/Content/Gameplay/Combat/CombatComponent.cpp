@@ -6,20 +6,15 @@
    CombatComponent
 -------------------*/
 
-void CombatComponent::Init(ObjectId owner, Pawn* ownerPawn)
+void CombatComponent::Init(BaseObject* owner)
 {
    SetOwner(owner);
-   SetOwnerPawn(ownerPawn);
+   SetOwnerPawn(static_cast<Pawn*>(owner));
 }
 
 void CombatComponent::SetOwnerPawn(Pawn* pawn)
 {
    ownerPawn_ = pawn;
-   if (ownerPawn_) {
-      if (ownerPawn_->GetId() != GetOwner()) {
-         consoleLogger->Log(Color::Red, L"[CombatComponent] SetOwnerPawn: Owner ID mismatch (Owner: %u, Pawn's Owner: %u)\n", GetOwner().value, ownerPawn_->GetId().value);
-      }
-   }
 }
 
 Pawn* CombatComponent::GetOwnerPawn() const

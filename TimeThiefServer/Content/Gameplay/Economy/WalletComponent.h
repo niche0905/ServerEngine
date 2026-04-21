@@ -16,7 +16,7 @@ class ObjectManager;
 class WalletComponent : public BaseComponent
 {
 public:
-   void Init(ObjectId owner)
+   void Init(BaseObject* owner)
    {
       SetOwner(owner);
    }

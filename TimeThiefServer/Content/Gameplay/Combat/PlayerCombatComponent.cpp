@@ -31,9 +31,9 @@ namespace
    PlayerCombatComponent
 -------------------------*/
 
-void PlayerCombatComponent::Init(ObjectId owner, Pawn* ownerPawn)
+void PlayerCombatComponent::Init(BaseObject* owner)
 {
-    CombatComponent::Init(owner, ownerPawn);
+    CombatComponent::Init(owner);
     
     // TEMP: 시작 무기 3개 초기화 예
     combatState_.weapons[0] = WeaponState{ .weaponId = 1, .ammoInMag = 30, .reserveAmmo = 9999, .isReloading = false };

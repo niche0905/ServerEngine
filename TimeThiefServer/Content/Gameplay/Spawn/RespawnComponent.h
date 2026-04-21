@@ -21,7 +21,7 @@ public:
     using Vector3 = SE::Math::Vector3;
     
 public:
-    void Init(ObjectId owner, const RespawnPolicy& policy)
+    void Init(BaseObject* owner, const RespawnPolicy& policy)
     {
         SetOwner(owner);
         

@@ -16,7 +16,7 @@ struct ItemStack;
 class InventoryComponent : public BaseComponent
 {
 public:
-   void Init(ObjectId owner, int32 capacity)
+   void Init(BaseObject* owner, int32 capacity)
    {
       SetOwner(owner);
       

@@ -275,6 +275,7 @@
     <ClCompile Include="Content\Object\Actor\SubProjectile\RocketActor.cpp" />
     <ClCompile Include="Content\Object\Actor\WorldItemActor.cpp" />
     <ClCompile Include="Content\Object\BaseObject.cpp" />
+    <ClCompile Include="Content\Shared\BaseComponent.cpp" />
     <ClCompile Include="Data\GameDataManager.cpp" />
     <ClCompile Include="Data\Loader\ServerMapLoader.cpp" />
     <ClCompile Include="Data\Loader\ServerMapLoaderTest.cpp" />

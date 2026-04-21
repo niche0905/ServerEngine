@@ -103,24 +103,24 @@ void PlayerPawn::OnSpawn()
    
    combat_ = std::make_unique<PlayerCombatComponent>();
    if (combat_)
-      combat_->Init(GetId(), this);
+      combat_->Init(this);
    
    // TEMP
    {
       auto bodyCollider = std::make_unique<ColliderComponent>();
       auto capsuleCollider = std::make_unique<SE::Physics::CharacterCapsuleCollider>(SE::Math::Vector3{0.0f, 0.0f, -90.0f}, 180.0f, 35.0f);
-      bodyCollider->Init(GetId(), this, ColliderRole::Hurtbox, std::move(capsuleCollider));
+      bodyCollider->Init(this, ColliderRole::Hurtbox, std::move(capsuleCollider));
       
       colliders_.push_back(std::move(bodyCollider));
    }
    
-   respawn_.Init(GetId(), RespawnPolicy{});
-   inventory_.Init(GetId(), 20);
-   wallet_.Init(GetId());     
+   respawn_.Init(this, RespawnPolicy{});
+   inventory_.Init(this, 20);
+   wallet_.Init(this);     
    wallet_.SetBalanceUnsafe(CurrencyType::TimePoint, 1000);      // TEMP: 초기 재화 1000
                                                                         // TODO: 이 값 Config로 빼기
-   skill_.Init(GetId());
-   upgrade_.Init(GetId());
+   skill_.Init(this);
+   upgrade_.Init(this);
 }
 
 void PlayerPawn::OnPreDestroy()

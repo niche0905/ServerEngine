@@ -12,7 +12,7 @@
 class LootSourceComponent : public BaseComponent
 {
 public:
-    void Init(ObjectId owner, int32 tableId)
+    void Init(BaseObject* owner, int32 tableId)
     {
         SetOwner(owner);
       

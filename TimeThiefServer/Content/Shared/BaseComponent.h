@@ -1,6 +1,7 @@
 ﻿#pragma once
 #include "Content/Object/ObjectId.h"
 
+class BaseObject;
 struct ObjectId;
 
 /*-----------------
@@ -15,11 +16,19 @@ struct ObjectId;
 class BaseComponent
 {
 public:
-    void SetOwner(ObjectId owner) { owner_ = owner; }
-    ObjectId GetOwner() const { return owner_; }
-    bool HasOwner() const { return static_cast<bool>(owner_); }
+    void SetOwner(BaseObject* owner) { owner_ = owner; }
+    BaseObject* GetOwner() const { return owner_; }
+    bool HasOwner() const { return owner_ != nullptr; }
+    
+    ObjectId GetOwnerId() const;
+    
+    template<typename T>
+    T* GetOwnerAs() const
+    {
+        return static_cast<T*>(owner_);
+    }
     
 protected:
-    ObjectId owner_{};
+    BaseObject* owner_ = nullptr;   // non-owning
     
 };
