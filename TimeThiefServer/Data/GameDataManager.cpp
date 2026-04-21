@@ -39,6 +39,10 @@ bool GameDataManager::Init(const ServerConfig& config)
       return false;
    }
    
+   // TODO: Store Table 로드하기 (우선 json 파일 작성부터)
+   // TODO: Weapon Table 로드하기 (우선 json 파일 작성부터)
+   // TODO: Upgrade Table 로드하기 (우선 json 파일 작성부터)
+   
    // TEMP: (파일 입출력이 아닌 코드로 무기 데이터 초기화)
    weaponTable_.tables[1] = {
       WeaponCommonStat{WeaponCategory::Rifle, WeaponFireType::HitScan, 12, 30, 0.1f, 1.5f, 1000.0f},

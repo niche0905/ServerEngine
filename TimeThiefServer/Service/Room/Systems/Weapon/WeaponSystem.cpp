@@ -9,13 +9,14 @@
    WeaponSystem
 ----------------*/
 
-bool WeaponSystem::Init(Room* ownerRoom, const WeaponTable& weaponTable)
+bool WeaponSystem::Init(Room* ownerRoom, const WeaponTable& weaponTable, const UpgradeTable& upgradeTable)
 {
    if (!ownerRoom)
       return false;   // 유효하지 않은 ownerRoom
    
    ownerRoom_ = ownerRoom;
    weaponTable_ = &weaponTable;
+   upgradeTable_ = &upgradeTable;
    return true;
 }
 
@@ -35,12 +36,15 @@ bool WeaponSystem::BuildFinalWeaponStat(PlayerPawn*player, uint32 weaponId, Weap
    const UpgradeComponent& upgrade = player->GetUpgrade();
    
    // TODO: 작성하기 (우선 Upgrade table이 필요할 듯 싶음)   
+   return false;
 }
 
 bool WeaponSystem::RebuildWeapon(PlayerPawn* player, int slotIndex)
 {
+   return false;
 }
 
 bool WeaponSystem::RebuildAllWeapons(PlayerPawn* player)
 {
+   return false;
 }

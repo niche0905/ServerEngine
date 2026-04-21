@@ -2,10 +2,7 @@
 #include "Content/Shared/BaseComponent.h"
 #include <unordered_set>
 #include <unordered_map>
-
-// TEMP
-using WeaponUpgradeCode = uint32;
-using StatUpgradeCode = uint32;
+#include "TypesDef.h"
 
 /*--------------------
    UpgradeComponent

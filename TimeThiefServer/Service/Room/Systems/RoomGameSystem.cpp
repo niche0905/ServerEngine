@@ -35,7 +35,7 @@ bool RoomGameSystem::Init(Room* ownerRoom, const GameDataManager& gameDataManage
    if (!storeSystem_.Init(ownerRoom, gameDataManager_->GetStoreEntryTable()))
       return false;
    
-   if (!weaponSystem_.Init(ownerRoom, gameDataManager_->GetWeaponTable()))
+   if (!weaponSystem_.Init(ownerRoom, gameDataManager_->GetWeaponTable(), gameDataManager_->GetUpgradeTable()))
       return false;
    
    return true;

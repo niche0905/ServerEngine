@@ -680,6 +680,7 @@
     <ClInclude Include="Data\Tables\LootTableJson.h" />
     <ClInclude Include="Data\Tables\LootTableTypes.h" />
     <ClInclude Include="Data\Tables\StoreEntryTable.h" />
+    <ClInclude Include="Data\Tables\UpgradeTable.h" />
     <ClInclude Include="Data\Tables\WeaponTable.h" />
     <ClInclude Include="Data\Tables\ZoneTable.h" />
     <ClInclude Include="Data\Tables\ZoneTableJson.h" />

@@ -1,4 +1,5 @@
 ﻿#pragma once
+#include "Data/Tables/UpgradeTable.h"
 
 class PlayerPawn;
 struct WeaponStat;
@@ -17,7 +18,7 @@ class WeaponSystem
 public:
    WeaponSystem() = default;
    
-   bool Init(Room* ownerRoom, const WeaponTable& weaponTable);
+   bool Init(Room* ownerRoom, const WeaponTable& weaponTable, const UpgradeTable& upgradeTable);
    
    const WeaponStat* GetBaseWeaponStat(uint32 weaponId) const;
    
@@ -29,5 +30,6 @@ public:
 private:
    Room*                      ownerRoom_ = nullptr;    // non-owning
    const WeaponTable*         weaponTable_ = nullptr;
+   const UpgradeTable*        upgradeTable_ = nullptr;
     
 };

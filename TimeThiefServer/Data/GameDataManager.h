@@ -2,6 +2,7 @@
 #include "Data/Tables/ZoneTable.h"
 #include "Tables/LootTableTypes.h"
 #include "Tables/StoreEntryTable.h"
+#include "Tables/UpgradeTable.h"
 #include "Tables/WeaponTable.h"
 
 struct ServerConfig;
@@ -21,11 +22,13 @@ public:
    const LootTable& GetLootTable() const { return lootTable_; }
    const StoreEntryTable& GetStoreEntryTable() const { return storeEntryTable_; }
    const WeaponTable& GetWeaponTable() const { return weaponTable_; }
+   const UpgradeTable& GetUpgradeTable() const { return upgradeTable_; }
    
 private:
    ZoneTable                  zoneTable_;
    LootTable                  lootTable_;
    StoreEntryTable            storeEntryTable_;
    WeaponTable                weaponTable_;
+   UpgradeTable               upgradeTable_;
    
 };
