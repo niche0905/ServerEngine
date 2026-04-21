@@ -107,6 +107,18 @@ public:
     bool IsWired() const { return actionState_.isWireActing; }
     void SetWired(bool isWired) { actionState_.isWireActing = isWired; }
     
+// Skill
+public:
+    void OnSkillChanged(SkillId skillId);
+    
+// Weapon
+public:
+    void OnWeaponUpgradeApplied(WeaponUpgradeCode code);
+    
+// Stat
+public:
+    void OnStatUpgradeApplied(StatUpgradeCode code, int32 newLevel);
+    
 protected:
     void OnSpawn() override;
     void OnPreDestroy() override;

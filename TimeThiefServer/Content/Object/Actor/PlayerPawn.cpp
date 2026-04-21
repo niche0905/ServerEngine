@@ -97,6 +97,22 @@ MoneyChangeResult PlayerPawn::SpendMoney(CurrencyType currency, CurrencyAmount a
    return wallet_.SpendMoney(currency, amount, ctx);
 }
 
+void PlayerPawn::OnSkillChanged(SkillId skillId)
+{
+   MarkReplicationDirty(ReplicationDirty::SkillState);
+}
+
+void PlayerPawn::OnWeaponUpgradeApplied(WeaponUpgradeCode code)
+{
+   MarkReplicationDirty(ReplicationDirty::WeaponStat);
+   // TODO: 작성하기 (Player Combat Comp에 있는 WeaponState에 접근하여 Rebuild 하기)
+}
+
+void PlayerPawn::OnStatUpgradeApplied(StatUpgradeCode code, int32 newLevel)
+{
+   // TODO: 작성하기...
+}
+
 void PlayerPawn::OnSpawn()
 {
    Pawn::OnSpawn();

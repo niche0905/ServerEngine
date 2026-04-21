@@ -1,6 +1,8 @@
 ﻿#include "pch.h"
 #include "UpgradeComponent.h"
 
+#include "Content/Object/Actor/PlayerPawn.h"
+
 /*--------------------
    UpgradeComponent
 --------------------*/
@@ -33,8 +35,13 @@ bool UpgradeComponent::ApplyWeaponUpgrade(WeaponUpgradeCode code)
       return false;
    
    weaponUpgradeCodes_.insert(code);
+   
    // TODO: 업그레이드 적용에 따른 추가 로직 (예: 플레이어 능력치 변경, 새로운 스킬 활성화 등)
    //       매번 참조하는 것은 branch stall도 그렇고 비효율 적일 수 있다 (Weapon Stat에 대한 정보를 Player마다 일단 들고 있으면 효율적일 듯?)
+   if (PlayerPawn* player = GetOwnerAs<PlayerPawn>()) {
+      player->OnWeaponUpgradeApplied(code);
+   }
+   
    return true;
 }
 
@@ -70,6 +77,9 @@ bool UpgradeComponent::ApplyStatUpgrade(StatUpgradeCode code, int32 maxLevel, in
    level = std::min(level + deltaLevel, maxLevel);
    
    // TODO: 업그레이드 적용에 따른 추가 로직 (예: 플레이어 능력치, 혹은 Skill에 쿨타임 변경 등 적용)
+   if (PlayerPawn* player = GetOwnerAs<PlayerPawn>()) {
+      player->OnStatUpgradeApplied(code, level);
+   }
    
    return true;
 }

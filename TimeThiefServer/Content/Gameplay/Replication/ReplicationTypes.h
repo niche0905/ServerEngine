@@ -20,6 +20,8 @@ enum class ReplicationDirty : uint32
     Inventory       = 1 << 4,   // Player Only  (인벤토리 아이템 상태)
     AnimState       = 1 << 5,   // (애니메이션 상태) <- NPC, Player 범용
     CombatState     = 1 << 6,   
+    SkillState      = 1 << 7,   // Player Only  (스킬 해금 상태)
+    WeaponStat      = 1 << 8,   // Player Only  (무기 강화 상태)
 };
 
 inline ReplicationDirty operator|(ReplicationDirty a, ReplicationDirty b)

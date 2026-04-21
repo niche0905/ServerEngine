@@ -40,6 +40,13 @@ bool SkillComponent::UnlockSkill(SkillId skillId)
    }
    
    unlockSkills_.insert(skillId);
+   
+   // TODO: Replicated 할 것이라면 여기서 Dirty flag 설정
+   
+   if (PlayerPawn* player = GetOwnerAs<PlayerPawn>()) {
+      
+   }
+   
    return true;
 }
 
