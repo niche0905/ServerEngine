@@ -1,6 +1,8 @@
 ﻿#pragma once
 #include "Content/Object/ObjectId.h"
+#include "Content/Object/ObjectManager.h"
 
+class Room;
 class BaseObject;
 struct ObjectId;
 
@@ -21,6 +23,8 @@ public:
     bool HasOwner() const { return owner_ != nullptr; }
     
     ObjectId GetOwnerId() const;
+    std::shared_ptr<Room> GetRoom() const;
+    ObjectManager* GetObjectManager() const;
     
     template<typename T>
     T* GetOwnerAs() const
