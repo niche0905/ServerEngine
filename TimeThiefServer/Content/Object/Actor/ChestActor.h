@@ -33,6 +33,9 @@ public:
     ChestActor& operator=(const ChestActor& Actor) = delete;
     
 public:
+    virtual ObjectType GetObjectType() const override { return ObjectType::OBJ_CHEST; }
+    
+public:
     ChestKind GetChestKind() const { return chestKind_; }
     void SetChestKind(ChestKind kind) { chestKind_ = kind; }
     
