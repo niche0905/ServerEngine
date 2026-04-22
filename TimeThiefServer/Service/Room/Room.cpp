@@ -11,6 +11,7 @@
 #include "Service/Player/PlayerManager/PlayerManager.h"
 #include "Shard/GameShard.h"
 #include "Content/Gameplay/Drop/DropTypes.h"
+#include "Content/Object/Actor/ChestActor.h"
 
 /*-----------------
    Local Helper
@@ -794,6 +795,7 @@ bool Room::HandleUseItem(PlayerId playerId, const se::game::C_UseItemReq& pkt)
 
 bool Room::HandleChestInteract(PlayerId playerId, const se::game::C_ChestInteractReq& pkt)
 {
+   SendBufferRef chestInteractBroadcastBuffer;
    std::shared_ptr<PlayerSession> sessionRef = sessionManager_.FindByPlayerId(playerId);
    
    if (!sessionRef) return false;   // 세션이 존재하지 않음 (정상적이지 않은 상황)
@@ -813,15 +815,56 @@ bool Room::HandleChestInteract(PlayerId playerId, const se::game::C_ChestInterac
       if (!playerPawn)
          return false;
       
+      if (not playerPawn->IsHpAlive()) {
+         // 사망한 Player가 Chest과 상호작용 시도 (정상적이지 않은 상황)
+         return false;
+      }
+      
       const ObjectId chestId{pkt.chest_entity_id().value()};
-      // TODO: Chest과의 상호작용 처리 로직 (예: Chest 열기, 아이템 획득 등)
-      //       로직에 따라 아이템이 우수수 떨어지게 (이는 Chest에서 아이템을 생성하고 Room에 생성된 아이템 정보를 Broadcast하는 구조로)
-      //       상호작용 모션이 Broadcast의 필요성이 있다면 패킷을 추가하고 세팅 (PlayerId, ChestId)
-      // auto* chestObj = objectManager_.FindAs(chestId);
+      auto* chestObj = objectManager_.FindAs<ChestActor>(chestId);
+      if (!chestObj) {
+         consoleLogger->Log(Color::Yellow, L"[Room] ChestActor not found for chestId %u\n", chestId.value);
+         return false;   // ChestActor가 존재하지 않음 (정상적이지 않은 상황)
+      }
+      
+      int32 outError{0};
+      if (chestObj->IsChest() and chestObj->CheckOpenPermission(*playerPawn, outError)) {
+         if (outError != 0) {
+            // 에러가 발생한 것
+         }
+         
+         DropSpawnContext dropSpawnContext;
+         dropSpawnContext.reason = DropReason::Chest;
+         dropSpawnContext.owner = chestId;
+         dropSpawnContext.instigator = playerPawn->GetId();
+         dropSpawnContext.lootBundle = chestObj->GenerateDrops();
+         if (dropSpawnContext.lootBundle.Empty()) {
+            // 드랍할 아이템이 없는 경우 (정상적이지 않은 상황) <- Loot Bundle이 제대로 생성되지 않은 것
+            consoleLogger->Log(Color::Yellow, L"[Room] Generated empty loot bundle from chestId %u\n", chestId.value);
+            return false;
+         }
+         
+         auto& dropSystem = roomGameSystem_.GetDropSystem();
+         DropSpawnResult result = dropSystem.DropItems(dropSpawnContext);
+         if (not result.spawned) {
+            // 드랍 처리 실패 (정상적이지 않은 상황)
+            consoleLogger->Log(Color::Yellow, L"[Room] Failed to drop items from chestId %u\n", chestId.value);
+            return false;
+         }
+         
+         se::game::N_ChestInteracted noti;
+         {
+            auto* entityIdPtr = noti.mutable_entity_id();
+            entityIdPtr->set_value(it->second.pawnObjectId.value);
+            auto* chestIdPtr = noti.mutable_chest_entity_id();
+            chestIdPtr->set_value(chestId.value);
+         }
+         chestInteractBroadcastBuffer = ServerPacketHandler::MakeSendBuffer(noti);
+      }
    }
    
-   // if (ChestInteractBroadcastBuffer)
-   //    Broadcast(ChestInteractBroadcastBuffer, playerId);   // Chest과 상호작용한
+   if (chestInteractBroadcastBuffer)
+      Broadcast(chestInteractBroadcastBuffer, playerId);   // Chest과 상호작용한
    
    return true;
 }

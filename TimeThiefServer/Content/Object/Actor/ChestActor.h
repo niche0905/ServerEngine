@@ -44,13 +44,14 @@ protected:
     void OnSpawn() override;
     void OnPreDestroy() override;
     
-private:
-    bool CheckOpenPermission(ObjectManager& om, PlayerPawn& byPlayer, int32& outError) const;
+public:
+    bool CheckOpenPermission(PlayerPawn& byPlayer, int32& outError) const;
     
 private:
     ChestKind chestKind_{ChestKind::Normal};
     
     LootSourceComponent lootSource_;
+    bool isOpened_{false};
     
     // 변경 전 방식
     // InventoryComponent inventory_;
