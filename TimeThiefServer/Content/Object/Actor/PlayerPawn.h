@@ -119,6 +119,9 @@ public:
 public:
     void OnStatUpgradeApplied(StatUpgradeCode code, int32 newLevel);
     
+public:
+    bool TrySetSavePoint(const Vector3& location);
+    
 protected:
     void OnSpawn() override;
     void OnPreDestroy() override;

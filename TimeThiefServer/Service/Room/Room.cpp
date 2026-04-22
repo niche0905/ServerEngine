@@ -1023,21 +1023,25 @@ bool Room::HandleSetSavePoint(PlayerId playerId, const se::game::C_SetSavePointR
          return false;
       
       const auto& savePointPos = pkt.position();
-      const auto& playerPos = playerPawn->GetPosition();
-
-      // TODO: pos 뿐만 아니라 현재 모든 상태를 저장해야 한다 (인벤토리, 강화 상태 등등)
-      playerPawn->SetSavedRespawnPosition(Vector3{savePointPos.x(), savePointPos.y(), savePointPos.z()});
+      const Vector3 savePos{ savePointPos.x(), savePointPos.y(), savePointPos.z() };
       
-      // TODO: 세이브 포인트 설정 유효성 판정 (예: 플레이어가 특정 지역 내에 있는지, 너무 자주 요청하는 것은 아닌지 등)
-      //       유효성 판정 결과에 따라 setSavePointResultBuffer에 결과 패킷 세팅하기 (예: 성공 여부, 메시지 등)
+      bool saved = playerPawn->TrySetSavePoint(savePos);
       
       se::game::S_SetSavePointRes res;
       {
-         res.set_success(true);   // TEMP: 세이브 포인트 설정 성공 여부 (실제 로직에서는 유효성 판정 결과에 따라 결정되어야 함)
-         auto* savePosPtr = res.mutable_position();
-         savePosPtr->set_x(savePointPos.x());
-         savePosPtr->set_y(savePointPos.y());
-         savePosPtr->set_z(savePointPos.z());
+         res.set_success(saved);   // TEMP: 세이브 포인트 설정 성공 여부 (실제 로직에서는 유효성 판정 결과에 따라 결정되어야 함)
+         
+         if (saved) {
+            auto* savePosPtr = res.mutable_position();
+            savePosPtr->set_x(savePointPos.x());
+            savePosPtr->set_y(savePointPos.y());
+            savePosPtr->set_z(savePointPos.z());
+         }
+         else {
+            auto* resultPtr = res.mutable_result();
+            resultPtr->set_message("Failed to set save point.");
+            resultPtr->set_code(se::common::ERR_ABILITY_NOT_AVAILABLE);
+         }
       }
       setSavePointResultBuffer = ServerPacketHandler::MakeSendBuffer(res);
    }
