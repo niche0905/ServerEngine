@@ -342,6 +342,14 @@ bool ServerPacketDispatcher::Handle_C_SetSavePointReq(PacketSessionRef& session,
     });
 }
 
+bool ServerPacketDispatcher::Handle_C_EquipItemReq(PacketSessionRef& session, const se::game::C_EquipItemReq& pkt)
+{
+    return EnqueueToPlayerRoom(session, pkt, [](Room& room, PlayerId playerId, const se::game::C_EquipItemReq& pkt)
+    {
+        room.HandleEquipItem(playerId, pkt);
+    });
+}
+
 bool ServerPacketDispatcher::TryGetPlayerId(PacketSessionRef& session, PlayerId& outPlayerId) const
 {
     outPlayerId = 0;

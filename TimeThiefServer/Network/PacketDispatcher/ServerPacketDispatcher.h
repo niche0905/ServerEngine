@@ -61,6 +61,8 @@ public:
    bool Handle_C_PickupItemReq(PacketSessionRef& session, const se::game::C_PickupItemReq& pkt);
    bool Handle_C_UseStoreReq(PacketSessionRef& session, const se::game::C_UseStoreReq& pkt);
    bool Handle_C_SetSavePointReq(PacketSessionRef& session, const se::game::C_SetSavePointReq& pkt);
+   bool Handle_C_EquipItemReq(PacketSessionRef& session, const se::game::C_EquipItemReq& pkt);
+   
    
 private:
    bool TryGetPlayerId(PacketSessionRef& session, PlayerId& outPlayerId) const;

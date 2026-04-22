@@ -257,6 +257,11 @@ bool Room::Join(PlayerId playerId, SessionId sessionId)
          }
       }
       {
+         // TODO:
+         // 입장한 플레어의 초기 값 세팅
+         // se::game::N_PlayerInitSetup playerInitSetup;
+      }
+      {
          se::room::N_EntitySpawn spawnPkt;
          if (BuildSpawnInfo(playerPawn, spawnPkt.mutable_info())) {
             spawnBufferToOthers = ServerPacketHandler::MakeSendBuffer(spawnPkt);
@@ -1232,6 +1237,57 @@ bool Room::HandleWireLaunch(PlayerId playerId, const se::game::C_WireLaunchReq& 
    
    if (wireLaunchBuffer)
       Broadcast(wireLaunchBuffer, playerId);   // 와이어 런치를 시작한 플레이어를 제외한 나머지 플레이어들에게 와이어 런치 정보 Broadcast
+   
+   return true;
+}
+
+bool Room::HandleEquipItem(PlayerId playerId, const se::game::C_EquipItemReq& pkt)
+{
+   SendBufferRef equipItemResultBuffer;
+   SendBufferRef equipItemBroadcastBuffer;
+   
+   std::shared_ptr<PlayerSession> sessionRef = sessionManager_.FindByPlayerId(playerId);
+   if (!sessionRef) return false;   // 세션이 존재하지 않음 (정상적이지 않은 상황)
+   
+   {
+      if (playerId == 0)
+         return false;
+      
+      auto it = roomPlayers_.find(playerId);
+      if (it == roomPlayers_.end())
+         return false;   // 방에 존재하지 않는 플레이어
+      
+      if (not it->second.loaded)
+         return false;
+      
+      auto* playerPawn = objectManager_.FindAs<PlayerPawn>(it->second.pawnObjectId);
+      if (!playerPawn)
+         return false;
+      
+      // TODO: Player가 Inventory에 해당 아이템을 가지고 있는지 확인하기
+      
+      se::game::S_EquipItemRes res;
+      {
+         res.set_success(true);   // TEMP: 아이템 장착 성공 여부 (실제 로직에서는 인벤토리 체크 결과에 따라 결정되어야 함)
+         res.set_item_id(pkt.item_id());  // TEMP
+      }
+      equipItemResultBuffer = ServerPacketHandler::MakeSendBuffer(res);
+      
+      se::game::N_EquipItem noti;
+      {
+         auto* entityIdPtr = noti.mutable_entity_id();
+         entityIdPtr->set_value(it->second.pawnObjectId.value);
+         
+         noti.set_item_id(pkt.item_id());
+      }
+      equipItemBroadcastBuffer = ServerPacketHandler::MakeSendBuffer(noti);
+   }
+   
+   if (equipItemResultBuffer)
+      sessionRef->Send(equipItemResultBuffer);   // 아이템 장착 결과를 해당 플레이어에게 전송
+   
+   if (equipItemBroadcastBuffer)
+      Broadcast(equipItemBroadcastBuffer, playerId);   // 아이템을 장착한
    
    return true;
 }

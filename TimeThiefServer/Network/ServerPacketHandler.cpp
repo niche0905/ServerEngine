@@ -214,4 +214,9 @@ bool Handle_C_SetSavePointReq(PacketSessionRef& session, const se::game::C_SetSa
     if (!Dispatcher()) return false;
     return Dispatcher()->Handle_C_SetSavePointReq(session, pkt);
 }
-    
+
+bool Handle_C_EquipItemReq(PacketSessionRef& session, const se::game::C_EquipItemReq& pkt)
+{
+    if (!Dispatcher()) return false;
+    return Dispatcher()->Handle_C_EquipItemReq(session, pkt);
+}
