@@ -10,6 +10,8 @@ using RoomId = uint32;
 using ItemId = uint32;
 using SkillId = uint32;
 
+constexpr int32 kMaxActiveSkills = 2;   // 플레이어가 동시에 장착할 수 있는 스킬 개수
+
 using WeaponUpgradeCode = uint32;
 using StatUpgradeCode = uint32;
 

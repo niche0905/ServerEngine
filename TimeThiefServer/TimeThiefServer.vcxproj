@@ -262,6 +262,7 @@
     <ClCompile Include="Content\Gameplay\Collider\ColliderComponent.cpp" />
     <ClCompile Include="Content\Gameplay\Combat\CombatComponent.cpp" />
     <ClCompile Include="Content\Gameplay\Combat\PlayerCombatComponent.cpp" />
+    <ClCompile Include="Content\Gameplay\Save\SaveComponent.cpp" />
     <ClCompile Include="Content\Gameplay\Skill\SkillComponent.cpp" />
     <ClCompile Include="Content\Gameplay\Upgrade\UpgradeComponent.cpp" />
     <ClCompile Include="Content\Object\Actor\Actor.cpp" />
@@ -652,6 +653,8 @@
     <ClInclude Include="Content\Gameplay\Replication\ReplicatedState.h" />
     <ClInclude Include="Content\Gameplay\Replication\ReplicationEvent.h" />
     <ClInclude Include="Content\Gameplay\Replication\ReplicationTypes.h" />
+    <ClInclude Include="Content\Gameplay\Save\SaveComponent.h" />
+    <ClInclude Include="Content\Gameplay\Save\SavePointSnapshot.h" />
     <ClInclude Include="Content\Gameplay\Skill\SkillComponent.h" />
     <ClInclude Include="Content\Gameplay\Spawn\IRespawnOwner.h" />
     <ClInclude Include="Content\Gameplay\Spawn\RespawnComponent.h" />
