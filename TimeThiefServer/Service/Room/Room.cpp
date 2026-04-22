@@ -413,6 +413,8 @@ bool Room::HandleMove(PlayerId playerId, const se::game::C_MoveReq& pkt)
          auto* entityIdPtr = noti.mutable_entity_id();
          entityIdPtr->set_value(it->second.pawnObjectId.value);
          
+         noti.set_object_type(se::common::OBJ_PLAYER);
+         
          auto* transformPtr = noti.mutable_transform();
          auto* positionPtr = transformPtr->mutable_position();
          const auto& newPos = playerPawn->GetPosition();
