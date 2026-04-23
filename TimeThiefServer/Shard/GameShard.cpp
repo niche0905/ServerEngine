@@ -73,6 +73,7 @@ bool GameShard::CreateRoom(CreateRoomParams params)
    
    room->Init(this, gameDataManager_, gameConfig_);
    room->SetPlayer(params.playerIds);
+   room->SetObject();
    
    // TODO: Room 초기화 (스크립트 읽어와서 Spawn 및 세팅 하는게 좋을듯)
    if (!AddRoom(params.roomId, room)) {

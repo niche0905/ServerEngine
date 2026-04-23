@@ -13,6 +13,7 @@
 #include "Systems/RoomGameSystem.h"
 #include "Utils/Random/WeightedRandom.h"
 
+class PlayerSession;
 struct SpawnWorldItemParams;
 class WorldItemActor;
 struct GameConfig;
@@ -61,12 +62,16 @@ public:
 public:
    bool Init(GameShard* ownerShard, const GameDataManager& gameDataManager, const GameConfig& gameConfig);
    void SetPlayer(const std::vector<PlayerId>& playerIds);
+   void SetObject();
    
 public:
    bool Join(PlayerId playerId, SessionId sessionId);
    bool Leave(PlayerId playerId);
    
    bool UpdateSession(PlayerId playerId, SessionId newSessionId);
+   
+private:
+   void JoinPlayerProcess(std::shared_ptr<PlayerSession>& session, PlayerPawn* playerPawn);
    
 // Handle Packet
 public:
