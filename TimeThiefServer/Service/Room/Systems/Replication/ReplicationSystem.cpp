@@ -32,8 +32,8 @@ void ReplicationSystem::NotifySpawn(BaseObject* object)
       return;   // 유효하지 않은 ownerRoom 또는 object
    
    RepEvent ev;
-   ev.type = RepEventType::Spawn;
-   ev.source = object->GetId();
+   ev.header.type = RepEventType::Spawn;
+   ev.header.source = object->GetId();
    replicationEvents_.push_back(ev);
    
    MarkDirty(object->GetId());
@@ -45,8 +45,8 @@ void ReplicationSystem::NotifyDespawn(ObjectId objectId)
       return;   // 유효하지 않은 ownerRoom
    
    RepEvent ev;
-   ev.type = RepEventType::Despawn;
-   ev.source = objectId;
+   ev.header.type = RepEventType::Despawn;
+   ev.header.source = objectId;
    replicationEvents_.push_back(ev);
    
    dirtyObjectSet_.erase(objectId);
@@ -88,11 +88,11 @@ void ReplicationSystem::FlushImmediate(const RepFrame& frame)
    
    for (RepEvent& ev : replicationEvents_) {
       
-      if (ev.tick == 0)
-         ev.tick = frame.roomTick;
+      if (ev.header.tick == 0)
+         ev.header.tick = frame.roomTick;
       
-      if (ev.timeMs == 0) {
-         ev.timeMs = static_cast<uint64>(std::chrono::duration_cast<Milliseconds>(frame.now.time_since_epoch()).count());
+      if (ev.header.timeMs == 0) {
+         ev.header.timeMs = static_cast<uint64>(std::chrono::duration_cast<Milliseconds>(frame.now.time_since_epoch()).count());
       }
       
       // ex)

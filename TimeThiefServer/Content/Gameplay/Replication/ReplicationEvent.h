@@ -1,4 +1,5 @@
 ﻿#pragma once
+#include <variant>
 #include "Content/Object/ObjectId.h"
 #include "ReplicationTypes.h"
 #include <vector>
@@ -28,103 +29,43 @@ enum class RepEventType : uint8
     // AttackHit,
 };
 
-struct RepEvent
+struct RepEventHeader
 {
     RepEventType type{RepEventType::None};
-    ObjectId source{};
-    TickSeq tick{0};
     uint64 timeMs{0};
+    TickSeq tick{0};
+    ObjectId source{};
+    ObjectId target{};      // optional
 };
 
-struct RepFireEvent
+struct FireEvent
 {
-    ObjectId source{};
     uint32 weaponId{0};
     uint32 shotSeed{0};
-    SE::Math::Vector3 origin{};
-    SE::Math::Vector3 direction{};
-    TickSeq tick{0};
-    uint64 timeMs{0};
+    SE::Math::Vector3 startPos{};       // muzzle
+    SE::Math::Vector3 direction{};      // normalized
 };
 
-struct RepThrowEvent
+struct WeaponChangedEvent
 {
-    ObjectId source{};
-    uint32 grenadeType{0};
-    SE::Math::Vector3 origin{};
-    SE::Math::Vector3 direction{};
-    TickSeq tick{0};
-    uint64 timeMs{0};
+    uint32 newWeaponId{0};
 };
 
-struct RepReloadEvent
+struct AimChangedEvent
 {
-    ObjectId source{};
-    uint32 weaponId{0};
-    TickSeq tick{0};
-    uint64 timeMs{0};
+    bool isAimed{false};
 };
 
-struct RepHitEvent
+using RepEventPayload = std::variant<
+    std::monostate,
+    FireEvent,
+    WeaponChangedEvent,
+    AimChangedEvent
+>;
+// TODO: 필요한 세부 Event 타입과 페이로드 정의하기 (여 위에 추가)
+
+struct RepEvent
 {
-    ObjectId source{};
-    se::common::Vector3 hitPoint{};
-    TickSeq tick{0};
-    uint64 timeMs{0};
-};
-
-// struct RepUseAbilityEvent
-// {
-//     ObjectId source{};
-//     uint32 abilityId{0};
-//     TickSeq tick{0};
-//     uint64 timeMs{0};
-// };
-
-// struct RepUseItemEvent
-// {
-//     ObjectId source{};
-//     uint32 itemId{0};
-//     TickSeq tick{0};
-//     uint64 timeMs{0};
-// };
-
-// struct RepChestEvent
-// {
-//     ObjectId source{};
-//     ObjectId chestId{0};
-//     TickSeq tick{0};
-//     uint64 timeMs{0};
-// };
-
-// struct RepPickupEvent
-// {
-//     ObjectId source{};
-//     ObjectId itemId{0};
-//     TickSeq tick{0};
-//     uint64 timeMs{0};
-// };
-
-struct RepWireLaunchEvent
-{
-    ObjectId source{};
-    SE::Math::Vector3 origin{};
-    SE::Math::Vector3 direction{};
-    TickSeq tick{0};
-    uint64 timeMs{0};
-};
-
-struct RepWireEvent
-{
-    ObjectId source{};
-    SE::Math::Vector3 anchorPos{};
-    TickSeq tick{0};
-    uint64 timeMs{0};
-};
-
-struct RepWireEndEvent
-{
-    ObjectId source{};
-    TickSeq tick{0};
-    uint64 timeMs{0};
+    RepEventHeader header{};
+    RepEventPayload payload;
 };
