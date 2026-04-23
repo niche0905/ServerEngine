@@ -12,6 +12,7 @@
 #include "Shard/GameShard.h"
 #include "Content/Gameplay/Drop/DropTypes.h"
 #include "Content/Object/Actor/ChestActor.h"
+#include "Content/Object/Actor/StoreActor.h"
 
 /*-----------------
    Local Helper
@@ -24,6 +25,8 @@ namespace
    bool BuildMonsterSpawnInfo(MonsterPawn* monsterPawn, se::room::SpawnInfo* outInfo);
    bool BuildItemSpawnInfo(WorldItemActor* item, se::room::SpawnInfo* outInfo);
    bool BuildProjectileSpawnInfo(ProjectileActor* projectile, se::room::SpawnInfo* outInfo);
+   bool BuildChestSpawnInfo(ChestActor* chest, se::room::SpawnInfo* outInfo);
+   bool BuildStoreSpawnInfo(StoreActor* store, se::room::SpawnInfo* outInfo);
    
    bool BuildSpawnInfo(BaseObject* obj, se::room::SpawnInfo* outInfo)
    {
@@ -43,6 +46,12 @@ namespace
          
       case ObjectType::OBJ_PROJECTILE:
          return BuildProjectileSpawnInfo(static_cast<ProjectileActor*>(obj), outInfo);
+         
+      case ObjectType::OBJ_CHEST:
+         return BuildChestSpawnInfo(static_cast<ChestActor*>(obj), outInfo);
+         
+      case ObjectType::OBJ_STORE:
+         return  BuildStoreSpawnInfo(static_cast<StoreActor*>(obj), outInfo);
          
       default:
          return false;
@@ -115,6 +124,46 @@ namespace
       velocityPtr->set_x(velo.x);
       velocityPtr->set_y(velo.y);
       velocityPtr->set_z(velo.z);
+      
+      return true;
+   }
+   
+   bool BuildChestSpawnInfo(ChestActor* chest, se::room::SpawnInfo* outInfo)
+   {
+      if (!chest or !outInfo)
+         return false;
+      
+      FillSpawnInfoBase(chest, 1, outInfo);
+      
+      auto* detailPtr = outInfo->mutable_chest_info();
+      auto* posPtr = detailPtr->mutable_position();
+      const SE::Math::Vector3& pos = chest->GetPosition();
+      posPtr->set_x(pos.x);
+      posPtr->set_y(pos.y);
+      posPtr->set_z(pos.z);
+      
+      const float yaw = chest->GetYaw();
+      detailPtr->set_yaw(yaw);
+      
+      return true;
+   }
+   
+   bool BuildStoreSpawnInfo(StoreActor* store, se::room::SpawnInfo* outInfo)
+   {
+      if (!store or !outInfo)
+         return false;
+      
+      FillSpawnInfoBase(store, 1, outInfo);
+      
+      auto* detailPtr = outInfo->mutable_store_info();
+      auto* posPtr = detailPtr->mutable_position();
+      const SE::Math::Vector3& pos = store->GetPosition();
+      posPtr->set_x(pos.x);
+      posPtr->set_y(pos.y);
+      posPtr->set_z(pos.z);
+      
+      const float yaw = store->GetYaw();
+      detailPtr->set_yaw(yaw);
       
       return true;
    }
