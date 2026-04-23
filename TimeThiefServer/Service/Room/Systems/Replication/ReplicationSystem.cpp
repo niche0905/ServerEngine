@@ -186,6 +186,8 @@ bool ReplicationSystem::FlushProjectilePeriodic(ProjectileActor* projectile, Rep
       auto* entityIdPtr = projectileMoveNoti.mutable_entity_id();
       entityIdPtr->set_value(projectile->GetId().value);
       
+      projectileMoveNoti.set_object_type(se::common::OBJ_PROJECTILE);
+      
       auto* transformPtr = projectileMoveNoti.mutable_transform();
       auto* positionPtr = transformPtr->mutable_position();
       const auto& pos = projectile->GetPosition();
