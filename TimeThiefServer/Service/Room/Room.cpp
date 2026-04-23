@@ -100,9 +100,26 @@ namespace
    
    bool BuildItemSpawnInfo(WorldItemActor* item, se::room::SpawnInfo* outInfo)
    {
-      // TODO: Item 스폰 인포 가져와서 연결하기
-      consoleLogger->Log(Color::Yellow, L"[Room] You Don't have Item Spawn Build\n");
-      return false;
+      if (!item or !outInfo)
+         return false;
+      
+      // TODO: Template은 Item Id를 기반으로 지정하여야 함 (아니면 Item Info에 필드를 추가하는 방식)
+      FillSpawnInfoBase(item, 1, outInfo);
+      
+      auto* detailPtr = outInfo->mutable_item_info();
+      auto* posPtr = detailPtr->mutable_position();
+      const SE::Math::Vector3& pos = item->GetPosition();
+      posPtr->set_x(pos.x);
+      posPtr->set_y(pos.y);
+      posPtr->set_z(pos.z);
+      auto* velocityPtr = detailPtr->mutable_velocity();
+      const SE::Math::Vector3& velo = item->GetVelocity();
+      velocityPtr->set_x(velo.x);
+      velocityPtr->set_y(velo.y);
+      velocityPtr->set_z(velo.z);
+      detailPtr->set_amount(item->GetItemStack().count);
+      
+      return true;
    }
    
    bool BuildProjectileSpawnInfo(ProjectileActor* projectile, se::room::SpawnInfo* outInfo)
