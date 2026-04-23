@@ -650,6 +650,7 @@
     <ClInclude Include="Content\Gameplay\Inventory\ItemTypes.h" />
     <ClInclude Include="Content\Gameplay\Loot\LootSourceComponent.h" />
     <ClInclude Include="Content\Gameplay\Loot\LootTypes.h" />
+    <ClInclude Include="Content\Gameplay\Replication\IObjectReplicator.h" />
     <ClInclude Include="Content\Gameplay\Replication\ReplicatedState.h" />
     <ClInclude Include="Content\Gameplay\Replication\ReplicationEvent.h" />
     <ClInclude Include="Content\Gameplay\Replication\ReplicationTypes.h" />

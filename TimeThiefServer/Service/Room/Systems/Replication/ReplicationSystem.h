@@ -3,7 +3,9 @@
 #include <unordered_set>
 #include "Content/Object/ObjectId.h"
 #include "Content/Gameplay/Replication/ReplicationEvent.h"
+#include "Content/Object/ObjectEnum.h"
 
+class IObjectReplicator;
 class ProjectileActor;
 struct RepFrame;
 struct RepEvent;
@@ -36,6 +38,9 @@ public:
    
 public:
    bool FlushProjectilePeriodic(ProjectileActor* projectile, ReplicationDirty flags, const RepFrame& frame, uint64 nowTimeMs);
+   
+private:
+   const IObjectReplicator* GetReplicator(ObjectType objectType);
    
 private:
    Room* ownerRoom_ = nullptr;   // non-owning

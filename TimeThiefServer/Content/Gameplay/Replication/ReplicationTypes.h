@@ -1,5 +1,7 @@
 ﻿#pragma once
+#include <Generated/ServerPacketHandler.h>
 
+class Room;
 struct SE::Math::Vector3;
 using TickSeq = uint32;
 
