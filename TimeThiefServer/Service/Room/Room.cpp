@@ -1710,6 +1710,11 @@ void Room::BroadcastReplication(SendBufferRef sendBuffer, PlayerId exceptPlayerI
    Broadcast(std::move(sendBuffer), exceptPlayerId);
 }
 
+void Room::SendReplication(PlayerId playerId, SendBufferRef sendBuffer)
+{
+   SendToPlayer(playerId, sendBuffer);
+}
+
 void Room::BroadcastGameStart()
 {
    se::game::N_GameStart noti;

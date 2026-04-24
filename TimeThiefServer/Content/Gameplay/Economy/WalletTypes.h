@@ -1,7 +1,7 @@
 ﻿#pragma once
 
 using CurrencyId = uint16;
-using CurrencyAmount = int64;
+using CurrencyAmount = int32;
 
 enum class CurrencyType : CurrencyId
 {

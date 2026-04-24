@@ -43,6 +43,9 @@ public:
    
    size_t GetWeaponSlotCount() const { return combatState_.slots.size(); }
    
+public:
+   const PlayerCombatState& GetCombatState() const { return combatState_; }
+   
 protected:
    virtual bool ExecuteAttack(AttackRequest& request) override;
    

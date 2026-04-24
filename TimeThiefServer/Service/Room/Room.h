@@ -188,6 +188,7 @@ private:
    
 public:
    void BroadcastReplication(SendBufferRef sendBuffer, PlayerId exceptPlayerId = 0);
+   void SendReplication(PlayerId playerId, SendBufferRef sendBuffer);
    
 public:
    void BroadcastGameStart();

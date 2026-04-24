@@ -121,6 +121,11 @@ bool SkillComponent::UnequipSkill(int32 slotIndex)
    return true;
 }
 
+const std::unordered_set<SkillId>& SkillComponent::GetUnlockSkills() const
+{
+   return unlockSkills_;
+}
+
 bool SkillComponent::IsValidSlot(int32 slotIndex) const
 {
    return slotIndex >= 0 && slotIndex < kMaxActiveSkills;

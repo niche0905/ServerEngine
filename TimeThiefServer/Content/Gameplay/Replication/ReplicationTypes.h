@@ -26,6 +26,12 @@ enum class ReplicationDirty : uint32
     WeaponStat      = 1 << 8,   // Player Only  (무기 강화 상태)
 };
 
+struct ReplicateResult
+{
+    bool sent = false;
+    ReplicationDirty handled = ReplicationDirty::None;   // 실제로 패킷이 생성되어 전송된 정보 (ReplicationDirty 플래그)
+};
+
 inline ReplicationDirty operator|(ReplicationDirty a, ReplicationDirty b)
 {
     return static_cast<ReplicationDirty>(static_cast<uint32>(a) | static_cast<uint32>(b));

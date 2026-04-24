@@ -40,7 +40,7 @@ enum class StoreRewardType : uint8
 struct StoreEntryDef
 {
     uint32 entryId{0};
-    int64 cost{0};
+    int32 cost{0};
     
     StoreRewardType rewardType{StoreRewardType::None};
     

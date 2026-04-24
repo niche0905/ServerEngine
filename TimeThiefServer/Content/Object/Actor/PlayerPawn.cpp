@@ -18,7 +18,7 @@ int32 PlayerPawn::ResolveIncomingDamage(int32 amount, const DamageContext& ctx)
       if (!room)
          return amount;   // 방이 없는 경우에는 존 데미지 처리하지 않음
       
-      const int64 deleteMoney = static_cast<int>(amount) * kMultiplierForZoneDamage;
+      const int32 deleteMoney = amount * kMultiplierForZoneDamage;
       
       if (wallet_.CanSpend(CurrencyType::TimePoint, deleteMoney)) {
          wallet_.SpendMoney(CurrencyType::TimePoint, deleteMoney, MoneyChangeContext{
@@ -31,7 +31,7 @@ int32 PlayerPawn::ResolveIncomingDamage(int32 amount, const DamageContext& ctx)
       //       만약 재화의 차감으로도 죽을 수 있다면 사망 처리 진행
       //       재화가 모두 삭제되었더라도 죽이지 않을 것이라면 차감된 재화 양에 따라 amount 수정
       
-      int64 currentMoney = wallet_.GetBalance(CurrencyType::TimePoint);
+      int32 currentMoney = wallet_.GetBalance(CurrencyType::TimePoint);
       wallet_.SpendMoney(CurrencyType::TimePoint, currentMoney, MoneyChangeContext{
            .reason = MoneyChangeReason::ZoneDamage,
         });

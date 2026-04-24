@@ -6,9 +6,9 @@ class PlayerPawn;
 class PlayerReplicator : public IObjectReplicator
 {
 public:
-    virtual bool FlushPeriodic(BaseObject* obj, ReplicationDirty flags, const RepFrame& frame, uint64 nowMs, Room& room) const;
+    virtual ReplicateResult FlushPeriodic(BaseObject* obj, ReplicationDirty flags, const RepFrame& frame, uint64 nowMs, Room& room) const;
     
 private:
-    virtual bool FlushPlayerPeriodic(PlayerPawn& player, ReplicationDirty flags, const RepFrame& frame, uint64 nowMs, Room& room) const;
+    virtual ReplicateResult FlushPlayerPeriodic(PlayerPawn& player, ReplicationDirty flags, const RepFrame& frame, uint64 nowMs, Room& room) const;
     
 };

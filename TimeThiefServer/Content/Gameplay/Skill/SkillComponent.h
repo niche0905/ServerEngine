@@ -28,6 +28,8 @@ public:
     bool EquipSkill(SkillId skillId, int32 slotIndex);
     bool UnequipSkill(int32 slotIndex);
     
+    const std::unordered_set<SkillId>& GetUnlockSkills() const;
+    
 private:
     bool IsValidSlot(int32 slotIndex) const;
     
