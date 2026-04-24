@@ -8,6 +8,9 @@
 
 void BaseObject::MarkReplicationDirty(ReplicationDirty dirtyFlag)
 {
+    if (not HasFlag(flags_, ObjectFlags::Replicable))
+        return;
+    
     replicated_.MarkDirty(dirtyFlag);
         
     if (auto room = GetRoom()) {
