@@ -12,7 +12,7 @@
     "game": {
         "movement_update_hz": 10,
         "ping_interval_ms": 1000,
-        "room_tick_interval_ms": 50,
+        "room_tick_interval_ms": 25,
         "zone_damage_tick_interval": 1.0,
         "match_size": 2
     }
