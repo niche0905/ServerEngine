@@ -7,6 +7,7 @@ class ReplicatedState
 public:
     void MarkDirty(ReplicationDirty flag) { dirtyFlags_ |= flag; }
     void ClearDirty() { dirtyFlags_ = ReplicationDirty::None; }
+    void ClearDirty(ReplicationDirty flag) { dirtyFlags_ &= ~flag; }
     
     bool IsDirty() const { return dirtyFlags_ != ReplicationDirty::None; }
     bool Has(ReplicationDirty flag) const { return HasDirty(dirtyFlags_, flag); }

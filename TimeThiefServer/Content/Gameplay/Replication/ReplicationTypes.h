@@ -32,6 +32,11 @@ struct ReplicateResult
     ReplicationDirty handled = ReplicationDirty::None;   // 실제로 패킷이 생성되어 전송된 정보 (ReplicationDirty 플래그)
 };
 
+inline ReplicationDirty operator~(ReplicationDirty a)
+{
+    return static_cast<ReplicationDirty>(~static_cast<uint32>(a));
+}
+
 inline ReplicationDirty operator|(ReplicationDirty a, ReplicationDirty b)
 {
     return static_cast<ReplicationDirty>(static_cast<uint32>(a) | static_cast<uint32>(b));
@@ -40,6 +45,17 @@ inline ReplicationDirty operator|(ReplicationDirty a, ReplicationDirty b)
 inline ReplicationDirty& operator|=(ReplicationDirty& a, ReplicationDirty b)
 {
     a = a | b;
+    return a;
+}
+
+inline ReplicationDirty operator&(ReplicationDirty a, ReplicationDirty b)
+{
+    return static_cast<ReplicationDirty>(static_cast<uint32>(a) & static_cast<uint32>(b));
+}
+
+inline ReplicationDirty& operator&=(ReplicationDirty& a, ReplicationDirty b)
+{
+    a = a & b;
     return a;
 }
 

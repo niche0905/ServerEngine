@@ -36,9 +36,6 @@ public:
    void FlushImmediate(const RepFrame& frame);
    void FlushPeriodic(const RepFrame& frame);
    
-public:
-   bool FlushProjectilePeriodic(ProjectileActor* projectile, ReplicationDirty flags, const RepFrame& frame, uint64 nowTimeMs);
-   
 private:
    const IObjectReplicator* GetReplicator(ObjectType objectType);
    

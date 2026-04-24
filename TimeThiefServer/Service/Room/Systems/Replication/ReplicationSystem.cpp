@@ -2,6 +2,7 @@
 #include "ReplicationSystem.h"
 #include <algorithm>
 #include <chrono>
+#include "Content/Gameplay/Replication/IObjectReplicator.h"
 #include "Content/Gameplay/Replication/ReplicationEvent.h"
 #include "Content/Object/BaseObject.h"
 #include "Content/Object/ObjectManager.h"
@@ -131,35 +132,25 @@ void ReplicationSystem::FlushPeriodic(const RepFrame& frame)
       if (!repState.IsDirty())
          continue;
       
-      // TODO:
-      // 여기서 repState.GetFlags()를 보고
-      // Transform / Velocity / Health 등의 패킷을 생성해서 전송한다.
-      //
-      // 예:
-      // if (repState.Has(ReplicationDirty::Transform)) { ... }
-      // if (repState.Has(ReplicationDirty::Velocity))  { ... }
-      bool sent = false;
-      
-      if (auto* pawn = dynamic_cast<Pawn*>(obj)) {
-      }
-      else if (auto* projectile = dynamic_cast<ProjectileActor*>(obj)) {
-         sent = FlushProjectilePeriodic(projectile, repState.GetFlags(), frame, nowMs);
+      auto* replicator = GetReplicator(obj->GetObjectType());
+      if (!replicator) {
+         consoleLogger->Log(Color::Yellow, L"[ReplicationSystem] No replicator for object type {}, skipping replication for objectId {}",
+                            obj->GetObjectType(), obj->GetId().value);
+         continue;   // 해당 오브젝트 타입에 대한 Replicator가 없는 경우 (예: 아직 구현되지 않았거나, 복제할 필요가 없는 타입인 경우)에는 스킵
       }
       
-      if (sent) {
+      auto result = replicator->FlushPeriodic(obj, repState.GetFlags(), frame, nowMs, *ownerRoom_);
+      
+      if (result.sent) {
          repState.lastReplicatedTick = frame.roomTick;
          repState.lastReplicatedTimeMs = nowMs;
          ++repState.replicationVersion;
-         repState.ClearDirty();
          
-         // 아직 dirty가 남아있다면 다음 periodic flush에서도 유지
-         if (repState.IsDirty())
-         {
-            nextDirtyObjects.push_back(objectId);
-            nextDirtySet.insert(objectId);
-         }
+         repState.ClearDirty(result.handled);
+         
       }
-      else {
+
+      if (repState.IsDirty()) {
          nextDirtyObjects.push_back(objectId);
          nextDirtySet.insert(objectId);
       }
@@ -167,49 +158,6 @@ void ReplicationSystem::FlushPeriodic(const RepFrame& frame)
    
    dirtyObjects_.swap(nextDirtyObjects);
    dirtyObjectSet_.swap(nextDirtySet);
-}
-
-bool ReplicationSystem::FlushProjectilePeriodic(ProjectileActor* projectile, ReplicationDirty flags, const RepFrame& frame, uint64 nowTimeMs)
-{
-   if (!projectile)
-      return false;
-   
-   if (!(HasDirty(flags, ReplicationDirty::Transform) || HasDirty(flags, ReplicationDirty::Velocity)))
-      return false;   // Transform이나 Velocity가 변경되지 않았다면 패킷 생성할 필요 없음
-   
-   if (nowTimeMs < projectile->GetReplicatedState().lastReplicatedTimeMs + 100) {   // TODO: 100ms이거 상수나 config 값으로 빼기
-      return false;
-   }
-   
-   se::game::N_Move projectileMoveNoti;
-   {
-      auto* entityIdPtr = projectileMoveNoti.mutable_entity_id();
-      entityIdPtr->set_value(projectile->GetId().value);
-      
-      projectileMoveNoti.set_object_type(se::common::OBJ_PROJECTILE);
-      
-      auto* transformPtr = projectileMoveNoti.mutable_transform();
-      auto* positionPtr = transformPtr->mutable_position();
-      const auto& pos = projectile->GetPosition();
-      positionPtr->set_x(pos.x);
-      positionPtr->set_y(pos.y);
-      positionPtr->set_z(pos.z);
-      transformPtr->set_yaw(projectile->GetYaw());    // 의미 없는 정보이긴 함 (velocity 방향으로 날아가게 할 것이기에) 
-      
-      auto* projectileMovementPtr = projectileMoveNoti.mutable_projectile_movement();
-      auto* directionPtr = projectileMovementPtr->mutable_velocity();
-      const auto& velocity = projectile->GetVelocity();
-      directionPtr->set_x(velocity.x);
-      directionPtr->set_y(velocity.y);
-      directionPtr->set_z(velocity.z);
-   }
-   
-   SendBufferRef moveNotiBuffer = ServerPacketHandler::MakeSendBuffer(projectileMoveNoti);
-   if (!moveNotiBuffer)
-      return false;
-   
-   ownerRoom_->BroadcastReplication(moveNotiBuffer);
-   return true;
 }
 
 const IObjectReplicator* ReplicationSystem::GetReplicator(ObjectType objectType)
