@@ -250,7 +250,7 @@ void Room::SetObject()
    // TODO: 변경하기 (기본 Spawn 정보 기반 Spawn)
    
    for (int32 i = 0; i < 5; ++i) {
-      auto chest = SpawnObject<ChestActor>(ObjectFlags::Replicable);
+      auto* chest = SpawnObject<ChestActor>(ObjectFlags::None);
       chest->SetPosition(Vector3{ 200.0f + i * 150.0f, 0.0f, 150.0f });
    }
 }
@@ -1612,8 +1612,7 @@ bool Room::LaunchRocket(const Vector3& pos, const Vector3& dir, Pawn* ownerPawn,
       return false;  // 발사체 생성 실패
    
    rocket->Init(ownerPawn->GetId(), pos, dir * speed, damage, lifetimeMs, radius);
-   
-   BroadcastSpawn(rocket->GetId(), se::common::OBJ_PROJECTILE, /*templateId=*/0);      // TODO: templateId는 나중에 생각하기
+   ReplicationSpawn(rocket, /*templateId=*/0);  // TODO: templateId는 나중에 생각하기
    return true;
 }
 
@@ -1632,14 +1631,13 @@ PlayerPawn* Room::CreatePreparedPlayerPawn(PlayerId playerId, const Vector3& spa
 
 WorldItemActor* Room::SpawnItem(const SpawnWorldItemParams& params)
 {
-   WorldItemActor* item = SpawnObject<WorldItemActor>(ObjectFlags::Replicable);
+   WorldItemActor* item = SpawnObject<WorldItemActor>(ObjectFlags::None);
    if (!item) {
       return nullptr;
    }
    
    item->SetPosition(params.position);
-   BroadcastSpawn(item->GetId(), se::common::OBJ_ITEM, params.itemStack.id);
-   // TODO: Replication으로 옮길 생각도 하기
+   ReplicationSpawn(item, params.itemStack.id, params.itemStack.count);
    return item;
 }
 
@@ -1695,20 +1693,6 @@ void Room::BroadcastGameStart()
    SendBufferRef gameStartBuffer = ServerPacketHandler::MakeSendBuffer(noti);
    if (gameStartBuffer)
       Broadcast(gameStartBuffer);   // 모두에게 게임 시작 정보 Broadcast
-}
-
-void Room::BroadcastSpawn(ObjectId objectId, se::common::ObjectType objectType, uint32 templateId)
-{
-   auto* obj = objectManager_.Find(objectId);
-   if (!obj)
-      return;
-   
-   se::room::N_EntitySpawn spawnPkt;
-   if (BuildSpawnInfo(obj, spawnPkt.mutable_info())) {
-      SendBufferRef spawnBuffer = ServerPacketHandler::MakeSendBuffer(spawnPkt);
-      if (spawnBuffer)
-         Broadcast(spawnBuffer);   // 모두에게 스폰 정보 Broadcast
-   }
 }
 
 void Room::BroadcastDeath(ObjectId objectId)
@@ -1784,6 +1768,23 @@ void Room::BroadcastKillPlayer(ObjectId killerId, ObjectId victimId)
    SendBufferRef killPlayerBuffer = ServerPacketHandler::MakeSendBuffer(noti);
    if (killPlayerBuffer)
       Broadcast(killPlayerBuffer);
+}
+
+void Room::ReplicateEventSet(RepEvent& ev, RepEventType eventType)
+{
+   ev.header.type = eventType;
+   ev.header.timeMs = std::chrono::duration_cast<Milliseconds>(Clock::now().time_since_epoch()).count();
+   ev.header.tick = tickSeq_;
+}
+
+void Room::ReplicationSpawn(Actor* actor, uint32 templateId, uint32 amount)
+{
+   RepEvent spawnEvent;
+   ReplicateEventSet(spawnEvent, RepEventType::Spawn);
+   spawnEvent.header.source = actor->GetId();
+   spawnEvent.payload = SpawnEvent{actor->GetObjectType(), templateId, actor->GetPosition(), actor->GetVelocity(), amount};
+   
+   roomGameSystem_.GetReplicationSystem().PushEvent(spawnEvent);
 }
 
 void Room::HandleDamageResult(Pawn* attacker, Actor* victim, const SE::Physics::Hit::HitResult& hitResult,

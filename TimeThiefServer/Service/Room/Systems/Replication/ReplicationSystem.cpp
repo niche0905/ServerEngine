@@ -27,33 +27,6 @@ bool ReplicationSystem::Init(Room* ownerRoom)
    return true;
 }
 
-void ReplicationSystem::NotifySpawn(BaseObject* object)
-{
-   if (!ownerRoom_ or !object)
-      return;   // 유효하지 않은 ownerRoom 또는 object
-   
-   RepEvent ev;
-   ev.header.type = RepEventType::Spawn;
-   ev.header.source = object->GetId();
-   replicationEvents_.push_back(ev);
-   
-   MarkDirty(object->GetId());
-}
-
-void ReplicationSystem::NotifyDespawn(ObjectId objectId)
-{
-   if (!ownerRoom_)
-      return;   // 유효하지 않은 ownerRoom
-   
-   RepEvent ev;
-   ev.header.type = RepEventType::Despawn;
-   ev.header.source = objectId;
-   replicationEvents_.push_back(ev);
-   
-   dirtyObjectSet_.erase(objectId);
-   std::erase(dirtyObjects_, objectId);
-}
-
 void ReplicationSystem::PushEvent(const RepEvent& event)
 {
    if (!ownerRoom_)
@@ -81,23 +54,12 @@ void ReplicationSystem::FlushImmediate(const RepFrame& frame)
    if (replicationEvents_.empty())
       return;
    
-   // TODO:
-   // 1. replicationEvents_를 순회하며 타입별 패킷 생성
-   // 2. 관심 영역 / 시야 대상 필터링
-   // 3. Broadcast 또는 개별 Send 수행
-   //
+   const uint64 nowMs = std::chrono::duration_cast<Milliseconds>(frame.now.time_since_epoch()).count();
    
    for (RepEvent& ev : replicationEvents_) {
       
-      if (ev.header.tick == 0)
-         ev.header.tick = frame.roomTick;
-      
-      if (ev.header.timeMs == 0) {
-         ev.header.timeMs = static_cast<uint64>(std::chrono::duration_cast<Milliseconds>(frame.now.time_since_epoch()).count());
-      }
-      
-      // ex)
-      // switch (ev.type)
+      NormalizeEvent(ev, frame, nowMs);
+      DispatchImmediateEvent(ev, frame);
    }
    
    replicationEvents_.clear();
@@ -134,7 +96,7 @@ void ReplicationSystem::FlushPeriodic(const RepFrame& frame)
       
       auto* replicator = GetReplicator(obj->GetObjectType());
       if (!replicator) {
-         consoleLogger->Log(Color::Yellow, L"[ReplicationSystem] No replicator for object type {}, skipping replication for objectId {}",
+         consoleLogger->Log(Color::Yellow, L"[ReplicationSystem] No replicator for object type %u, skipping replication for objectId %u\n",
                             obj->GetObjectType(), obj->GetId().value);
          continue;   // 해당 오브젝트 타입에 대한 Replicator가 없는 경우 (예: 아직 구현되지 않았거나, 복제할 필요가 없는 타입인 경우)에는 스킵
       }
@@ -176,4 +138,99 @@ const IObjectReplicator* ReplicationSystem::GetReplicator(ObjectType objectType)
    default:
       return nullptr;
    }
+}
+
+void ReplicationSystem::NormalizeEvent(RepEvent& ev, const RepFrame& frame, uint64 nowMs) const
+{
+   if (ev.header.tick == 0) {
+      ev.header.tick = frame.roomTick;
+   }
+   if (ev.header.timeMs == 0) {
+      ev.header.timeMs = nowMs;
+   }
+}
+
+void ReplicationSystem::DispatchImmediateEvent(const RepEvent& ev, const RepFrame& frame) const
+{
+   switch (ev.header.type)
+   {
+   case RepEventType::Spawn:
+      FlushEvent_Spawn(ev, frame);
+      break;
+      
+   case RepEventType::Despawn:
+      FlushEvent_Despawn(ev, frame);
+      break;
+      
+      
+      // TODO: 추가하고 여기서 연결하기 (작성도 해야 함, 멤버 함수)
+   default:
+      break;
+   }
+}
+
+void ReplicationSystem::FlushEvent_Spawn(const RepEvent& ev, const RepFrame& frame) const
+{
+   const SpawnEvent* spawnEv = std::get_if<SpawnEvent>(&ev.payload);
+   if (!spawnEv) {
+      consoleLogger->Log(Color::Yellow, L"[ReplicationSystem] Spawn event with invalid payload, skipping. objectId={}", ev.header.source.value);
+      return;   // 페이로드가 SpawnEvent가 아닌 경우 (잘못된 이벤트)
+   }
+   
+   se::room::N_EntitySpawn spawnPkt;
+   auto* spawnInfo = spawnPkt.mutable_info();
+   spawnInfo->set_type(spawnEv->type);
+   spawnInfo->set_template_id(spawnEv->templateId);
+   auto* entityIdPtr = spawnInfo->mutable_entity_id();
+   entityIdPtr->set_value(ev.header.source.value);
+   
+   switch (spawnEv->type)
+   {
+   case ObjectType::OBJ_ITEM:
+      {
+         auto* itemInfo = spawnInfo->mutable_item_info();
+         auto* pos = itemInfo->mutable_position();
+         pos->set_x(spawnEv->position.x);
+         pos->set_y(spawnEv->position.y);
+         pos->set_z(spawnEv->position.z);
+         auto* vel = itemInfo->mutable_velocity();
+         vel->set_x(spawnEv->velocity.x);
+         vel->set_y(spawnEv->velocity.y);
+         vel->set_z(spawnEv->velocity.z);
+         itemInfo->set_amount(spawnEv->amount);
+      }
+      break;
+      
+   case ObjectType::OBJ_PROJECTILE:
+      {
+         auto* projInfo = spawnInfo->mutable_projectile_info();
+         auto* pos = projInfo->mutable_position();
+         pos->set_x(spawnEv->position.x);
+         pos->set_y(spawnEv->position.y);
+         pos->set_z(spawnEv->position.z);
+         auto* vel = projInfo->mutable_velocity();
+         vel->set_x(spawnEv->velocity.x);
+         vel->set_y(spawnEv->velocity.y);
+         vel->set_z(spawnEv->velocity.z);
+      }
+      break;
+      
+   default:
+      consoleLogger->Log(Color::Yellow, L"[ReplicationSystem] Spawn event with unsupported object type {}, skipping. objectId={}", spawnEv->type, ev.header.source.value);
+      break;
+   }
+   
+   SendBufferRef sendBuffer = ServerPacketHandler::MakeSendBuffer(spawnPkt);
+   ownerRoom_->BroadcastReplication(sendBuffer);
+}
+
+void ReplicationSystem::FlushEvent_Despawn(const RepEvent& ev, const RepFrame& frame) const
+{
+   // 이건 아마 안쓰이지 않을까 싶기도 함...
+   se::room::N_EntityDespawn despawnPkt;
+   auto* entityIdPtr = despawnPkt.mutable_entity_id();
+   entityIdPtr->set_value(ev.header.source.value);
+   
+   SendBufferRef sendBuffer = ServerPacketHandler::MakeSendBuffer(despawnPkt);
+   ownerRoom_->BroadcastReplication(sendBuffer);
 }

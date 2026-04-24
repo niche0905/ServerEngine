@@ -4,7 +4,7 @@
 #include "ReplicationTypes.h"
 #include <vector>
 #include <common/common_types.pb.h>
-
+#include "Content/Object/ObjectEnum.h"
 #include "Physics/Narrowphase/IntersectUtil.h"
 
 enum class RepEventType : uint8
@@ -38,6 +38,16 @@ struct RepEventHeader
     ObjectId target{};      // optional
 };
 
+struct SpawnEvent
+{
+    ObjectType type{ObjectType::OBJ_NONE};
+    uint32 templateId{0};
+    // 동적으로 생성하는 것들은 아이템, 투사체로 한정 될 것이므로 일단 보류
+    SE::Math::Vector3 position{};
+    SE::Math::Vector3 velocity{};
+    uint32 amount;
+};
+
 struct FireEvent
 {
     uint32 weaponId{0};
@@ -58,6 +68,7 @@ struct AimChangedEvent
 
 using RepEventPayload = std::variant<
     std::monostate,
+    SpawnEvent,
     FireEvent,
     WeaponChangedEvent,
     AimChangedEvent

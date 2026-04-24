@@ -29,9 +29,6 @@ public:
    
    bool Init(Room* ownerRoom);
 
-   void NotifySpawn(BaseObject* object);
-   void NotifyDespawn(ObjectId objectId);
-   
    void PushEvent(const RepEvent& event);
    
    void MarkDirty(ObjectId objectId);
@@ -41,6 +38,13 @@ public:
    
 private:
    const IObjectReplicator* GetReplicator(ObjectType objectType);
+   
+   void NormalizeEvent(RepEvent& ev, const RepFrame& frame, uint64 nowMs) const;
+   void DispatchImmediateEvent(const RepEvent& ev, const RepFrame& frame) const;
+
+private:
+   void FlushEvent_Spawn(const RepEvent& ev, const RepFrame& frame) const;
+   void FlushEvent_Despawn(const RepEvent& ev, const RepFrame& frame) const;
    
 private:
    Room*                         ownerRoom_ = nullptr;   // non-owning

@@ -192,12 +192,16 @@ public:
    
 public:
    void BroadcastGameStart();
-   void BroadcastSpawn(ObjectId objectId, se::common::ObjectType objectType, uint32 templateId);
    void BroadcastDeath(ObjectId objectId);
    void BroadcastRespawn(ObjectId objectId);
    void NotifyHealthChange(PlayerId id, int newHealth, int deltaHealth);
    // void BroadcastHit();
    void BroadcastKillPlayer(ObjectId killerId, ObjectId victimId);
+   
+private:
+   void ReplicateEventSet(RepEvent& ev, RepEventType eventType);
+   
+   void ReplicationSpawn(Actor* actor, uint32 templateId, uint32 amount = 0);
    
 public:
    void HandleDamageResult(Pawn* attacker, Actor* victim, const SE::Physics::Hit::HitResult& hitResult, const DamageContext& ctx, const DamageResult& damageResult);
