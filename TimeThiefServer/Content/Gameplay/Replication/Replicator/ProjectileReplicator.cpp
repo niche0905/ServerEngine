@@ -17,11 +17,15 @@ ReplicateResult ProjectileReplicator::FlushPeriodic(BaseObject* obj, Replication
 ReplicateResult ProjectileReplicator::FlushProjectilePeriodic(ProjectileActor& projectile, ReplicationDirty flags,
     const RepFrame& frame, uint64 nowMs, Room& room) const
 {
+    constexpr uint64 ProjectileReplicateIntervalMs = 100;   // TODO: 상수나 config 값으로 빼기
+    
+    const uint64 lastMs = projectile.GetReplicatedState().lastReplicatedTimeMs;
+    
     ReplicateResult result;
     
     if (HasDirty(flags, ReplicationDirty::Transform)) {
         
-        if (nowMs >= projectile.GetReplicatedState().lastReplicatedTimeMs + 100) {   // TODO: 100ms이거 상수나 config 값으로 빼기
+        if ((nowMs - lastMs) >= ProjectileReplicateIntervalMs) {
             
             se::game::N_Move projectileMoveNoti;
             {
