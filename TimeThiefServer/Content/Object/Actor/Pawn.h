@@ -48,9 +48,6 @@ public:
     
 // Movement
 public:
-    const Vector3& GetVelocity() const { return velocity_; }
-    void SetVelocity(const Vector3& velocity);
-    
     virtual void IntegrateMove(float dt);  // 단순 이동 (물리/충돌 미적용 <- 상속받아서 구현 필요)
     
 // Damageable
@@ -123,7 +120,6 @@ protected:
     RespawnComponent                    respawn_;
     std::unique_ptr<CombatComponent>    combat_;
     
-    Vector3                             velocity_{};
     bool                                isDead_{false};
     
 };

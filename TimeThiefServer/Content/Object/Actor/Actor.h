@@ -41,6 +41,9 @@ public:
    
    void SetTransform(const Vector3& position, float yaw);
    
+   const Vector3& GetVelocity() const { return velocity_; }
+   void SetVelocity(const Vector3& velocity) { velocity_ = velocity; }
+   
 // Collider 관련 함수들
 public:
     virtual void ForEachCollider(const std::function<void(ColliderComponent*)>& fn) const override;
@@ -56,6 +59,8 @@ public:
 protected:
    Vector3  position_{};
    float    yaw_{0.0f};
+   
+   Vector3  velocity_{};
    
    std::vector<std::unique_ptr<ColliderComponent>> colliders_;
    

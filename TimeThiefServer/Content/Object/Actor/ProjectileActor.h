@@ -31,9 +31,6 @@ public:
     int32 GetDamage() const { return damage_; }
     void SetDamage(int32 damage) { damage_ = damage; }
     
-    const Vector3& GetVelocity() const { return velocity_; }
-    void SetVelocity(const Vector3& velocity) { velocity_ = velocity; }
-    
 public:
     void Init(ObjectId ownerId, const Vector3& startPos, const Vector3& velocity, int32 damage, uint32 lifetimeMs, float radius);
     
@@ -55,6 +52,5 @@ private:
     int32 damage_{ 0 };
     
     TimerId lifetimeTimer_{};
-    Vector3 velocity_{};
     
 };

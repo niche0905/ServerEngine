@@ -8,12 +8,6 @@
    Pawn
 --------*/
 
-void Pawn::SetVelocity(const Vector3& velocity)
-{
-   velocity_ = velocity;
-   // 필요 시 속도 변경에 따른 추가 작업 수행
-}
-
 void Pawn::IntegrateMove(float dt)
 {
    Vector3 pos = GetPosition();

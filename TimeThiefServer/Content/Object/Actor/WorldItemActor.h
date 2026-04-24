@@ -27,10 +27,11 @@ public:
    virtual se::common::ObjectType GetObjectType() const override { return se::common::OBJ_ITEM; }
    
 public:
-   const Vector3& GetVelocity() const { return velocity_; }
-   
    const ItemStack& GetItemStack() const { return stack_; }
    void SetItemStack(const ItemStack& stack) { stack_ = stack; }
+   
+   uint32 GetTemplateId() const { return stack_.id; }
+   uint32 GetAmount() const { return stack_.count; }
    
    void InitDrop(const ItemStack& stack, const Vector3& pos, const Vector3& initVel);
 
@@ -40,7 +41,5 @@ protected:
    
 private:
    ItemStack stack_{};
-   
-   Vector3 velocity_{};
    
 };
