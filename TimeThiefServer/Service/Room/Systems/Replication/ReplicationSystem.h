@@ -3,6 +3,9 @@
 #include <unordered_set>
 #include "Content/Object/ObjectId.h"
 #include "Content/Gameplay/Replication/ReplicationEvent.h"
+#include "Content/Gameplay/Replication/Replicator/MonsterReplicator.h"
+#include "Content/Gameplay/Replication/Replicator/PlayerReplicator.h"
+#include "Content/Gameplay/Replication/Replicator/ProjectileReplicator.h"
 #include "Content/Object/ObjectEnum.h"
 
 class IObjectReplicator;
@@ -40,10 +43,15 @@ private:
    const IObjectReplicator* GetReplicator(ObjectType objectType);
    
 private:
-   Room* ownerRoom_ = nullptr;   // non-owning
+   Room*                         ownerRoom_ = nullptr;   // non-owning
    
-   std::vector<ObjectId> dirtyObjects_;   // 복제 대상이 된 오브젝트들의 ID 리스트
-   std::unordered_set<ObjectId> dirtyObjectSet_;
-   std::vector<RepEvent> replicationEvents_;
+   std::vector<ObjectId>         dirtyObjects_;   // 복제 대상이 된 오브젝트들의 ID 리스트
+   std::unordered_set<ObjectId>  dirtyObjectSet_;
+   std::vector<RepEvent>         replicationEvents_;
+   
+private:
+   PlayerReplicator              playerReplicator_;
+   MonsterReplicator             monsterReplicator_;
+   ProjectileReplicator          projectileReplicator_;
    
 };

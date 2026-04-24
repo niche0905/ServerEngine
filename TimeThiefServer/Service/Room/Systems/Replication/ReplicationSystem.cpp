@@ -162,8 +162,18 @@ void ReplicationSystem::FlushPeriodic(const RepFrame& frame)
 
 const IObjectReplicator* ReplicationSystem::GetReplicator(ObjectType objectType)
 {
-   // TODO: objectType별로 IObjectReplicator 구현체를 만들어서 반환하도록 구현
-   //       Replication System을 Init 할 때 각 replicator들을 생성해서 멤버 변수로 보관하는 방식으로 구현하면 될 듯
-   
-   return nullptr;
+   switch (objectType)
+   {
+   case ObjectType::OBJ_PLAYER:
+      return &playerReplicator_;
+      
+   case ObjectType::OBJ_MONSTER:
+      return &monsterReplicator_;
+      
+   case ObjectType::OBJ_PROJECTILE:
+      return &projectileReplicator_;
+      
+   default:
+      return nullptr;
+   }
 }
