@@ -1,14 +1,14 @@
 ﻿#pragma once
 #include "Content/Gameplay/Replication/IObjectReplicator.h"
 
-class PlayerPawn;
+class ProjectileActor;
 
-class PlayerReplicator : public IObjectReplicator
+class ProjectileReplicator : public IObjectReplicator
 {
 public:
     virtual ReplicateResult FlushPeriodic(BaseObject* obj, ReplicationDirty flags, const RepFrame& frame, uint64 nowMs, Room& room) const override;
     
 private:
-    ReplicateResult FlushPlayerPeriodic(PlayerPawn& player, ReplicationDirty flags, const RepFrame& frame, uint64 nowMs, Room& room) const;
+    ReplicateResult FlushProjectilePeriodic(ProjectileActor& projectile, ReplicationDirty flags, const RepFrame& frame, uint64 nowMs, Room& room) const;
     
 };
