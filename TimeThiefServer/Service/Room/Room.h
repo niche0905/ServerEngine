@@ -185,6 +185,7 @@ private:
    void Broadcast(SendBufferRef sendBuffer, PlayerId exceptPlayerId = 0);
    bool SendToPlayer(PlayerId playerId, SendBufferRef sendBuffer);
    
+public:
    void BroadcastReplication(SendBufferRef sendBuffer, PlayerId exceptPlayerId = 0);
    
 public:

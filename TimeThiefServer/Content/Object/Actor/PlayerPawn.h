@@ -42,10 +42,12 @@ public:
 protected:
     virtual int32 ResolveIncomingDamage(int32 amount, const DamageContext& ctx) override;
     
-// pitch
 public:
     float GetPitch() const { return pitch_; }
     void SetPitch(float pitch) { pitch_ = pitch; }
+    
+    int32 GetMovementMode() const { return movementMode_; }
+    void SetMovementMode(int32 movementMode) { movementMode_ = movementMode; }
     
 // Component
 public:
@@ -143,6 +145,7 @@ private:
     PlayerId                    playerId_;
     
     float                       pitch_{0.0f};
+    int32                       movementMode_{0};
     
     InventoryComponent          inventory_{};
     WalletComponent             wallet_{};
