@@ -466,9 +466,7 @@ bool Room::HandleLoadingComplete(PlayerId playerId)
 
 bool Room::HandleMove(PlayerId playerId, const se::game::C_MoveReq& pkt)
 {
-   SendBufferRef moveBroadcastBuffer;
    std::shared_ptr<PlayerSession> sessionRef = sessionManager_.FindByPlayerId(playerId);
-   
    if (!sessionRef) return false;   // 세션이 존재하지 않음 (정상적이지 않은 상황)
    // TODO: 기본적으로 본인 Player에겐 예외, 다만 유효성 판정 실패 시 보정 패킷을 보내야 한다
    
@@ -488,6 +486,7 @@ bool Room::HandleMove(PlayerId playerId, const se::game::C_MoveReq& pkt)
          return false;
       
       const auto& move = pkt.movement();
+      const auto& velocity = move.velocity();
       const auto& pos = move.position();
       
       // TODO: 유효성 판정은 여기서
@@ -496,35 +495,9 @@ bool Room::HandleMove(PlayerId playerId, const se::game::C_MoveReq& pkt)
       playerPawn->SetPosition(Vector3{pos.x(), pos.y(), pos.z()});
       playerPawn->SetYaw(move.yaw());
       playerPawn->SetPitch(move.pitch());
-      
-      se::game::N_Move noti;
-      {
-         auto* entityIdPtr = noti.mutable_entity_id();
-         entityIdPtr->set_value(it->second.pawnObjectId.value);
-         
-         noti.set_object_type(se::common::OBJ_PLAYER);
-         
-         auto* transformPtr = noti.mutable_transform();
-         auto* positionPtr = transformPtr->mutable_position();
-         const auto& newPos = playerPawn->GetPosition();
-         positionPtr->set_x(newPos.x);
-         positionPtr->set_y(newPos.y);
-         positionPtr->set_z(newPos.z);
-         transformPtr->set_yaw(playerPawn->GetYaw());
-         
-         auto* playerMovementPtr = noti.mutable_player_movement();
-         playerMovementPtr->set_pitch(playerPawn->GetPitch());
-         auto* velocityPtr = playerMovementPtr->mutable_velocity();
-         velocityPtr->set_x(move.velocity().x());
-         velocityPtr->set_y(move.velocity().y());
-         playerMovementPtr->set_movement_mode(move.movement_mode());
-      }
-      
-      moveBroadcastBuffer = ServerPacketHandler::MakeSendBuffer(noti);
+      playerPawn->SetVelocity(Vector3{velocity.x(), velocity.y(), 0.0f});
+      playerPawn->SetMovementMode(move.movement_mode());
    }
-   
-   if (moveBroadcastBuffer)
-      Broadcast(moveBroadcastBuffer, playerId);   // 이동한 플레이어를 제외한 나머지 플레이어들에게 이동 정보 Broadcast
    
    return true;
 }
