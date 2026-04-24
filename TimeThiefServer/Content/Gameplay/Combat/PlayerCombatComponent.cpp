@@ -56,7 +56,7 @@ bool PlayerCombatComponent::CanAttack(const AttackRequest& request) const
                 return false;   // 무기 ID가 0인 경우 유효하지 않음
     
             const WeaponSlotState* weaponState = GetCurrentWeaponSlot();
-            if (!weaponState || weaponState->runtime.weaponId == request.weaponId or weaponState->stat.common.fireType != WeaponFireType::HitScan)
+            if (!weaponState || weaponState->runtime.weaponId != request.weaponId or weaponState->stat.common.fireType != WeaponFireType::HitScan)
                 return false;   // 해당 슬롯에 무기가 없거나 유효하지 않은 무기
     
             if (weaponState->runtime.isReloading)
