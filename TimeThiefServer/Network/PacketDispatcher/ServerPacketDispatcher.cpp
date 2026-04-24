@@ -350,6 +350,14 @@ bool ServerPacketDispatcher::Handle_C_EquipItemReq(PacketSessionRef& session, co
     });
 }
 
+bool ServerPacketDispatcher::Handle_C_SkillEquipReq(PacketSessionRef& session, const se::game::C_SkillEquipReq& pkt)
+{
+    return EnqueueToPlayerRoom(session, pkt, [](Room& room, PlayerId playerId, const se::game::C_SkillEquipReq& pkt)
+    {
+        room.HandleSkillEquip(playerId, pkt);
+    });
+}
+
 bool ServerPacketDispatcher::TryGetPlayerId(PacketSessionRef& session, PlayerId& outPlayerId) const
 {
     outPlayerId = 0;

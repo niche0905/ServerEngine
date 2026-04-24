@@ -1452,6 +1452,57 @@ bool Room::HandleEquipItem(PlayerId playerId, const se::game::C_EquipItemReq& pk
    return true;
 }
 
+bool Room::HandleSkillEquip(PlayerId playerId, const se::game::C_SkillEquipReq& pkt)
+{
+   SendBufferRef skillEquipResultBuffer;
+   
+   std::shared_ptr<PlayerSession> sessionRef = sessionManager_.FindByPlayerId(playerId);
+   if (!sessionRef) return false;   // 세션이 존재하지 않음 (정상적이지 않은 상황)
+   
+   {
+      if (playerId == 0)
+         return false;
+      
+      auto it = roomPlayers_.find(playerId);
+      if (it == roomPlayers_.end())
+         return false;   // 방에 존재하지 않는 플레이어
+      
+      if (not it->second.loaded)
+         return false;
+      
+      auto* playerPawn = objectManager_.FindAs<PlayerPawn>(it->second.pawnObjectId);
+      if (!playerPawn)
+         return false;
+      
+      const uint32 skillId = pkt.skill_id();
+      const uint32 slotIndex = pkt.slot_index();
+      
+      auto& skill = playerPawn->GetSkill();
+      bool equip = skill.EquipSkill(skillId, static_cast<uint8>(slotIndex));
+      
+      se::game::S_SkillEquipRes res;
+      {
+         res.set_success(equip);
+         if (not equip) {
+            auto* resultPtr = res.mutable_result();
+            consoleLogger->Log(Color::Yellow, L"[Room] Failed to equip skillId %u to slotIndex %u for playerId %u\n", skillId, slotIndex, playerId);
+            resultPtr->set_message("Failed to equip skill.");
+            resultPtr->set_code(se::common::ERR_UNKNOWN);   // TODO: 실패 사유에 따른 코드 구체화 필요
+         }
+         else {
+            res.set_skill_id(skillId);
+            res.set_slot_index(slotIndex);
+         }
+      }
+      skillEquipResultBuffer = ServerPacketHandler::MakeSendBuffer(res);
+   }
+   
+   if (skillEquipResultBuffer)
+      sessionRef->Send(skillEquipResultBuffer);   // 스킬 장착 결과를 해당 플레이어에게 전송
+   
+   return false;
+}
+
 bool Room::Start()
 {
    if (roomState_ != RoomState::Loading) 

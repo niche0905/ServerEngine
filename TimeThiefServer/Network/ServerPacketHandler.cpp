@@ -203,6 +203,12 @@ bool Handle_C_PickupItemReq(PacketSessionRef& session, const se::game::C_PickupI
     return Dispatcher()->Handle_C_PickupItemReq(session, pkt);
 }
     
+bool Handle_C_EquipItemReq(PacketSessionRef& session, const se::game::C_EquipItemReq& pkt)
+{
+    if (!Dispatcher()) return false;
+    return Dispatcher()->Handle_C_EquipItemReq(session, pkt);
+}
+
 bool Handle_C_UseStoreReq(PacketSessionRef& session, const se::game::C_UseStoreReq& pkt)
 {
     if (!Dispatcher()) return false;
@@ -215,8 +221,8 @@ bool Handle_C_SetSavePointReq(PacketSessionRef& session, const se::game::C_SetSa
     return Dispatcher()->Handle_C_SetSavePointReq(session, pkt);
 }
 
-bool Handle_C_EquipItemReq(PacketSessionRef& session, const se::game::C_EquipItemReq& pkt)
+bool Handle_C_SkillEquipReq(PacketSessionRef& session, const se::game::C_SkillEquipReq& pkt)
 {
     if (!Dispatcher()) return false;
-    return Dispatcher()->Handle_C_EquipItemReq(session, pkt);
+    return Dispatcher()->Handle_C_SkillEquipReq(session, pkt); 
 }

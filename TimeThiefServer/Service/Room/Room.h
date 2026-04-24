@@ -97,6 +97,7 @@ public:
    bool HandleWireActionEnd(PlayerId playerId, const se::game::C_WireActionEnd& pkt);
    bool HandleWireLaunch(PlayerId playerId, const se::game::C_WireLaunchReq& pkt);
    bool HandleEquipItem(PlayerId playerId, const se::game::C_EquipItemReq& pkt);
+   bool HandleSkillEquip(PlayerId playerId, const se::game::C_SkillEquipReq& pkt);
    
 public:
    template<typename T, typename... Args>
