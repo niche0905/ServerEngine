@@ -363,8 +363,7 @@ void PlayerCombatComponent::FireLauncher(const AttackRequest& request)
     const float projectileSpeed = launcher->projectileSpeed;
     const float explosionRadius = launcher->explosionRadius;
     
-    // TEMP: 무기 ID가 3이면서 현재 무기와 일치하는 경우에만 발사 가능하도록 간단히 구현 (나중에 Weapon Data로 관리하기)
-    if (request.weaponId == 0 or request.weaponId != GetCurrentWeaponId() or request.weaponId != 3)
+    if (request.weaponId == 0 or request.weaponId != GetCurrentWeaponId())
         return;
     
     uint8 weaponSlot = WeaponSlotFromWeaponId(request.weaponId);
