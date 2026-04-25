@@ -323,7 +323,7 @@ bool PlayerCombatComponent::FireShotgun(const AttackRequest& request)
     const int pelletCount = shotgun->pelletCount;
     const float spread = shotgun->coneAngleDegrees;
     
-    if (request.weaponId == 0 or request.weaponId != GetCurrentWeaponId() or request.weaponId == 2)
+    if (request.weaponId == 0 or request.weaponId != GetCurrentWeaponId())
         return false;
     
     uint8 weaponSlot = WeaponSlotFromWeaponId(request.weaponId);
