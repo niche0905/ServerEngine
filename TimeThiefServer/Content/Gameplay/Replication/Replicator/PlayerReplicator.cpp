@@ -39,6 +39,7 @@ ReplicateResult PlayerReplicator::FlushPlayerPeriodic(PlayerPawn& player, Replic
             transformPtr->set_yaw(player.GetYaw());
          
             auto* playerMovementPtr = noti.mutable_player_movement();
+            playerMovementPtr->set_aim_yaw((player.GetAimYaw()));
             playerMovementPtr->set_pitch(player.GetPitch());
             auto* velocityPtr = playerMovementPtr->mutable_velocity();
             const auto& newVelocity = player.GetVelocity();

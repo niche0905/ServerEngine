@@ -43,6 +43,9 @@ protected:
     virtual int32 ResolveIncomingDamage(int32 amount, const DamageContext& ctx) override;
     
 public:
+    float GetAimYaw() const { return aimYaw_; }
+    void SetAimYaw(float aimYaw) { aimYaw_ = aimYaw; }
+    
     float GetPitch() const { return pitch_; }
     void SetPitch(float pitch) { pitch_ = pitch; }
     
@@ -144,6 +147,7 @@ private:
 private:
     PlayerId                    playerId_;
     
+    float                       aimYaw_{0.0f};
     float                       pitch_{0.0f};
     int32                       movementMode_{0};
     

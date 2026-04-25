@@ -494,6 +494,7 @@ bool Room::HandleMove(PlayerId playerId, const se::game::C_MoveReq& pkt)
       
       playerPawn->SetPosition(Vector3{pos.x(), pos.y(), pos.z()});
       playerPawn->SetYaw(move.yaw());
+      playerPawn->SetAimYaw(move.aim_yaw());
       playerPawn->SetPitch(move.pitch());
       playerPawn->SetVelocity(Vector3{velocity.x(), velocity.y(), 0.0f});
       playerPawn->SetMovementMode(move.movement_mode());
