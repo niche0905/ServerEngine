@@ -1,5 +1,6 @@
 ﻿#include "pch.h"
 #include "Room.h"
+#include <utility>
 #include "Content/Gameplay/Combat/PlayerCombatComponent.h"
 #include "Content/Object/BaseObject.h"
 #include "Content/Object/Actor/MonsterPawn.h"
@@ -1684,7 +1685,7 @@ void Room::BroadcastReplication(SendBufferRef sendBuffer, PlayerId exceptPlayerI
 
 void Room::SendReplication(PlayerId playerId, SendBufferRef sendBuffer)
 {
-   SendToPlayer(playerId, sendBuffer);
+   SendToPlayer(playerId, std::move(sendBuffer));
 }
 
 void Room::BroadcastGameStart()
@@ -1740,19 +1741,23 @@ void Room::BroadcastRespawn(ObjectId objectId)
 
 void Room::NotifyHealthChange(PlayerId id, int newHealth, int deltaHealth)
 {
-   se::game::N_HealthChanged noti;
-   {
-      auto* entityIdPtr = noti.mutable_entity_id();
-      entityIdPtr->set_value(roomPlayers_[id].pawnObjectId.value);
-      noti.set_new_health(newHealth);
-      noti.set_delta(deltaHealth);
-   }
+   RepEvent healthChangeEvent;
+   ReplicateEventSet(healthChangeEvent, RepEventType::HealthChange);
+   healthChangeEvent.header.playerId = id;
+   healthChangeEvent.header.source = roomPlayers_[id].pawnObjectId;
+   healthChangeEvent.payload = HealthChangeEvent{newHealth, deltaHealth};
    
-   SendBufferRef healthChangeBuffer = ServerPacketHandler::MakeSendBuffer(noti);
-   if (!healthChangeBuffer)
-      return;   // 유효하지 않은 SendBuffer
+   roomGameSystem_.GetReplicationSystem().PushEvent(healthChangeEvent);
+}
+
+void Room::NotifyTimePointChange(PlayerId id, int newTimePoint, int deltaTimePoint)
+{
+   RepEvent moneyChangeEvent;
+   ReplicateEventSet(moneyChangeEvent, RepEventType::MoneyChange);      // Resource
+   moneyChangeEvent.header.playerId = id;
+   moneyChangeEvent.payload = MoneyChangeEvent{newTimePoint, deltaTimePoint};
    
-   SendToPlayer(id, healthChangeBuffer);
+   roomGameSystem_.GetReplicationSystem().PushEvent(moneyChangeEvent);
 }
 
 void Room::BroadcastKillPlayer(ObjectId killerId, ObjectId victimId)

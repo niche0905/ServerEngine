@@ -51,6 +51,8 @@ public:
       
       result.accepted = true;
       
+      owner_->MarkReplicationDirty(ReplicationDirty::Resource);
+      
       return result;
    }
    
@@ -76,6 +78,8 @@ public:
       
       result.accepted = true;
       
+      owner_->MarkReplicationDirty(ReplicationDirty::Resource);
+      
       return result;
    }
    
@@ -83,6 +87,8 @@ public:
    void SetBalanceUnsafe(CurrencyType currency, CurrencyAmount amount)
    {
       balances_[currency] = amount;
+      
+      owner_->MarkReplicationDirty(ReplicationDirty::Resource);
    }
    
    void Clear()

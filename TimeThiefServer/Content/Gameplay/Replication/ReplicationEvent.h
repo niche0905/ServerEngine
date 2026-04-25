@@ -14,6 +14,8 @@ enum class RepEventType : uint8
     Spawn,
     Despawn,
     
+    HealthChange,
+    MoneyChange,
     // Damage,
     // Death,
     // Respawn,
@@ -34,6 +36,7 @@ struct RepEventHeader
     RepEventType type{RepEventType::None};
     uint64 timeMs{0};
     TickSeq tick{0};
+    PlayerId playerId{0};   // optional (Owner Client 에게만 발생하는 이벤트의 경우, 예: HealthChangeEvent)
     ObjectId source{};
     ObjectId target{};      // optional
 };
@@ -46,6 +49,18 @@ struct SpawnEvent
     SE::Math::Vector3 position{};
     SE::Math::Vector3 velocity{};
     uint32 amount;
+};
+
+struct HealthChangeEvent
+{
+    int32 newHealth{0};
+    int32 deltaHealth{0};
+};
+
+struct MoneyChangeEvent
+{
+    int32 newMoney{0};
+    int32 deltaMoney{0};
 };
 
 struct FireEvent
@@ -69,6 +84,8 @@ struct AimChangedEvent
 using RepEventPayload = std::variant<
     std::monostate,
     SpawnEvent,
+    HealthChangeEvent,
+    MoneyChangeEvent,
     FireEvent,
     WeaponChangedEvent,
     AimChangedEvent

@@ -57,6 +57,8 @@ public:
         result.applied = result.hpBefore - result.hpAfter;
         result.killed = (hp_ == 0);
         
+        owner_->MarkReplicationDirty(ReplicationDirty::Health);
+        
         return result;
     }
     
@@ -66,6 +68,8 @@ public:
 
         const int32 before = hp_;
         hp_ = std::min(maxHp_, hp_ + amount);
+        
+        owner_->MarkReplicationDirty(ReplicationDirty::Health);
   
         return hp_ - before;
     }
@@ -73,13 +77,18 @@ public:
     void Revive(int32 hp)
     {
         hp_ = std::clamp(hp, 1, maxHp_);
+        
         invincible_ = false;
+        
+        owner_->MarkReplicationDirty(ReplicationDirty::Health);
     }
     
     // 디버깅 용도
     void SetHpUnsafe(int32 hp)
     {
         hp_ = std::clamp(hp, 0, maxHp_);
+        
+        owner_->MarkReplicationDirty(ReplicationDirty::Health);
     }
     
 private:

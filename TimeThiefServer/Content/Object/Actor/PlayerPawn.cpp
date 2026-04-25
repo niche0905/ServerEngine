@@ -20,8 +20,9 @@ int32 PlayerPawn::ResolveIncomingDamage(int32 amount, const DamageContext& ctx)
       
       const int32 deleteMoney = amount * kMultiplierForZoneDamage;
       
-      if (wallet_.CanSpend(CurrencyType::TimePoint, deleteMoney)) {
-         wallet_.SpendMoney(CurrencyType::TimePoint, deleteMoney, MoneyChangeContext{
+      
+      if (CanSpend(CurrencyType::TimePoint, deleteMoney)) {
+         SpendMoney(CurrencyType::TimePoint, deleteMoney, MoneyChangeContext{
             .reason = MoneyChangeReason::ZoneDamage,
          });
          return 0;   // 존 데미지로 삭제할 재화가 충분하면 체력에는 데미지를 주지 않음
@@ -31,8 +32,8 @@ int32 PlayerPawn::ResolveIncomingDamage(int32 amount, const DamageContext& ctx)
       //       만약 재화의 차감으로도 죽을 수 있다면 사망 처리 진행
       //       재화가 모두 삭제되었더라도 죽이지 않을 것이라면 차감된 재화 양에 따라 amount 수정
       
-      int32 currentMoney = wallet_.GetBalance(CurrencyType::TimePoint);
-      wallet_.SpendMoney(CurrencyType::TimePoint, currentMoney, MoneyChangeContext{
+      int32 currentMoney = GetBalance(CurrencyType::TimePoint);
+      SpendMoney(CurrencyType::TimePoint, currentMoney, MoneyChangeContext{
            .reason = MoneyChangeReason::ZoneDamage,
         });
       int64 remainDelete = deleteMoney - currentMoney;
@@ -88,13 +89,21 @@ InventoryOpResult PlayerPawn::ConsumeItem(ItemId itemId, int32 count, const Item
 MoneyChangeResult PlayerPawn::AddMoney(CurrencyType currency, CurrencyAmount amount,
    const MoneyChangeContext& ctx)
 {
-   return wallet_.AddMoney(currency, amount, ctx);
+   MoneyChangeResult result = wallet_.AddMoney(currency, amount, ctx);
+   if (auto room = GetRoom()) {
+      room->NotifyTimePointChange(GetOwnerPlayerId(), result.after, result.delta);
+   }
+   return result;
 }
 
 MoneyChangeResult PlayerPawn::SpendMoney(CurrencyType currency, CurrencyAmount amount,
    const MoneyChangeContext& ctx)
 {
-   return wallet_.SpendMoney(currency, amount, ctx);
+   MoneyChangeResult result = wallet_.SpendMoney(currency, amount, ctx);
+   if (auto room = GetRoom()) {
+      room->NotifyTimePointChange(GetOwnerPlayerId(), result.after, result.delta);
+   }
+   return result;
 }
 
 void PlayerPawn::OnSkillChanged(SkillId skillId)

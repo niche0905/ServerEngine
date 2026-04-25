@@ -195,6 +195,7 @@ public:
    void BroadcastDeath(ObjectId objectId);
    void BroadcastRespawn(ObjectId objectId);
    void NotifyHealthChange(PlayerId id, int newHealth, int deltaHealth);
+   void NotifyTimePointChange(PlayerId id, int newTimePoint, int deltaTimePoint);
    // void BroadcastHit();
    void BroadcastKillPlayer(ObjectId killerId, ObjectId victimId);
    

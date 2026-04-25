@@ -162,6 +162,13 @@ void ReplicationSystem::DispatchImmediateEvent(const RepEvent& ev, const RepFram
       FlushEvent_Despawn(ev, frame);
       break;
       
+   case RepEventType::HealthChange:
+      FlushEvent_Health(ev, frame);
+      break;
+      
+   case RepEventType::MoneyChange:
+      FlushEvent_Money(ev, frame);
+      break;
       
       // TODO: 추가하고 여기서 연결하기 (작성도 해야 함, 멤버 함수)
    default:
@@ -233,4 +240,38 @@ void ReplicationSystem::FlushEvent_Despawn(const RepEvent& ev, const RepFrame& f
    
    SendBufferRef sendBuffer = ServerPacketHandler::MakeSendBuffer(despawnPkt);
    ownerRoom_->BroadcastReplication(sendBuffer);
+}
+
+void ReplicationSystem::FlushEvent_Health(const RepEvent& ev, const RepFrame& frame) const
+{
+   const HealthChangeEvent* healthChangeEv = std::get_if<HealthChangeEvent>(&ev.payload);
+   if (!healthChangeEv) {
+      consoleLogger->Log(Color::Yellow, L"[ReplicationSystem] HealthChange event with invalid payload, skipping. PlayerId={}", ev.header.playerId);
+      return;   // 페이로드가 HealthChangeEvent가 아닌 경우 (잘못된 이벤트)
+   }
+   
+   se::game::N_HealthChanged healthPkt;
+   auto* entityIdPtr = healthPkt.mutable_entity_id();
+   entityIdPtr->set_value(ev.header.source.value);
+   healthPkt.set_new_health(healthChangeEv->newHealth);
+   healthPkt.set_delta(healthChangeEv->deltaHealth);
+   
+   SendBufferRef sendBuffer = ServerPacketHandler::MakeSendBuffer(healthPkt);
+   ownerRoom_->SendReplication(ev.header.playerId, sendBuffer);
+}
+
+void ReplicationSystem::FlushEvent_Money(const RepEvent& ev, const RepFrame& frame) const
+{
+   const MoneyChangeEvent* moneyChangeEv = std::get_if<MoneyChangeEvent>(&ev.payload);
+   if (!moneyChangeEv) {
+      consoleLogger->Log(Color::Yellow, L"[ReplicationSystem] MoneyChange event with invalid payload, skipping. PlayerId={}", ev.header.playerId);
+      return;   // 페이로드가 MoneyChangeEvent가 아닌 경우 (잘못된 이벤트)
+   }
+   
+   se::game::N_TimePointChanged timePointPkt;
+   timePointPkt.set_new_time_points(moneyChangeEv->newMoney);
+   timePointPkt.set_delta(moneyChangeEv->deltaMoney);
+   
+   SendBufferRef sendBuffer = ServerPacketHandler::MakeSendBuffer(timePointPkt);
+   ownerRoom_->SendReplication(ev.header.playerId, sendBuffer);
 }
