@@ -1553,7 +1553,7 @@ bool Room::HandleZoneStop(PlayerId playerId, const se::test::C_ZoneStopReq& pkt)
    ZoneSystem& zoneSystem = roomGameSystem_.GetZoneSystem();
    zoneSystem.SetProgressing(false);
    
-   // TODO: 존이 멈춘 것을 모두에게 Broadcast하기 (존이 멈췄을 때의 자기장 축소 정지를 Client에서 반영하기 위해)
+   NotifyZoneFlow(false);
    
    return true;
 }
@@ -1562,6 +1562,8 @@ bool Room::HandleZoneStart(PlayerId playerId, const se::test::C_ZoneStartReq& pk
 {
    ZoneSystem& zoneSystem = roomGameSystem_.GetZoneSystem();
    zoneSystem.SetProgressing(true);
+   
+   NotifyZoneFlow(true);
    
    return true;
 }
