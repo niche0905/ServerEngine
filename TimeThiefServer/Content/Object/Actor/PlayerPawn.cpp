@@ -53,6 +53,16 @@ void PlayerPawn::Damaged(const DamageResult& dmgResult)
    }
 }
 
+void PlayerPawn::Heal(int32 amount)
+{
+   int32 currentHp = GetHealth().GetHp();
+   health_.Heal(amount);
+   int32 newHp = GetHealth().GetHp();
+   if (auto room = GetRoom()) {
+      room->NotifyHealthChange(GetOwnerPlayerId(), newHp, newHp - currentHp);
+   }
+}
+
 LootBundle PlayerPawn::GenerateDrops()
 // 플레이어의 경우는 죽었을 때 인벤토리에 있는 아이템을 전부 드롭한다
 {

@@ -72,7 +72,7 @@ public:
 public:
     virtual void Damaged(const DamageResult& dmgResult) override;
     
-    // TODO: Health 관련 Heal 메서드에서 RepEvent 로 Replicate 할 수 있게 하여야 함
+    void Heal(int32 amount);
 
 // IDropOwner
 public:
