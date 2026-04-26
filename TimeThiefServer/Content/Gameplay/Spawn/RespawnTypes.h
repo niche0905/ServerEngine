@@ -15,7 +15,7 @@ struct RespawnPolicy
     bool enabled{true};
     
     uint32 delayMs{5000};       // 리스폰 대기 시간 (밀리초)
-    uint32 invulMs{1500};       // 리스폰 후 무적 시간 (밀리초)
+    uint32 invulMs{3000};       // 리스폰 후 무적 시간 (밀리초)
     
     // 리스폰 위치 관련 설정
     bool useSpawnPoint{true};   // 스폰 포인트 사용 여부
