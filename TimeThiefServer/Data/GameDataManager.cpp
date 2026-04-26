@@ -45,15 +45,15 @@ bool GameDataManager::Init(const ServerConfig& config)
    
    // TEMP: (파일 입출력이 아닌 코드로 무기 데이터 초기화)
    weaponTable_.tables[1] = {
-      WeaponCommonStat{WeaponCategory::Rifle, WeaponFireType::HitScan, 12, 30, 0.1f, 1.5f, 1000.0f},
+      WeaponCommonStat{WeaponCategory::Rifle, WeaponFireType::HitScan, 12, 30, 0.1f, 1.5f, 10000.0f},
       RifleStat{}
    };
    weaponTable_.tables[2] = {
-      WeaponCommonStat{WeaponCategory::Shotgun, WeaponFireType::HitScan, 8, 8, 1.0f, 2.5f, 500.0f},
+      WeaponCommonStat{WeaponCategory::Shotgun, WeaponFireType::HitScan, 8, 8, 1.0f, 2.5f, 3000.0f},
       ShotgunStat{12, 0.5f}
    };
    weaponTable_.tables[3] = {
-      WeaponCommonStat{WeaponCategory::Launcher, WeaponFireType::Projectile, 80, 1, 1.5f, 3.0f, 800.0f},
+      WeaponCommonStat{WeaponCategory::Launcher, WeaponFireType::Projectile, 80, 1, 1.5f, 3.0f, 200.0f},
       LauncherStat{500.0f, 20.0f}
    };
    
