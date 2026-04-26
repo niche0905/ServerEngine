@@ -1550,27 +1550,44 @@ bool Room::HandleMaxHealth(PlayerId playerId, const se::test::C_MaxHealthReq& pk
 
 bool Room::HandleZoneStop(PlayerId playerId, const se::test::C_ZoneStopReq& pkt)
 {
-   return false;
+   ZoneSystem& zoneSystem = roomGameSystem_.GetZoneSystem();
+   zoneSystem.SetProgressing(false);
+   
+   // TODO: 존이 멈춘 것을 모두에게 Broadcast하기 (존이 멈췄을 때의 자기장 축소 정지를 Client에서 반영하기 위해)
+   
+   return true;
 }
 
 bool Room::HandleZoneStart(PlayerId playerId, const se::test::C_ZoneStartReq& pkt)
 {
-   return false;
+   ZoneSystem& zoneSystem = roomGameSystem_.GetZoneSystem();
+   zoneSystem.SetProgressing(true);
+   
+   return true;
 }
 
 bool Room::HandleZoneReset(PlayerId playerId, const se::test::C_ZoneResetReq& pkt)
 {
-   return false;
+   ZoneSystem& zoneSystem = roomGameSystem_.GetZoneSystem();
+   zoneSystem.ReStart();
+   
+   return true;
 }
 
 bool Room::HandleZoneDamageOff(PlayerId playerId, const se::test::C_ZoneDamageOffReq& pkt)
 {
-   return false;
+   ZoneSystem& zoneSystem = roomGameSystem_.GetZoneSystem();
+   zoneSystem.SetDamageApplied(false);
+   
+   return true;
 }
 
 bool Room::HandleZoneDamageOn(PlayerId playerId, const se::test::C_ZoneDamageOnReq& pkt)
 {
-   return false;
+   ZoneSystem& zoneSystem = roomGameSystem_.GetZoneSystem();
+   zoneSystem.SetProgressing(true);
+   
+   return true;
 }
 
 bool Room::SpawnChest(const Vector3& pos, int32 tableId)

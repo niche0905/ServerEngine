@@ -23,7 +23,11 @@ public:
     bool Start();
     void Update(float deltaTime);
     
+    void ReStart();
     void Reset();
+    
+    void SetProgressing(bool isProgressing) { isProgressing_ = isProgressing; }
+    void SetDamageApplied(bool isDamageApplied) { isDamageApplied_ = isDamageApplied; }
     
     bool IsInsideSafeZone(const SE::Math::Vector3& position) const;
     float GetDamagePerSecond() const;
@@ -32,6 +36,13 @@ public:
     const ZoneCircle& GetStartZone() const { return startZone_; }
     const ZoneCircle& GetNextZone() const { return nextZone_; }
     uint32 GetCurrentPhase() const { return currentPhase_; }
+    
+private:
+    // 축소 되는 과정
+    void ProgressingZone(float deltaTime);
+    
+    // Zone에 의한 피해 적용
+    void ZoneDamage(float deltaTime);
     
 private:
     void EnterNextPhase();
@@ -58,5 +69,10 @@ private:
     float               damageTickInterval_ = 1.0f;
     
     bool                isShrinking_ = false;
+    
+// Testing
+private:
+    bool                isProgressing_ = true;
+    bool                isDamageApplied_ = true;
     
 };

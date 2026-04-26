@@ -77,6 +77,46 @@ void ZoneSystem::Update(float deltaTime)
    if (deltaTime <= 0.0f)
       return;
    
+   if (isProgressing_)
+      ProgressingZone(deltaTime);
+   
+   if (isDamageApplied_)
+      ZoneDamage(deltaTime);
+}
+
+void ZoneSystem::ReStart()
+{
+   Reset();
+   CalculateNextZone();
+}
+
+void ZoneSystem::Reset()
+{
+   currentPhase_ = 0;
+   phaseElapsedTime_ = 0.0f;
+   isShrinking_ = false;
+   damageTickElapsed_ = 0.0f;
+   
+   startZone_ = ZoneCircle{ zoneBounds_.center, 200000.0f };   // 초기 Zone은 매우 큰 반지름으로 설정하여 사실상 모든 영역이 안전지대가 되도록 함
+   currentZone_ = startZone_;
+}
+
+bool ZoneSystem::IsInsideSafeZone(const SE::Math::Vector3& position) const
+{
+   return currentZone_.Contains(position);
+}
+
+float ZoneSystem::GetDamagePerSecond() const
+{
+   if (zoneTable_ == nullptr)
+      return 0.0f;
+   
+   const ZonePhaseData& phaseData = zoneTable_->GetPhaseData(currentPhase_);
+   return phaseData.damagePerSecond;
+}
+
+void ZoneSystem::ProgressingZone(float deltaTime)
+{
    phaseElapsedTime_ += deltaTime;
    
    const ZonePhaseData& phaseData = zoneTable_->GetPhaseData(currentPhase_);
@@ -103,37 +143,15 @@ void ZoneSystem::Update(float deltaTime)
          EnterNextPhase();
       }
    }
-   
+}
+
+void ZoneSystem::ZoneDamage(float deltaTime)
+{
    damageTickElapsed_ += deltaTime;
    while (damageTickElapsed_ >= damageTickInterval_) {
       damageTickElapsed_ -= damageTickInterval_;
       ApplyZoneDamage(damageTickInterval_);
    }
-}
-
-void ZoneSystem::Reset()
-{
-   currentPhase_ = 0;
-   phaseElapsedTime_ = 0.0f;
-   isShrinking_ = false;
-   damageTickElapsed_ = 0.0f;
-   
-   startZone_ = ZoneCircle{ zoneBounds_.center, 1000000.0f };   // 초기 Zone은 매우 큰 반지름으로 설정하여 사실상 모든 영역이 안전지대가 되도록 함
-   currentZone_ = startZone_;
-}
-
-bool ZoneSystem::IsInsideSafeZone(const SE::Math::Vector3& position) const
-{
-   return currentZone_.Contains(position);
-}
-
-float ZoneSystem::GetDamagePerSecond() const
-{
-   if (zoneTable_ == nullptr)
-      return 0.0f;
-   
-   const ZonePhaseData& phaseData = zoneTable_->GetPhaseData(currentPhase_);
-   return phaseData.damagePerSecond;
 }
 
 void ZoneSystem::EnterNextPhase()
