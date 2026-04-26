@@ -1486,32 +1486,66 @@ bool Room::HandleSpawnMonster(PlayerId playerId, const se::test::C_SpawnMonsterR
 
 bool Room::HandleSpawnChest(PlayerId playerId, const se::test::C_SpawnChestReq& pkt)
 {
-   return false;
+   const auto& pos = pkt.spawn_position();
+   return SpawnChest(Vector3{pos.x(), pos.y(), pos.z()}, 1);    // TEMP: Table ID는 클라이언트에서 모른다
 }
 
 bool Room::HandleSpawnStore(PlayerId playerId, const se::test::C_SpawnStoreReq& pkt)
 {
-   return false;
+   const auto& pos = pkt.spawn_position();
+   return SpawnStore(Vector3{pos.x(), pos.y(), pos.z()});
 }
 
 bool Room::HandleItem(PlayerId playerId, const se::test::C_ItemReq& pkt)
 {
-   return false;
+   return GiveItem(playerId, ItemStack{pkt.item_id(), static_cast<int32>(pkt.quantity())});
 }
 
 bool Room::HandleMoney(PlayerId playerId, const se::test::C_MoneyReq& pkt)
 {
-   return false;
+   return GiveMoney(playerId, static_cast<int32>(pkt.amount()));
 }
 
 bool Room::HandleHealth(PlayerId playerId, const se::test::C_HealthReq& pkt)
 {
-   return false;
+   if (playerId == 0)
+      return false;
+      
+   auto it = roomPlayers_.find(playerId);
+   if (it == roomPlayers_.end())
+      return false;   // 방에 존재하지 않는 플레이어
+      
+   auto* playerPawn = objectManager_.FindAs<PlayerPawn>(it->second.pawnObjectId);
+   if (!playerPawn)
+      return false;
+   
+   auto& health = playerPawn->GetHealth();
+   int32 currentHp = health.GetHp();
+   health.SetHpUnsafe(static_cast<int32>(pkt.health()));
+   int32 newHp = health.GetHp();
+   NotifyHealthChange(playerId, newHp, newHp - currentHp);
+   return true;
 }
 
 bool Room::HandleMaxHealth(PlayerId playerId, const se::test::C_MaxHealthReq& pkt)
 {
-   return false;
+   if (playerId == 0)
+      return false;
+      
+   auto it = roomPlayers_.find(playerId);
+   if (it == roomPlayers_.end())
+      return false;   // 방에 존재하지 않는 플레이어
+      
+   auto* playerPawn = objectManager_.FindAs<PlayerPawn>(it->second.pawnObjectId);
+   if (!playerPawn)
+      return false;
+   
+   auto& health = playerPawn->GetHealth();
+   health.SetHpUnsafe(static_cast<int32>(pkt.max_health()));
+   int32 newMapHp = health.GetMaxHp();
+   int32 currentHp = health.GetMaxHp();
+   NotifyMaxHealthChange(playerId, newMapHp, currentHp);
+   return true;
 }
 
 bool Room::HandleZoneStop(PlayerId playerId, const se::test::C_ZoneStopReq& pkt)
@@ -1537,6 +1571,33 @@ bool Room::HandleZoneDamageOff(PlayerId playerId, const se::test::C_ZoneDamageOf
 bool Room::HandleZoneDamageOn(PlayerId playerId, const se::test::C_ZoneDamageOnReq& pkt)
 {
    return false;
+}
+
+bool Room::SpawnChest(const Vector3& pos, int32 tableId)
+{
+   auto* chest = SpawnObject<ChestActor>(ObjectFlags::None);
+   if (!chest)
+      return false;
+   
+   chest->SetPosition(pos);
+   chest->SetTableId(tableId);
+   
+   // TODO: Spawn 사실 Broadcast (Replicate Event로)
+   
+   return true;
+}
+
+bool Room::SpawnStore(const Vector3& pos)
+{
+   auto* store = SpawnObject<StoreActor>(ObjectFlags::None);
+   if (!store)
+      return false;
+   
+   store->SetPosition(pos);
+   
+   // TODO: Spawn 사실 Broadcast (Replicate Event로)
+   
+   return true;
 }
 
 bool Room::Start()
@@ -1704,6 +1765,40 @@ WorldItemActor* Room::SpawnItem(const SpawnWorldItemParams& params)
    return item;
 }
 
+bool Room::GiveItem(PlayerId playerId, const ItemStack& itemStack)
+{
+   if (playerId == 0)
+      return false;
+      
+   auto it = roomPlayers_.find(playerId);
+   if (it == roomPlayers_.end())
+      return false;   // 방에 존재하지 않는 플레이어
+      
+   auto* playerPawn = objectManager_.FindAs<PlayerPawn>(it->second.pawnObjectId);
+   if (!playerPawn)
+      return false;
+   
+   InventoryOpResult result = playerPawn->AddItem(itemStack.id, itemStack.count, ItemChangeContext{ItemChangeReason::System});
+   return result.accepted;
+}
+
+bool Room::GiveMoney(PlayerId playerId, int32 amount)
+{
+   if (playerId == 0)
+      return false;
+      
+   auto it = roomPlayers_.find(playerId);
+   if (it == roomPlayers_.end())
+      return false;   // 방에 존재하지 않는 플레이어
+      
+   auto* playerPawn = objectManager_.FindAs<PlayerPawn>(it->second.pawnObjectId);
+   if (!playerPawn)
+      return false;
+   
+   MoneyChangeResult result = playerPawn->AddMoney(CurrencyType::TimePoint, amount, MoneyChangeContext{MoneyChangeReason::System});
+   return result.accepted;
+}
+
 void Room::Broadcast(std::shared_ptr<SendBuffer> sendBuffer, PlayerId exceptPlayerId)
 {
    if (not sendBuffer)
@@ -1809,6 +1904,17 @@ void Room::NotifyHealthChange(PlayerId id, int newHealth, int deltaHealth)
    healthChangeEvent.payload = HealthChangeEvent{newHealth, deltaHealth};
    
    roomGameSystem_.GetReplicationSystem().PushEvent(healthChangeEvent);
+}
+
+void Room::NotifyMaxHealthChange(PlayerId id, int newMaxHealth, int newHealth)
+{
+   RepEvent maxHealthChangeEvent;
+   ReplicateEventSet(maxHealthChangeEvent, RepEventType::MaxHealthChange);
+   maxHealthChangeEvent.header.playerId = id;
+   maxHealthChangeEvent.header.source = roomPlayers_[id].pawnObjectId;
+   maxHealthChangeEvent.payload = MaxHealthChangeEvent{newMaxHealth, newHealth};
+   
+   roomGameSystem_.GetReplicationSystem().PushEvent(maxHealthChangeEvent);
 }
 
 void Room::NotifyTimePointChange(PlayerId id, int newTimePoint, int deltaTimePoint)

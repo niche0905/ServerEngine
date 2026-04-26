@@ -260,6 +260,24 @@ void ReplicationSystem::FlushEvent_Health(const RepEvent& ev, const RepFrame& fr
    ownerRoom_->SendReplication(ev.header.playerId, sendBuffer);
 }
 
+void ReplicationSystem::FlushEvent_MaxHealth(const RepEvent& ev, const RepFrame& frame) const
+{
+   const MaxHealthChangeEvent* maxHealthChangeEv = std::get_if<MaxHealthChangeEvent>(&ev.payload);
+   if (!maxHealthChangeEv) {
+      consoleLogger->Log(Color::Yellow, L"[ReplicationSystem] MaxHealthChange event with invalid payload, skipping. PlayerId={}", ev.header.playerId);
+      return;   // 페이로드가 HealthChangeEvent가 아닌 경우 (잘못된 이벤트)
+   }
+   
+   se::game::N_MaxHealthChanged maxHealthPkt;
+   auto* entityIdPtr = maxHealthPkt.mutable_entity_id();
+   entityIdPtr->set_value(ev.header.source.value);
+   maxHealthPkt.set_new_max_health(maxHealthChangeEv->newMaxHealth);
+   maxHealthPkt.set_new_current_health(maxHealthChangeEv->newHealth);
+   
+   SendBufferRef sendBuffer = ServerPacketHandler::MakeSendBuffer(maxHealthPkt);
+   ownerRoom_->SendReplication(ev.header.playerId, sendBuffer);
+}
+
 void ReplicationSystem::FlushEvent_Money(const RepEvent& ev, const RepFrame& frame) const
 {
    const MoneyChangeEvent* moneyChangeEv = std::get_if<MoneyChangeEvent>(&ev.payload);

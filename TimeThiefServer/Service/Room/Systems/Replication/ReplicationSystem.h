@@ -46,6 +46,7 @@ private:
    void FlushEvent_Spawn(const RepEvent& ev, const RepFrame& frame) const;
    void FlushEvent_Despawn(const RepEvent& ev, const RepFrame& frame) const;
    void FlushEvent_Health(const RepEvent& ev, const RepFrame& frame) const;
+   void FlushEvent_MaxHealth(const RepEvent& ev, const RepFrame& frame) const;
    void FlushEvent_Money(const RepEvent& ev, const RepFrame& frame) const;
    
 private:

@@ -91,6 +91,14 @@ public:
         owner_->MarkReplicationDirty(ReplicationDirty::Health);
     }
     
+    void SetMaxHpUnsafe(int32 maxHp)
+    {
+        maxHp_ = std::max(1, maxHp);
+        hp_ = std::min(hp_, maxHp_);
+        
+        owner_->MarkReplicationDirty(ReplicationDirty::Health);
+    }
+    
 private:
     int32 hp_{0};
     int32 maxHp_{0};

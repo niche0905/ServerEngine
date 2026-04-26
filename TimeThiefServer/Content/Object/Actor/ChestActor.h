@@ -39,6 +39,8 @@ public:
     ChestKind GetChestKind() const { return chestKind_; }
     void SetChestKind(ChestKind kind) { chestKind_ = kind; }
     
+    void SetTableId(int32 tableId) { lootSource_.SetTableId(tableId); }
+    
 // IDropOwner
 public:
     virtual LootBundle GenerateDrops() override;

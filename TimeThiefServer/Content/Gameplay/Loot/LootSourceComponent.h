@@ -20,6 +20,7 @@ public:
     }
     
     int32 GetTableId() const { return tableId_; }
+    void SetTableId(int32 tableId) { tableId_ = tableId; }
    
 private:
     int32 tableId_{0};

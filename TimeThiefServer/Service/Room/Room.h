@@ -135,6 +135,10 @@ public:
       return objectManager_.RequestDestroy(objectId);
    }
    
+private:
+   bool SpawnChest(const Vector3& pos, int32 tableId);
+   bool SpawnStore(const Vector3& pos);
+   
 public:
    template <typename Func>
    void ForEachPawn(Func&& func)
@@ -198,6 +202,10 @@ public:
    WorldItemActor* SpawnItem(const SpawnWorldItemParams& params);
    
 private:
+   bool GiveItem(PlayerId playerId, const ItemStack& itemStack);
+   bool GiveMoney(PlayerId playerId, int32 amount);
+   
+private:
    void Broadcast(SendBufferRef sendBuffer, PlayerId exceptPlayerId = 0);
    bool SendToPlayer(PlayerId playerId, SendBufferRef sendBuffer);
    
@@ -210,6 +218,7 @@ public:
    void BroadcastDeath(ObjectId objectId);
    void BroadcastRespawn(ObjectId objectId);
    void NotifyHealthChange(PlayerId id, int newHealth, int deltaHealth);
+   void NotifyMaxHealthChange(PlayerId id, int newMaxHealth, int newHealth);
    void NotifyTimePointChange(PlayerId id, int newTimePoint, int deltaTimePoint);
    // void BroadcastHit();
    void BroadcastKillPlayer(ObjectId killerId, ObjectId victimId);

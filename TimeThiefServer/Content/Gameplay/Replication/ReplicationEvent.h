@@ -15,6 +15,7 @@ enum class RepEventType : uint8
     Despawn,
     
     HealthChange,
+    MaxHealthChange,
     MoneyChange,
     // Damage,
     // Death,
@@ -57,6 +58,12 @@ struct HealthChangeEvent
     int32 deltaHealth{0};
 };
 
+struct MaxHealthChangeEvent
+{
+    int32 newMaxHealth{0};
+    int32 newHealth{0};
+};
+
 struct MoneyChangeEvent
 {
     int32 newMoney{0};
@@ -85,6 +92,7 @@ using RepEventPayload = std::variant<
     std::monostate,
     SpawnEvent,
     HealthChangeEvent,
+    MaxHealthChangeEvent,
     MoneyChangeEvent,
     FireEvent,
     WeaponChangedEvent,
