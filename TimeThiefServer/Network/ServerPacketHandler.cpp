@@ -226,3 +226,72 @@ bool Handle_C_SkillEquipReq(PacketSessionRef& session, const se::game::C_SkillEq
     if (!Dispatcher()) return false;
     return Dispatcher()->Handle_C_SkillEquipReq(session, pkt); 
 }
+
+
+//------------------------------------------------------------
+//
+// Test Packets
+// TODO: 테스트용 패킷들은 development가 아닌 경우에는 비활성화
+//
+//------------------------------------------------------------
+
+bool Handle_C_SpawnMonsterReq(PacketSessionRef& session, const se::test::C_SpawnMonsterReq& pkt)
+{
+    if (!Dispatcher()) return false;
+    return Dispatcher()->Handle_C_SpawnMonsterReq(session, pkt);
+}
+bool Handle_C_SpawnChestReq(PacketSessionRef& session, const se::test::C_SpawnChestReq& pkt)
+{
+    if (!Dispatcher()) return false;
+    return Dispatcher()->Handle_C_SpawnChestReq(session, pkt);
+}
+bool Handle_C_SpawnStoreReq(PacketSessionRef& session, const se::test::C_SpawnStoreReq& pkt)
+{
+    if (!Dispatcher()) return false;
+    return Dispatcher()->Handle_C_SpawnStoreReq(session, pkt);
+}
+bool Handle_C_ItemReq(PacketSessionRef& session, const se::test::C_ItemReq& pkt)
+{
+    if (!Dispatcher()) return false;
+    return Dispatcher()->Handle_C_ItemReq(session, pkt);
+}
+bool Handle_C_MoneyReq(PacketSessionRef& session, const se::test::C_MoneyReq& pkt)
+{
+    if (!Dispatcher()) return false;
+    return Dispatcher()->Handle_C_MoneyReq(session, pkt);
+}
+bool Handle_C_HealthReq(PacketSessionRef& session, const se::test::C_HealthReq& pkt)
+{
+    if (!Dispatcher()) return false;
+    return Dispatcher()->Handle_C_HealthReq(session, pkt);
+}
+bool Handle_C_MaxHealthReq(PacketSessionRef& session, const se::test::C_MaxHealthReq& pkt)
+{
+    if (!Dispatcher()) return false;
+    return Dispatcher()->Handle_C_MaxHealthReq(session, pkt);
+}
+bool Handle_C_ZoneStopReq(PacketSessionRef& session, const se::test::C_ZoneStopReq& pkt)
+{
+    if (!Dispatcher()) return false;
+    return Dispatcher()->Handle_C_ZoneStopReq(session, pkt);
+}
+bool Handle_C_ZoneStartReq(PacketSessionRef& session, const se::test::C_ZoneStartReq& pkt)
+{
+    if (!Dispatcher()) return false;
+    return Dispatcher()->Handle_C_ZoneStartReq(session, pkt);
+}
+bool Handle_C_ZoneResetReq(PacketSessionRef& session, const se::test::C_ZoneResetReq& pkt)
+{
+    if (!Dispatcher()) return false;
+    return Dispatcher()->Handle_C_ZoneResetReq(session, pkt);
+}
+bool Handle_C_ZoneDamageOffReq(PacketSessionRef& session, const se::test::C_ZoneDamageOffReq& pkt)
+{
+    if (!Dispatcher()) return false;
+    return Dispatcher()->Handle_C_ZoneDamageOffReq(session, pkt);
+}
+bool Handle_C_ZoneDamageOnReq(PacketSessionRef& session, const se::test::C_ZoneDamageOnReq& pkt)
+{
+    if (!Dispatcher()) return false;
+    return Dispatcher()->Handle_C_ZoneDamageOnReq(session, pkt);
+}

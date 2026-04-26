@@ -358,6 +358,103 @@ bool ServerPacketDispatcher::Handle_C_SkillEquipReq(PacketSessionRef& session, c
     });
 }
 
+bool ServerPacketDispatcher::Handle_C_SpawnMonsterReq(PacketSessionRef& session, const se::test::C_SpawnMonsterReq& pkt)
+{
+    return EnqueueToPlayerRoom(session, pkt, [](Room& room, PlayerId playerId, const se::test::C_SpawnMonsterReq& pkt)
+    {
+        room.HandleSpawnMonster(playerId, pkt);
+    });
+}
+
+bool ServerPacketDispatcher::Handle_C_SpawnChestReq(PacketSessionRef& session, const se::test::C_SpawnChestReq& pkt)
+{
+    return EnqueueToPlayerRoom(session, pkt, [](Room& room, PlayerId playerId, const se::test::C_SpawnChestReq& pkt)
+    {
+        room.HandleSpawnChest(playerId, pkt);
+    });
+}
+
+bool ServerPacketDispatcher::Handle_C_SpawnStoreReq(PacketSessionRef& session, const se::test::C_SpawnStoreReq& pkt)
+{
+    return EnqueueToPlayerRoom(session, pkt, [](Room& room, PlayerId playerId, const se::test::C_SpawnStoreReq& pkt)
+    {
+        room.HandleSpawnStore(playerId, pkt);
+    });
+}
+
+bool ServerPacketDispatcher::Handle_C_ItemReq(PacketSessionRef& session, const se::test::C_ItemReq& pkt)
+{
+    return EnqueueToPlayerRoom(session, pkt, [](Room& room, PlayerId playerId, const se::test::C_ItemReq& pkt)
+    {
+        room.HandleItem(playerId, pkt);
+    });
+}
+
+bool ServerPacketDispatcher::Handle_C_MoneyReq(PacketSessionRef& session, const se::test::C_MoneyReq& pkt)
+{
+    return EnqueueToPlayerRoom(session, pkt, [](Room& room, PlayerId playerId, const se::test::C_MoneyReq& pkt)
+    {
+        room.HandleMoney(playerId, pkt);
+    });
+}
+
+bool ServerPacketDispatcher::Handle_C_HealthReq(PacketSessionRef& session, const se::test::C_HealthReq& pkt)
+{
+    return EnqueueToPlayerRoom(session, pkt, [](Room& room, PlayerId playerId, const se::test::C_HealthReq& pkt)
+    {
+        room.HandleHealth(playerId, pkt);
+    });
+}
+
+bool ServerPacketDispatcher::Handle_C_MaxHealthReq(PacketSessionRef& session, const se::test::C_MaxHealthReq& pkt)
+{
+    return EnqueueToPlayerRoom(session, pkt, [](Room& room, PlayerId playerId, const se::test::C_MaxHealthReq& pkt)
+    {
+        room.HandleMaxHealth(playerId, pkt);
+    });
+}
+
+bool ServerPacketDispatcher::Handle_C_ZoneStopReq(PacketSessionRef& session, const se::test::C_ZoneStopReq& pkt)
+{
+    return EnqueueToPlayerRoom(session, pkt, [](Room& room, PlayerId playerId, const se::test::C_ZoneStopReq& pkt)
+    {
+        room.HandleZoneStop(playerId, pkt);
+    });
+}
+
+bool ServerPacketDispatcher::Handle_C_ZoneStartReq(PacketSessionRef& session, const se::test::C_ZoneStartReq& pkt)
+{
+    return EnqueueToPlayerRoom(session, pkt, [](Room& room, PlayerId playerId, const se::test::C_ZoneStartReq& pkt)
+    {
+        room.HandleZoneStart(playerId, pkt);
+    });
+}
+
+bool ServerPacketDispatcher::Handle_C_ZoneResetReq(PacketSessionRef& session, const se::test::C_ZoneResetReq& pkt)
+{
+    return EnqueueToPlayerRoom(session, pkt, [](Room& room, PlayerId playerId, const se::test::C_ZoneResetReq& pkt)
+    {
+        room.HandleZoneReset(playerId, pkt);
+    });
+}
+
+bool ServerPacketDispatcher::Handle_C_ZoneDamageOffReq(PacketSessionRef& session,
+    const se::test::C_ZoneDamageOffReq& pkt)
+{
+    return EnqueueToPlayerRoom(session, pkt, [](Room& room, PlayerId playerId, const se::test::C_ZoneDamageOffReq& pkt)
+    {
+        room.HandleZoneDamageOff(playerId, pkt);
+    });
+}
+
+bool ServerPacketDispatcher::Handle_C_ZoneDamageOnReq(PacketSessionRef& session, const se::test::C_ZoneDamageOnReq& pkt)
+{
+    return EnqueueToPlayerRoom(session, pkt, [](Room& room, PlayerId playerId, const se::test::C_ZoneDamageOnReq& pkt)
+    {
+        room.HandleZoneDamageOn(playerId, pkt);
+    });
+}
+
 bool ServerPacketDispatcher::TryGetPlayerId(PacketSessionRef& session, PlayerId& outPlayerId) const
 {
     outPlayerId = 0;

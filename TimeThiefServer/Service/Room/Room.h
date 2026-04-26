@@ -99,6 +99,21 @@ public:
    bool HandleEquipItem(PlayerId playerId, const se::game::C_EquipItemReq& pkt);
    bool HandleSkillEquip(PlayerId playerId, const se::game::C_SkillEquipReq& pkt);
    
+// Handle Test Packet
+public:
+   bool HandleSpawnMonster(PlayerId playerId, const se::test::C_SpawnMonsterReq& pkt);
+   bool HandleSpawnChest(PlayerId playerId, const se::test::C_SpawnChestReq& pkt);
+   bool HandleSpawnStore(PlayerId playerId, const se::test::C_SpawnStoreReq& pkt);
+   bool HandleItem(PlayerId playerId, const se::test::C_ItemReq& pkt);
+   bool HandleMoney(PlayerId playerId, const se::test::C_MoneyReq& pkt);
+   bool HandleHealth(PlayerId playerId, const se::test::C_HealthReq& pkt);
+   bool HandleMaxHealth(PlayerId playerId, const se::test::C_MaxHealthReq& pkt);
+   bool HandleZoneStop(PlayerId playerId, const se::test::C_ZoneStopReq& pkt);
+   bool HandleZoneStart(PlayerId playerId, const se::test::C_ZoneStartReq& pkt);
+   bool HandleZoneReset(PlayerId playerId, const se::test::C_ZoneResetReq& pkt);
+   bool HandleZoneDamageOff(PlayerId playerId, const se::test::C_ZoneDamageOffReq& pkt);
+   bool HandleZoneDamageOn(PlayerId playerId, const se::test::C_ZoneDamageOnReq& pkt);
+   
 public:
    template<typename T, typename... Args>
    T* SpawnObject(ObjectFlags flags, Args&&... args)

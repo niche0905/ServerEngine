@@ -258,6 +258,10 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="..\External\ProtocolShared\cpp\test\test_messages.pb.cc">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
     <ClCompile Include="Content\Gameplay\AI\MonsterAiComponent.cpp" />
     <ClCompile Include="Content\Gameplay\Collider\ColliderComponent.cpp" />
     <ClCompile Include="Content\Gameplay\Combat\CombatComponent.cpp" />

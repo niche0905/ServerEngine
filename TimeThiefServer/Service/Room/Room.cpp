@@ -1478,6 +1478,67 @@ bool Room::HandleSkillEquip(PlayerId playerId, const se::game::C_SkillEquipReq& 
    return false;
 }
 
+// TODO: Monster 우선 만들고 아래 핸들러 구현하기 (Monster Spawn, Monster Attack 등)
+bool Room::HandleSpawnMonster(PlayerId playerId, const se::test::C_SpawnMonsterReq& pkt)
+{
+   return false;
+}
+
+bool Room::HandleSpawnChest(PlayerId playerId, const se::test::C_SpawnChestReq& pkt)
+{
+   return false;
+}
+
+bool Room::HandleSpawnStore(PlayerId playerId, const se::test::C_SpawnStoreReq& pkt)
+{
+   return false;
+}
+
+bool Room::HandleItem(PlayerId playerId, const se::test::C_ItemReq& pkt)
+{
+   return false;
+}
+
+bool Room::HandleMoney(PlayerId playerId, const se::test::C_MoneyReq& pkt)
+{
+   return false;
+}
+
+bool Room::HandleHealth(PlayerId playerId, const se::test::C_HealthReq& pkt)
+{
+   return false;
+}
+
+bool Room::HandleMaxHealth(PlayerId playerId, const se::test::C_MaxHealthReq& pkt)
+{
+   return false;
+}
+
+bool Room::HandleZoneStop(PlayerId playerId, const se::test::C_ZoneStopReq& pkt)
+{
+   return false;
+}
+
+bool Room::HandleZoneStart(PlayerId playerId, const se::test::C_ZoneStartReq& pkt)
+{
+   return false;
+}
+
+bool Room::HandleZoneReset(PlayerId playerId, const se::test::C_ZoneResetReq& pkt)
+{
+   return false;
+}
+
+bool Room::HandleZoneDamageOff(PlayerId playerId, const se::test::C_ZoneDamageOffReq& pkt)
+{
+   return false;
+}
+
+bool Room::HandleZoneDamageOn(PlayerId playerId, const se::test::C_ZoneDamageOnReq& pkt)
+{
+   return false;
+}
+
 bool Room::Start()
 {
    if (roomState_ != RoomState::Loading) 

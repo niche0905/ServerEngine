@@ -64,6 +64,20 @@ public:
    bool Handle_C_EquipItemReq(PacketSessionRef& session, const se::game::C_EquipItemReq& pkt);
    bool Handle_C_SkillEquipReq(PacketSessionRef& session, const se::game::C_SkillEquipReq& pkt);
    
+// Test Packet
+public:
+   bool Handle_C_SpawnMonsterReq(PacketSessionRef& session, const se::test::C_SpawnMonsterReq& pkt);
+   bool Handle_C_SpawnChestReq(PacketSessionRef& session, const se::test::C_SpawnChestReq& pkt);
+   bool Handle_C_SpawnStoreReq(PacketSessionRef& session, const se::test::C_SpawnStoreReq& pkt);
+   bool Handle_C_ItemReq(PacketSessionRef& session, const se::test::C_ItemReq& pkt);
+   bool Handle_C_MoneyReq(PacketSessionRef& session, const se::test::C_MoneyReq& pkt);
+   bool Handle_C_HealthReq(PacketSessionRef& session, const se::test::C_HealthReq& pkt);
+   bool Handle_C_MaxHealthReq(PacketSessionRef& session, const se::test::C_MaxHealthReq& pkt);
+   bool Handle_C_ZoneStopReq(PacketSessionRef& session, const se::test::C_ZoneStopReq& pkt);
+   bool Handle_C_ZoneStartReq(PacketSessionRef& session, const se::test::C_ZoneStartReq& pkt);
+   bool Handle_C_ZoneResetReq(PacketSessionRef& session, const se::test::C_ZoneResetReq& pkt);
+   bool Handle_C_ZoneDamageOffReq(PacketSessionRef& session, const se::test::C_ZoneDamageOffReq& pkt);
+   bool Handle_C_ZoneDamageOnReq(PacketSessionRef& session, const se::test::C_ZoneDamageOnReq& pkt);
    
 private:
    bool TryGetPlayerId(PacketSessionRef& session, PlayerId& outPlayerId) const;
