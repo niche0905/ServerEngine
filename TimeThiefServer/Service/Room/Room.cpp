@@ -909,18 +909,14 @@ bool Room::HandleChestInteract(PlayerId playerId, const se::game::C_ChestInterac
          dropSpawnContext.owner = chestId;
          dropSpawnContext.instigator = playerPawn->GetId();
          dropSpawnContext.lootBundle = chestObj->GenerateDrops();
-         if (dropSpawnContext.lootBundle.Empty()) {
-            // 드랍할 아이템이 없는 경우 (정상적이지 않은 상황) <- Loot Bundle이 제대로 생성되지 않은 것
-            consoleLogger->Log(Color::Yellow, L"[Room] Generated empty loot bundle from chestId %u\n", chestId.value);
-            return false;
-         }
-         
-         auto& dropSystem = roomGameSystem_.GetDropSystem();
-         DropSpawnResult result = dropSystem.DropItems(dropSpawnContext);
-         if (not result.spawned) {
-            // 드랍 처리 실패 (정상적이지 않은 상황)
-            consoleLogger->Log(Color::Yellow, L"[Room] Failed to drop items from chestId %u\n", chestId.value);
-            return false;
+         if (not dropSpawnContext.lootBundle.Empty()) {
+            auto& dropSystem = roomGameSystem_.GetDropSystem();
+            DropSpawnResult result = dropSystem.DropItems(dropSpawnContext);
+            if (not result.spawned) {
+               // 드랍 처리 실패 (정상적이지 않은 상황)
+               consoleLogger->Log(Color::Yellow, L"[Room] Failed to drop items from chestId %u\n", chestId.value);
+               return false;
+            }
          }
          
          se::game::N_ChestInteracted noti;
