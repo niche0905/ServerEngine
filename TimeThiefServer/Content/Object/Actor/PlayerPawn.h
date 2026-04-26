@@ -73,6 +73,11 @@ public:
     virtual void Damaged(const DamageResult& dmgResult) override;
     
     void Heal(int32 amount);
+    
+// Respawn
+public:
+    virtual void OnPreRespawn(ObjectManager& om) override;
+    virtual void OnPostRespawn(ObjectManager& om) override;
 
 // IDropOwner
 public:

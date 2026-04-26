@@ -63,6 +63,21 @@ void PlayerPawn::Heal(int32 amount)
    }
 }
 
+void PlayerPawn::OnPreRespawn(ObjectManager& om)
+{
+   Pawn::OnPreRespawn(om);
+   
+   // TODO: Inventory Save 꺼 가져오기
+   //       Inventory 외에도 여러 항목들 가져와서 세팅하기 (예: 스킬, 업그레이드, 위치 등)
+}
+
+void PlayerPawn::OnPostRespawn(ObjectManager& om)
+{
+   Pawn::OnPostRespawn(om);
+   
+   MarkReplicationDirty(ReplicationDirty::Inventory);    // 인벤토리 새로고침
+}
+
 LootBundle PlayerPawn::GenerateDrops()
 // 플레이어의 경우는 죽었을 때 인벤토리에 있는 아이템을 전부 드롭한다
 {
