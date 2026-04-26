@@ -71,6 +71,7 @@ LootBundle PlayerPawn::GenerateDrops()
    return bundle;
 }
 
+// TODO: Player Pawn의 Item Op 들 Replication 하기 (Event로 즉시, 컴포넌트에선 Dirty 찍고 체크)
 InventoryOpResult PlayerPawn::AddItem(ItemId itemId, int32 count, const ItemChangeContext& ctx)
 {
    return inventory_.AddItem(itemId, count, ctx);
