@@ -1960,6 +1960,15 @@ void Room::BroadcastKillPlayer(ObjectId killerId, ObjectId victimId)
       Broadcast(killPlayerBuffer);
 }
 
+void Room::NotifyZoneFlow(bool flowing)
+{
+   RepEvent zoneFlowEvent;
+   ReplicateEventSet(zoneFlowEvent, RepEventType::ZoneFlow);
+   zoneFlowEvent.payload = ZoneFlowEvent{flowing};
+   
+   roomGameSystem_.GetReplicationSystem().PushEvent(zoneFlowEvent);
+}
+
 void Room::ReplicateEventSet(RepEvent& ev, RepEventType eventType)
 {
    ev.header.type = eventType;

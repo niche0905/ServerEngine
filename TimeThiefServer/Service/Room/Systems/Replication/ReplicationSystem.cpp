@@ -174,6 +174,10 @@ void ReplicationSystem::DispatchImmediateEvent(const RepEvent& ev, const RepFram
       FlushEvent_Money(ev, frame);
       break;
       
+   case RepEventType::ZoneFlow:
+      FlushEvent_ZoneFlow(ev, frame);
+      break;
+      
       // TODO: 추가하고 여기서 연결하기 (작성도 해야 함, 멤버 함수)
    default:
       break;
@@ -296,4 +300,25 @@ void ReplicationSystem::FlushEvent_Money(const RepEvent& ev, const RepFrame& fra
    
    SendBufferRef sendBuffer = ServerPacketHandler::MakeSendBuffer(timePointPkt);
    ownerRoom_->SendReplication(ev.header.playerId, sendBuffer);
+}
+
+void ReplicationSystem::FlushEvent_ZoneFlow(const RepEvent& ev, const RepFrame& frame) const
+{
+   const ZoneFlowEvent* zoneFlowEv = std::get_if<ZoneFlowEvent>(&ev.payload);
+   if (!zoneFlowEv) {
+      consoleLogger->Log(Color::Yellow, L"[ReplicationSystem] ZoneFlow event with invalid payload, skipping.\n");
+      return;   // 페이로드가 ZoneFlowEvent가 아닌 경우 (잘못된 이벤트)
+   }
+
+   SendBufferRef sendBuffer;
+   if (zoneFlowEv->flowing) {
+      se::test::N_ZoneStart zoneStartPkt;
+      sendBuffer = ServerPacketHandler::MakeSendBuffer(zoneStartPkt);
+   }
+   else {
+      se::test::N_ZoneStop zoneStopPkt;
+      sendBuffer = ServerPacketHandler::MakeSendBuffer(zoneStopPkt);
+   }
+   
+   ownerRoom_->BroadcastReplication(sendBuffer);
 }

@@ -222,6 +222,7 @@ public:
    void NotifyTimePointChange(PlayerId id, int newTimePoint, int deltaTimePoint);
    // void BroadcastHit();
    void BroadcastKillPlayer(ObjectId killerId, ObjectId victimId);
+   void NotifyZoneFlow(bool flowing);
    
 private:
    void ReplicateEventSet(RepEvent& ev, RepEventType eventType);

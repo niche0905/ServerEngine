@@ -17,6 +17,11 @@ enum class RepEventType : uint8
     HealthChange,
     MaxHealthChange,
     MoneyChange,
+    
+    
+    ZoneFlow,               // 테스트 용 (Zone이 Stop 되거나 Start 될 때)
+    
+    
     // Damage,
     // Death,
     // Respawn,
@@ -88,6 +93,13 @@ struct AimChangedEvent
     bool isAimed{false};
 };
 
+
+
+struct ZoneFlowEvent
+{
+    bool flowing{false};
+};
+
 using RepEventPayload = std::variant<
     std::monostate,
     SpawnEvent,
@@ -96,7 +108,8 @@ using RepEventPayload = std::variant<
     MoneyChangeEvent,
     FireEvent,
     WeaponChangedEvent,
-    AimChangedEvent
+    AimChangedEvent,
+    ZoneFlowEvent
 >;
 // TODO: 필요한 세부 Event 타입과 페이로드 정의하기 (여 위에 추가)
 
