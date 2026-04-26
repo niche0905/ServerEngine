@@ -234,6 +234,29 @@ void ReplicationSystem::FlushEvent_Spawn(const RepEvent& ev, const RepFrame& fra
       }
       break;
       
+// Testing
+   case ObjectType::OBJ_CHEST:
+      {
+         auto* chestInfo = spawnInfo->mutable_chest_info();
+         auto* pos = chestInfo->mutable_position();
+         pos->set_x(spawnEv->position.x);
+         pos->set_y(spawnEv->position.y);
+         pos->set_z(spawnEv->position.z);
+         chestInfo->set_yaw(spawnEv->yaw);
+      }
+      break;
+      
+   case ObjectType::OBJ_STORE:
+      {
+         auto* storeInfo = spawnInfo->mutable_store_info();
+         auto* pos = storeInfo->mutable_position();
+         pos->set_x(spawnEv->position.x);
+         pos->set_y(spawnEv->position.y);
+         pos->set_z(spawnEv->position.z);
+         storeInfo->set_yaw(spawnEv->yaw);
+      }
+      break;
+      
    default:
       consoleLogger->Log(Color::Yellow, L"[ReplicationSystem] Spawn event with unsupported object type {}, skipping. objectId={}", spawnEv->type, ev.header.source.value);
       break;

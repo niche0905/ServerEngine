@@ -1583,6 +1583,18 @@ bool Room::HandleZoneDamageOn(PlayerId playerId, const se::test::C_ZoneDamageOnR
    return true;
 }
 
+WorldItemActor* Room::SpawnItem(const SpawnWorldItemParams& params)
+{
+   WorldItemActor* item = SpawnObject<WorldItemActor>(ObjectFlags::None);
+   if (!item) {
+      return nullptr;
+   }
+   
+   item->SetPosition(params.position);
+   ReplicationSpawn(item, params.itemStack.id, item->GetYaw(), params.itemStack.count);
+   return item;
+}
+
 bool Room::SpawnChest(const Vector3& pos, int32 tableId)
 {
    auto* chest = SpawnObject<ChestActor>(ObjectFlags::None);
@@ -1592,7 +1604,7 @@ bool Room::SpawnChest(const Vector3& pos, int32 tableId)
    chest->SetPosition(pos);
    chest->SetTableId(tableId);
    
-   // TODO: Spawn 사실 Broadcast (Replicate Event로)
+   ReplicationSpawn(chest, /*templateId=*/0, chest->GetYaw());    // TODO: templateId는 나중에 생각하기
    
    return true;
 }
@@ -1605,7 +1617,7 @@ bool Room::SpawnStore(const Vector3& pos)
    
    store->SetPosition(pos);
    
-   // TODO: Spawn 사실 Broadcast (Replicate Event로)
+   ReplicationSpawn(store, /*templateId=*/0, store->GetYaw());    // TODO: templateId는 나중에 생각하기
    
    return true;
 }
@@ -1746,7 +1758,7 @@ bool Room::LaunchRocket(const Vector3& pos, const Vector3& dir, Pawn* ownerPawn,
       return false;  // 발사체 생성 실패
    
    rocket->Init(ownerPawn->GetId(), pos, dir * speed, damage, lifetimeMs, radius);
-   ReplicationSpawn(rocket, /*templateId=*/0);  // TODO: templateId는 나중에 생각하기
+   ReplicationSpawn(rocket, /*templateId=*/0, rocket->GetYaw());  // TODO: templateId는 나중에 생각하기
    return true;
 }
 
@@ -1761,18 +1773,6 @@ PlayerPawn* Room::CreatePreparedPlayerPawn(PlayerId playerId, const Vector3& spa
    playerPawn->SetSavedRespawnPosition(spawnPos);
    playerPawn->SetOwnerPlayerId(playerId);
    return playerPawn;
-}
-
-WorldItemActor* Room::SpawnItem(const SpawnWorldItemParams& params)
-{
-   WorldItemActor* item = SpawnObject<WorldItemActor>(ObjectFlags::None);
-   if (!item) {
-      return nullptr;
-   }
-   
-   item->SetPosition(params.position);
-   ReplicationSpawn(item, params.itemStack.id, params.itemStack.count);
-   return item;
 }
 
 bool Room::GiveItem(PlayerId playerId, const ItemStack& itemStack)
@@ -1980,12 +1980,12 @@ void Room::ReplicateEventSet(RepEvent& ev, RepEventType eventType)
    ev.header.tick = tickSeq_;
 }
 
-void Room::ReplicationSpawn(Actor* actor, uint32 templateId, uint32 amount)
+void Room::ReplicationSpawn(Actor* actor, uint32 templateId, float yaw, uint32 amount)
 {
    RepEvent spawnEvent;
    ReplicateEventSet(spawnEvent, RepEventType::Spawn);
    spawnEvent.header.source = actor->GetId();
-   spawnEvent.payload = SpawnEvent{actor->GetObjectType(), templateId, actor->GetPosition(), actor->GetVelocity(), amount};
+   spawnEvent.payload = SpawnEvent{actor->GetObjectType(), templateId, actor->GetPosition(), actor->GetVelocity(), yaw, amount};
    
    roomGameSystem_.GetReplicationSystem().PushEvent(spawnEvent);
 }

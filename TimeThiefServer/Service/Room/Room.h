@@ -135,6 +135,9 @@ public:
       return objectManager_.RequestDestroy(objectId);
    }
    
+public:
+   WorldItemActor* SpawnItem(const SpawnWorldItemParams& params);
+   
 private:
    bool SpawnChest(const Vector3& pos, int32 tableId);
    bool SpawnStore(const Vector3& pos);
@@ -198,9 +201,6 @@ public:
 private:
    PlayerPawn* CreatePreparedPlayerPawn(PlayerId playerId, const Vector3& spawnPos);
    
-public:
-   WorldItemActor* SpawnItem(const SpawnWorldItemParams& params);
-   
 private:
    bool GiveItem(PlayerId playerId, const ItemStack& itemStack);
    bool GiveMoney(PlayerId playerId, int32 amount);
@@ -228,7 +228,7 @@ public:
 private:
    void ReplicateEventSet(RepEvent& ev, RepEventType eventType);
    
-   void ReplicationSpawn(Actor* actor, uint32 templateId, uint32 amount = 0);
+   void ReplicationSpawn(Actor* actor, uint32 templateId, float yaw, uint32 amount = 0);
    
 public:
    void HandleDamageResult(Pawn* attacker, Actor* victim, const SE::Physics::Hit::HitResult& hitResult, const DamageContext& ctx, const DamageResult& damageResult);

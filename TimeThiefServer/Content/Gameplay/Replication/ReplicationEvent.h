@@ -52,10 +52,10 @@ struct SpawnEvent
 {
     ObjectType type{ObjectType::OBJ_NONE};
     uint32 templateId{0};
-    // 동적으로 생성하는 것들은 아이템, 투사체로 한정 될 것이므로 일단 보류
     SE::Math::Vector3 position{};
-    SE::Math::Vector3 velocity{};
-    uint32 amount;
+    SE::Math::Vector3 velocity{};       // optional, 투사체 등 움직이는 오브젝트에 대해서만 사용
+    float yaw{0};                       // optional, 회전이 필요한 오브젝트에 대해서만 사용 (예: Player)
+    uint32 amount;                      // optional, 아이템 스택 수량 등 필요에 따라 사용
 };
 
 struct HealthChangeEvent
