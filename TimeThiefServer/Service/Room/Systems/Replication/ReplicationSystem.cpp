@@ -166,6 +166,10 @@ void ReplicationSystem::DispatchImmediateEvent(const RepEvent& ev, const RepFram
       FlushEvent_Health(ev, frame);
       break;
       
+   case RepEventType::MaxHealthChange:
+      FlushEvent_MaxHealth(ev, frame);
+      break;
+      
    case RepEventType::MoneyChange:
       FlushEvent_Money(ev, frame);
       break;
@@ -265,7 +269,7 @@ void ReplicationSystem::FlushEvent_MaxHealth(const RepEvent& ev, const RepFrame&
    const MaxHealthChangeEvent* maxHealthChangeEv = std::get_if<MaxHealthChangeEvent>(&ev.payload);
    if (!maxHealthChangeEv) {
       consoleLogger->Log(Color::Yellow, L"[ReplicationSystem] MaxHealthChange event with invalid payload, skipping. PlayerId={}", ev.header.playerId);
-      return;   // 페이로드가 HealthChangeEvent가 아닌 경우 (잘못된 이벤트)
+      return;   // 페이로드가 MaxHealthChangeEvent가 아닌 경우 (잘못된 이벤트)
    }
    
    se::game::N_MaxHealthChanged maxHealthPkt;
