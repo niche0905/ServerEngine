@@ -174,6 +174,10 @@ void ReplicationSystem::DispatchImmediateEvent(const RepEvent& ev, const RepFram
       FlushEvent_Money(ev, frame);
       break;
       
+   case RepEventType::ItemChange:
+      FlushEvent_Item(ev, frame);
+      break;
+      
    case RepEventType::ZoneFlow:
       FlushEvent_ZoneFlow(ev, frame);
       break;
@@ -299,6 +303,36 @@ void ReplicationSystem::FlushEvent_Money(const RepEvent& ev, const RepFrame& fra
    timePointPkt.set_delta(moneyChangeEv->deltaMoney);
    
    SendBufferRef sendBuffer = ServerPacketHandler::MakeSendBuffer(timePointPkt);
+   ownerRoom_->SendReplication(ev.header.playerId, sendBuffer);
+}
+
+void ReplicationSystem::FlushEvent_Item(const RepEvent& ev, const RepFrame& frame) const
+{
+   const ItemChangeEvent* itemChangeEv = std::get_if<ItemChangeEvent>(&ev.payload);
+   if (!itemChangeEv) {
+      consoleLogger->Log(Color::Yellow, L"[ReplicationSystem] ItemChange event with invalid payload, skipping. PlayerId={}", ev.header.playerId);
+      return;   // 페이로드가 ItemChangeEvent가 아닌 경우 (잘못된 이벤트)
+   }
+   
+   SendBufferRef sendBuffer;
+   
+   if (itemChangeEv->deltaCount > 0) {
+      se::game::N_ItemGained itemGainedPkt;
+      itemGainedPkt.set_item_id(itemChangeEv->itemId);
+      itemGainedPkt.set_new_quantity(itemChangeEv->newCount);
+      itemGainedPkt.set_quantity(itemChangeEv->deltaCount);
+      
+      sendBuffer = ServerPacketHandler::MakeSendBuffer(itemGainedPkt);
+   }
+   else {
+      se::game::N_ItemLost itemLostPkt;
+      itemLostPkt.set_item_id(itemChangeEv->itemId);
+      itemLostPkt.set_new_quantity(itemChangeEv->newCount);
+      itemLostPkt.set_quantity(itemChangeEv->deltaCount);
+      
+      sendBuffer = ServerPacketHandler::MakeSendBuffer(itemLostPkt);
+   }
+   
    ownerRoom_->SendReplication(ev.header.playerId, sendBuffer);
 }
 

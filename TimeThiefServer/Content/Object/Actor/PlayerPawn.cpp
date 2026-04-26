@@ -81,20 +81,31 @@ LootBundle PlayerPawn::GenerateDrops()
    return bundle;
 }
 
-// TODO: Player Pawn의 Item Op 들 Replication 하기 (Event로 즉시, 컴포넌트에선 Dirty 찍고 체크)
 InventoryOpResult PlayerPawn::AddItem(ItemId itemId, int32 count, const ItemChangeContext& ctx)
 {
-   return inventory_.AddItem(itemId, count, ctx);
+   InventoryOpResult result = inventory_.AddItem(itemId, count, ctx);
+   if (auto room = GetRoom()) {
+      room->NotifyItemChange(GetOwnerPlayerId(), itemId, result.newQuantity, result.delta.count);
+   }
+   return result;
 }
 
 InventoryOpResult PlayerPawn::RemoveItem(ItemId itemId, int32 count, const ItemChangeContext& ctx)
 {
-   return inventory_.RemoveItem(itemId, count, ctx);
+   InventoryOpResult result = inventory_.RemoveItem(itemId, count, ctx);
+   if (auto room = GetRoom()) {
+      room->NotifyItemChange(GetOwnerPlayerId(), itemId, result.newQuantity, result.delta.count);
+   }
+   return result;
 }
 
 InventoryOpResult PlayerPawn::ConsumeItem(ItemId itemId, int32 count, const ItemChangeContext& ctx)
 {
-   return inventory_.ConsumeItem(itemId, count, ctx);
+   InventoryOpResult result = inventory_.ConsumeItem(itemId, count, ctx);
+   if (auto room = GetRoom()) {
+      room->NotifyItemChange(GetOwnerPlayerId(), itemId, result.newQuantity, result.delta.count);
+   }
+   return result;
 }
 
 MoneyChangeResult PlayerPawn::AddMoney(CurrencyType currency, CurrencyAmount amount,

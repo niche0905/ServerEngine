@@ -942,7 +942,6 @@ bool Room::HandleChestInteract(PlayerId playerId, const se::game::C_ChestInterac
 
 bool Room::HandlePickupItem(PlayerId playerId, const se::game::C_PickupItemReq& pkt)
 {
-   SendBufferRef pickupResultBuffer;
    SendBufferRef pickupBroadcastBuffer;
    SendBufferRef itemDespawnBuffer;
    std::shared_ptr<PlayerSession> sessionRef = sessionManager_.FindByPlayerId(playerId);
@@ -980,12 +979,7 @@ bool Room::HandlePickupItem(PlayerId playerId, const se::game::C_PickupItemReq& 
       if (!itemStack.IsValid())
          return false;
       
-      se::game::N_ItemGained itemGainedNoti;
-      {
-         itemGainedNoti.set_item_id(itemStack.id);
-         itemGainedNoti.set_quantity(itemStack.count);
-      }
-      pickupResultBuffer = ServerPacketHandler::MakeSendBuffer(itemGainedNoti);
+      playerPawn->AddItem(itemStack.id, itemStack.count, ItemChangeContext(ItemChangeReason::Loot));
       
       se::game::N_PickupItem pickupItemNoti;
       {
@@ -1004,9 +998,6 @@ bool Room::HandlePickupItem(PlayerId playerId, const se::game::C_PickupItemReq& 
       }
       itemDespawnBuffer = ServerPacketHandler::MakeSendBuffer(itemDespawnNoti);
    }
-   
-   if (pickupResultBuffer)
-      sessionRef->Send(pickupResultBuffer);   // 아이템 획득 결과를 해당 플레이어에게 전송
    
    if (pickupBroadcastBuffer)
       Broadcast(pickupBroadcastBuffer);   // 아이템을 획득 (이펙트를 위해)
@@ -1912,6 +1903,17 @@ void Room::BroadcastRespawn(ObjectId objectId)
    if (respawnBuffer)
       Broadcast(respawnBuffer);     // 모두에게 리스폰 정보 Broadcast
                                     // Local Control Player의 경우는 Set Position 하도록 (Set Yaw 까지도 가능)
+}
+
+void Room::NotifyItemChange(PlayerId playerId, uint32 itemId, int32 newCount, int32 deltaCount)
+{
+   RepEvent itemChangeEvent;
+   ReplicateEventSet(itemChangeEvent, RepEventType::ItemChange);
+   itemChangeEvent.header.playerId = playerId;
+   itemChangeEvent.header.source = roomPlayers_[playerId].pawnObjectId;
+   itemChangeEvent.payload = ItemChangeEvent{itemId, newCount, deltaCount};
+   
+   roomGameSystem_.GetReplicationSystem().PushEvent(itemChangeEvent);
 }
 
 void Room::NotifyHealthChange(PlayerId id, int newHealth, int deltaHealth)

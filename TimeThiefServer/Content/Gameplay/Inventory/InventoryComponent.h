@@ -77,6 +77,7 @@ public:
             slot.count += count;
             
             result.code = InventoryOpCode::Ok;
+            result.newQuantity = GetItemCount(itemId);
             result.delta = ItemStack{ itemId, count };
             
             result.accepted = true;
@@ -91,6 +92,7 @@ public:
             slot.count = count;
             
             result.code = InventoryOpCode::Ok;
+            result.newQuantity = GetItemCount(itemId);
             result.delta = ItemStack{ itemId, count };
             
             result.accepted = true;
@@ -129,6 +131,7 @@ public:
       }
       
       result.code = InventoryOpCode::Ok;
+      result.newQuantity = GetItemCount(itemId);
       result.delta = ItemStack{ itemId, -count };
       
       result.accepted = true;
@@ -164,6 +167,7 @@ public:
       }
       
       result.code = InventoryOpCode::Ok;
+      result.newQuantity = GetItemCount(slot.id);
       result.delta = ItemStack{ slot.id, -count };
       
       result.accepted = true;

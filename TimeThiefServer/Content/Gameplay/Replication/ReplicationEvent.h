@@ -18,6 +18,7 @@ enum class RepEventType : uint8
     MaxHealthChange,
     MoneyChange,
     
+    ItemChange,
     
     ZoneFlow,               // 테스트 용 (Zone이 Stop 되거나 Start 될 때)
     
@@ -75,6 +76,13 @@ struct MoneyChangeEvent
     int32 deltaMoney{0};
 };
 
+struct ItemChangeEvent
+{
+    uint32 itemId{0};
+    int32 newCount{0};
+    int32 deltaCount{0};
+};
+
 struct FireEvent
 {
     uint32 weaponId{0};
@@ -106,6 +114,7 @@ using RepEventPayload = std::variant<
     HealthChangeEvent,
     MaxHealthChangeEvent,
     MoneyChangeEvent,
+    ItemChangeEvent,
     FireEvent,
     WeaponChangedEvent,
     AimChangedEvent,

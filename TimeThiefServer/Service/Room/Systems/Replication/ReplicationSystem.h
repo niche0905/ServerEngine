@@ -48,6 +48,7 @@ private:
    void FlushEvent_Health(const RepEvent& ev, const RepFrame& frame) const;
    void FlushEvent_MaxHealth(const RepEvent& ev, const RepFrame& frame) const;
    void FlushEvent_Money(const RepEvent& ev, const RepFrame& frame) const;
+   void FlushEvent_Item(const RepEvent& ev, const RepFrame& frame) const;
    
    void FlushEvent_ZoneFlow(const RepEvent& ev, const RepFrame& frame) const;
    

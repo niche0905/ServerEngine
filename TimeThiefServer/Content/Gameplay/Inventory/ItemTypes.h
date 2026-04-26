@@ -44,6 +44,8 @@ struct InventoryOpResult
 {
     InventoryOpCode code{InventoryOpCode::InvalidItem};
     bool accepted{false};
+    
+    int32 newQuantity{0};
 
     // 실제 변동량(성공 시 양수/음수)
     ItemStack delta{};

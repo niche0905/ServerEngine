@@ -217,6 +217,7 @@ public:
    void BroadcastGameStart();
    void BroadcastDeath(ObjectId objectId);
    void BroadcastRespawn(ObjectId objectId);
+   void NotifyItemChange(PlayerId playerId, uint32 itemId, int32 newCount, int32 deltaCount);
    void NotifyHealthChange(PlayerId id, int newHealth, int deltaHealth);
    void NotifyMaxHealthChange(PlayerId id, int newMaxHealth, int newHealth);
    void NotifyTimePointChange(PlayerId id, int newTimePoint, int deltaTimePoint);
