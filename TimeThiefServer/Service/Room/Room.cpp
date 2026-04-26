@@ -415,11 +415,11 @@ void Room::JoinPlayerProcess(std::shared_ptr<PlayerSession>& session, PlayerPawn
          int32 maxHp = health.GetMaxHp();
          int32 currentHp = health.GetHp();
          auto wallet = playerPawn->GetWallet();
-         int64 money = wallet.GetBalance(CurrencyType::TimePoint);
+         int32 money = wallet.GetBalance(CurrencyType::TimePoint);
          
          playerInitSetup.set_max_health(maxHp);
          playerInitSetup.set_current_health(currentHp);
-         playerInitSetup.set_time_points(static_cast<int32>(money));
+         playerInitSetup.set_time_points(money);
          
          // TODO: 초기 Weapon Setting은 여기서 진행 할 것
       }
