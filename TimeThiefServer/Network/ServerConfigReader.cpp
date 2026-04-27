@@ -99,8 +99,10 @@ bool ServerConfigReader::ParseJsonText(const std::string& jsonText, const std::f
       if (game.isMember("zone_damage_tick_interval"))
          newConfig.game.zoneDamageTickInterval = game["zone_damage_tick_interval"].asFloat();
       
-      if (game.isMember("match_size"))
-         newConfig.game.matchSize = game["match_size"].asInt();
+      if (game.isMember("match_size")) {
+         int32 matchSize = game["match_size"].asInt();
+         newConfig.game.matchSize = std::min(8, std::max(2, matchSize));   // 최소 2명, 최대 8명으로 제한
+      }
    }
    
    config_ = std::move(newConfig);

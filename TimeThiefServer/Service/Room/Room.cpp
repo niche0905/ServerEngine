@@ -1,5 +1,7 @@
 ﻿#include "pch.h"
 #include "Room.h"
+
+#include <random>
 #include <utility>
 #include "Content/Gameplay/Combat/PlayerCombatComponent.h"
 #include "Content/Object/BaseObject.h"
@@ -14,6 +16,7 @@
 #include "Content/Gameplay/Drop/DropTypes.h"
 #include "Content/Object/Actor/ChestActor.h"
 #include "Content/Object/Actor/StoreActor.h"
+#include "Data/GameDataManager.h"
 
 /*-----------------
    Local Helper
@@ -220,6 +223,8 @@ bool Room::Init(GameShard* ownerShard, const GameDataManager& gameDataManager, c
    if (!roomGameSystem_.Init(this, gameDataManager, gameConfig))
       return false;
    
+   gameDataManager_ = &gameDataManager;
+   
    return true;
 }
 
@@ -227,14 +232,24 @@ void Room::SetPlayer(const std::vector<PlayerId>& playerIds)
 {
    roomPlayers_.clear();
    
+   std::vector<Vector3> spawnPoints;
+   spawnPoints.reserve(gameDataManager_->GetPlayerSpawnTable().spawnPoints.size());
+   
+   for (const auto& sp : gameDataManager_->GetPlayerSpawnTable().spawnPoints) {
+      spawnPoints.emplace_back(sp.x, sp.y, sp.z);
+   }
+   
+   std::random_device rd;
+   std::mt19937 rng(rd());
+   std::ranges::shuffle(spawnPoints, rng);
+   
    for (size_t i = 0; i < playerIds.size(); ++i) {
       const PlayerId playerId = playerIds[i];
 
       RoomPlayer roomPlayer;
       roomPlayer.playerId = playerId;
 
-      // TEMP Spawn Point (나중에 Spawn Point 시스템으로 변경하기)
-      auto playerPawn = CreatePreparedPlayerPawn(playerId, Vector3{static_cast<float>(i * 150), 0.0f, 500.0f });
+      auto playerPawn = CreatePreparedPlayerPawn(playerId, spawnPoints[i]);
       if (!playerPawn) {
          consoleLogger->Log(Color::Yellow, L"[Room] Failed to pre-spawn PlayerPawn for playerId %u\n", playerId);
          continue;   // PlayerPawn 생성 실패한 경우 (정상적이지 않은 상황)

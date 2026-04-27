@@ -1,6 +1,7 @@
 ﻿#pragma once
 #include "Data/Tables/ZoneTable.h"
 #include "Tables/LootTableTypes.h"
+#include "Tables/PlayerSpawnTable.h"
 #include "Tables/StoreEntryTable.h"
 #include "Tables/UpgradeTable.h"
 #include "Tables/WeaponTable.h"
@@ -23,6 +24,7 @@ public:
    const StoreEntryTable& GetStoreEntryTable() const { return storeEntryTable_; }
    const WeaponTable& GetWeaponTable() const { return weaponTable_; }
    const UpgradeTable& GetUpgradeTable() const { return upgradeTable_; }
+   const PlayerSpawnTable& GetPlayerSpawnTable() const { return playerSpawnTable_; }
    
 private:
    ZoneTable                  zoneTable_;
@@ -30,5 +32,6 @@ private:
    StoreEntryTable            storeEntryTable_;
    WeaponTable                weaponTable_;
    UpgradeTable               upgradeTable_;
+   PlayerSpawnTable           playerSpawnTable_;
    
 };

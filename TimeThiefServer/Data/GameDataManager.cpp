@@ -57,5 +57,17 @@ bool GameDataManager::Init(const ServerConfig& config)
       LauncherStat{500.0f, 20.0f}
    };
    
+   // TEMP: (파일 입출력이 아닌 코드로 플레이어 스폰 정보 초기화)
+   playerSpawnTable_.spawnPoints = {
+      SE::Math::Vector3{ 41825.19f, -15198.09f, 92.29f },
+      SE::Math::Vector3{ 38692.11f, 18581.00f, 92.13f },
+      SE::Math::Vector3{ 20253.15f, 39826.38f, -127.84f },
+      SE::Math::Vector3{ -20000.00f, 40000.00f, 92.13f },
+      SE::Math::Vector3{ -40000.0f, 20000.0f, 92.29f },
+      SE::Math::Vector3{ -39625.87f, -20191.79f, 92.29f },
+      SE::Math::Vector3{ -21912.13f, -38632.58f, 92.13f },
+      SE::Math::Vector3{ 20150.02f, -39015.13f, 728.11f }
+   };
+   
    return true;
 }

@@ -279,6 +279,8 @@ private:
    std::unordered_set<ObjectId> pawnObjects_;               // Pawn들
    std::vector<ObjectId> npcTickList_;                      // 매 틱마다 업데이트가 필요한 NPC들의 ID 리스트
    RoomGameSystem roomGameSystem_{};
+   const GameDataManager* gameDataManager_ = nullptr;   // non-owning
+   
    Random32 rng_{};
    
    RoomState roomState_{};
