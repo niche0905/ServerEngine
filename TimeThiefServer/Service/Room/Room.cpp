@@ -1574,7 +1574,7 @@ bool Room::HandleZoneDamageOff(PlayerId playerId, const se::test::C_ZoneDamageOf
 bool Room::HandleZoneDamageOn(PlayerId playerId, const se::test::C_ZoneDamageOnReq& pkt)
 {
    ZoneSystem& zoneSystem = roomGameSystem_.GetZoneSystem();
-   zoneSystem.SetProgressing(true);
+   zoneSystem.SetDamageApplied(true);
    
    return true;
 }
