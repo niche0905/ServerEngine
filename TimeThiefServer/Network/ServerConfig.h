@@ -13,6 +13,7 @@ struct DataFilesConfig
 {
     std::filesystem::path zoneTablePath;
     std::filesystem::path lootTablePath;
+    std::filesystem::path playerSpawnTablePath;
 };
 
 struct GameConfig
@@ -25,6 +26,8 @@ struct GameConfig
     float zoneDamageTickInterval = 1.0f;   // 존 데미지 Tick 간격 (초)
     
     int32 matchSize = 8;   // 매치당 필요한 플레이어 수
+    
+    bool testSpawnPoints = true;        // 테스트용 스폰 지점 활성화 (실제 게임을 위한 것이 아닌)
 };
 
 struct ServerConfig

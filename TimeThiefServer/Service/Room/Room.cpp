@@ -232,12 +232,13 @@ void Room::SetPlayer(const std::vector<PlayerId>& playerIds)
 {
    roomPlayers_.clear();
    
-   std::vector<Vector3> spawnPoints;
-   spawnPoints.reserve(gameDataManager_->GetPlayerSpawnTable().spawnPoints.size());
-   
-   for (const auto& sp : gameDataManager_->GetPlayerSpawnTable().spawnPoints) {
-      spawnPoints.emplace_back(sp.x, sp.y, sp.z);
+   const size_t spawnPointCount = gameDataManager_->GetPlayerSpawnTable().spawnPoints.size();
+   if (spawnPointCount < playerIds.size()) {
+      consoleLogger->Log(Color::Red, L"[Room] Not enough spawn points for players. SpawnPointCount: %zu, PlayerCount: %zu\n", spawnPointCount, playerIds.size());
+      return;   // 플레이어 수보다 스폰 포인트가 적은 경우 (정상적이지 않은 상황)
    }
+   
+   std::vector<Vector3> spawnPoints(gameDataManager_->GetPlayerSpawnTable().spawnPoints);
    
    std::random_device rd;
    std::mt19937 rng(rd());

@@ -2,5 +2,5 @@
 
 struct PlayerSpawnTable
 {
-    std::array<SE::Math::Vector3, 8> spawnPoints;
+    std::vector<SE::Math::Vector3> spawnPoints;
 };

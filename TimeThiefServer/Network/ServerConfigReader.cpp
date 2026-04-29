@@ -80,6 +80,9 @@ bool ServerConfigReader::ParseJsonText(const std::string& jsonText, const std::f
       if (dataFiles.isMember("loot_table"))
          newConfig.dataFiles.lootTablePath = ResolvePath(dataFiles["loot_table"].asString(), baseDir);
       
+      if (dataFiles.isMember("player_spawn_table"))
+         newConfig.dataFiles.playerSpawnTablePath = ResolvePath(dataFiles["player_spawn_table"].asString(), baseDir);
+      
    }
    
    // game
@@ -103,6 +106,9 @@ bool ServerConfigReader::ParseJsonText(const std::string& jsonText, const std::f
          int32 matchSize = game["match_size"].asInt();
          newConfig.game.matchSize = std::min(8, std::max(2, matchSize));   // 최소 2명, 최대 8명으로 제한
       }
+      
+      if (game.isMember("test_spawn_points"))
+         newConfig.game.testSpawnPoints = game["test_spawn_points"].asBool();
    }
    
    config_ = std::move(newConfig);

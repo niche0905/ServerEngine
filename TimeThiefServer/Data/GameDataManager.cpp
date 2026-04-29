@@ -2,6 +2,7 @@
 #include "GameDataManager.h"
 #include "Network/ServerConfig.h"
 #include "Tables/LootTableJson.h"
+#include "Tables/PlayerSpawnTableJson.h"
 #include "Tables/ZoneTableJson.h"
 
 /*-------------------
@@ -12,12 +13,12 @@ bool GameDataManager::Init(const ServerConfig& config)
 {
    std::string error;
    if (not ZoneTableJson::LoadFromFile(config.dataFiles.zoneTablePath, zoneTable_, &error)) {
-      consoleLogger->Log(Color::Red, L"[GDM] Failed to load ZoneTable: %s\n", error.c_str());
+      consoleLogger->Log(Color::Red, L"[GDM] Failed to load ZoneTable: %hs\n", error.c_str());
       return false;
    }
 
    if (not LootTableJson::LoadFromFile(config.dataFiles.lootTablePath, lootTable_, &error)) {
-      consoleLogger->Log(Color::Red, L"[GDM] Failed to load LootTable: %s\n", error.c_str());
+      consoleLogger->Log(Color::Red, L"[GDM] Failed to load LootTable: %hs\n", error.c_str());
       return false;
    }
    
@@ -57,17 +58,23 @@ bool GameDataManager::Init(const ServerConfig& config)
       LauncherStat{500.0f, 20.0f}
    };
    
-   // TEMP: (파일 입출력이 아닌 코드로 플레이어 스폰 정보 초기화)
-   playerSpawnTable_.spawnPoints = {
-      SE::Math::Vector3{ 41825.19f, -15198.09f, 92.29f },
-      SE::Math::Vector3{ 38692.11f, 18581.00f, 92.13f },
-      SE::Math::Vector3{ 20253.15f, 39826.38f, -127.84f },
-      SE::Math::Vector3{ -20000.00f, 40000.00f, 92.13f },
-      SE::Math::Vector3{ -40000.0f, 20000.0f, 92.29f },
-      SE::Math::Vector3{ -39625.87f, -20191.79f, 92.29f },
-      SE::Math::Vector3{ -21912.13f, -38632.58f, 92.13f },
-      SE::Math::Vector3{ 20150.02f, -39015.13f, 728.11f }
-   };
+   bool loadedPlayerSpawnTable = true;
+   if (not PlayerSpawnTableJson::LoadFromFile(config.dataFiles.playerSpawnTablePath, playerSpawnTable_, &error)) {
+      consoleLogger->Log(Color::Red, L"[GDM] Failed to load PlayerSpawnTable: %hs\n", error.c_str());
+      loadedPlayerSpawnTable = false;
+   }
+   if (config.game.testSpawnPoints or !loadedPlayerSpawnTable) {
+      // 테스트용 스폰 포인트를 활성화 했을 경우, 혹은 파일에서 스폰 포인트를 불러오는데 실패했을 경우
+      
+      playerSpawnTable_.spawnPoints.clear();
+      playerSpawnTable_.spawnPoints.reserve(20);
+      
+      for (int32 i = 0; i < 20; ++i) {
+         playerSpawnTable_.spawnPoints.emplace_back(
+            (0.0f + i * 200.0f), 0.0f, 100.0f
+         );
+      }
+   }
    
    return true;
 }

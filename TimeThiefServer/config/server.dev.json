@@ -7,13 +7,15 @@
     },
     "data_files": {
         "zone_table": "data/tables/ZoneDataTable.json",
-        "loot_table": "data/tables/LootTables.json"
+        "loot_table": "data/tables/LootTables.json",
+        "player_spawn_table": "data/tables/PlayerSpawnTable.json"
     },
     "game": {
         "movement_update_hz": 10,
         "ping_interval_ms": 1000,
         "room_tick_interval_ms": 25,
         "zone_damage_tick_interval": 1.0,
-        "match_size": 2
+        "match_size": 2,
+        "test_spawn_points": true
     }
 }
