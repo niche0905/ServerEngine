@@ -35,6 +35,6 @@ private:
     
 private:
     std::unordered_set<SkillId> unlockSkills_;              // 플레이어가 잠금 해제한 스킬 ID 집합
-    std::array<SkillId, kMaxActiveSkills> activeSkills_;    // 현재 장착된 스킬 ID 배열
+    std::array<SkillId, MaxActiveSkills> activeSkills_;    // 현재 장착된 스킬 ID 배열
     
 };

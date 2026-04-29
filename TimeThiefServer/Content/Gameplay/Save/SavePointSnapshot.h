@@ -19,7 +19,7 @@ struct InventorySnapshot
 struct SkillSnapshot
 {
     std::unordered_set<SkillId> unlockSkills;   // 플레이어가 잠금 해제한 스킬 ID 집합
-    std::array<SkillId, kMaxActiveSkills> equippedSkills{};       // 플레이어가 장착한 스킬 ID 배열
+    std::array<SkillId, MaxActiveSkills> equippedSkills{};       // 플레이어가 장착한 스킬 ID 배열
 };
 
 struct UpgradeSnapshot

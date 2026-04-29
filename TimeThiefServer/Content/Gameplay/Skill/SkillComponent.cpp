@@ -88,7 +88,7 @@ bool SkillComponent::CanEquipSkill(SkillId skillId, int32 slotIndex) const
       return false;   // 스킬이 잠금 해제되지 않음
    }
    
-   for (int32 i = 0; i < kMaxActiveSkills; ++i) {
+   for (int32 i = 0; i < MaxActiveSkills; ++i) {
       if (i == slotIndex) {
          continue;   // 현재 슬롯은 검사에서 제외
       }
@@ -128,5 +128,5 @@ const std::unordered_set<SkillId>& SkillComponent::GetUnlockSkills() const
 
 bool SkillComponent::IsValidSlot(int32 slotIndex) const
 {
-   return slotIndex >= 0 && slotIndex < kMaxActiveSkills;
+   return slotIndex >= 0 && slotIndex < MaxActiveSkills;
 }

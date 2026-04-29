@@ -43,6 +43,8 @@ public:
    
    size_t GetWeaponSlotCount() const { return combatState_.slots.size(); }
    
+   const std::array<WeaponSlotState, MaxWeaponSlots>& GetWeaponSlots() const { return combatState_.slots; }
+   
 public:
    const PlayerCombatState& GetCombatState() const { return combatState_; }
    

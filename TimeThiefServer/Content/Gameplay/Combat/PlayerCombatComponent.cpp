@@ -22,7 +22,7 @@ namespace
         case 3:
             return 2;
         default:
-            return PlayerCombatState::kMaxWeaponSlots;  // 유효하지 않은 슬롯 인덱스 반환
+            return MaxWeaponSlots;  // 유효하지 않은 슬롯 인덱스 반환
         }
     }
     
@@ -180,7 +180,7 @@ WeaponSlotState* PlayerCombatComponent::GetWeaponSlotByIndex(uint8 slotIndex)
 uint8 PlayerCombatComponent::GetCurrentWeaponIndex() const
 {
     if (!IsValidWeaponSlot(combatState_.currentWeaponSlot))
-        return PlayerCombatState::kMaxWeaponSlots;  // 유효하지 않은 슬롯 인덱스 반환
+        return MaxWeaponSlots;  // 유효하지 않은 슬롯 인덱스 반환
     
     return combatState_.currentWeaponSlot;
 }

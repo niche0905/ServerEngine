@@ -1,5 +1,6 @@
 ﻿#pragma once
 #include "Data/Tables/WeaponTable.h"
+#include "Utils/Types.h"
 
 class Actor;
 
@@ -52,8 +53,6 @@ struct WeaponSlotState
 
 struct PlayerCombatState
 {
-    static constexpr size_t kMaxWeaponSlots = 3;
-    
-    std::array<WeaponSlotState, kMaxWeaponSlots> slots{};
+    std::array<WeaponSlotState, MaxWeaponSlots> slots{};
     uint8 currentWeaponSlot = 0;
 };

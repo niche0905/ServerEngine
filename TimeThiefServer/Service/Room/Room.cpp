@@ -437,7 +437,43 @@ void Room::JoinPlayerProcess(std::shared_ptr<PlayerSession>& session, PlayerPawn
          playerInitSetup.set_current_health(currentHp);
          playerInitSetup.set_time_points(money);
          
-         // TODO: 초기 Weapon Setting은 여기서 진행 할 것
+         const auto& weapons = playerPawn->GetPlayerCombat()->GetWeaponSlots();
+         for (const auto& weapon : weapons) {
+            auto* weaponPtr = playerInitSetup.add_weapon_slots();
+            weaponPtr->set_weapon_id(weapon.runtime.weaponId);
+            auto* weaponStat = weaponPtr->mutable_stat();
+            weaponStat->set_mag_capacity(weapon.stat.common.magCapacity);
+            weaponStat->set_fire_interval(weapon.stat.common.fireIntervalSec);
+            weaponStat->set_reload_time(weapon.stat.common.reloadTimeSec);
+
+            switch (weapon.stat.common.category)
+            {
+            case WeaponCategory::Rifle:
+               // None
+               break;
+               
+            case WeaponCategory::Shotgun:
+               {
+                  if (std::holds_alternative<ShotgunStat>(weapon.stat.extra)) {
+                     const ShotgunStat& shotgunStat = std::get<ShotgunStat>(weapon.stat.extra);
+                     weaponStat->set_pellet_count(shotgunStat.pelletCount);
+                     weaponStat->set_cone_angle(shotgunStat.coneAngleDegrees);
+                  }
+               }
+               break;
+               
+            case WeaponCategory::Launcher:
+               {
+                  if (std::holds_alternative<LauncherStat>(weapon.stat.extra)) {
+                     const LauncherStat& launcherStat = std::get<LauncherStat>(weapon.stat.extra);
+                     weaponStat->set_projectile_speed(launcherStat.projectileSpeed);
+                     weaponStat->set_explosion_radius(launcherStat.explosionRadius);
+                  }
+               }
+               break;
+            }
+         }
+         
       }
       playerInitBuffer = ServerPacketHandler::MakeSendBuffer(playerInitSetup);
    }
