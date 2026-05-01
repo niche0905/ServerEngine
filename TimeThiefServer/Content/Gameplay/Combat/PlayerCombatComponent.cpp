@@ -381,7 +381,7 @@ void PlayerCombatComponent::FireLauncher(const AttackRequest& request)
     const SE::Math::Vector3 spawnPos = request.origin;
     const SE::Math::Vector3 spawnDir = request.direction.Normalized();
     
-    room->LaunchRocket(spawnDir, spawnDir, ownerPawn, request.damage, projectileSpeed, 10000, explosionRadius);
+    room->LaunchRocket(spawnPos, spawnDir, ownerPawn, request.damage, projectileSpeed, 10000, explosionRadius);
 }
 
 PlayerCombatComponent::PalletPattern PlayerCombatComponent::GeneratePalletPattern(const SE::Math::Vector3& forwardDir,
