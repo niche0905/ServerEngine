@@ -1424,14 +1424,12 @@ bool Room::HandleEquipItem(PlayerId playerId, const se::game::C_EquipItemReq& pk
       
       const uint32 itemId = pkt.item_id();
       
-      // TODO: Player가 Inventory에 해당 아이템을 가지고 있는지 확인하기
       auto& inventory = playerPawn->GetInventory();
       bool hasItem = inventory.HasItem(itemId, 1);
       
       if (not hasItem) {
          // 인벤토리에 아이템이 없는 경우 (정상적이지 않은 상황)
          consoleLogger->Log(Color::Yellow, L"[Room] Equip Item Failed: Player does not have itemId %u in inventory\n", itemId);
-         return false;
       }
       else {
          se::game::N_EquipItem noti;
