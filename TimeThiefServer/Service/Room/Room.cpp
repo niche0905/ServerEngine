@@ -1637,6 +1637,7 @@ WorldItemActor* Room::SpawnItem(const SpawnWorldItemParams& params)
    }
    
    item->SetPosition(params.position);
+   item->SetItemStack(params.itemStack);
    ReplicationSpawn(item, params.itemStack.id, item->GetYaw(), params.itemStack.count);
    return item;
 }

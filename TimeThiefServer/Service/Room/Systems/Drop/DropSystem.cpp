@@ -57,6 +57,9 @@ DropSpawnResult DropSystem::DropItems(const DropSpawnContext& ctx)
          const auto& actorPos = actor->GetPosition();
          DropSpawnResult result{};
          for (const auto& itemStack : ctx.lootBundle.items) {
+            if (!itemStack.IsValid())
+               continue;   // 유효하지 않은 아이템 스택은 무시
+            
             SpawnWorldItemParams spawnParams;
             spawnParams.itemStack = itemStack;
             spawnParams.position = RandomScatterPosition(actorPos, /*radius=*/200.0f);       // TEMP: 반경 200 유닛 내에서 흩뿌리기
