@@ -4,6 +4,7 @@
 #include "Tables/LootTableJson.h"
 #include "Tables/PlayerSpawnTableJson.h"
 #include "Tables/UpgradeTableJson.h"
+#include "Tables/WeaponTableJson.h"
 #include "Tables/ZoneTableJson.h"
 
 /*-------------------
@@ -42,21 +43,11 @@ bool GameDataManager::Init(const ServerConfig& config)
    }
    
    // TODO: Store Table 로드하기 (우선 json 파일 작성부터)
-   // TODO: Weapon Table 로드하기 (우선 json 파일 작성부터)
    
-   // TEMP: (파일 입출력이 아닌 코드로 무기 데이터 초기화)
-   weaponTable_.tables[1] = {
-      WeaponCommonStat{WeaponCategory::Rifle, WeaponFireType::HitScan, 12, 30, 0.1f, 2.0f, 10000.0f},
-      RifleStat{}
-   };
-   weaponTable_.tables[2] = {
-      WeaponCommonStat{WeaponCategory::Shotgun, WeaponFireType::HitScan, 8, 8, 60.0f / 110.0f, 2.0f, 3000.0f},
-      ShotgunStat{12, 3.5f}
-   };
-   weaponTable_.tables[3] = {
-      WeaponCommonStat{WeaponCategory::Launcher, WeaponFireType::Projectile, 80, 1, 60.0f / 48.0f, 3.0f, 200.0f},
-      LauncherStat{2000.0f, 300.0f}
-   };
+   if (not WeaponTableJson::LoadFromFile(config.dataFiles.weaponTablePath, weaponTable_, &error)) {
+      consoleLogger->Log(Color::Red, L"[GDM] Failed to load WeaponTable: %hs\n", error.c_str());
+      return false;
+   }
    
    if (not UpgradeTableJson::LoadFromFile(config.dataFiles.weaponUpgradeTablePath, upgradeTable_.WeaponUpgradeTable, &error)) {
       consoleLogger->Log(Color::Red, L"[GDM] Failed to load WeaponUpgradeTable: %hs\n", error.c_str());

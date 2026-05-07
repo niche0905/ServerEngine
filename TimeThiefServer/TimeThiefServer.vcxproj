@@ -291,6 +291,7 @@
     <ClCompile Include="Data\Tables\LootTableJson.cpp" />
     <ClCompile Include="Data\Tables\PlayerSpawnTableJson.cpp" />
     <ClCompile Include="Data\Tables\UpgradeTableJson.cpp" />
+    <ClCompile Include="Data\Tables\WeaponTableJson.cpp" />
     <ClCompile Include="Data\Tables\ZoneTableJson.cpp" />
     <ClCompile Include="Main\main.cpp">
       <RuntimeLibrary>MultiThreadedDebugDll</RuntimeLibrary>
@@ -552,6 +553,7 @@
     <ClInclude Include="Data\Tables\UpgradeTable.h" />
     <ClInclude Include="Data\Tables\UpgradeTableJson.h" />
     <ClInclude Include="Data\Tables\WeaponTable.h" />
+    <ClInclude Include="Data\Tables\WeaponTableJson.h" />
     <ClInclude Include="Data\Tables\ZoneTable.h" />
     <ClInclude Include="Data\Tables\ZoneTableJson.h" />
     <ClInclude Include="Network\PacketDispatcher\Routing\PlayerRoute.h" />
@@ -603,6 +605,7 @@
     <Content Include="config\data\tables\LootTables.json" />
     <Content Include="config\data\tables\PlayerSpawnTable.json" />
     <Content Include="config\data\tables\StatUpgradeTable.json" />
+    <Content Include="config\data\tables\WeaponTable.json" />
     <Content Include="config\data\tables\WeaponUpgradeTable.json" />
     <Content Include="config\data\tables\ZoneDataTable.json" />
     <Content Include="config\server.dev.json" />

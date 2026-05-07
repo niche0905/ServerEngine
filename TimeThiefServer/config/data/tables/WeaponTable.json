@@ -1,0 +1,38 @@
+{
+  "weapons": [
+    {
+      "weapon_id": 1,
+      "category": 1,
+      "fire_type": 0,
+      "damage": 12,
+      "magazine_size": 30,
+      "fire_interval": 0.1,
+      "reload_time": 2.0,
+      "range": 10000.0
+    },
+    {
+      "weapon_id": 2,
+      "category": 2,
+      "fire_type": 0,
+      "damage": 8,
+      "magazine_size": 8,
+      "fire_interval": 0.545454,
+      "reload_time": 2.0,
+      "range": 3000.0,
+      "pellet_count": 12,
+      "cone_angle": 3.5
+    },
+    {
+      "weapon_id": 3,
+      "category": 3,
+      "fire_type": 1,
+      "damage": 80,
+      "magazine_size": 1,
+      "fire_interval": 1.25,
+      "reload_time": 3.0,
+      "range": 200.0,
+      "projectile_speed": 2000.0,
+      "explosion_radius": 300.0
+    }
+  ]
+}

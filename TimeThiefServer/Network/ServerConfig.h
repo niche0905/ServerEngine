@@ -13,6 +13,7 @@ struct DataFilesConfig
 {
     std::filesystem::path zoneTablePath;
     std::filesystem::path lootTablePath;
+    std::filesystem::path weaponTablePath;
     std::filesystem::path weaponUpgradeTablePath;
     std::filesystem::path statUpgradeTablePath;
     std::filesystem::path playerSpawnTablePath;
