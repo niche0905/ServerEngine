@@ -20,10 +20,11 @@ enum class ReplicationDirty : uint32
     Health          = 1 << 2,   // Player Only  (체력 상태)
     Resource        = 1 << 3,   // Player Only  (자원 상태 <- 재화 한정)
     Inventory       = 1 << 4,   // Player Only  (인벤토리 아이템 상태)
-    AnimState       = 1 << 5,   // (애니메이션 상태) <- NPC, Player 범용
-    CombatState     = 1 << 6,   
-    SkillState      = 1 << 7,   // Player Only  (스킬 해금 상태)
-    WeaponStat      = 1 << 8,   // Player Only  (무기 강화 상태)
+    Stat            = 1 << 5,   // Player Only  (스텟 상태)
+    AnimState       = 1 << 6,   // (애니메이션 상태) <- NPC, Player 범용
+    CombatState     = 1 << 7,   
+    SkillState      = 1 << 8,   // Player Only  (스킬 해금 상태)
+    WeaponStat      = 1 << 9,   // Player Only  (무기 강화 상태)
 };
 
 struct ReplicateResult

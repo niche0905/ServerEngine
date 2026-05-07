@@ -37,6 +37,12 @@ enum class StoreRewardType : uint8
     StatUpgrade,                    // 스텟 강화 보상
 };
 
+enum StatCode : uint8
+{
+    Health_S = 1,                   // 체력 스텟
+    Speed_S,                        // 이동 속도 스텟
+};
+
 struct StoreEntryDef
 {
     uint32 entryId{0};

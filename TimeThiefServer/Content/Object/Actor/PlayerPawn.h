@@ -163,6 +163,8 @@ private:
     SkillComponent              skill_{};
     UpgradeComponent            upgrade_{};
     
+    int32                       speed_{};
+    
     ActionState                 actionState_{};
     
 };

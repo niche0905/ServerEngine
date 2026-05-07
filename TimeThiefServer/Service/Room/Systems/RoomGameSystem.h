@@ -4,6 +4,7 @@
 #include "Replication/ReplicationSystem.h"
 #include "Respawn/RespawnSystem.h"
 #include "Store/StoreSystem.h"
+#include "Upgrade/UpgradeSystem.h"
 #include "Weapon/WeaponSystem.h"
 #include "Zone/ZoneSystem.h"
 
@@ -50,6 +51,9 @@ public:
    WeaponSystem& GetWeaponSystem() { return weaponSystem_; }
    const WeaponSystem& GetWeaponSystem() const { return weaponSystem_; }
    
+   UpgradeSystem& GetUpgradeSystem() { return upgradeSystem_; }
+   const UpgradeSystem& GetUpgradeSystem() const { return upgradeSystem_; }
+   
 public:
    void OnPawnDeath(ObjectId pawnId);
    
@@ -64,5 +68,6 @@ private:
    LootSystem              lootSystem_{};
    StoreSystem             storeSystem_{};
    WeaponSystem            weaponSystem_{};
+   UpgradeSystem           upgradeSystem_{};
     
 };

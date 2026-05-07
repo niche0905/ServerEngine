@@ -74,6 +74,14 @@ public:
         return hp_ - before;
     }
     
+    void UpgradeHealth(int32 newMaxHp)
+    {
+        maxHp_ = std::max(1, newMaxHp);
+        hp_ = maxHp_;
+        
+        owner_->MarkReplicationDirty(ReplicationDirty::Health);
+    }
+    
     void Revive(int32 hp)
     {
         hp_ = std::clamp(hp, 1, maxHp_);

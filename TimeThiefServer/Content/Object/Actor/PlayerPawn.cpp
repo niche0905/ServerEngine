@@ -146,6 +146,7 @@ MoneyChangeResult PlayerPawn::SpendMoney(CurrencyType currency, CurrencyAmount a
 void PlayerPawn::OnSkillChanged(SkillId skillId)
 {
    MarkReplicationDirty(ReplicationDirty::SkillState);
+   // TODO: 작성하기
 }
 
 void PlayerPawn::OnWeaponUpgradeApplied(WeaponUpgradeCode code)
@@ -156,7 +157,23 @@ void PlayerPawn::OnWeaponUpgradeApplied(WeaponUpgradeCode code)
 
 void PlayerPawn::OnStatUpgradeApplied(StatUpgradeCode code, int32 newLevel)
 {
-   // TODO: 작성하기...
+   auto room = GetRoom();
+   if (!room)
+      return;
+   
+   auto& upgradeSystem = room->GetRoomGameSystem().GetUpgradeSystem();
+   int32 finalValue = upgradeSystem.GetStatFinalValue(code, newLevel);
+   
+   switch (code)
+   {
+   case Health_S:
+      health_.UpgradeHealth(finalValue);
+      break;
+   case Speed_S:
+      speed_ = finalValue;
+      MarkReplicationDirty(ReplicationDirty::Stat);
+      break;
+   }
 }
 
 bool PlayerPawn::TrySetSavePoint(const Vector3& location)
@@ -200,6 +217,8 @@ void PlayerPawn::OnSpawn()
                                                                         // TODO: 이 값 Config로 빼기
    skill_.Init(this);
    upgrade_.Init(this);
+   
+   speed_ = 600;
    
    InitDefaultLoadout();
 }

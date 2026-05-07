@@ -1,14 +1,14 @@
 ﻿#pragma once
 #include "WeaponTable.h"
 
-enum class UpgradeTargetType : uint8
+enum class WeaponUpgradeTargetType : uint8
 {
     AllWeapons,
     Category,
     WeaponId
 };
 
-struct UpgradeTarget
+struct WeaponUpgradeTarget
 {
     // UpgradeTargetType       type = UpgradeTargetType::AllWeapons;
     // WeaponCategory          category = WeaponCategory::None;
@@ -32,7 +32,7 @@ struct WeaponStatModifier
 
 struct WeaponUpgradeDef
 {
-    UpgradeTarget           target{};
+    WeaponUpgradeTarget     target{};
     WeaponStatModifier      modifier{};
 };
 
@@ -47,7 +47,38 @@ struct WeaponUpgradeTable
     }
 };
 
+struct StatUpgradeDef
+{
+    uint32              statCode = 0;
+    int32               statDelta = 0;
+};
+
+struct StatUpgradeEntry
+{
+    std::vector<StatUpgradeDef> statUpgrades;
+    
+    const StatUpgradeDef* GetLevelByStat(int32 level) const
+    {
+        if (statUpgrades.empty()) return nullptr;
+        if (level >= static_cast<int>(statUpgrades.size()) or level < 1) return nullptr;
+        
+        return &statUpgrades[level- 1];
+    }
+};
+
+struct StatUpgradeTable
+{
+    std::unordered_map<StatUpgradeCode, StatUpgradeEntry> statUpgrades;
+    
+    const StatUpgradeEntry* Find(StatUpgradeCode code) const
+    {
+        auto it = statUpgrades.find(code);
+        return (it != statUpgrades.end()) ? &it->second : nullptr;
+    }
+};
+
 struct UpgradeTable
 {
-    WeaponUpgradeTable WeaponUpgradeTable;
+    WeaponUpgradeTable      WeaponUpgradeTable;
+    StatUpgradeTable        StatUpgradeTable;
 };

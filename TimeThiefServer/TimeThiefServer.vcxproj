@@ -389,6 +389,7 @@
     <ClCompile Include="Service\Room\Systems\Respawn\RespawnSystem.cpp" />
     <ClCompile Include="Service\Room\Systems\RoomGameSystem.cpp" />
     <ClCompile Include="Service\Room\Systems\Store\StoreSystem.cpp" />
+    <ClCompile Include="Service\Room\Systems\Upgrade\UpgradeSystem.cpp" />
     <ClCompile Include="Service\Room\Systems\Weapon\WeaponSystem.cpp" />
     <ClCompile Include="Service\Room\Systems\Zone\ZoneSystem.cpp" />
     <ClCompile Include="Service\Server\TimeThiefServerApp.cpp" />
@@ -581,6 +582,7 @@
     <ClInclude Include="Service\Room\Systems\Respawn\RespawnSystem.h" />
     <ClInclude Include="Service\Room\Systems\RoomGameSystem.h" />
     <ClInclude Include="Service\Room\Systems\Store\StoreSystem.h" />
+    <ClInclude Include="Service\Room\Systems\Upgrade\UpgradeSystem.h" />
     <ClInclude Include="Service\Room\Systems\Weapon\WeaponSystem.h" />
     <ClInclude Include="Service\Room\Systems\Zone\ZoneSystem.h" />
     <ClInclude Include="Service\Room\Systems\Zone\ZoneTypes.h" />

@@ -74,9 +74,12 @@ bool UpgradeComponent::ApplyStatUpgrade(StatUpgradeCode code, int32 maxLevel, in
       return false;
    
    int32& level = statUpgradeLevels_[code];
+   int32 oldLevel = level;
    level = std::min(level + deltaLevel, maxLevel);
    
-   // TODO: 업그레이드 적용에 따른 추가 로직 (예: 플레이어 능력치, 혹은 Skill에 쿨타임 변경 등 적용)
+   if (oldLevel == level)
+      return false;   // 이미 최대 레벨이어서 적용할 수 없는 경우
+   
    if (PlayerPawn* player = GetOwnerAs<PlayerPawn>()) {
       player->OnStatUpgradeApplied(code, level);
    }
