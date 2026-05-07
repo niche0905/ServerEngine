@@ -49,7 +49,6 @@ struct WeaponUpgradeTable
 
 struct StatUpgradeDef
 {
-    uint32              statCode = 0;
     int32               statDelta = 0;
 };
 

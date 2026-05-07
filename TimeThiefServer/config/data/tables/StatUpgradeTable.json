@@ -1,0 +1,35 @@
+{
+  "upgrades": [
+    {
+      "code": 1,
+      "stat_infos": [
+        {
+          "delta": 100
+        },
+        {
+          "delta": 20
+        },
+        {
+          "delta": 35
+        },
+        {
+          "delta": 50
+        }
+      ]
+    },
+    {
+      "code": 2,
+      "stat_infos": [
+        {
+        "delta": 600
+        },
+        {
+        "delta": 40
+        },
+        {
+        "delta": 60
+        }
+      ]
+    }
+  ]
+}

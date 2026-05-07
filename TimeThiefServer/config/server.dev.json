@@ -8,6 +8,8 @@
     "data_files": {
         "zone_table": "data/tables/ZoneDataTable.json",
         "loot_table": "data/tables/LootTables.json",
+        "stat_upgrade_table": "data/tables/StatUpgradeTable.json",
+        "weapon_upgrade_table": "data/tables/WeaponUpgradeTable.json",
         "player_spawn_table": "data/tables/PlayerSpawnTable.json"
     },
     "game": {

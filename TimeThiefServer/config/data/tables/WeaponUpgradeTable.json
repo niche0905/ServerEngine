@@ -1,0 +1,29 @@
+{
+  "upgrades": [
+    {
+      "code": 1001,
+      "target": 1,
+      "modifier": {
+        "damage_delta": 5,
+        "mag_capacity_delta": 10,
+        "fire_interval_set_delta": -0.0333
+      }
+    },
+    {
+      "code": 2001,
+      "target": 2,
+      "modifier": {
+        "pallet_count_delta": 2,
+        "cone_angle_degrees_delta": -0.1,
+      }
+    },
+    {
+      "code": 3001,
+      "target": 3,
+      "modifier": {
+        "projectile_speed_delta": 250.0,
+        "explosion_radius_delta": 75.0
+      }
+    }
+  ]
+}

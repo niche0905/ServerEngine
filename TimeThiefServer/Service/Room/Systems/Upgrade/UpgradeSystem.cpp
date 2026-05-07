@@ -25,10 +25,6 @@ int32 UpgradeSystem::GetStatDelta(StatUpgradeCode code, int32 currentLevel) cons
 {
    if (auto* statUpgradeInfo = upgradeTable_->StatUpgradeTable.Find(code)) {
       if (auto* currentLevelInfo = statUpgradeInfo->GetLevelByStat(currentLevel)) {
-         if (currentLevelInfo->statCode != code) {
-            consoleLogger->Log(Color::Yellow, L"Not Same Stat Code\n");
-         }
-         
          return currentLevelInfo->statDelta;
       }
    }
@@ -43,10 +39,6 @@ int32 UpgradeSystem::GetStatFinalValue(StatUpgradeCode code, int32 currentLevel)
    if (auto* statUpgradeInfo = upgradeTable_->StatUpgradeTable.Find(code)) {
       for (int32 level = 0; level <= currentLevel; ++level) {
          if (auto* levelInfo = statUpgradeInfo->GetLevelByStat(level)) {
-            if (levelInfo->statCode != code) {
-               consoleLogger->Log(Color::Yellow, L"Not Same Stat Code\n");
-            }
-            
             // 누적된 델타를 더해나감
             result += levelInfo->statDelta;
          }
