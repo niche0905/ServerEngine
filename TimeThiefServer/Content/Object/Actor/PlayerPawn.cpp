@@ -218,8 +218,6 @@ void PlayerPawn::OnSpawn()
    skill_.Init(this);
    upgrade_.Init(this);
    
-   speed_ = 600;
-   
    InitDefaultLoadout();
 }
 

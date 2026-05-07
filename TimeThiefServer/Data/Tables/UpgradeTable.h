@@ -60,9 +60,9 @@ struct StatUpgradeEntry
     const StatUpgradeDef* GetLevelByStat(int32 level) const
     {
         if (statUpgrades.empty()) return nullptr;
-        if (level >= static_cast<int>(statUpgrades.size()) or level < 1) return nullptr;
+        if (level >= static_cast<int>(statUpgrades.size()) or level < 0) return nullptr;
         
-        return &statUpgrades[level- 1];
+        return &statUpgrades[level];
     }
 };
 

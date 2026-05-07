@@ -16,6 +16,8 @@ class UpgradeComponent : public BaseComponent
 public:
    virtual void Init(BaseObject* owner);
    
+   void InitStatUpgrade(StatUpgradeCode code);
+   
 // Weapon
 public:
    bool HasWeaponUpgrade(WeaponUpgradeCode code) const;

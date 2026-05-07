@@ -1,6 +1,6 @@
 ﻿#include "pch.h"
 #include "UpgradeComponent.h"
-
+#include "Content/Gameplay/Economy/StoreTypes.h"
 #include "Content/Object/Actor/PlayerPawn.h"
 
 /*--------------------
@@ -11,6 +11,23 @@ void UpgradeComponent::Init(BaseObject* owner)
 {
    SetOwner(owner);
    Clear();
+   
+   statUpgradeLevels_[Health_S] = 0;
+   statUpgradeLevels_[Speed_S] = 0;
+   InitStatUpgrade(Health_S);
+   InitStatUpgrade(Speed_S);
+}
+
+void UpgradeComponent::InitStatUpgrade(StatUpgradeCode code)
+{
+   if (code == 0)
+      return;
+   
+   int32 level = statUpgradeLevels_[code];
+   
+   if (PlayerPawn* player = GetOwnerAs<PlayerPawn>()) {
+      player->OnStatUpgradeApplied(code, level);
+   }
 }
 
 bool UpgradeComponent::HasWeaponUpgrade(WeaponUpgradeCode code) const
