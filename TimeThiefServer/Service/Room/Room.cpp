@@ -1578,7 +1578,7 @@ bool Room::HandleMaxHealth(PlayerId playerId, const se::test::C_MaxHealthReq& pk
       return false;
    
    auto& health = playerPawn->GetHealth();
-   health.SetHpUnsafe(static_cast<int32>(pkt.max_health()));
+   health.SetMaxHpUnsafe(static_cast<int32>(pkt.max_health()));
    int32 newMapHp = health.GetMaxHp();
    int32 currentHp = health.GetMaxHp();
    NotifyMaxHealthChange(playerId, newMapHp, currentHp);
