@@ -28,14 +28,14 @@ namespace PlayerSpawnTableJson
             return false;
         }
         
-        if (!root.isMember("spawnPoints") || !root["spawnPoints"].isArray()) {
+        if (!root.isMember("spawn_points") || !root["spawn_points"].isArray()) {
             if (outError) *outError = "Missing or invalid 'spawnPoints'";
             return false;
         }
         
         outTable.spawnPoints.clear();
-        outTable.spawnPoints.reserve(root["spawnPoints"].size());
-        for (const Json::Value& point : root["spawnPoints"]) {
+        outTable.spawnPoints.reserve(root["spawn_points"].size());
+        for (const Json::Value& point : root["spawn_points"]) {
             if (!point.isObject() || !point.isMember("x") || !point.isMember("y") || !point.isMember("z")) {
                 if (outError) *outError = "Invalid spawn point format";
                 return false;
