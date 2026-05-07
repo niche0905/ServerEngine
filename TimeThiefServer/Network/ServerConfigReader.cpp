@@ -80,6 +80,9 @@ bool ServerConfigReader::ParseJsonText(const std::string& jsonText, const std::f
       if (dataFiles.isMember("loot_table"))
          newConfig.dataFiles.lootTablePath = ResolvePath(dataFiles["loot_table"].asString(), baseDir);
 
+      if (dataFiles.isMember("store_entry_table"))
+         newConfig.dataFiles.storeEntryTablePath = ResolvePath(dataFiles["store_entry_table"].asString(), baseDir);
+      
       if (dataFiles.isMember("weapon_table"))
          newConfig.dataFiles.weaponTablePath = ResolvePath(dataFiles["weapon_table"].asString(), baseDir);
       

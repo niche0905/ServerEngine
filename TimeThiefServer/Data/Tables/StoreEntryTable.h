@@ -7,14 +7,22 @@ struct StoreEntryDef;
 struct StoreEntryTable
 {
     std::unordered_map<uint32, StoreEntryDef> Entries;
+    std::unordered_map<uint32, UpgradeLineDef> UpgradeLines; 
     
-    int64 GetCost(uint32 entryId) const
+    int32 GetCost(uint32 entryId, uint32 nowLevel = 0) const
     {
         auto it = Entries.find(entryId);
-        if (it != Entries.end())
+        if (it == Entries.end())
+            return -1;
+        
+        if (it->second.upgradeLineId == 0)
             return it->second.cost;
         
-        return -1;  // 유효하지 않은 entryId
+        auto lineIt = UpgradeLines.find(it->second.upgradeLineId);
+        if (lineIt == UpgradeLines.end())
+            return -1;
+        
+        return lineIt->second.GetStep(nowLevel)->cost;
     }
     
     const StoreEntryDef* GetStoreEntry(uint32 entryId) const
@@ -29,4 +37,14 @@ struct StoreEntryTable
     {
         return Entries.contains(entryId);
     }
+    
+    int32 GetMaxLevel(uint32 lineId) const
+    {
+        auto lineIt = UpgradeLines.find(lineId);
+        if (lineIt == UpgradeLines.end())
+            return -1;
+        
+        return static_cast<int32>(lineIt->second.steps.size());
+    }
+    
 };

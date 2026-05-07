@@ -46,19 +46,20 @@ enum StatCode : uint8
 struct StoreEntryDef
 {
     uint32 entryId{0};
-    int32 cost{0};
+    int32 cost{0};      // 반복 구매, 혹은 고정 가격용 (단계형은 다르게)
     
     StoreRewardType rewardType{StoreRewardType::None};
     
     ItemId itemId{0};               // 아이템이라면...
     int32 itemCount{0};             // 아이템 보상 개수
     
-    SkillId skillId{0};              // 스킬이라면...
+    SkillId skillId{0};             // 스킬이라면...
     
     uint32 weaponUpgradeType{0};    // 무기 강화라면... (강화할 종류)
     
     uint32 statUpgradeType{0};      // 스텟 강화라면... (강화할 종류)
-    int32 statUpgradeMaxLevel{0};     // 스텟 강화라면... (강화 가능한 최대 Level)
+    
+    uint32 upgradeLineId{0};        // 단계형 구매라면
 };
 
 struct StoreBuyResult
@@ -79,3 +80,23 @@ struct StoreBuyContext
     const StoreEntryDef* entryDef{nullptr};
     uint32 entryId{0};
 };
+
+struct UpgradeStepDef
+{
+    int32 cost{0};
+};
+
+struct UpgradeLineDef
+{
+    uint32 lienId{0};
+    std::vector<UpgradeStepDef> steps;
+    
+    const UpgradeStepDef* GetStep(uint32 level) const
+    {
+        if (steps.empty() || level >= steps.size())
+            return nullptr;
+        
+        return &steps[level];
+    }
+};
+

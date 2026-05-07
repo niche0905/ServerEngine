@@ -3,6 +3,7 @@
 #include "Network/ServerConfig.h"
 #include "Tables/LootTableJson.h"
 #include "Tables/PlayerSpawnTableJson.h"
+#include "Tables/StoreEntryTableJson.h"
 #include "Tables/UpgradeTableJson.h"
 #include "Tables/WeaponTableJson.h"
 #include "Tables/ZoneTableJson.h"
@@ -42,7 +43,10 @@ bool GameDataManager::Init(const ServerConfig& config)
       return false;
    }
    
-   // TODO: Store Table 로드하기 (우선 json 파일 작성부터)
+   if (not StoreEntryTableJson::LoadFromFile(config.dataFiles.storeEntryTablePath, storeEntryTable_, &error)) {
+      consoleLogger->Log(Color::Red, L"[GDM] Failed to load StoreEntryTable: %hs\n", error.c_str());
+      return false;
+   }
    
    if (not WeaponTableJson::LoadFromFile(config.dataFiles.weaponTablePath, weaponTable_, &error)) {
       consoleLogger->Log(Color::Red, L"[GDM] Failed to load WeaponTable: %hs\n", error.c_str());

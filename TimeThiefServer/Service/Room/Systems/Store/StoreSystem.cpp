@@ -214,7 +214,13 @@ bool StoreSystem::CanPurchaseReward(PlayerPawn* playerPawn, const StoreEntryDef*
    case StoreRewardType::StatUpgrade:
       {
          auto& upgradeComp = playerPawn->GetUpgrade();
-         return upgradeComp.CanApplyStatUpgrade(entryDef->statUpgradeType, entryDef->statUpgradeMaxLevel);
+         if (entryDef->upgradeLineId == 0)
+            return false;
+   
+         int32 maxLevel = storeEntryTable_->GetMaxLevel(entryDef->upgradeLineId);
+         if (maxLevel <= 0)
+            return false;
+         return upgradeComp.CanApplyStatUpgrade(entryDef->statUpgradeType, maxLevel);
       }
    default:
       return false;
@@ -248,5 +254,13 @@ bool StoreSystem::TryApplyStatUpgradeReward(const StoreBuyContext& ctx)
 {
    UpgradeComponent& upgradeComp = ctx.playerPawn->GetUpgrade();
    const StoreEntryDef* entryDef = ctx.entryDef;
-   return upgradeComp.ApplyStatUpgrade(entryDef->statUpgradeType, entryDef->statUpgradeMaxLevel);
+   
+   if (entryDef->upgradeLineId == 0)
+      return false;
+   
+   int32 maxLevel = storeEntryTable_->GetMaxLevel(entryDef->upgradeLineId);
+   if (maxLevel <= 0)
+      return false;
+   
+   return upgradeComp.ApplyStatUpgrade(entryDef->statUpgradeType, maxLevel);
 }

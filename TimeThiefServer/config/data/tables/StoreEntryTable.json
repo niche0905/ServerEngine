@@ -1,0 +1,124 @@
+﻿{
+  "entries": [
+    {
+      "entry_id": 8,
+      "cost": 300,
+      "type": 1,
+      "item_id": 8,
+      "item_count": 1
+    },
+    {
+      "entry_id": 9,
+      "cost": 1000,
+      "type": 1,
+      "item_id": 9,
+      "item_count": 1
+    },
+    {
+      "entry_id": 10,
+      "cost": 2000,
+      "type": 1,
+      "item_id": 10,
+      "item_count": 1
+    },
+    {
+      "entry_id": 11,
+      "cost": 500,
+      "type": 1,
+      "item_id": 11,
+      "item_count": 1
+    },
+    {
+      "entry_id": 5,
+      "cost": 1000,
+      "type": 2,
+      "skill_id": 1
+    },
+    {
+      "entry_id": 6,
+      "cost": 1000,
+      "type": 2,
+      "skill_id": 2
+    },
+    {
+      "entry_id": 7,
+      "cost": 1000,
+      "type": 2,
+      "skill_id": 3
+    },
+    {
+      "entry_id": 0,
+      "cost": 500,
+      "type": 3,
+      "weapon_upgrade_type": 1001
+    },
+    {
+      "entry_id": 1,
+      "cost": 500,
+      "type": 3,
+      "weapon_upgrade_type": 2001
+    },
+    {
+      "entry_id": 2,
+      "cost": 500,
+      "type": 3,
+      "weapon_upgrade_type": 3001
+    },
+    {
+      "entry_id": 3,
+      "cost": 0,
+      "type": 4,
+      "stat_upgrade_type": 1,
+      "upgrade_line_id": 1
+    },
+    {
+      "entry_id": 4,
+      "cost": 0,
+      "type": 4,
+      "stat_upgrade_type": 2,
+      "upgrade_line_id": 2
+    }
+  ],
+  "upgrade_lines": [
+    {
+      "line_id": 1,
+      "steps": [
+        {
+          "cost": 200
+        },
+        {
+          "cost": 400
+        },
+        {
+          "cost": 800
+        },
+        {
+          "cost": 1500
+        },
+        {
+          "cost": 99999
+        }
+      ]
+    },
+    {
+      "line_id": 2,
+      "steps": [
+        {
+          "cost": 300
+        },
+        {
+          "cost": 600
+        },
+        {
+          "cost": 1200
+        },
+        {
+          "cost": 2500
+        },
+        {
+          "cost": 99999
+        }
+      ]
+    }
+  ]
+}
