@@ -87,6 +87,8 @@ namespace WeaponTableJson
                 }
                 break;
             }
+            
+            outTable.tables[row["weapon_id"].asUInt()] = stat;
         }
         
         return true;
