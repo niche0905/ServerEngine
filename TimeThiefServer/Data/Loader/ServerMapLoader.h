@@ -1,7 +1,7 @@
 ﻿#pragma once
-
 #include <vector>
 #include <string>
+#include <filesystem>
 #include "Data/Map/ServerMapFormat.h"
 
 
@@ -16,7 +16,7 @@ namespace se::map
     class ServerMapLoader
     {
     public:
-        bool LoadFromFile(const std::string& filePath, LoadedMapData& outMapData);
+        bool LoadFromFile(const std::filesystem::path& filePath, LoadedMapData& outMapData, std::string* outError = nullptr);
     
     };
 }

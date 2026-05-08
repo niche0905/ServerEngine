@@ -1,7 +1,7 @@
 ﻿#include "pch.h"
 #include "Data/Loader/ServerMapLoaderTest.h"
+#include <filesystem>
 #include "Data/Loader/ServerMapLoader.h"
-
 #include <fstream>
 #include <iostream>
 
@@ -9,7 +9,7 @@ namespace se::map
 {
     namespace
     {
-        bool WriteTestMapFile(const std::string& filePath)
+        bool WriteTestMapFile(const std::filesystem::path& filePath)
         {
             MapHeader header{};
             header.colliderCount = 1;
@@ -37,7 +37,7 @@ namespace se::map
     
     bool RunServerMapLoaderTest()
     {
-        const std::string filePath = "TestMap_Tagged.servermap";
+        const std::filesystem::path filePath = "TestMap_Tagged.servermap";
 
         // if (not WriteTestMapFile(filePath)) {
         //     std::cout << "[Test] WriteTestMapFile failed\n";
