@@ -182,6 +182,10 @@ void ReplicationSystem::DispatchImmediateEvent(const RepEvent& ev, const RepFram
       FlushEvent_Item(ev, frame);
       break;
       
+   case RepEventType::Fire:
+      FlushEvent_Fire(ev, frame);
+      break;
+      
    case RepEventType::ZoneFlow:
       FlushEvent_ZoneFlow(ev, frame);
       break;
@@ -377,6 +381,35 @@ void ReplicationSystem::FlushEvent_Item(const RepEvent& ev, const RepFrame& fram
    }
    
    ownerRoom_->SendReplication(ev.header.playerId, sendBuffer);
+}
+
+void ReplicationSystem::FlushEvent_Fire(const RepEvent& ev, const RepFrame& frame) const
+{
+   const FireEvent* fireEv = std::get_if<FireEvent>(&ev.payload);
+   if (!fireEv) {
+      consoleLogger->Log(Color::Yellow, L"[ReplicationSystem] Fire event with invalid payload, skipping. PlayerId={}", ev.header.playerId);
+      return;   // 페이로드가 FireEvent가 아닌 경우 (잘못된 이벤트)
+   }
+   
+   se::game::N_Fire noti;
+   auto* entityIdPtr = noti.mutable_entity_id();
+   entityIdPtr->set_value(ev.header.source.value);
+      
+   noti.set_weapon_id(fireEv->weaponId);
+   noti.set_shot_seed(fireEv->shotSeed);
+      
+   auto* startPosPtr = noti.mutable_start_position();
+   startPosPtr->set_x(fireEv->startPos.x);
+   startPosPtr->set_y(fireEv->startPos.y);
+   startPosPtr->set_z(fireEv->startPos.z);
+      
+   auto* dirPtr = noti.mutable_direction();
+   dirPtr->set_x(fireEv->direction.x);
+   dirPtr->set_y(fireEv->direction.y);
+   dirPtr->set_z(fireEv->direction.z);
+   
+   SendBufferRef sendBuffer = ServerPacketHandler::MakeSendBuffer(noti);
+   ownerRoom_->BroadcastReplication(sendBuffer, ev.header.playerId);
 }
 
 void ReplicationSystem::FlushEvent_ZoneFlow(const RepEvent& ev, const RepFrame& frame) const

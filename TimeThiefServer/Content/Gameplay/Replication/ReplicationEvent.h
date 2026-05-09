@@ -22,15 +22,13 @@ enum class RepEventType : uint8
     
     ItemChange,
     
+    Fire,                   // 발사 이벤트 (무기 종류, 발사 위치, 방향 등 포함)
+    
     ZoneFlow,               // 테스트 용 (Zone이 Stop 되거나 Start 될 때)
     
     
-    // Damage,
     // Death,
     // Respawn,
-    //
-    // Fire,
-    // ProjectileExplode,
     //
     // ItemUseStart,
     // ItemUseCancel,

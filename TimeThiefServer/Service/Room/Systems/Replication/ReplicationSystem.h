@@ -50,6 +50,7 @@ private:
    void FlushEvent_Money(const RepEvent& ev, const RepFrame& frame) const;
    void FlushEvent_Explosion(const RepEvent& ev, const RepFrame& frame) const;
    void FlushEvent_Item(const RepEvent& ev, const RepFrame& frame) const;
+   void FlushEvent_Fire(const RepEvent& ev, const RepFrame& frame) const;
    
    void FlushEvent_ZoneFlow(const RepEvent& ev, const RepFrame& frame) const;
    

@@ -250,7 +250,7 @@ bool PlayerCombatComponent::ExecuteAttack(AttackRequest& request)
         break;
     }
     
-    return hit;
+    return true;
 }
 
 bool PlayerCombatComponent::TraceHit(const AttackRequest& request, const SE::Physics::Ray& ray, SE::Physics::Hit::HitResult& outHit)

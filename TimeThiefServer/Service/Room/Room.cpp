@@ -596,7 +596,6 @@ bool Room::HandleAim(PlayerId playerId, const se::game::C_AimReq& pkt)
 
 bool Room::HandleFire(PlayerId playerId, const se::game::C_FireReq& pkt)
 {
-   SendBufferRef fireBroadcastBuffer;
    std::shared_ptr<PlayerSession> sessionRef = sessionManager_.FindByPlayerId(playerId);
    
    if (!sessionRef) return false;   // 세션이 존재하지 않음 (정상적이지 않은 상황)
@@ -633,33 +632,19 @@ bool Room::HandleFire(PlayerId playerId, const se::game::C_FireReq& pkt)
       attackReq.direction = Vector3{dir.x(), dir.y(), dir.z()};
       
       bool attackSucc = combatComp->TryAttack(attackReq);
-      
-      se::game::N_Fire noti;
-      {
-         auto* entityIdPtr = noti.mutable_entity_id();
-         entityIdPtr->set_value(it->second.pawnObjectId.value);
-         
-         // TODO: pkt의 weapon_id를 바로 사용하지 않고 Player State의 Weapon Id 와 비교 한번 진행하기
-         noti.set_weapon_id(pkt.weapon_id());
-         
-         auto* startPosPtr = noti.mutable_start_position();
-         startPosPtr->set_x(startPos.x());
-         startPosPtr->set_y(startPos.y());
-         startPosPtr->set_z(startPos.z());
-         
-         auto* dirPtr = noti.mutable_direction();
-         dirPtr->set_x(dir.x());
-         dirPtr->set_y(dir.y());
-         dirPtr->set_z(dir.z());
-         
-         noti.set_shot_seed(pkt.shot_seed());
+      if (!attackSucc) {
+         consoleLogger->Log(Color::Yellow, L"[Room] Attack failed for playerId %u with weaponId %u\n", playerId, pkt.weapon_id());
+         return true;   // 공격 시도 실패 (예: 탄약 부족, 재장전 중 등)
       }
       
-      fireBroadcastBuffer = ServerPacketHandler::MakeSendBuffer(noti);
-   }
+      RepEvent explosionEvent;
+      ReplicateEventSet(explosionEvent, RepEventType::Fire);
+      explosionEvent.header.playerId = playerId;
+      explosionEvent.header.source = playerPawn->GetId();
+      explosionEvent.payload = FireEvent{attackReq.weaponId, attackReq.shotSeed, attackReq.origin, attackReq.direction};
    
-   if (fireBroadcastBuffer)
-      Broadcast(fireBroadcastBuffer, playerId);   // 발사한 플레이어를 제외한 나머지 플레이어들에게 발사 정보 Broadcast
+      roomGameSystem_.GetReplicationSystem().PushEvent(explosionEvent);
+   }
    
    return true;
 }
