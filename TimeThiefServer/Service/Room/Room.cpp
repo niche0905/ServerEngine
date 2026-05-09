@@ -814,6 +814,21 @@ bool Room::HandleWeaponChange(PlayerId playerId, const se::game::C_WeaponChangeR
    return true;
 }
 
+bool Room::HandleGrenadeMoveSync(PlayerId playerId, const se::game::C_GrenadeMoveSyncReq& pkt)
+{
+   // TODO: 수류탄 이동 Broadcast 하기
+   //       Server에도 Actor로 가지고 있어야 할 지는 고민
+   
+   return true;
+}
+
+bool Room::HandleGrenadeExplosion(PlayerId playerId, const se::game::C_GrenadeExplosionReq& pkt)
+{
+   // TODO: 수류탄 폭발 처리 (폭발 범위 내 플레이어 피해 적용, 폭발 이펙트 및 사운드 Broadcast 등)
+   
+   return true;
+}
+
 bool Room::HandleUseAbility(PlayerId playerId, const se::game::C_UseAbilityReq& pkt)
 {
    SendBufferRef abilityUseBroadcastBuffer;
@@ -1822,7 +1837,7 @@ void Room::ProjectileExplosion(ObjectId projectileId, const Vector3& pos, Object
    if (pawn != nullptr) {
       PlayerId playerId = pawn->GetOwnerPlayerId();
       explosionEvent.header.playerId = playerId;
-      explosionEvent.header.source = pawn->GetId();   // ownerId;
+      explosionEvent.header.source = projectileId;
    }
    explosionEvent.payload = ExplosionEvent{pos, radius};
    

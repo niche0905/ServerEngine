@@ -166,6 +166,18 @@ bool Handle_C_ThrowGrenadeReq(PacketSessionRef& session, const se::game::C_Throw
     if (!Dispatcher()) return false;
     return Dispatcher()->Handle_C_ThrowGrenadeReq(session, pkt);
 }
+
+bool Handle_C_GrenadeMoveSyncReq(PacketSessionRef& session, const se::game::C_GrenadeMoveSyncReq& pkt)
+{
+    if (!Dispatcher()) return false;
+    return Dispatcher()->Handle_C_GrenadeMoveSyncReq(session, pkt);
+}
+
+bool Handle_C_GrenadeExplosionReq(PacketSessionRef& session, const se::game::C_GrenadeExplosionReq& pkt)
+{
+    if (!Dispatcher()) return false;
+    return Dispatcher()->Handle_C_GrenadeExplosionReq(session, pkt);
+}
     
 bool Handle_C_ReloadReq(PacketSessionRef& session, const se::game::C_ReloadReq& pkt)
 {

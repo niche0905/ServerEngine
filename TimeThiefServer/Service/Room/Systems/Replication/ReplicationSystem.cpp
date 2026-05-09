@@ -345,12 +345,17 @@ void ReplicationSystem::FlushEvent_Explosion(const RepEvent& ev, const RepFrame&
       return;   // 페이로드가 ExplosionEvent가 아닌 경우 (잘못된 이벤트)
    }
    
-   // TODO: Explosion 이벤트 패킷 작성 및 브로드캐스트
-   //       se::game::N_Explosion explosionPkt;
-   //       해당 패킷을 먼저 추가하여야 한다
+   se::game::N_ProjectileExplosion explosionPkt;
+   auto* entityIdPtr = explosionPkt.mutable_entity_id();
+   entityIdPtr->set_value(ev.header.source.value);
+   auto* posPtr = explosionPkt.mutable_position();
+   posPtr->set_x(explosionEv->explosionPos.x);
+   posPtr->set_y(explosionEv->explosionPos.y);
+   posPtr->set_z(explosionEv->explosionPos.z);
+   explosionPkt.set_explosion_radius(explosionEv->explosionRadius);
    
-   // SendBufferRef sendBuffer = ServerPacketHandler::MakeSendBuffer(explosionPkt);
-   // ownerRoom_->BroadcastReplication(sendBuffer);
+   SendBufferRef sendBuffer = ServerPacketHandler::MakeSendBuffer(explosionPkt);
+   ownerRoom_->BroadcastReplication(sendBuffer);
 }
 
 void ReplicationSystem::FlushEvent_Item(const RepEvent& ev, const RepFrame& frame) const

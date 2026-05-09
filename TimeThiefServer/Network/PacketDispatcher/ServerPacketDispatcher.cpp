@@ -277,6 +277,24 @@ bool ServerPacketDispatcher::Handle_C_ThrowGrenadeReq(PacketSessionRef& session,
     });
 }
 
+bool ServerPacketDispatcher::Handle_C_GrenadeMoveSyncReq(PacketSessionRef& session,
+    const se::game::C_GrenadeMoveSyncReq& pkt)
+{
+    return EnqueueToPlayerRoom(session, pkt, [](Room& room, PlayerId playerId, const se::game::C_GrenadeMoveSyncReq& pkt)
+    {
+        room.HandleGrenadeMoveSync(playerId, pkt);
+    });
+}
+
+bool ServerPacketDispatcher::Handle_C_GrenadeExplosionReq(PacketSessionRef& session,
+    const se::game::C_GrenadeExplosionReq& pkt)
+{
+    return EnqueueToPlayerRoom(session, pkt, [](Room& room, PlayerId playerId, const se::game::C_GrenadeExplosionReq& pkt)
+    {
+        room.HandleGrenadeExplosion(playerId, pkt);
+    });
+}
+
 bool ServerPacketDispatcher::Handle_C_ReloadReq(PacketSessionRef& session, const se::game::C_ReloadReq& pkt)
 {
     return EnqueueToPlayerRoom(session, pkt, [](Room& room, PlayerId playerId, const se::game::C_ReloadReq& pkt)

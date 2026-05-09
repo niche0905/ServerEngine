@@ -53,6 +53,8 @@ public:
    bool Handle_C_AimReq(PacketSessionRef& session, const se::game::C_AimReq& pkt);
    bool Handle_C_FireReq(PacketSessionRef& session, const se::game::C_FireReq& pkt);
    bool Handle_C_ThrowGrenadeReq(PacketSessionRef& session, const se::game::C_ThrowGrenadeReq& pkt);
+   bool Handle_C_GrenadeMoveSyncReq(PacketSessionRef& session, const se::game::C_GrenadeMoveSyncReq& pkt);
+   bool Handle_C_GrenadeExplosionReq(PacketSessionRef& session, const se::game::C_GrenadeExplosionReq& pkt);
    bool Handle_C_ReloadReq(PacketSessionRef& session, const se::game::C_ReloadReq& pkt);
    bool Handle_C_WeaponChangeReq(PacketSessionRef& session, const se::game::C_WeaponChangeReq& pkt);
    bool Handle_C_UseAbilityReq(PacketSessionRef& session, const se::game::C_UseAbilityReq& pkt);
