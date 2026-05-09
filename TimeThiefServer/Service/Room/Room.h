@@ -197,6 +197,7 @@ public:
    
 public:
    bool LaunchRocket(const Vector3& pos, const Vector3& dir, Pawn* ownerPawn, int32 damage, float speed, uint32 lifetimeMs, float radius);
+   void ProjectileExplosion(ObjectId projectileId, const Vector3& pos, ObjectId ownerId, int32 damage, float radius, bool distanceDamageEnabled);
    
 private:
    PlayerPawn* CreatePreparedPlayerPawn(PlayerId playerId, const Vector3& spawnPos);

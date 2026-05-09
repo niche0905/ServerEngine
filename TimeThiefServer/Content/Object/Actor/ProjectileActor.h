@@ -32,7 +32,7 @@ public:
     void SetDamage(int32 damage) { damage_ = damage; }
     
 public:
-    void Init(ObjectId ownerId, const Vector3& startPos, const Vector3& velocity, int32 damage, uint32 lifetimeMs, float radius);
+    void Init(ObjectId ownerId, const Vector3& startPos, const Vector3& velocity, int32 damage, uint32 lifetimeMs, float projectileRadius, float explosionRadius, bool distanceDamageEnabled);
     
 protected:
     virtual void OnSpawn() override;
@@ -50,6 +50,8 @@ protected:
 private:
     ObjectId ownerId_;
     int32 damage_{ 0 };
+    float radius_{ 0.0f };
+    bool distanceDamageEnabled_{ false };
     
     TimerId lifetimeTimer_{};
     

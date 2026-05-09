@@ -1804,9 +1804,44 @@ bool Room::LaunchRocket(const Vector3& pos, const Vector3& dir, Pawn* ownerPawn,
    if (!rocket)
       return false;  // 발사체 생성 실패
    
-   rocket->Init(ownerPawn->GetId(), pos, dir * speed, damage, lifetimeMs, radius);
+   rocket->Init(ownerPawn->GetId(), pos, dir * speed, damage, lifetimeMs, 15.0f, radius, true);   // TEMP: 폭탄 충돌체의 반경은 15cm 정도로
    ReplicationSpawn(rocket, /*templateId=*/0, rocket->GetYaw());  // TODO: templateId는 나중에 생각하기
    return true;
+}
+
+void Room::ProjectileExplosion(ObjectId projectileId, const Vector3& pos, ObjectId ownerId, int32 damage, float radius,
+   bool distanceDamageEnabled)
+{
+   if (projectileId == ObjectId{}) {
+      consoleLogger->Log(Color::Yellow, L"[Room] ProjectileExplosion called with invalid projectileId\n");
+      return;
+   }
+
+   if (ownerId == ObjectId{}) {
+      consoleLogger->Log(Color::Yellow, L"[Room] ProjectileExplosion called with invalid ownerId\n");
+   }
+   
+   Pawn* pawn = objectManager_.FindAs<Pawn>(ownerId);
+   if (pawn == nullptr) {
+      consoleLogger->Log(Color::Yellow, L"[Room] ProjectileExplosion: Owner Pawn not found for ownerId %u\n", ownerId.value);
+   }
+   
+   // TODO: 폭발 범위 내의 오브젝트들을 찾아서 데미지 적용하기 (거리 기반 데미지 적용 여부에 따른 처리도 포함)
+   //       거리별 데미지일 경우 로직을 다르게 하여야 하고,
+   //       장애물에 Block 되는 지도 확인해야 함
+   
+   
+   // 폭발 이벤트를 생성하여 클라이언트에게 전송 (폭발 이펙트 재생을 위해)
+   RepEvent explosionEvent;
+   ReplicateEventSet(explosionEvent, RepEventType::Explosion);
+   if (pawn != nullptr) {
+      PlayerId playerId = pawn->GetOwnerPlayerId();
+      explosionEvent.header.playerId = playerId;
+      explosionEvent.header.source = pawn->GetId();   // ownerId;
+   }
+   explosionEvent.payload = ExplosionEvent{pos, radius};
+   
+   roomGameSystem_.GetReplicationSystem().PushEvent(explosionEvent);
 }
 
 PlayerPawn* Room::CreatePreparedPlayerPawn(PlayerId playerId, const Vector3& spawnPos)

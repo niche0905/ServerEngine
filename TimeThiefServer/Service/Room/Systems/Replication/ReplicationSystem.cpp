@@ -174,6 +174,10 @@ void ReplicationSystem::DispatchImmediateEvent(const RepEvent& ev, const RepFram
       FlushEvent_Money(ev, frame);
       break;
       
+   case RepEventType::Explosion:
+      FlushEvent_Explosion(ev, frame);
+      break;
+      
    case RepEventType::ItemChange:
       FlushEvent_Item(ev, frame);
       break;
@@ -327,6 +331,22 @@ void ReplicationSystem::FlushEvent_Money(const RepEvent& ev, const RepFrame& fra
    
    SendBufferRef sendBuffer = ServerPacketHandler::MakeSendBuffer(timePointPkt);
    ownerRoom_->SendReplication(ev.header.playerId, sendBuffer);
+}
+
+void ReplicationSystem::FlushEvent_Explosion(const RepEvent& ev, const RepFrame& frame) const
+{
+   const ExplosionEvent* explosionEv = std::get_if<ExplosionEvent>(&ev.payload);
+   if (!explosionEv) {
+      consoleLogger->Log(Color::Yellow, L"[ReplicationSystem] Explosion event with invalid payload, skipping. objectId={}", ev.header.source.value);
+      return;   // 페이로드가 ExplosionEvent가 아닌 경우 (잘못된 이벤트)
+   }
+   
+   // TODO: Explosion 이벤트 패킷 작성 및 브로드캐스트
+   //       se::game::N_Explosion explosionPkt;
+   //       해당 패킷을 먼저 추가하여야 한다
+   
+   // SendBufferRef sendBuffer = ServerPacketHandler::MakeSendBuffer(explosionPkt);
+   // ownerRoom_->BroadcastReplication(sendBuffer);
 }
 
 void ReplicationSystem::FlushEvent_Item(const RepEvent& ev, const RepFrame& frame) const

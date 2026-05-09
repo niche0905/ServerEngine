@@ -11,11 +11,13 @@
 -------------------*/
 
 void ProjectileActor::Init(ObjectId ownerId, const Vector3& startPos, const Vector3& velocity, int32 damage,
-    uint32 lifetimeMs, float radius)
+    uint32 lifetimeMs, float projectileRadius, float explosionRadius, bool distanceDamageEnabled)
 {
     ownerId_ = ownerId;
     damage_ = damage;
     velocity_ = velocity;
+    radius_ = explosionRadius;
+    distanceDamageEnabled_ = distanceDamageEnabled;
     
     auto room = GetRoom();
     if (!room)
@@ -43,7 +45,7 @@ void ProjectileActor::Init(ObjectId ownerId, const Vector3& startPos, const Vect
     // 충돌체 설정
     {
         auto collider = std::make_unique<ColliderComponent>();
-        auto sphereCollider = std::make_unique<SE::Physics::SphereCollider>(SE::Math::Vector3{0.0f, 0.0f, 0.0f}, radius);
+        auto sphereCollider = std::make_unique<SE::Physics::SphereCollider>(SE::Math::Vector3{0.0f, 0.0f, 0.0f}, projectileRadius);
         collider->Init(this, ColliderRole::Hitbox, std::move(sphereCollider));
         
         colliders_.push_back(std::move(collider));
@@ -108,15 +110,15 @@ void ProjectileActor::OnLifetimeExpired(ObjectManager& om)
 
 void ProjectileActor::OnExplode(ObjectManager& om)
 {
-    // TODO: 아래 동작 구현
-    // 1) 데미지 계산 식에 맞게 적용 (범위, 방어구 등)
-    // 2) 자신은 제거 필요 시 EffectArea 생성 등 추가 동작
-    
     // 기본적으로 폭발 시 파괴
     if (lifetimeTimer_ != TimerId{}) {
         // Room에서 예약된 타이머 취소
         if (auto room = GetRoom()) {
+            room->ProjectileExplosion(GetId(), GetPosition(), GetOwner(), GetDamage(), radius_, distanceDamageEnabled_);
             room->CancelScheduled(lifetimeTimer_);
+        }
+        else {
+            consoleLogger->Log(Color::Yellow, L"[ProjectileActor] Warning: Room not found when trying to cancel lifetime timer.");
         }
         lifetimeTimer_ = TimerId{};
     }

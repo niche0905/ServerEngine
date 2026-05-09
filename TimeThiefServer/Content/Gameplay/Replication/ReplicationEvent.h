@@ -18,6 +18,8 @@ enum class RepEventType : uint8
     MaxHealthChange,
     MoneyChange,
     
+    Explosion,              // 폭발 이벤트 (폭발이 발생한 위치, 범위 등 포함)
+    
     ItemChange,
     
     ZoneFlow,               // 테스트 용 (Zone이 Stop 되거나 Start 될 때)
@@ -76,6 +78,12 @@ struct MoneyChangeEvent
     int32 deltaMoney{0};
 };
 
+struct ExplosionEvent
+{
+    SE::Math::Vector3 explosionPos{};       // 폭발이 발생한 위치(중점)
+    float explosionRadius{0};               // 폭발 범위(반지름)
+};
+
 struct ItemChangeEvent
 {
     uint32 itemId{0};
@@ -114,6 +122,7 @@ using RepEventPayload = std::variant<
     HealthChangeEvent,
     MaxHealthChangeEvent,
     MoneyChangeEvent,
+    ExplosionEvent,
     ItemChangeEvent,
     FireEvent,
     WeaponChangedEvent,
