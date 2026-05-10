@@ -71,9 +71,9 @@ bool GameDataManager::Init(const ServerConfig& config)
       // 테스트용 스폰 포인트를 활성화 했을 경우, 혹은 파일에서 스폰 포인트를 불러오는데 실패했을 경우
       
       playerSpawnTable_.spawnPoints.clear();
-      playerSpawnTable_.spawnPoints.reserve(20);
+      playerSpawnTable_.spawnPoints.reserve(10);
       
-      for (int32 i = 0; i < 20; ++i) {
+      for (int32 i = 0; i < 10; ++i) {
          playerSpawnTable_.spawnPoints.emplace_back(
             (0.0f + i * 200.0f), 0.0f, 100.0f
          );
