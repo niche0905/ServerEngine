@@ -270,6 +270,11 @@ void Room::SetObject()
       auto* chest = SpawnObject<ChestActor>(ObjectFlags::None);
       chest->SetPosition(Vector3{ 200.0f + i * 150.0f, 0.0f, 150.0f });
    }
+   
+   {
+      auto* store = SpawnObject<StoreActor>(ObjectFlags::None);
+      store->SetPosition(Vector3{ -200.0f, 0.0f, 100.0f });
+   }
 }
 
 bool Room::Join(PlayerId playerId, SessionId sessionId)
