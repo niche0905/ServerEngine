@@ -103,6 +103,8 @@ namespace StoreEntryTableJson
             if (entry.isMember("upgrade_line_id")) {
                 def.upgradeLineId = entry["upgrade_line_id"].asUInt();
             }
+            
+            outTable.Entries[def.entryId] = def;
         }
         
         for (const auto& upgradeLine : root["upgrade_lines"]) {
@@ -125,6 +127,8 @@ namespace StoreEntryTableJson
                 int32 cost = step["cost"].asInt();
                 line.steps.push_back({ cost });
             }
+            
+            outTable.UpgradeLines[line.lienId] = line;
         }
         
         return true;

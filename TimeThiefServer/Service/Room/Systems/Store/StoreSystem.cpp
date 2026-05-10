@@ -229,15 +229,15 @@ bool StoreSystem::CanPurchaseReward(PlayerPawn* playerPawn, const StoreEntryDef*
 
 bool StoreSystem::TryApplyItemReward(const StoreBuyContext& ctx)
 {
-   InventoryComponent& inventoryComp = ctx.playerPawn->GetInventory();
    const StoreEntryDef* entryDef = ctx.entryDef;
    ItemChangeContext changeCtx{ ItemChangeReason::Purchase, ctx.entryId };
-   InventoryOpResult result = inventoryComp.AddItem(entryDef->itemId, entryDef->itemCount, changeCtx);
+   InventoryOpResult result = ctx.playerPawn->AddItem(entryDef->itemId, entryDef->itemCount, changeCtx);
    return result.accepted;
 }
 
 bool StoreSystem::TryApplySkillReward(const StoreBuyContext& ctx)
 {
+   // TODO: 아래 Player Pawn으로 옮기고 Replication으로 클라이언트에 전달하기
    SkillComponent& skillComp = ctx.playerPawn->GetSkill();
    const StoreEntryDef* entryDef = ctx.entryDef;
    return skillComp.UnlockSkill(entryDef->skillId);
