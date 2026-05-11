@@ -167,8 +167,8 @@ bool ServerMap::BuildFromLoadedData(const se::map::LoadedMapData& loadedData)
    
    // consoleLogger->Log(Color::Blue, L"[ServerMap] Successfully built ServerMap from loaded data. Collider count: %zu\n", colliders_.size());
    
-   // TODO: UniformGridSpatial 구축하기 (colliders_의 콜라이더들을 공간에 삽입)
-
+   spatial_.Build(colliders_, 10000.0f);
+   
    return true;
 }
 

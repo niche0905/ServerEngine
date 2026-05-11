@@ -289,6 +289,7 @@
     <ClCompile Include="Data\Loader\ServerMapLoader.cpp" />
     <ClCompile Include="Data\Loader\ServerMapLoaderTest.cpp" />
     <ClCompile Include="Data\Map\ServerMap.cpp" />
+    <ClCompile Include="Data\Map\Spatial\UniformGridSpatial.cpp" />
     <ClCompile Include="Data\Tables\LootTableJson.cpp" />
     <ClCompile Include="Data\Tables\PlayerSpawnTableJson.cpp" />
     <ClCompile Include="Data\Tables\StoreEntryTableJson.cpp" />
@@ -548,6 +549,7 @@
     <ClInclude Include="Data\Loader\ServerMapLoaderTest.h" />
     <ClInclude Include="Data\Map\ServerMap.h" />
     <ClInclude Include="Data\Map\ServerMapFormat.h" />
+    <ClInclude Include="Data\Map\Spatial\UniformGridSpatial.h" />
     <ClInclude Include="Data\Tables\LootTableJson.h" />
     <ClInclude Include="Data\Tables\LootTableTypes.h" />
     <ClInclude Include="Data\Tables\PlayerSpawnTable.h" />

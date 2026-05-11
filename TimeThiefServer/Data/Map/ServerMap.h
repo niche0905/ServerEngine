@@ -1,5 +1,6 @@
 ﻿#pragma once
 #include "Physics/Collider/Collider.h"
+#include "Spatial/UniformGridSpatial.h"
 
 namespace SE::Physics
 {
@@ -19,7 +20,6 @@ namespace se::map
 // ServerMap는 Spatial을 포함하는 정적 맵 데이터를 나타냅니다.
 //
 
-
 class ServerMap
 {
 public:
@@ -30,6 +30,6 @@ public:
    
 private:
    std::vector<std::unique_ptr<SE::Physics::Collider>> colliders_;
-   // UniformGridSpatial
+   UniformGridSpatial spatial_{};
     
 };
