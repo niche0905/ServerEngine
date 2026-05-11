@@ -30,6 +30,11 @@ bool GameDataManager::Init(const ServerConfig& config)
       return false;
    }
    
+   if (not serverMap_.BuildFromLoadedData(loadedMapData)) {
+      consoleLogger->Log(Color::Red, L"[GDM] Failed to build ServerMap from loaded data.\n");
+      return false;
+   }
+   
    // consoleLogger->Log(Color::Blue, L"Map data loaded successfully. Collider count: %zu\n", loadedMapData.colliders.size());
    
    if (not ZoneTableJson::LoadFromFile(config.dataFiles.zoneTablePath, zoneTable_, &error)) {
