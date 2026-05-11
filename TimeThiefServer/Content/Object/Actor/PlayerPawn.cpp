@@ -2,8 +2,61 @@
 #include "PlayerPawn.h"
 #include "Content/Gameplay/Collider/ColliderComponent.h"
 #include "Content/Gameplay/Combat/PlayerCombatComponent.h"
+#include "Data/GameDataManager.h"
 #include "Physics/Collider/CharacterCapsuleCollider.h"
 #include "Service/Room/Room.h"
+
+namespace 
+{
+   WeaponStatModifier MakeWeaponStatFinal(uint32 weaponId, WeaponStat oldStat, WeaponStat newStat)
+   {
+      WeaponStatModifier finalStat{};
+      
+      if (oldStat.common.magCapacity != newStat.common.magCapacity) {
+         finalStat.magCapacityDelta = newStat.common.magCapacity;
+      }
+      
+      if (!SE::Math::NearlyEqual(oldStat.common.fireIntervalSec, newStat.common.fireIntervalSec)) {
+         finalStat.fireIntervalSecDelta = newStat.common.fireIntervalSec;
+      }
+      
+      if (!SE::Math::NearlyEqual(oldStat.common.reloadTimeSec, newStat.common.reloadTimeSec)) {
+         finalStat.reloadTimeSecDelta = newStat.common.reloadTimeSec;
+      }
+      
+      if (weaponId == 2) {
+         auto* oldShotgunStat =  std::get_if<ShotgunStat>(&oldStat.extra);
+         auto* newShotgunStat =  std::get_if<ShotgunStat>(&newStat.extra);
+         
+         if (oldShotgunStat and newShotgunStat) {
+            if (oldShotgunStat->pelletCount != newShotgunStat->pelletCount) {
+               finalStat.palletCountDelta = newShotgunStat->pelletCount;
+            }
+            
+            if (!SE::Math::NearlyEqual(oldShotgunStat->coneAngleDegrees, newShotgunStat->coneAngleDegrees)) {
+               finalStat.coneAngleDegreesDelta = newShotgunStat->coneAngleDegrees;
+            }
+         }
+      }
+      if (weaponId == 3)
+      {
+         auto* oldLauncherStat =  std::get_if<LauncherStat>(&oldStat.extra);
+         auto* newLauncherStat =  std::get_if<LauncherStat>(&newStat.extra);
+         
+         if (oldLauncherStat and newLauncherStat) {
+            if (oldLauncherStat->projectileSpeed != newLauncherStat->projectileSpeed) {
+               finalStat.projectileSpeedDelta = newLauncherStat->projectileSpeed;
+            }
+            
+            if (!SE::Math::NearlyEqual(oldLauncherStat->explosionRadius, newLauncherStat->explosionRadius)) {
+               finalStat.explosionRadiusDelta = newLauncherStat->explosionRadius;
+            }
+         }
+      }
+      
+      return finalStat;
+   }
+}
 
 /*--------------
    PlayerPawn
@@ -151,8 +204,50 @@ void PlayerPawn::OnSkillChanged(SkillId skillId)
 
 void PlayerPawn::OnWeaponUpgradeApplied(WeaponUpgradeCode code)
 {
-   MarkReplicationDirty(ReplicationDirty::WeaponStat);
-   // TODO: 작성하기 (Player Combat Comp에 있는 WeaponState에 접근하여 Rebuild 하기)
+   auto* playerCombat = GetPlayerCombat();
+   if (!playerCombat)
+      return;
+   
+   RefreshWeaponStatsByUpgrade(code);
+   
+   playerCombat->OnWeaponUpgrade();
+}
+
+void PlayerPawn::RefreshWeaponStatsByUpgrade(uint32 code)
+{
+   auto room = GetRoom();
+   auto* playerCombat = GetPlayerCombat();
+   auto* GDM = room->GetGameDataManager();
+   
+   if (!room or !playerCombat or !GDM)
+      return;
+   
+   const auto& upgradeDef = GDM->GetUpgradeTable().WeaponUpgradeTable.Find(code);
+   uint32 weaponId = upgradeDef->target.weaponId;
+   
+   if (auto* weaponSlot = playerCombat->GetWeaponSlot(weaponId))
+      weaponSlot->dirty = true;
+   
+   auto& weaponSystem = room->GetRoomGameSystem().GetWeaponSystem();
+   
+   for (uint32 weaponId = 1; weaponId <= MaxWeaponSlots; ++weaponId) {
+      auto* weaponSlot = playerCombat->GetWeaponSlot(weaponId);
+      if (!weaponSlot)
+         continue;
+      
+      if (not weaponSlot->dirty)
+         continue;
+      
+      WeaponStat oldStat = weaponSlot->stat;
+      WeaponStat finalStat;
+      if (!weaponSystem.BuildFinalWeaponStat(this, weaponId, finalStat))
+         continue;
+      
+      WeaponStatModifier finalWeaponStat = MakeWeaponStatFinal(weaponId, oldStat, finalStat);
+      
+      weaponSlot->stat = finalStat;
+      room->NotifyWeaponStatChange(GetOwnerPlayerId(), weaponId, finalWeaponStat);
+   }
 }
 
 void PlayerPawn::OnStatUpgradeApplied(StatUpgradeCode code, int32 newLevel)

@@ -5,6 +5,7 @@
 #include <vector>
 #include <common/common_types.pb.h>
 #include "Content/Object/ObjectEnum.h"
+#include "Data/Tables/UpgradeTable.h"
 #include "Physics/Narrowphase/IntersectUtil.h"
 
 enum class RepEventType : uint8
@@ -23,6 +24,8 @@ enum class RepEventType : uint8
     ItemChange,
     
     Fire,                   // 발사 이벤트 (무기 종류, 발사 위치, 방향 등 포함)
+    
+    WeaponStatChange,       // 무기 스탯 변경 이벤트 (무기 ID, 변경된 스탯과 그 값 등 포함)
     
     ZoneFlow,               // 테스트 용 (Zone이 Stop 되거나 Start 될 때)
     
@@ -107,7 +110,11 @@ struct AimChangedEvent
     bool isAimed{false};
 };
 
-
+struct WeaponStatChangeEvent
+{
+    uint32 weaponId{0};
+    WeaponStatModifier modifier{};
+};
 
 struct ZoneFlowEvent
 {
@@ -125,6 +132,7 @@ using RepEventPayload = std::variant<
     FireEvent,
     WeaponChangedEvent,
     AimChangedEvent,
+    WeaponStatChangeEvent,
     ZoneFlowEvent
 >;
 // TODO: 필요한 세부 Event 타입과 페이로드 정의하기 (여 위에 추가)

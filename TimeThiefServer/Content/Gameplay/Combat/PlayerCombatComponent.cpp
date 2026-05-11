@@ -193,6 +193,11 @@ uint32 PlayerCombatComponent::GetCurrentWeaponId() const
     return combatState_.slots[combatState_.currentWeaponSlot].runtime.weaponId;
 }
 
+void PlayerCombatComponent::OnWeaponUpgrade()
+{
+    // none
+}
+
 bool PlayerCombatComponent::ExecuteAttack(AttackRequest& request)
 {
     bool hit = false;

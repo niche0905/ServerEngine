@@ -2035,6 +2035,16 @@ void Room::NotifyTimePointChange(PlayerId id, int newTimePoint, int deltaTimePoi
    roomGameSystem_.GetReplicationSystem().PushEvent(moneyChangeEvent);
 }
 
+void Room::NotifyWeaponStatChange(PlayerId id, uint32 weaponId, const WeaponStatModifier& newStat)
+{
+   RepEvent weaponStatChangeEvent;
+   ReplicateEventSet(weaponStatChangeEvent, RepEventType::WeaponStatChange);
+   weaponStatChangeEvent.header.playerId = id;
+   weaponStatChangeEvent.payload = WeaponStatChangeEvent{weaponId, newStat};
+   
+   roomGameSystem_.GetReplicationSystem().PushEvent(weaponStatChangeEvent);
+}
+
 void Room::BroadcastKillPlayer(ObjectId killerId, ObjectId victimId)
 {
    se::game::N_KillPlayer noti;

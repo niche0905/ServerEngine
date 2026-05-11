@@ -188,6 +188,8 @@ public:
    RoomState GetRoomState() const { return roomState_; }
    void SetRoomState(RoomState state) { roomState_ = state; }
    
+   const GameDataManager* GetGameDataManager() const { return gameDataManager_; }
+   
 public:
    TickSeq GetTickSeq() const { return tickSeq_; }
    TickSeq AdvanceTick() { return ++tickSeq_; }
@@ -224,6 +226,7 @@ public:
    void NotifyHealthChange(PlayerId id, int newHealth, int deltaHealth);
    void NotifyMaxHealthChange(PlayerId id, int newMaxHealth, int newHealth);
    void NotifyTimePointChange(PlayerId id, int newTimePoint, int deltaTimePoint);
+   void NotifyWeaponStatChange(PlayerId id, uint32 weaponId, const WeaponStatModifier& newStat);
    // void BroadcastHit();
    void BroadcastKillPlayer(ObjectId killerId, ObjectId victimId);
    void NotifyZoneFlow(bool flowing);

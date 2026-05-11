@@ -45,6 +45,8 @@ public:
    
    const std::array<WeaponSlotState, MaxWeaponSlots>& GetWeaponSlots() const { return combatState_.slots; }
    
+   void OnWeaponUpgrade();
+   
 public:
    const PlayerCombatState& GetCombatState() const { return combatState_; }
    

@@ -186,6 +186,10 @@ void ReplicationSystem::DispatchImmediateEvent(const RepEvent& ev, const RepFram
       FlushEvent_Fire(ev, frame);
       break;
       
+   case RepEventType::WeaponStatChange:
+      FlushEvent_WeaponStatChange(ev, frame);
+      break;
+      
    case RepEventType::ZoneFlow:
       FlushEvent_ZoneFlow(ev, frame);
       break;
@@ -415,6 +419,63 @@ void ReplicationSystem::FlushEvent_Fire(const RepEvent& ev, const RepFrame& fram
    
    SendBufferRef sendBuffer = ServerPacketHandler::MakeSendBuffer(noti);
    ownerRoom_->BroadcastReplication(sendBuffer, ev.header.playerId);
+}
+
+void ReplicationSystem::FlushEvent_WeaponStatChange(const RepEvent& ev, const RepFrame& frame) const
+{
+   const WeaponStatChangeEvent* weaponStatChangeEv = std::get_if<WeaponStatChangeEvent>(&ev.payload);
+   if (!weaponStatChangeEv) {
+      consoleLogger->Log(Color::Yellow, L"[ReplicationSystem] WeaponStatChange event with invalid payload, skipping. PlayerId={}", ev.header.playerId);
+      return;   // 페이로드가 WeaponStatChangeEvent가 아닌 경우 (잘못된 이벤트)
+   }
+   
+   se::game::N_WeaponStatChanged noti;
+   noti.set_weapon_id(weaponStatChangeEv->weaponId);
+   
+   if (weaponStatChangeEv->modifier.magCapacityDelta != 0) {
+      se::game::WeaponStatValue* magCapacityVal = noti.add_stats();
+      magCapacityVal->set_stat_type(se::game::WeaponStatType::WEAPON_STAT_MAGAZINE_SIZE);
+      magCapacityVal->set_int_value(weaponStatChangeEv->modifier.magCapacityDelta);
+   }
+   
+   if (not SE::Math::NearlyZero(weaponStatChangeEv->modifier.fireIntervalSecDelta)) {
+      se::game::WeaponStatValue* fireRateVal = noti.add_stats();
+      fireRateVal->set_stat_type(se::game::WeaponStatType::WEAPON_STAT_FIRE_INTERVAL);
+      fireRateVal->set_float_value(weaponStatChangeEv->modifier.fireIntervalSecDelta);
+   }
+   
+   if (not SE::Math::NearlyZero(weaponStatChangeEv->modifier.reloadTimeSecDelta)) {
+      se::game::WeaponStatValue* reloadTimeVal = noti.add_stats();
+      reloadTimeVal->set_stat_type(se::game::WeaponStatType::WEAPON_STAT_RELOAD);
+      reloadTimeVal->set_float_value(weaponStatChangeEv->modifier.reloadTimeSecDelta);
+   }
+   
+   if (weaponStatChangeEv->modifier.palletCountDelta != 0) {
+      se::game::WeaponStatValue* palletCountVal = noti.add_stats();
+      palletCountVal->set_stat_type(se::game::WeaponStatType::WEAPON_STAT_PALLET);
+      palletCountVal->set_int_value(weaponStatChangeEv->modifier.palletCountDelta);
+   }
+   
+   if (not SE::Math::NearlyZero(weaponStatChangeEv->modifier.coneAngleDegreesDelta)) {
+      se::game::WeaponStatValue* coneAngleVal = noti.add_stats();
+      coneAngleVal->set_stat_type(se::game::WeaponStatType::WEAPON_STAT_CONE);
+      coneAngleVal->set_float_value(weaponStatChangeEv->modifier.coneAngleDegreesDelta);
+   }
+   
+   if (not SE::Math::NearlyZero(weaponStatChangeEv->modifier.projectileSpeedDelta)) {
+      se::game::WeaponStatValue* projSpeedVal = noti.add_stats();
+      projSpeedVal->set_stat_type(se::game::WeaponStatType::WEAPON_STAT_PROJECTILE_SPEED);
+      projSpeedVal->set_float_value(weaponStatChangeEv->modifier.projectileSpeedDelta);
+   }
+   
+   if (not SE::Math::NearlyZero(weaponStatChangeEv->modifier.explosionRadiusDelta)) {
+      se::game::WeaponStatValue* explosionRadiusVal = noti.add_stats();
+      explosionRadiusVal->set_stat_type(se::game::WeaponStatType::WEAPON_STAT_EXPLOSION_RADIUS);
+      explosionRadiusVal->set_float_value(weaponStatChangeEv->modifier.explosionRadiusDelta);
+   }
+   
+   SendBufferRef sendBuffer = ServerPacketHandler::MakeSendBuffer(noti);
+   ownerRoom_->SendReplication(ev.header.playerId, sendBuffer);
 }
 
 void ReplicationSystem::FlushEvent_ZoneFlow(const RepEvent& ev, const RepFrame& frame) const
