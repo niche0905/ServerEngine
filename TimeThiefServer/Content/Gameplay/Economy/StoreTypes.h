@@ -70,6 +70,10 @@ struct StoreBuyResult
     ObjectId playerId;
     ObjectId storeId;
     uint32 entryId;
+    
+    // 구매 성공 시 바뀐 정보
+    int32 newCost{0};           // 해당 Entry의 가격이 변동이 될 경우
+    bool slotOff{false};        // 해당 Entry가 구매로 인해 슬롯이 닫히게 될 경우 (구매 한도 초과 등)
 };
 
 struct StoreBuyContext

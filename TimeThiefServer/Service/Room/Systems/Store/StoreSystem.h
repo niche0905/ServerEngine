@@ -29,6 +29,8 @@ private:
    bool CanInteractStore(PlayerPawn* playerPawn, Actor* storeActor) const;
    bool CanBuy(PlayerPawn* playerPawn) const;
    
+   bool SlotOff(StoreBuyContext& ctx);
+   
 private:
    bool CanPurchaseReward(PlayerPawn* playerPawn, const StoreEntryDef* entryDef) const;
    

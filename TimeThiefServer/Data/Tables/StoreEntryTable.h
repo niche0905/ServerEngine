@@ -22,7 +22,11 @@ struct StoreEntryTable
         if (lineIt == UpgradeLines.end())
             return -1;
         
-        return lineIt->second.GetStep(nowLevel)->cost;
+        auto* step = lineIt->second.GetStep(nowLevel);
+        if (!step)
+            return -1;
+        
+        return step->cost;
     }
     
     const StoreEntryDef* GetStoreEntry(uint32 entryId) const

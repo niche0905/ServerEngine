@@ -1100,6 +1100,11 @@ bool Room::HandleUseStore(PlayerId playerId, const se::game::C_UseStoreReq& pkt)
             resultPtr->set_code(se::common::ERR_INSUFFICIENT_TIME_POINTS);        // TODO: 구매 실패 사유 (예: 아이템 부족, 인벤토리 공간 부족 등) 올바르게 적기
                                                                                        //       Protocol Enum 확장 필요
          }
+         else {
+            res.set_store_item_id(result.entryId);
+            res.set_new_price(result.newCost);
+            res.set_is_sold_out(result.slotOff);
+         }
       }
       
       useStoreResultBuffer = ServerPacketHandler::MakeSendBuffer(res);

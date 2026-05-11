@@ -30,6 +30,56 @@ void UpgradeComponent::InitStatUpgrade(StatUpgradeCode code)
    }
 }
 
+int32 UpgradeComponent::GetUpgradeLineLevel(uint32 lineId) const
+{
+   if (appliedUpgradeEntryLevels_.contains(lineId)) {
+      return appliedUpgradeEntryLevels_.at(lineId);
+   }
+   
+   return 0;
+}
+
+bool UpgradeComponent::ApplyUpgradeLine(uint32 lineId, int32 maxLevel, int32 deltaLevel)
+{
+   if (lineId == 0 || deltaLevel <= 0)
+      return false;
+   
+   int32& level = appliedUpgradeEntryLevels_[lineId];
+   int32 oldLevel = level;
+   level = std::min(level + deltaLevel, maxLevel);
+   
+   if (oldLevel == level)
+      return false;   // 이미 최대 레벨이어서 적용할 수 없는 경우
+   
+   return true;
+}
+
+bool UpgradeComponent::ApplyUpgrade(uint32 lineId, int32 maxLevel, uint32 templateId)
+{
+   if (lineId == 0 and maxLevel <= 0) {
+      return ApplyWeaponUpgrade(templateId);
+   }
+   else {
+      ApplyUpgradeLine(lineId, maxLevel, 1);
+      int32 newLevel = GetUpgradeLineLevel(lineId);
+      return ApplyStatUpgrade(templateId, maxLevel, newLevel);
+   }
+}
+
+bool UpgradeComponent::CanApplyUpgrade(uint32 lineId, int32 maxLevel) const
+{
+   if (maxLevel <= 0)
+      return false;
+   
+   if (appliedUpgradeEntryLevels_.contains(lineId)) {
+      int32 currentLevel = appliedUpgradeEntryLevels_.at(lineId);
+      if (currentLevel >= maxLevel)
+         return false;   // 이미 최대 레벨이어서 적용할 수 없는 경우
+   }
+   
+   return true;
+}
+
 bool UpgradeComponent::HasWeaponUpgrade(WeaponUpgradeCode code) const
 {
    if (code == 0)
@@ -80,9 +130,9 @@ bool UpgradeComponent::CanApplyStatUpgrade(StatUpgradeCode code, int32 maxLevel)
    return GetStatUpgradeLevel(code) < maxLevel;
 }
 
-bool UpgradeComponent::ApplyStatUpgrade(StatUpgradeCode code, int32 maxLevel, int32 deltaLevel)
+bool UpgradeComponent::ApplyStatUpgrade(StatUpgradeCode code, int32 maxLevel, int32 newLevel)
 {
-   if (code == 0 || deltaLevel <= 0)
+   if (code == 0)
       return false;
    
    if (!CanApplyStatUpgrade(code, maxLevel))
@@ -90,7 +140,7 @@ bool UpgradeComponent::ApplyStatUpgrade(StatUpgradeCode code, int32 maxLevel, in
    
    int32& level = statUpgradeLevels_[code];
    int32 oldLevel = level;
-   level = std::min(level + deltaLevel, maxLevel);
+   level = std::min(newLevel, maxLevel);
    
    if (oldLevel == level)
       return false;   // 이미 최대 레벨이어서 적용할 수 없는 경우

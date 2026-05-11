@@ -48,6 +48,14 @@ StoreBuyResult StoreSystem::Buy(const StoreBuyRequest& req)
       return result;
    }
    
+   if (ctx.entryDef->upgradeLineId != 0) {
+      auto& upgradeComp = ctx.playerPawn->GetUpgrade();
+      int32 newLevel = upgradeComp.GetUpgradeLineLevel(ctx.entryDef->upgradeLineId);
+      result.newCost = storeEntryTable_->GetCost(ctx.entryId, newLevel);
+   }
+   
+   result.slotOff = SlotOff(ctx);
+   
    result.success = true;
    result.resultCode = StoreBuyResultCode::Success;
    return result;
@@ -123,8 +131,15 @@ bool StoreSystem::TryConsumeCost(StoreBuyContext& ctx)
    if (!ctx.playerPawn)
       return false;
    
-   MoneyChangeResult result = ctx.playerPawn->SpendMoney(CurrencyType::TimePoint, ctx.entryDef->cost, MoneyChangeContext{MoneyChangeReason::Purchase, ctx.entryId});
+   uint32 nowLevel = 0;
+   if (ctx.entryDef->upgradeLineId != 0) {
+      auto& upgradeComp = ctx.playerPawn->GetUpgrade();
+      nowLevel = upgradeComp.GetUpgradeLineLevel(ctx.entryDef->upgradeLineId);
+   }
    
+   int32 cost = storeEntryTable_->GetCost(ctx.entryId, nowLevel);
+   MoneyChangeResult result = ctx.playerPawn->SpendMoney(CurrencyType::TimePoint, cost, MoneyChangeContext{MoneyChangeReason::Purchase, ctx.entryId});
+
    return result.accepted;
 }
 
@@ -190,6 +205,40 @@ bool StoreSystem::CanBuy(PlayerPawn* playerPawn) const
    return true;
 }
 
+bool StoreSystem::SlotOff(StoreBuyContext& ctx)
+{
+   switch (ctx.entryDef->rewardType)
+   {
+   case StoreRewardType::Item:
+      return false;   // 아이템은 구매 한도 없음
+      
+   case StoreRewardType::Skill:
+      {
+         auto& skillComp = ctx.playerPawn->GetSkill();
+         return !skillComp.CanUnlockSkill(ctx.entryDef->skillId);
+      }
+   case StoreRewardType::WeaponUpgrade:
+      {
+         auto& upgradeComp = ctx.playerPawn->GetUpgrade();
+         return !upgradeComp.CanApplyWeaponUpgrade(ctx.entryDef->weaponUpgradeType);
+      }
+   case StoreRewardType::StatUpgrade:
+      {
+         auto& upgradeComp = ctx.playerPawn->GetUpgrade();
+         if (ctx.entryDef->upgradeLineId == 0)
+            return true;
+   
+         int32 maxLevel = storeEntryTable_->GetMaxLevel(ctx.entryDef->upgradeLineId);
+         if (maxLevel <= 0)
+            return true;
+         return !upgradeComp.CanApplyUpgrade(ctx.entryDef->upgradeLineId, maxLevel);
+      }
+      
+   default:
+      return false;
+   }
+}
+
 bool StoreSystem::CanPurchaseReward(PlayerPawn* playerPawn, const StoreEntryDef* entryDef) const
 {
    if (!playerPawn or !entryDef)
@@ -220,7 +269,7 @@ bool StoreSystem::CanPurchaseReward(PlayerPawn* playerPawn, const StoreEntryDef*
          int32 maxLevel = storeEntryTable_->GetMaxLevel(entryDef->upgradeLineId);
          if (maxLevel <= 0)
             return false;
-         return upgradeComp.CanApplyStatUpgrade(entryDef->statUpgradeType, maxLevel);
+         return upgradeComp.CanApplyUpgrade(entryDef->upgradeLineId, maxLevel);
       }
    default:
       return false;
@@ -247,7 +296,7 @@ bool StoreSystem::TryApplyWeaponUpgradeReward(const StoreBuyContext& ctx)
 {
    UpgradeComponent& upgradeComp = ctx.playerPawn->GetUpgrade();
    const StoreEntryDef* entryDef = ctx.entryDef;
-   return upgradeComp.ApplyWeaponUpgrade(entryDef->weaponUpgradeType);
+   return upgradeComp.ApplyUpgrade(0, 0, entryDef->weaponUpgradeType);
 }
 
 bool StoreSystem::TryApplyStatUpgradeReward(const StoreBuyContext& ctx)
@@ -262,5 +311,5 @@ bool StoreSystem::TryApplyStatUpgradeReward(const StoreBuyContext& ctx)
    if (maxLevel <= 0)
       return false;
    
-   return upgradeComp.ApplyStatUpgrade(entryDef->statUpgradeType, maxLevel);
+   return upgradeComp.ApplyUpgrade(entryDef->upgradeLineId, maxLevel, entryDef->statUpgradeType);
 }
