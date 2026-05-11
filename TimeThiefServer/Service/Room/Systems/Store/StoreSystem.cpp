@@ -174,7 +174,7 @@ bool StoreSystem::TryApplyReward(StoreBuyContext& ctx)
 
 const StoreEntryDef* StoreSystem::FindStoreEntry(uint32 entryId) const
 {
-   if (entryId == 0 or !storeEntryTable_)
+   if (!storeEntryTable_)
       return nullptr;
    
    return storeEntryTable_->GetStoreEntry(entryId);

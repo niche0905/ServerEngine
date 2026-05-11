@@ -225,29 +225,21 @@ void PlayerPawn::RefreshWeaponStatsByUpgrade(uint32 code)
    const auto& upgradeDef = GDM->GetUpgradeTable().WeaponUpgradeTable.Find(code);
    uint32 weaponId = upgradeDef->target.weaponId;
    
-   if (auto* weaponSlot = playerCombat->GetWeaponSlot(weaponId))
-      weaponSlot->dirty = true;
-   
    auto& weaponSystem = room->GetRoomGameSystem().GetWeaponSystem();
    
-   for (uint32 weaponId = 1; weaponId <= MaxWeaponSlots; ++weaponId) {
-      auto* weaponSlot = playerCombat->GetWeaponSlot(weaponId);
-      if (!weaponSlot)
-         continue;
+   auto* weaponSlot = playerCombat->GetWeaponSlot(weaponId);
+   if (!weaponSlot)
+      return;
       
-      if (not weaponSlot->dirty)
-         continue;
+   WeaponStat oldStat = weaponSlot->stat;
+   WeaponStat finalStat;
+   if (!weaponSystem.BuildFinalWeaponStat(this, weaponId, finalStat))
+      return;
       
-      WeaponStat oldStat = weaponSlot->stat;
-      WeaponStat finalStat;
-      if (!weaponSystem.BuildFinalWeaponStat(this, weaponId, finalStat))
-         continue;
+   WeaponStatModifier finalWeaponStat = MakeWeaponStatFinal(weaponId, oldStat, finalStat);
       
-      WeaponStatModifier finalWeaponStat = MakeWeaponStatFinal(weaponId, oldStat, finalStat);
-      
-      weaponSlot->stat = finalStat;
-      room->NotifyWeaponStatChange(GetOwnerPlayerId(), weaponId, finalWeaponStat);
-   }
+   weaponSlot->stat = finalStat;
+   room->NotifyWeaponStatChange(GetOwnerPlayerId(), weaponId, finalWeaponStat);
 }
 
 void PlayerPawn::OnStatUpgradeApplied(StatUpgradeCode code, int32 newLevel)
