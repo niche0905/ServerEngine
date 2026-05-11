@@ -437,10 +437,12 @@ void Room::JoinPlayerProcess(std::shared_ptr<PlayerSession>& session, PlayerPawn
          int32 currentHp = health.GetHp();
          auto wallet = playerPawn->GetWallet();
          int32 money = wallet.GetBalance(CurrencyType::TimePoint);
+         int32 moveSpeed = playerPawn->GetSpeed();
          
          playerInitSetup.set_max_health(maxHp);
          playerInitSetup.set_current_health(currentHp);
          playerInitSetup.set_time_points(money);
+         playerInitSetup.set_move_speed(static_cast<float>(moveSpeed));
          
          const auto& weapons = playerPawn->GetPlayerCombat()->GetWeaponSlots();
          for (const auto& weapon : weapons) {

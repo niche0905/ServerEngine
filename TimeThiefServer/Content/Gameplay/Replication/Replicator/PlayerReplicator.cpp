@@ -111,10 +111,16 @@ ReplicateResult PlayerReplicator::FlushPlayerPeriodic(PlayerPawn& player, Replic
     }
     if (HasDirty(flags, ReplicationDirty::Stat)) {
         
-        // TODO: Stat Change 관련 패킷을 만들어야 한다 (Speed) 값 하나를 위해서
+        se::game::N_SpeedChanged noti;
+        {
+            noti.set_new_speed(static_cast<float>(player.GetSpeed()));
+        }
         
-        // result.sent = true;
-        // result.handled |= ReplicationDirty::Stat;
+        SendBufferRef sendBuffer = ServerPacketHandler::MakeSendBuffer(noti);
+        room.SendReplication(player.GetOwnerPlayerId(), sendBuffer);
+
+        result.sent = true;
+        result.handled |= ReplicationDirty::Stat;
     }
     if (HasDirty(flags, ReplicationDirty::SkillState)) {
         // 스킬 해금 상태가 변경될 때마다 이벤트로 처리하는 구조로 하는 게 좋을 것 같음

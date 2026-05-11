@@ -52,6 +52,8 @@ public:
     int32 GetMovementMode() const { return movementMode_; }
     void SetMovementMode(int32 movementMode) { movementMode_ = movementMode; }
     
+    int32 GetSpeed() const { return speed_; }
+    
 // Component
 public:
     PlayerCombatComponent* GetPlayerCombat() { return static_cast<PlayerCombatComponent*>(combat_.get()); }
