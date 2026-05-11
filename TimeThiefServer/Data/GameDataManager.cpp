@@ -1,5 +1,6 @@
 ﻿#include "pch.h"
 #include "GameDataManager.h"
+#include "Loader/ServerMapLoader.h"
 #include "Network/ServerConfig.h"
 #include "Tables/LootTableJson.h"
 #include "Tables/PlayerSpawnTableJson.h"
@@ -15,6 +16,22 @@
 bool GameDataManager::Init(const ServerConfig& config)
 {
    std::string error;
+   
+   se::map::ServerMapLoader loader;
+   se::map::LoadedMapData loadedMapData;
+
+   if (not loader.LoadFromFile(config.dataFiles.mapFilePath, loadedMapData, &error)) {
+      consoleLogger->Log(Color::Red, L"[GDM] Failed to Map Data: %hs\n", error.c_str());
+      return false;
+   }
+
+   if (loadedMapData.colliders.empty()) {
+      consoleLogger->Log(Color::Red, L"[GDM] No Colliders loaded: %hs\n", error.c_str());
+      return false;
+   }
+   
+   // consoleLogger->Log(Color::Blue, L"Map data loaded successfully. Collider count: %zu\n", loadedMapData.colliders.size());
+   
    if (not ZoneTableJson::LoadFromFile(config.dataFiles.zoneTablePath, zoneTable_, &error)) {
       consoleLogger->Log(Color::Red, L"[GDM] Failed to load ZoneTable: %hs\n", error.c_str());
       return false;
