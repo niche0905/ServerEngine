@@ -3,8 +3,10 @@
 #include "Data/Loader/ServerMapLoader.h"
 #include "Physics/Collider/Collider.h"
 #include "Physics/Collider/CapsuleCollider.h"
+#include "Physics/Collider/CollisionResult.h"
 #include "Physics/Collider/OBBCollider.h"
 #include "Physics/Collider/SphereCollider.h"
+#include "Physics/Ray/RaycastHit.h"
 
 namespace 
 {
@@ -185,4 +187,69 @@ const SE::Physics::Collider* ServerMap::GetCollider(uint32 colliderId) const
 void ServerMap::QueryAABB(const SE::Physics::AABBCollider& query, std::vector<uint32>& outColliderIds) const
 {
    spatial_.QueryAABB(query, outColliderIds);
+}
+
+bool ServerMap::Raycast(const SE::Physics::Ray& ray, SE::Physics::RaycastHit& outResult) const
+{
+   bool hit = false;
+   float closestDistance = std::numeric_limits<float>::max();
+
+   SE::Physics::RaycastHit tempHit{};
+   
+   // TODO: Spatial에서 Raycast 기능이 구현되면, 여기서 Spatial을 이용해서 후보 콜라이더들을 먼저 걸러내도록 변경하기
+   for (const auto& colliderPtr : colliders_) {
+      if (!colliderPtr)
+         continue;
+
+      tempHit = {};
+      
+      if (!colliderPtr->Raycast(ray, tempHit))
+         continue;
+      
+      if (tempHit.t >= closestDistance)
+         continue;
+      
+      closestDistance = tempHit.t;
+      outResult = tempHit;
+      
+      hit = true;
+   }
+   
+   return hit;
+}
+
+bool ServerMap::Intersect(const SE::Physics::Collider& other, SE::Physics::CollisionResult& outResult) const
+{
+   bool collided = false;
+   
+   std::vector<uint32> candidateIds;
+   candidateIds.reserve(64);
+   
+   spatial_.QueryAABB(other.GetWorldAABB(), candidateIds);
+   
+   SE::Physics::CollisionResult tempResult{};
+   
+   float maxPenetrationDepth = -std::numeric_limits<float>::max();
+   
+   for (uint32 colliderId : candidateIds) {
+      const SE::Physics::Collider* collider = GetCollider(colliderId);
+      if (!collider)
+         continue;
+      
+      tempResult = {};
+      if (!other.Intersect(collider->GetWorldAABB(), tempResult))
+         continue;
+      
+      tempResult = {};
+      if (!other.Intersect(*collider, tempResult))
+         continue;
+      
+      if (!collided or tempResult.penetration > maxPenetrationDepth) {
+         maxPenetrationDepth = tempResult.penetration;
+         outResult = tempResult;
+         collided = true;
+      }
+   }
+   
+   return collided;
 }

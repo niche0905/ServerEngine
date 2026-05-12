@@ -28,6 +28,9 @@ public:
    const SE::Physics::Collider* GetCollider(uint32 colliderId) const;
    void QueryAABB(const SE::Physics::AABBCollider& query, std::vector<uint32>& outColliderIds) const;
    
+   bool Raycast(const SE::Physics::Ray& ray, SE::Physics::RaycastHit& outResult) const;
+   bool Intersect(const SE::Physics::Collider& other, SE::Physics::CollisionResult& outResult) const;
+   
 private:
    std::vector<std::unique_ptr<SE::Physics::Collider>> colliders_;
    UniformGridSpatial spatial_{};
