@@ -123,7 +123,6 @@ bool TimeThiefServerApp::CreateManagers()
       return false;
    }
    
-   // TODO: GameShard의 개수 정책 어떻게 할 지 고민해 보아야 함
    const int32 hc = static_cast<int32>(std::thread::hardware_concurrency());
    const int32 shardCount = (hc / 2) > 1 ? (hc / 2) : 1;   // TEMP: Network IO Worker thread의 반절
    
@@ -136,7 +135,8 @@ bool TimeThiefServerApp::CreateManagers()
       consoleLogger->Log(Color::Red, L"[TTSA] MatchMaker init fail\n");
       return false;
    }
-   matchMaker_->SetPartialMatch(true, Duration{Seconds{10}}, 2);   // TEMP: 불완전 매칭 기능 활성화, 대기 시간과 최소 매칭 인원은 임시값
+   const auto& cfg = configReader_->Get();
+   matchMaker_->SetPartialMatch(cfg.game.enablePartialMatch, Duration{Seconds{cfg.game.partialMatchWaitTimeSec}}, cfg.game.minPartialMatchSize);
    
    if (not CreatePacketDispatcher()) {
       consoleLogger->Log(Color::Red, L"[TTSA] CreatePacketDispatcher fail\n");

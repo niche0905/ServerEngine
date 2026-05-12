@@ -32,6 +32,10 @@ struct GameConfig
     
     int32 matchSize = 8;   // 매치당 필요한 플레이어 수
     
+    bool enablePartialMatch = false;   // 불완전 매칭 허용 여부
+    int32 minPartialMatchSize = 2;   // 불완전 매칭 허용을 위한 최소 플레이어 수 (이 수 이상일 때 불완전 매칭 허용 시)
+    int32 partialMatchWaitTimeSec = 10;   // 불완전 매칭 대기 시간 (초)
+    
     bool testSpawnPoints = true;        // 테스트용 스폰 지점 활성화 (실제 게임을 위한 것이 아닌)
 };
 

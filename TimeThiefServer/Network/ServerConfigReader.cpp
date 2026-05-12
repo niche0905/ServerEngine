@@ -122,6 +122,19 @@ bool ServerConfigReader::ParseJsonText(const std::string& jsonText, const std::f
          newConfig.game.matchSize = std::min(8, std::max(2, matchSize));   // 최소 2명, 최대 8명으로 제한
       }
       
+      if (game.isMember("partial_match"))
+         newConfig.game.enablePartialMatch = game["partial_match"].asBool();
+      
+      if (game.isMember("partial_match_size")) {
+         int32 minPartialMatchSize = game["partial_match_size"].asInt();
+         newConfig.game.minPartialMatchSize = minPartialMatchSize;   // 최소 2명, 최대 match size로 제한
+      }
+      
+      if (game.isMember("partial_match_wait_time_sec")) {
+         int32 partialMatchWaitTimeSec = game["partial_match_wait_time_sec"].asInt();
+         newConfig.game.partialMatchWaitTimeSec = std::max(0, partialMatchWaitTimeSec);   // 음수 값 허용하지 않음
+      }
+      
       if (game.isMember("test_spawn_points"))
          newConfig.game.testSpawnPoints = game["test_spawn_points"].asBool();
    }

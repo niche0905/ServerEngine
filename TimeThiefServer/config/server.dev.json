@@ -20,7 +20,10 @@
         "ping_interval_ms": 1000,
         "room_tick_interval_ms": 25,
         "zone_damage_tick_interval": 1.0,
-        "match_size": 4,
+        "match_size": 2,
+        "partial_match": true,
+        "partial_match_size": 2,
+        "partial_match_wait_time_sec": 10,
         "test_spawn_points": true
     }
 }
