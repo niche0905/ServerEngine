@@ -270,11 +270,13 @@ bool PlayerCombatComponent::TraceHit(const AttackRequest& request, const SE::Phy
     
     Actor* victim = nullptr;
     
-    if (room->TraceHit(ray, ownerPawn->GetId(), outHit)) {
+    if (room->GetRoomGameSystem().GetCombatSystem().TraceHit(ray, ownerPawn->GetId(), outHit)) {
         if (outHit.hit) {
             victim = outHit.actor;
         }
     }
+    
+    // TODO: outHit.hit 가 true, 즉 충돌이 발생 헀다면 Hit 정보를 담아서 모든 클라이언트에게 Replicate 하기
     
     if (victim == nullptr) 
         return false;   // 히트한 Actor가 없는 경우
@@ -386,7 +388,7 @@ void PlayerCombatComponent::FireLauncher(const AttackRequest& request)
     const SE::Math::Vector3 spawnPos = request.origin;
     const SE::Math::Vector3 spawnDir = request.direction.Normalized();
     
-    room->LaunchRocket(spawnPos, spawnDir, ownerPawn, request.damage, projectileSpeed, 10000, explosionRadius);
+    room->GetRoomGameSystem().GetCombatSystem().LaunchRocket(spawnPos, spawnDir, ownerPawn, request.damage, projectileSpeed, 10000, explosionRadius);
 }
 
 PlayerCombatComponent::PalletPattern PlayerCombatComponent::GeneratePalletPattern(const SE::Math::Vector3& forwardDir,

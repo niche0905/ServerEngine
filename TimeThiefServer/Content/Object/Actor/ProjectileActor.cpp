@@ -114,7 +114,7 @@ void ProjectileActor::OnExplode(ObjectManager& om)
     if (lifetimeTimer_ != TimerId{}) {
         // Room에서 예약된 타이머 취소
         if (auto room = GetRoom()) {
-            room->ProjectileExplosion(GetId(), GetPosition(), GetOwner(), GetDamage(), radius_, distanceDamageEnabled_);
+            room->GetRoomGameSystem().GetCombatSystem().ProjectileExplosion(GetId(), GetPosition(), GetOwner(), GetDamage(), radius_, distanceDamageEnabled_);
             room->CancelScheduled(lifetimeTimer_);
         }
         else {

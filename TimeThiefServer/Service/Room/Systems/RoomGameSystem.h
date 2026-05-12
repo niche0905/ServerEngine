@@ -1,4 +1,5 @@
 ﻿#pragma once
+#include "Combat/CombatSystem.h"
 #include "Drop/DropSystem.h"
 #include "Loot/LootSystem.h"
 #include "Replication/ReplicationSystem.h"
@@ -54,6 +55,9 @@ public:
    UpgradeSystem& GetUpgradeSystem() { return upgradeSystem_; }
    const UpgradeSystem& GetUpgradeSystem() const { return upgradeSystem_; }
    
+   CombatSystem& GetCombatSystem() { return combatSystem_; }
+   const CombatSystem& GetCombatSystem() const { return combatSystem_; }
+   
 public:
    void OnPawnDeath(ObjectId pawnId);
    
@@ -69,5 +73,6 @@ private:
    StoreSystem             storeSystem_{};
    WeaponSystem            weaponSystem_{};
    UpgradeSystem           upgradeSystem_{};
+   CombatSystem            combatSystem_{};
     
 };

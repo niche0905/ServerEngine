@@ -41,6 +41,9 @@ bool RoomGameSystem::Init(Room* ownerRoom, const GameDataManager& gameDataManage
    if (!upgradeSystem_.Init(ownerRoom, gameDataManager_->GetUpgradeTable()))
       return false;
    
+   if (!combatSystem_.Init(ownerRoom, gameDataManager_->GetServerMap()))
+      return false;
+   
    return true;
 }
 

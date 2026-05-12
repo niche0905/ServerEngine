@@ -1717,58 +1717,6 @@ void Room::UpdateTick(const RepFrame& frame)
    roomGameSystem_.GetReplicationSystem().FlushPeriodic(frame);
 }
 
-bool Room::TraceHit(const SE::Physics::Ray& ray, ObjectId exceptId, SE::Physics::Hit::HitResult& outHit) const
-{
-   bool hasHit = false;
-   float closestT = std::numeric_limits<float>::max();
-   
-   outHit.Reset();
-   
-   objectManager_.ForEachAlive([&](BaseObject* obj)
-   {
-      if (!obj)
-         return;
-      
-      if (obj->GetId() == exceptId)
-         return;   // 제외할 오브젝트는 건너뛰기
-      
-      obj->ForEachCollider([&](ColliderComponent* collider)
-      {
-         if (!collider)
-            return;
-         
-         const ColliderRole role = collider->GetRole();
-         if (role != ColliderRole::Hit && role != ColliderRole::Hurtbox)
-            return;   // 명중 판정이 필요한 콜라이더가 아닌 경우 건너 뛰기
-         
-         SE::Physics::RaycastHit rayHit{};
-         if (!collider->GetCollider()->Raycast(ray, rayHit)) 
-            return;
-         
-         if (!rayHit.hit)
-            return;
-         
-         if (rayHit.t >= closestT) 
-            return;
-         
-         outHit.hit = rayHit.hit;
-         outHit.t = rayHit.t;
-         outHit.point = rayHit.point;
-         outHit.normal = rayHit.normal;
-         
-         outHit.group = SE::Physics::Hit::HitGroup::Torso;
-         outHit.damageMultiplier = 1.0f;   // TODO: HitGroup에 따른 데미지 배율 적용하기
-         outHit.partIndex = 0;   // TODO: HitGroup에 따른 부위 인덱스 적용하기
-         outHit.actor = collider->GetOwnerActor();
-         
-         closestT = rayHit.t;
-         hasHit = true;
-      });
-   });
-   
-   return hasHit;
-}
-
 TimerId Room::ScheduleAt(TimePoint executeAt, Job job)
 {
    return ownerShard_->ScheduleAt(executeAt, std::move(job));
@@ -1805,55 +1753,6 @@ ObjectId Room::GetObjectId(PlayerId playerId) const
       return ObjectId{};   // 방에 존재하지 않는 플레이어
    
    return it->second.pawnObjectId;
-}
-
-bool Room::LaunchRocket(const Vector3& pos, const Vector3& dir, Pawn* ownerPawn, int32 damage, float speed, uint32 lifetimeMs, float radius)
-{
-   if (!ownerPawn)
-      return false;   // 유효하지 않은 발사체 소유자 Pawn
-   
-   ProjectileActor* rocket = SpawnObject<ProjectileActor>(ObjectFlags::Replicable | ObjectFlags::Tickable);
-   if (!rocket)
-      return false;  // 발사체 생성 실패
-   
-   rocket->Init(ownerPawn->GetId(), pos, dir * speed, damage, lifetimeMs, 15.0f, radius, true);   // TEMP: 폭탄 충돌체의 반경은 15cm 정도로
-   ReplicationSpawn(rocket, /*templateId=*/0, rocket->GetYaw());  // TODO: templateId는 나중에 생각하기
-   return true;
-}
-
-void Room::ProjectileExplosion(ObjectId projectileId, const Vector3& pos, ObjectId ownerId, int32 damage, float radius,
-   bool distanceDamageEnabled)
-{
-   if (projectileId == ObjectId{}) {
-      consoleLogger->Log(Color::Yellow, L"[Room] ProjectileExplosion called with invalid projectileId\n");
-      return;
-   }
-
-   if (ownerId == ObjectId{}) {
-      consoleLogger->Log(Color::Yellow, L"[Room] ProjectileExplosion called with invalid ownerId\n");
-   }
-   
-   Pawn* pawn = objectManager_.FindAs<Pawn>(ownerId);
-   if (pawn == nullptr) {
-      consoleLogger->Log(Color::Yellow, L"[Room] ProjectileExplosion: Owner Pawn not found for ownerId %u\n", ownerId.value);
-   }
-   
-   // TODO: 폭발 범위 내의 오브젝트들을 찾아서 데미지 적용하기 (거리 기반 데미지 적용 여부에 따른 처리도 포함)
-   //       거리별 데미지일 경우 로직을 다르게 하여야 하고,
-   //       장애물에 Block 되는 지도 확인해야 함
-   
-   
-   // 폭발 이벤트를 생성하여 클라이언트에게 전송 (폭발 이펙트 재생을 위해)
-   RepEvent explosionEvent;
-   ReplicateEventSet(explosionEvent, RepEventType::Explosion);
-   if (pawn != nullptr) {
-      PlayerId playerId = pawn->GetOwnerPlayerId();
-      explosionEvent.header.playerId = playerId;
-      explosionEvent.header.source = projectileId;
-   }
-   explosionEvent.payload = ExplosionEvent{pos, radius};
-   
-   roomGameSystem_.GetReplicationSystem().PushEvent(explosionEvent);
 }
 
 PlayerPawn* Room::CreatePreparedPlayerPawn(PlayerId playerId, const Vector3& spawnPos)
@@ -1999,6 +1898,14 @@ void Room::BroadcastRespawn(ObjectId objectId)
                                     // Local Control Player의 경우는 Set Position 하도록 (Set Yaw 까지도 가능)
 }
 
+void Room::NotifyProjectileSpawn(ProjectileActor* projectile, uint32 templateId)
+{
+   if (!projectile)
+      return;   // 유효하지 않은 발사체
+   
+   ReplicationSpawn(projectile, templateId, projectile->GetYaw());
+}
+
 void Room::NotifyItemChange(PlayerId playerId, uint32 itemId, int32 newCount, int32 deltaCount)
 {
    RepEvent itemChangeEvent;
@@ -2075,6 +1982,18 @@ void Room::NotifyZoneFlow(bool flowing)
    zoneFlowEvent.payload = ZoneFlowEvent{flowing};
    
    roomGameSystem_.GetReplicationSystem().PushEvent(zoneFlowEvent);
+}
+
+void Room::NotifyExplosion(ObjectId sourceId, PlayerId ownerPlayerId, const Vector3& pos, float radius)
+{
+   // 폭발 이벤트를 생성하여 클라이언트에게 전송 (폭발 이펙트 재생을 위해)
+   RepEvent explosionEvent;
+   ReplicateEventSet(explosionEvent, RepEventType::Explosion);
+   explosionEvent.header.playerId = ownerPlayerId;
+   explosionEvent.header.source = sourceId;
+   explosionEvent.payload = ExplosionEvent{pos, radius};
+   
+   roomGameSystem_.GetReplicationSystem().PushEvent(explosionEvent);
 }
 
 void Room::ReplicateEventSet(RepEvent& ev, RepEventType eventType)

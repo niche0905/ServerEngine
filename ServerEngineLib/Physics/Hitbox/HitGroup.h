@@ -16,6 +16,8 @@ namespace SE::Physics::Hit
         Arms,   // 팔
         Legs,   // 다리
         
+        NotHurtBox,  // 히트박스는 맞았지만, 데미지를 입히지 않는 부분 (예: 무기, 장갑 등)
+        
         Unknown // 알 수 없음...
     };
    

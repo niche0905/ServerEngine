@@ -10,7 +10,8 @@ enum class ColliderRole
    Hit,
    Hurtbox,
    Hitbox,
-   Trigger
+   Trigger,
+   Block
 };
 
 /*---------------------

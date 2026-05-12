@@ -160,7 +160,6 @@ public:
    bool Start();
    
    void UpdateTick(const RepFrame& frame);
-   bool TraceHit(const SE::Physics::Ray& ray, ObjectId exceptId, SE::Physics::Hit::HitResult& outHit) const;
    
    bool IsPlaying() const { return roomState_ == RoomState::Playing; }
    
@@ -199,10 +198,6 @@ public:
    SessionId GetSessionId(PlayerId playerId) const;
    ObjectId GetObjectId(PlayerId playerId) const;
    
-public:
-   bool LaunchRocket(const Vector3& pos, const Vector3& dir, Pawn* ownerPawn, int32 damage, float speed, uint32 lifetimeMs, float radius);
-   void ProjectileExplosion(ObjectId projectileId, const Vector3& pos, ObjectId ownerId, int32 damage, float radius, bool distanceDamageEnabled);
-   
 private:
    PlayerPawn* CreatePreparedPlayerPawn(PlayerId playerId, const Vector3& spawnPos);
    
@@ -222,6 +217,7 @@ public:
    void BroadcastGameStart();
    void BroadcastDeath(ObjectId objectId);
    void BroadcastRespawn(ObjectId objectId);
+   void NotifyProjectileSpawn(ProjectileActor* projectile, uint32 templateId);
    void NotifyItemChange(PlayerId playerId, uint32 itemId, int32 newCount, int32 deltaCount);
    void NotifyHealthChange(PlayerId id, int newHealth, int deltaHealth);
    void NotifyMaxHealthChange(PlayerId id, int newMaxHealth, int newHealth);
@@ -230,6 +226,7 @@ public:
    // void BroadcastHit();
    void BroadcastKillPlayer(ObjectId killerId, ObjectId victimId);
    void NotifyZoneFlow(bool flowing);
+   void NotifyExplosion(ObjectId sourceId, PlayerId ownerPlayerId, const Vector3& pos, float radius);
    
 private:
    void ReplicateEventSet(RepEvent& ev, RepEventType eventType);
