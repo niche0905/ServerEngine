@@ -186,6 +186,10 @@ void ReplicationSystem::DispatchImmediateEvent(const RepEvent& ev, const RepFram
       FlushEvent_Fire(ev, frame);
       break;
       
+   case RepEventType::Hit:
+      FlushEvent_Hit(ev, frame);
+      break;
+      
    case RepEventType::WeaponStatChange:
       FlushEvent_WeaponStatChange(ev, frame);
       break;
@@ -196,6 +200,7 @@ void ReplicationSystem::DispatchImmediateEvent(const RepEvent& ev, const RepFram
       
       // TODO: 추가하고 여기서 연결하기 (작성도 해야 함, 멤버 함수)
    default:
+      consoleLogger->Log(Color::Yellow, L"[ReplicationSystem] Unsupported event type %u\n", static_cast<uint32>(ev.header.type));
       break;
    }
 }
@@ -419,6 +424,27 @@ void ReplicationSystem::FlushEvent_Fire(const RepEvent& ev, const RepFrame& fram
    
    SendBufferRef sendBuffer = ServerPacketHandler::MakeSendBuffer(noti);
    ownerRoom_->BroadcastReplication(sendBuffer, ev.header.playerId);
+}
+
+void ReplicationSystem::FlushEvent_Hit(const RepEvent& ev, const RepFrame& frame) const
+{
+   const HitEvent* hitEv = std::get_if<HitEvent>(&ev.payload);
+   if (!hitEv) {
+      consoleLogger->Log(Color::Yellow, L"[ReplicationSystem] Hit event with invalid payload, skipping. objectId={}", ev.header.source.value);
+      return;   // 페이로드가 HitEvent가 아닌 경우 (잘못된 이벤트)
+   }
+   
+   se::game::N_EntityHit noti;
+   auto* entityIdPtr = noti.mutable_entity_id();
+   entityIdPtr->set_value(ev.header.source.value);
+   auto* hitPosPtr = noti.mutable_hit_position();
+   hitPosPtr->set_x(hitEv->hitPos.x);
+   hitPosPtr->set_y(hitEv->hitPos.y);
+   hitPosPtr->set_z(hitEv->hitPos.z);
+   noti.set_damage(hitEv->damage);
+   
+   SendBufferRef sendBuffer = ServerPacketHandler::MakeSendBuffer(noti);
+   ownerRoom_->BroadcastReplication(sendBuffer);
 }
 
 void ReplicationSystem::FlushEvent_WeaponStatChange(const RepEvent& ev, const RepFrame& frame) const

@@ -276,7 +276,8 @@ bool PlayerCombatComponent::TraceHit(const AttackRequest& request, const SE::Phy
         }
     }
     
-    // TODO: outHit.hit 가 true, 즉 충돌이 발생 헀다면 Hit 정보를 담아서 모든 클라이언트에게 Replicate 하기
+    ObjectId victimId = victim ? victim->GetId() : ObjectId{};
+    room->NotifyEntityHit(victimId, outHit.point, request.damage);
     
     if (victim == nullptr) 
         return false;   // 히트한 Actor가 없는 경우

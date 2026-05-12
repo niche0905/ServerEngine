@@ -1898,6 +1898,16 @@ void Room::BroadcastRespawn(ObjectId objectId)
                                     // Local Control Player의 경우는 Set Position 하도록 (Set Yaw 까지도 가능)
 }
 
+void Room::NotifyEntityHit(ObjectId objectId, const SE::Math::Vector3& point, int32 int32)
+{
+   RepEvent entityHitEvent;
+   ReplicateEventSet(entityHitEvent, RepEventType::Hit);
+   entityHitEvent.header.source = objectId;
+   entityHitEvent.payload = HitEvent{point, int32};
+   
+   roomGameSystem_.GetReplicationSystem().PushEvent(entityHitEvent);
+}
+
 void Room::NotifyProjectileSpawn(ProjectileActor* projectile, uint32 templateId)
 {
    if (!projectile)

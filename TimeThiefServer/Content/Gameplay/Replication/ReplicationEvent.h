@@ -24,6 +24,7 @@ enum class RepEventType : uint8
     ItemChange,
     
     Fire,                   // 발사 이벤트 (무기 종류, 발사 위치, 방향 등 포함)
+    Hit,                    // 히트 이벤트 (공격이 명중한 경우, 명중 위치, 피해량 등 포함)
     
     WeaponStatChange,       // 무기 스탯 변경 이벤트 (무기 ID, 변경된 스탯과 그 값 등 포함)
     
@@ -100,6 +101,12 @@ struct FireEvent
     SE::Math::Vector3 direction{};      // normalized
 };
 
+struct HitEvent
+{
+    SE::Math::Vector3 hitPos{};
+    int32 damage{0};
+};
+
 struct WeaponChangedEvent
 {
     uint32 newWeaponId{0};
@@ -130,6 +137,7 @@ using RepEventPayload = std::variant<
     ExplosionEvent,
     ItemChangeEvent,
     FireEvent,
+    HitEvent,
     WeaponChangedEvent,
     AimChangedEvent,
     WeaponStatChangeEvent,

@@ -217,6 +217,7 @@ public:
    void BroadcastGameStart();
    void BroadcastDeath(ObjectId objectId);
    void BroadcastRespawn(ObjectId objectId);
+   void NotifyEntityHit(ObjectId objectId, const SE::Math::Vector3& point, int32 int32);
    void NotifyProjectileSpawn(ProjectileActor* projectile, uint32 templateId);
    void NotifyItemChange(PlayerId playerId, uint32 itemId, int32 newCount, int32 deltaCount);
    void NotifyHealthChange(PlayerId id, int newHealth, int deltaHealth);
