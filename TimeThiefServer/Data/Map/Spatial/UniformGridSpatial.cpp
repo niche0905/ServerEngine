@@ -5,6 +5,7 @@
 #include <cmath>
 #include <unordered_set>
 #include <limits>
+#include "Physics/Ray/Ray.h"
 
 /*----------------------
    UniformGridSpatial
@@ -136,6 +137,90 @@ void UniformGridSpatial::QueryAABB(const SE::Physics::AABBCollider& query, std::
                outColliderIds.push_back(colliderId);
             }
          }
+      }
+   }
+}
+
+void UniformGridSpatial::QueryRay(const SE::Physics::Ray& ray, std::vector<uint32>& outColliderIds) const
+{
+   outColliderIds.clear();
+   
+   if (width_ <= 0 or height_ <= 0 or cellSize_ <= 0.0f)
+      return;
+   
+   const auto& origin = ray.origin;
+   const auto& dir = ray.direction;
+   
+   constexpr float EPSILON = 1e-6f;
+   
+   if (std::abs(dir.x) < EPSILON and std::abs(dir.y) < EPSILON) {
+      // Ray가 거의 수직인 경우, 단일 셀만 검사
+      Int2 cell = WorldToCell(origin);
+      if (cell.x >= 0 && cell.x < width_ && cell.y >= 0 && cell.y < height_) {
+         const int32 index = cell.y * width_ + cell.x;
+         const GridCell& gridCell = cells_[index];
+         outColliderIds.insert(outColliderIds.end(), gridCell.colliderIds.begin(), gridCell.colliderIds.end());
+      }
+      return;
+   }
+   
+   Int2 cell = WorldToCell(origin);
+   
+   // TODO: 만약 Ray의 시작점이 그리드 범위를 벗어난 경우, 교차점 계산하여 시작 셀을 결정하는 로직 추가 가능 (현재는 단순히 반환)
+   if (cell.x < 0 or cell.x >= width_ or cell.y < 0 or cell.y >= height_) {
+      // Ray의 시작점이 그리드 범위를 벗어난 경우, 교차점 계산 필요 (생략 가능)
+      return;
+   }
+   
+   int32 stepX = 0;
+   int32 stepY = 0;
+   
+   float tMaxX = std::numeric_limits<float>::infinity();
+   float tMaxY = std::numeric_limits<float>::infinity();
+   
+   float tDeltaX = std::numeric_limits<float>::infinity();
+   float tDeltaY = std::numeric_limits<float>::infinity();
+   
+   if (std::abs(dir.x) >= EPSILON) {
+      stepX = (dir.x > 0.0f) ? 1 : -1;
+      
+      const float nextBoundaryX = (stepX > 0) ? static_cast<float>(cell.x + 1) * cellSize_ : static_cast<float>(cell.x) * cellSize_;
+      
+      tMaxX = (nextBoundaryX - origin.x) / dir.x;
+      tDeltaX = cellSize_ / std::abs(dir.x);
+   }
+   
+   if (std::abs(dir.y) >= EPSILON) {
+      stepY = (dir.y > 0.0f) ? 1 : -1;
+      
+      const float nextBoundaryY = (stepY > 0) ? static_cast<float>(cell.y + 1) * cellSize_ : static_cast<float>(cell.y) * cellSize_;
+      
+      tMaxY = (nextBoundaryY - origin.y) / dir.y;
+      tDeltaY = cellSize_ / std::abs(dir.y);
+   }
+   
+   std::unordered_set<uint32> visitedColliderIds;
+   visitedColliderIds.reserve(128);
+
+   while (cell.x >= 0 and cell.x < width_ and cell.y >= 0 and cell.y < height_) {
+      
+      const int32 index = cell.y * width_ + cell.x;
+      
+      const GridCell& gridCell = cells_[index];
+      
+      for (uint32 colliderId : gridCell.colliderIds) {
+         if (visitedColliderIds.insert(colliderId).second) {
+            outColliderIds.push_back(colliderId);
+         }
+      }
+      
+      if (tMaxX < tMaxY) {
+         cell.x += stepX;
+         tMaxX += tDeltaX;
+      }
+      else {
+         cell.y += stepY;
+         tMaxY += tDeltaY;
       }
    }
 }

@@ -191,13 +191,18 @@ void ServerMap::QueryAABB(const SE::Physics::AABBCollider& query, std::vector<ui
 
 bool ServerMap::Raycast(const SE::Physics::Ray& ray, SE::Physics::RaycastHit& outResult) const
 {
+   std::vector<uint32> candidateIds;
+   candidateIds.reserve(64);
+   
+   spatial_.QueryRay(ray, candidateIds);
+   
    bool hit = false;
    float closestDistance = std::numeric_limits<float>::max();
 
    SE::Physics::RaycastHit tempHit{};
    
-   // TODO: Spatial에서 Raycast 기능이 구현되면, 여기서 Spatial을 이용해서 후보 콜라이더들을 먼저 걸러내도록 변경하기
-   for (const auto& colliderPtr : colliders_) {
+   for (uint32 colliderId : candidateIds) {
+      const SE::Physics::Collider* colliderPtr = GetCollider(colliderId);
       if (!colliderPtr)
          continue;
 

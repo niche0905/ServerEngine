@@ -19,6 +19,7 @@ class UniformGridSpatial
 public:
    void Build(const std::vector<std::unique_ptr<SE::Physics::Collider>>& colliders, float cellSize);
    void QueryAABB(const SE::Physics::AABBCollider& query, std::vector<uint32>& outColliderIds) const;
+   void QueryRay(const SE::Physics::Ray& ray, std::vector<uint32>& outColliderIds) const;
    
 private:
    Int2 WorldToCell(const SE::Math::Vector3& position) const;
