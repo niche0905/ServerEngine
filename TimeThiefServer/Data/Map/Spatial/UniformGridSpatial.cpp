@@ -3,6 +3,8 @@
 #include "Physics/Collider/AABBCollider.h"
 #include <algorithm>
 #include <cmath>
+#include <unordered_set>
+#include <limits>
 
 /*----------------------
    UniformGridSpatial

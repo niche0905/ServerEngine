@@ -174,10 +174,15 @@ bool ServerMap::BuildFromLoadedData(const se::map::LoadedMapData& loadedData)
 
 const SE::Physics::Collider* ServerMap::GetCollider(uint32 colliderId) const
 {
-   return nullptr;
+   if (colliderId >= colliders_.size()) {
+      consoleLogger->Log(Color::Red, L"[ServerMap] GetCollider: Invalid colliderId %u (out of range)\n", colliderId);
+      return nullptr;
+   }
+   
+   return colliders_[colliderId].get();
 }
 
 void ServerMap::QueryAABB(const SE::Physics::AABBCollider& query, std::vector<uint32>& outColliderIds) const
 {
-   return;
+   spatial_.QueryAABB(query, outColliderIds);
 }
