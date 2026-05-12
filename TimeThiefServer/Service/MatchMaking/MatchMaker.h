@@ -30,6 +30,7 @@ public:
     
 public:
     bool Init(SessionManager& sessionManager, PlayerManager& playerManager, ShardManager& shardManage, RoomDirectory& roomDirectory, RoomIdFactory roomIdFactory, size_t matchSize);
+    void SetPartialMatch(bool enable, Duration waitTime, size_t partialMatchSize);
     
 public:
     bool Enqueue(PlayerId playerId);
@@ -44,9 +45,14 @@ private:
     RoomDirectory*          roomDirectory_ = nullptr;        // non-owning   
     
 private:
-    MatchMakingQueue queue_;
-    RoomIdFactory roomIdFactory_;
+    MatchMakingQueue        queue_;
+    RoomIdFactory           roomIdFactory_;
     
-    size_t matchSize_ = 4;
+    size_t                  matchSize_ = 8;
+    
+// 불완전 매칭 기능을 위한 것
+    bool                    enablePartialMatch_ = false;
+    Duration                partialMatchWaitTime_ = std::chrono::seconds(10);
+    size_t                  minPartialMatchSize_ = 2;
     
 };

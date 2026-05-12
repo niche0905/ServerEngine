@@ -136,6 +136,7 @@ bool TimeThiefServerApp::CreateManagers()
       consoleLogger->Log(Color::Red, L"[TTSA] MatchMaker init fail\n");
       return false;
    }
+   matchMaker_->SetPartialMatch(true, Duration{Seconds{10}}, 2);   // TEMP: 불완전 매칭 기능 활성화, 대기 시간과 최소 매칭 인원은 임시값
    
    if (not CreatePacketDispatcher()) {
       consoleLogger->Log(Color::Red, L"[TTSA] CreatePacketDispatcher fail\n");

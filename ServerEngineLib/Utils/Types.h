@@ -27,6 +27,7 @@ using char32        = char32_t;
 using Clock         = std::chrono::steady_clock;
 using TimePoint     = Clock::time_point;
 using Duration      = Clock::duration;
+using Seconds       = std::chrono::seconds;
 using Milliseconds  = std::chrono::milliseconds;
 
 constexpr float Pi = std::numbers::pi_v<float>;

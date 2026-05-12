@@ -29,13 +29,18 @@ public:
     void RequeueFrontBatch(const std::vector<PlayerId>& playerIds);
     
     std::vector<PlayerId> TryPopMatch(size_t matchSize);
+    std::vector<PlayerId> TryPopUpTo(size_t maxSize);
     bool IsWaiting(PlayerId playerId) const;
     
     size_t Size() const;
+    std::optional<TimePoint> GetLastEnterTime() const;
     
 private:
     mutable std::mutex mutex_;
+    
     std::list<PlayerId> waitingList_;
     std::unordered_map<PlayerId, std::list<PlayerId>::iterator> waitingMap_;
+    
+    std::optional<TimePoint> lastEnterTime_;
     
 };

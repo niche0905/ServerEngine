@@ -16,6 +16,8 @@ bool MatchMakingQueue::Enqueue(PlayerId playerId)
    auto it = std::prev(waitingList_.end());
    waitingMap_.emplace(playerId, it);
    
+   lastEnterTime_ = Clock::now();
+   
    return true;
 }
 
@@ -29,6 +31,9 @@ bool MatchMakingQueue::Cancel(PlayerId playerId)
    
    waitingList_.erase(it->second);
    waitingMap_.erase(it);
+   
+   if (waitingList_.empty())
+      lastEnterTime_.reset();
    
    return true;
 }
@@ -67,12 +72,12 @@ std::vector<PlayerId> MatchMakingQueue::TryPopMatch(size_t matchSize)
    if (matchSize == 0)
       return result;
    
+   result.reserve(matchSize);
+
    std::lock_guard<std::mutex> lock(mutex_);
    
    if (waitingList_.size() < matchSize)
       return result;
-   
-   result.reserve(matchSize);
    
    for (size_t i = 0; i < matchSize; ++i) {
       PlayerId playerId = waitingList_.front();
@@ -80,6 +85,33 @@ std::vector<PlayerId> MatchMakingQueue::TryPopMatch(size_t matchSize)
       waitingMap_.erase(playerId);
       result.push_back(playerId);
    }
+   
+   if (waitingList_.empty())
+      lastEnterTime_.reset();
+   
+   return result;
+}
+
+std::vector<PlayerId> MatchMakingQueue::TryPopUpTo(size_t maxSize)
+{
+   std::vector<PlayerId> result;
+   if (maxSize == 0)
+      return result;
+   
+   result.reserve(maxSize);
+   
+   std::lock_guard<std::mutex> lock(mutex_);
+   
+   for (size_t i = 0; i < maxSize and !waitingList_.empty(); ++i) {
+      PlayerId playerId = waitingList_.front();
+      waitingList_.pop_front();
+      waitingMap_.erase(playerId);
+      result.push_back(playerId);
+   }
+   
+   if (waitingList_.empty())
+      lastEnterTime_.reset();
+   
    return result;
 }
 
@@ -93,4 +125,10 @@ size_t MatchMakingQueue::Size() const
 {
    std::lock_guard<std::mutex> lock(mutex_);
    return waitingList_.size();
+}
+
+std::optional<TimePoint> MatchMakingQueue::GetLastEnterTime() const
+{
+   std::lock_guard<std::mutex> lock(mutex_);
+   return lastEnterTime_;
 }
