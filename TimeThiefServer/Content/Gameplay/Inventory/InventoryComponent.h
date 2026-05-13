@@ -192,6 +192,8 @@ public:
    
    void RestoreSnapshot(const InventorySnapshot& snapshot)
    {
+      owner_->MarkReplicationDirty(ReplicationDirty::Inventory);
+      
       if (snapshot.inventoryItems.size() > slots_.size()) {
          consoleLogger->Log(Color::Yellow, L"[InventoryComponent] Snapshot size does not match inventory capacity. SnapshotSize={}, InventoryCapacity={}", snapshot.inventoryItems.size(), slots_.size());
          return;   // Snapshot 크기가 인벤토리 용량보다 큰 경우 (정상적이지 않은 상황)

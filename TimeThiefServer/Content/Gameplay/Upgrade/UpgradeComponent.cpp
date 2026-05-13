@@ -175,6 +175,7 @@ UpgradeSnapshot UpgradeComponent::CaptureSnapshot() const
 
 void UpgradeComponent::RestoreSnapshot(const UpgradeSnapshot& snapshot)
 {
+   
    appliedUpgradeEntryLevels_ = snapshot.appliedUpgradeEntryLevels_;
    statUpgradeLevels_ = snapshot.statUpgradeLevels;
    weaponUpgradeCodes_ = snapshot.weaponUpgradeCodes;

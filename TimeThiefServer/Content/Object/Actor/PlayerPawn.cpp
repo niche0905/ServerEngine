@@ -120,15 +120,12 @@ void PlayerPawn::OnPreRespawn(ObjectManager& om)
 {
    Pawn::OnPreRespawn(om);
    
-   // TODO: Inventory Save 꺼 가져오기
-   //       Inventory 외에도 여러 항목들 가져와서 세팅하기 (예: 스킬, 업그레이드, 위치 등)
+   save_.Rollback();
 }
 
 void PlayerPawn::OnPostRespawn(ObjectManager& om)
 {
    Pawn::OnPostRespawn(om);
-   
-   MarkReplicationDirty(ReplicationDirty::Inventory);    // 인벤토리 새로고침
 }
 
 bool PlayerPawn::TryReserveRespawn()
@@ -309,6 +306,7 @@ bool PlayerPawn::TrySetSavePoint(const Vector3& location)
    //       플레이어 상태 (체력, 인벤토리, 스킬, 업데이트 등)
    //       Save Component를 작성하는 것이 좋아 보인다
    {
+      save_.CaptureSnapshot();
       SetSavedRespawnPosition(location);
    }
    
@@ -339,6 +337,9 @@ void PlayerPawn::OnSpawn()
                                                                         // TODO: 이 값 Config로 빼기
    skill_.Init(this);
    upgrade_.Init(this);
+   
+   save_.Init(this);
+   save_.CaptureSnapshot();   // 초기 상태 저장
    
    deathCount_ = 0;
    

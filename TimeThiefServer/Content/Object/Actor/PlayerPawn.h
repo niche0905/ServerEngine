@@ -5,6 +5,7 @@
 #include "Content/Gameplay/Inventory/IInventoryOwner.h"
 #include "Content/Gameplay/Inventory/InventoryComponent.h"
 #include "Content/Gameplay/Economy/WalletComponent.h"
+#include "Content/Gameplay/Save/SaveComponent.h"
 #include "Content/Gameplay/Skill/SkillComponent.h"
 #include "Content/Gameplay/Upgrade/UpgradeComponent.h"
 #include "Content/Object/Actor/PlayerPawnState.h"
@@ -70,6 +71,9 @@ public:
     
     UpgradeComponent& GetUpgrade() { return upgrade_; }
     const UpgradeComponent& GetUpgrade() const { return upgrade_; }
+    
+    SaveComponent& GetSave() { return save_; }
+    const SaveComponent& GetSave() const { return save_; }
     
 public:
     virtual void Damaged(const DamageResult& dmgResult) override;
@@ -169,6 +173,7 @@ private:
     WalletComponent             wallet_{};
     SkillComponent              skill_{};
     UpgradeComponent            upgrade_{};
+    SaveComponent               save_{};
     
     int32                       speed_{};
     
