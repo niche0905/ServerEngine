@@ -1,5 +1,6 @@
 ﻿#pragma once
 #include "TypesDef.h"
+#include "Content/Gameplay/Save/SavePointSnapshot.h"
 #include "Content/Shared/BaseComponent.h"
 
 /*-------------------
@@ -29,6 +30,9 @@ public:
     bool UnequipSkill(int32 slotIndex);
     
     const std::unordered_set<SkillId>& GetUnlockSkills() const;
+    
+    SkillSnapshot CaptureSnapshot() const;
+    void RestoreSnapshot(const SkillSnapshot& snapshot);
     
 private:
     bool IsValidSlot(int32 slotIndex) const;

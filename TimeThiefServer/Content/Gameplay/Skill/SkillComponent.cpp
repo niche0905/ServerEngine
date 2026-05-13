@@ -126,6 +126,24 @@ const std::unordered_set<SkillId>& SkillComponent::GetUnlockSkills() const
    return unlockSkills_;
 }
 
+SkillSnapshot SkillComponent::CaptureSnapshot() const
+{
+   SkillSnapshot result;
+   result.unlockSkills = unlockSkills_;
+   for (int32 i = 0; i < MaxActiveSkills; ++i){
+      result.equippedSkills[i] = activeSkills_[i];
+   }
+   return result;
+}
+
+void SkillComponent::RestoreSnapshot(const SkillSnapshot& snapshot)
+{
+   unlockSkills_ = snapshot.unlockSkills;
+   for (int32 i = 0; i < MaxActiveSkills; ++i) {
+      activeSkills_[i] = snapshot.equippedSkills[i];
+   }
+}
+
 bool SkillComponent::IsValidSlot(int32 slotIndex) const
 {
    return slotIndex >= 0 && slotIndex < MaxActiveSkills;

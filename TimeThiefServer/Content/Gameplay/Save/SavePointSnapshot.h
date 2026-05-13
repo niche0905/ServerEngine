@@ -24,8 +24,10 @@ struct SkillSnapshot
 
 struct UpgradeSnapshot
 {
-    std::unordered_set<WeaponUpgradeCode> weaponUpgradeCodes;    // 플레이어가 획득한 무기 업그레이드 코드들의 집합
-    std::unordered_map<StatUpgradeCode, int32> statUpgradeLevels;     // 플레이어가 획득한 스탯 업그레이드 코드와 해당 레벨의 맵
+    std::unordered_set<WeaponUpgradeCode> weaponUpgradeCodes;           // 플레이어가 획득한 무기 업그레이드 코드들의 집합
+    std::unordered_map<StatUpgradeCode, int32> statUpgradeLevels;       // 플레이어가 획득한 스탯 업그레이드 코드와 해당 레벨의 맵
+    
+    std::unordered_map<uint32, int32>  appliedUpgradeEntryLevels_;      // 플레이어가 획득한 업그레이드 엔트리 ID와 해당 레벨의 맵
 };
 
 

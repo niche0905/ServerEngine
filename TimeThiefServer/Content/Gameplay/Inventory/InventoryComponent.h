@@ -2,6 +2,7 @@
 #include "Content/Shared/BaseComponent.h"
 #include "Content/Object/ObjectId.h"
 #include "ItemTypes.h"
+#include "Content/Gameplay/Save/SavePointSnapshot.h"
 
 class ObjectManager;
 struct ItemStack;
@@ -180,6 +181,23 @@ public:
       for (auto& slot : slots_) {
          slot = ItemStack{};
       }
+   }
+   
+   InventorySnapshot CaptureSnapshot() const
+   {
+      InventorySnapshot result;
+      result.inventoryItems = slots_;
+      return result;
+   }
+   
+   void RestoreSnapshot(const InventorySnapshot& snapshot)
+   {
+      if (snapshot.inventoryItems.size() > slots_.size()) {
+         consoleLogger->Log(Color::Yellow, L"[InventoryComponent] Snapshot size does not match inventory capacity. SnapshotSize={}, InventoryCapacity={}", snapshot.inventoryItems.size(), slots_.size());
+         return;   // Snapshot 크기가 인벤토리 용량보다 큰 경우 (정상적이지 않은 상황)
+      }
+      
+      slots_ = snapshot.inventoryItems;
    }
    
 private:

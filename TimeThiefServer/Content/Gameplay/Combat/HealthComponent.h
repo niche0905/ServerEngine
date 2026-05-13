@@ -86,7 +86,7 @@ public:
     {
         hp_ = std::clamp(hp, 1, maxHp_);
         
-        invincible_ = false;
+        // invincible_ = false;
         
         owner_->MarkReplicationDirty(ReplicationDirty::Health);
     }

@@ -129,6 +129,7 @@ public:
 public:
     void OnWeaponUpgradeApplied(WeaponUpgradeCode code);
     void RefreshWeaponStatsByUpgrade(uint32 code);
+    void RefreshWeaponStats();
     
 // Stat
 public:

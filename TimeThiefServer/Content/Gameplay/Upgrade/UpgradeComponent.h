@@ -3,6 +3,7 @@
 #include <unordered_set>
 #include <unordered_map>
 #include "TypesDef.h"
+#include "Content/Gameplay/Save/SavePointSnapshot.h"
 
 /*--------------------
    UpgradeComponent
@@ -16,6 +17,7 @@ class UpgradeComponent : public BaseComponent
 public:
    virtual void Init(BaseObject* owner);
    
+   void InitStats();
    void InitStatUpgrade(StatUpgradeCode code);
    
 public:
@@ -42,6 +44,10 @@ public:
 public:
    void Clear();
    const std::unordered_set<WeaponUpgradeCode>& GetAllWeaponUpgrades() const { return weaponUpgradeCodes_; }
+   const std::unordered_map<StatUpgradeCode, int32>& GetAllStatUpgrades() const { return statUpgradeLevels_; }
+   
+   UpgradeSnapshot CaptureSnapshot() const;
+   void RestoreSnapshot(const UpgradeSnapshot& snapshot);
    
 private:
    std::unordered_set<WeaponUpgradeCode>           weaponUpgradeCodes_;    // 플레이어가 획득한 무기 업그레이드 코드들의 집합

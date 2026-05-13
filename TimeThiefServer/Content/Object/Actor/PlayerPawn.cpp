@@ -242,6 +242,30 @@ void PlayerPawn::RefreshWeaponStatsByUpgrade(uint32 code)
    room->NotifyWeaponStatChange(GetOwnerPlayerId(), weaponId, finalWeaponStat);
 }
 
+void PlayerPawn::RefreshWeaponStats()
+{
+   MarkReplicationDirty(ReplicationDirty::WeaponStat);
+   
+   auto room = GetRoom();
+   auto* playerCombat = GetPlayerCombat();
+   auto& weaponSystem = room->GetRoomGameSystem().GetWeaponSystem();
+   
+   if (!room or !playerCombat)
+      return;
+   
+   for (uint32 weaponId = 1; weaponId <= MaxWeaponSlots; ++weaponId) {
+      auto* weaponSlot = playerCombat->GetWeaponSlot(weaponId);
+      if (!weaponSlot)
+         continue;
+      
+      WeaponStat finalStat;
+      if (!weaponSystem.BuildFinalWeaponStat(this, weaponId, finalStat))
+         continue;
+      
+      weaponSlot->stat = finalStat;
+   }
+}
+
 void PlayerPawn::OnStatUpgradeApplied(StatUpgradeCode code, int32 newLevel)
 {
    auto room = GetRoom();

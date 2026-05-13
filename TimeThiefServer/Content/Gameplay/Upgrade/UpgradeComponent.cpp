@@ -14,6 +14,11 @@ void UpgradeComponent::Init(BaseObject* owner)
    
    statUpgradeLevels_[Health_S] = 0;
    statUpgradeLevels_[Speed_S] = 0;
+   InitStats();
+}
+
+void UpgradeComponent::InitStats()
+{
    InitStatUpgrade(Health_S);
    InitStatUpgrade(Speed_S);
 }
@@ -156,4 +161,27 @@ void UpgradeComponent::Clear()
 {
    weaponUpgradeCodes_.clear();
    statUpgradeLevels_.clear();
+   appliedUpgradeEntryLevels_.clear();
+}
+
+UpgradeSnapshot UpgradeComponent::CaptureSnapshot() const
+{
+   UpgradeSnapshot result;
+   result.weaponUpgradeCodes = weaponUpgradeCodes_;
+   result.statUpgradeLevels = statUpgradeLevels_;
+   result.appliedUpgradeEntryLevels_ = appliedUpgradeEntryLevels_;
+   return result;
+}
+
+void UpgradeComponent::RestoreSnapshot(const UpgradeSnapshot& snapshot)
+{
+   appliedUpgradeEntryLevels_ = snapshot.appliedUpgradeEntryLevels_;
+   statUpgradeLevels_ = snapshot.statUpgradeLevels;
+   weaponUpgradeCodes_ = snapshot.weaponUpgradeCodes;
+   
+   // 현재 상태에 맞게 플레이어의 스탯과 무기 스탯 새로고침하기
+   InitStats();
+   if (PlayerPawn* player = GetOwnerAs<PlayerPawn>()) {
+      player->RefreshWeaponStats();
+   }
 }
