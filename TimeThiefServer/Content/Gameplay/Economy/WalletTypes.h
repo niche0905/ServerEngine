@@ -20,6 +20,7 @@ enum class MoneyChangeReason : uint8
     DropOnDeath,
     // QuestReward,
     Purchase,
+    RespawnCost,
     // Sell,
     Cheat,
     System,

@@ -28,6 +28,9 @@ void RespawnSystem::RequestRespawn(ObjectId objectId)
    if (pawn == nullptr)
       return;   // 오브젝트가 존재하지 않음
    
+   if (not pawn->TryReserveRespawn())
+      return;  // 리스폰 예약이 불가능한 경우 (예: 재화 부족)
+   
    uint64 token = pawn->GetRespawnComponent().GetRespawnToken();
    RoomId roomId = ownerRoom_->GetRoomId();
    GameShard* ownerShard = ownerRoom_->GetOwnerShard();

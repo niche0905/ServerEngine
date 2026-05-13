@@ -80,6 +80,8 @@ public:
 public:
     virtual void OnPreRespawn(ObjectManager& om) override;
     virtual void OnPostRespawn(ObjectManager& om) override;
+    
+    virtual bool TryReserveRespawn() override;
 
 // IDropOwner
 public:
@@ -161,6 +163,7 @@ private:
     float                       aimYaw_{0.0f};
     float                       pitch_{0.0f};
     int32                       movementMode_{0};
+    uint32                      deathCount_{0};
     
     InventoryComponent          inventory_{};
     WalletComponent             wallet_{};

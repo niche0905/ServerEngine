@@ -92,6 +92,9 @@ public:
     const Vector3& GetSavedRespawnPosition() const { return respawn_.GetRespawnPosition(); }
     void SetSavedRespawnPosition(const Vector3& pos) { respawn_.SetRespawnPosition(pos); }
     
+    virtual bool TryReserveRespawn();
+    virtual void CancelReserveRespawn();
+    
 // Combat
 public:
         CombatComponent* GetCombatComponent() { return combat_.get(); }

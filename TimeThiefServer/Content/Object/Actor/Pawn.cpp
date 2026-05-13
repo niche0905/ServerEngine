@@ -137,6 +137,16 @@ void Pawn::GrantSpawnInvulnerability(ObjectManager& om, uint32 durationMs)
    (void)durationMs;
 }
 
+bool Pawn::TryReserveRespawn()
+{
+   return true;
+}
+
+void Pawn::CancelReserveRespawn()
+{
+   respawn_.CancelScheduled();
+}
+
 void Pawn::OnSpawn()
 {
    Actor::OnSpawn();
