@@ -96,7 +96,7 @@ void ProjectileActor::CheckHit(const SE::Math::Vector3& from, const SE::Math::Ve
             .ownerId = GetOwner(),
             .from = from,
             .to = to,
-            .radius = explosionRadius_,
+            .radius = projectileRadius_,
             .hitMap = true,
             .hitBlockActor = true,
             .hitHurtBox = true

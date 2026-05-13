@@ -174,6 +174,9 @@ bool CombatSystem::SweepProjectile(const ProjectileSweepQuery& query, SE::Physic
       if (obj->GetId() == query.projectileId)
          return;
       
+      if (obj->GetId() == query.ownerId)
+         return;   // 발사체 자신과 발사체의 소유자는 명중 판정에서 제외하기
+      
       obj->ForEachCollider([&](ColliderComponent* collider)
       {
          if (!collider || !collider->GetCollider())
