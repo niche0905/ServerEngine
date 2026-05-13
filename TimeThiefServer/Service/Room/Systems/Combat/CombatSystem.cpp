@@ -1,5 +1,7 @@
 ﻿#include "pch.h"
 #include "CombatSystem.h"
+
+#include "ProjectileSweepQuery.h"
 #include "Content/Object/ObjectId.h"
 #include "Content/Object/Actor/Pawn.h"
 #include "Content/Object/Actor/ProjectileActor.h"
@@ -109,36 +111,102 @@ bool CombatSystem::LaunchRocket(const SE::Math::Vector3& pos, const SE::Math::Ve
    return true;
 }
 
-bool CombatSystem::SweepProjectile(ObjectId projectileId, ObjectId ownerId, const SE::Math::Vector3& from,
-   const SE::Math::Vector3& to, float projectileRadius, SE::Physics::Hit::HitResult& outHit) const
+bool CombatSystem::SweepProjectile(const ProjectileSweepQuery& query, SE::Physics::Hit::HitResult& outHit) const
 {
-   if (ownerRoom_ == nullptr || mapData_ == nullptr)
+   if (ownerRoom_ == nullptr or mapData_ == nullptr)
       return false;
-
-   SE::Math::Vector3 delta = to - from;
-   float dist = delta.Length();
+   
+   const SE::Math::Vector3 delta = query.to - query.from;
+   const float dist = delta.Length();
 
    if (dist <= 0.001f)
       return false;
 
-   SE::Math::Vector3 dir = delta.Normalized();
+   float closestT = std::numeric_limits<float>::max();
+   bool hasHit = false;
+   
+   auto TryPickClosest = [&](const SE::Physics::RaycastHit& sweepHit,
+                          SE::Physics::Hit::HitGroup group,
+                          float damageMultiplier,
+                          Actor* actor)
+   {
+      if (!sweepHit.hit)
+         return;
 
-   SE::Physics::Ray ray;
-   ray.origin = from;
-   ray.direction = dir;
+      if (sweepHit.t < 0.0f || sweepHit.t > dist)
+         return;
 
-   SE::Physics::Hit::HitResult hit{};
-   if (!TraceHit(ray, ownerId, hit))
-      return false;
+      if (sweepHit.t >= closestT)
+         return;
 
-   if (!hit.hit)
-      return false;
+      outHit.hit = true;
+      outHit.t = sweepHit.t;
+      outHit.point = sweepHit.point;
+      outHit.normal = sweepHit.normal;
 
-   if (hit.t > dist)
-      return false;
+      outHit.group = group;
+      outHit.damageMultiplier = damageMultiplier;
+      outHit.partIndex = 0;
+      outHit.actor = actor;
 
-   outHit = hit;
-   return true;
+      closestT = sweepHit.t;
+      hasHit = true;
+   };
+
+   if (query.hitMap) {
+      SE::Physics::RaycastHit mapHit{};
+      if (mapData_->SphereCast(query.from, query.to, query.radius, mapHit)) {
+         TryPickClosest(
+             mapHit,
+             SE::Physics::Hit::HitGroup::NotHurtBox,
+             0.0f,
+             nullptr
+         );
+      }
+   }
+   
+   ownerRoom_->GetObjectManager().ForEachAlive([&](BaseObject* obj)
+   {
+      if (!obj)
+         return;
+
+      if (obj->GetId() == query.projectileId)
+         return;
+      
+      obj->ForEachCollider([&](ColliderComponent* collider)
+      {
+         if (!collider || !collider->GetCollider())
+            return;
+
+         const ColliderRole role = collider->GetRole();
+
+         if (role == ColliderRole::Block) {
+            if (!query.hitBlockActor)
+               return;
+         }
+         else if (role == ColliderRole::Hurtbox) {
+            if (!query.hitHurtBox)
+               return;
+         }
+         else {
+            return;
+         }
+
+         SE::Physics::RaycastHit actorHit{};
+         if (!collider->GetCollider()->SphereCast(query.from, query.to, query.radius, actorHit)) {
+            return;
+         }
+
+         if (role == ColliderRole::Block) {
+            TryPickClosest(actorHit, SE::Physics::Hit::HitGroup::NotHurtBox, 0.0f, collider->GetOwnerActor());
+         }
+         else if (role == ColliderRole::Hurtbox) {
+            TryPickClosest(actorHit, SE::Physics::Hit::HitGroup::Torso, 1.0f, collider->GetOwnerActor());
+         }
+      });
+   });
+   
+   return hasHit;
 }
 
 void CombatSystem::ProjectileExplosion(ObjectId projectileId, const SE::Math::Vector3& pos, ObjectId ownerId,

@@ -30,6 +30,7 @@ public:
    
    bool Raycast(const SE::Physics::Ray& ray, SE::Physics::RaycastHit& outResult) const;
    bool Intersect(const SE::Physics::Collider& other, SE::Physics::CollisionResult& outResult) const;
+   bool SphereCast(const SE::Math::Vector3& from, const SE::Math::Vector3& to, float radius, SE::Physics::RaycastHit& outResult) const;
    
 private:
    std::vector<std::unique_ptr<SE::Physics::Collider>> colliders_;

@@ -44,6 +44,7 @@ namespace SE::Physics
         const AABBCollider& GetWorldAABB() const override;
         
         virtual bool Raycast(const Ray& ray, RaycastHit& out) const override;
+        virtual bool SphereCast(const Math::Vector3& from, const Math::Vector3& to, float radius, RaycastHit& outHit) const override;
         
         Vector3 ClosestPointOnSegment(const Vector3& point) const;
         Vector3 ClosestPoint(const Vector3& point) const;

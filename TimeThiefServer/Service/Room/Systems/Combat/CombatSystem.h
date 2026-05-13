@@ -1,5 +1,6 @@
 ﻿#pragma once
 
+struct ProjectileSweepQuery;
 class Pawn;
 
 namespace SE::Physics
@@ -33,7 +34,7 @@ public:
    bool TraceHit(const SE::Physics::Ray& ray, ObjectId exceptId, SE::Physics::Hit::HitResult& outHit) const;
    bool LaunchRocket(const SE::Math::Vector3& pos, const SE::Math::Vector3& dir, Pawn* ownerPawn, int32 damage, float speed, uint32 lifetimeMs, float radius);
    
-   bool SweepProjectile(ObjectId projectileId, ObjectId ownerId, const SE::Math::Vector3& from, const SE::Math::Vector3& to, float projectileRadius, SE::Physics::Hit::HitResult& outHit) const;
+   bool SweepProjectile(const ProjectileSweepQuery& query, SE::Physics::Hit::HitResult& outHit) const;
    void ProjectileExplosion(ObjectId projectileId, const SE::Math::Vector3& pos, ObjectId ownerId, int32 damage, float radius, bool distanceDamageEnabled);
   
 private:

@@ -162,6 +162,125 @@ namespace SE::Physics
       return true;
    }
 
+   bool OBBCollider::SphereCast(const Math::Vector3& from, const Math::Vector3& to, float radius,
+      RaycastHit& outHit) const
+   {
+      assert(SE::Math::NearlyZero(worldAxis_[0].LengthSq() - 1.0f, 1e-3f) && "OBB axisX must be normalized");
+      assert(SE::Math::NearlyZero(worldAxis_[1].LengthSq() - 1.0f, 1e-3f) && "OBB axisY must be normalized");
+      assert(SE::Math::NearlyZero(worldAxis_[2].LengthSq() - 1.0f, 1e-3f) && "OBB axisZ must be normalized");
+
+      if (radius < 0.0f)
+         return false;
+
+      const Vector3 delta = to - from;
+      const float dist = delta.Length();
+
+      if (dist <= 1e-4f)
+         return false;
+
+      const Vector3 dir = delta.Normalized();
+
+      Ray ray;
+      ray.origin = from;
+      ray.direction = dir;
+      ray.tMin = 0.0f;
+      ray.tMax = dist;
+
+      const Vector3 o = ray.origin - worldCenter_;
+
+      const Vector3 oL{
+         o.Dot(worldAxis_[0]),
+         o.Dot(worldAxis_[1]),
+         o.Dot(worldAxis_[2])
+      };
+
+      const Vector3 dL{
+         ray.direction.Dot(worldAxis_[0]),
+         ray.direction.Dot(worldAxis_[1]),
+         ray.direction.Dot(worldAxis_[2])
+      };
+
+      const Vector3 expandedHalf = worldHalf_ + Vector3{ radius, radius, radius };
+
+      const Vector3 mn = Vector3{ -expandedHalf.x, -expandedHalf.y, -expandedHalf.z };
+      const Vector3 mx = Vector3{  expandedHalf.x,  expandedHalf.y,  expandedHalf.z };
+
+      float tMin = ray.tMin;
+      float tMax = ray.tMax;
+
+      Vector3 enterN{ 0.0f, 0.0f, 0.0f };
+      Vector3 exitN{ 0.0f, 0.0f, 0.0f };
+
+      auto slab = [&](float origin, float dir, float minB, float maxB,
+                      const Vector3& nEnter, const Vector3& nExit) -> bool
+      {
+         if (std::fabs(dir) <= 1e-12f) {
+            return origin >= minB && origin <= maxB;
+         }
+
+         const float invD = 1.0f / dir;
+         float t1 = (minB - origin) * invD;
+         float t2 = (maxB - origin) * invD;
+
+         Vector3 n1 = nEnter;
+         Vector3 n2 = nExit;
+
+         if (t1 > t2) {
+            std::swap(t1, t2);
+            std::swap(n1, n2);
+         }
+
+         if (t1 > tMin) {
+            tMin = t1;
+            enterN = n1;
+         }
+
+         if (t2 < tMax) {
+            tMax = t2;
+            exitN = n2;
+         }
+
+         return tMin <= tMax;
+      };
+
+      if (!slab(oL.x, dL.x, mn.x, mx.x, Vector3{ -1,  0,  0 }, Vector3{  1,  0,  0 })) return false;
+      if (!slab(oL.y, dL.y, mn.y, mx.y, Vector3{  0, -1,  0 }, Vector3{  0,  1,  0 })) return false;
+      if (!slab(oL.z, dL.z, mn.z, mx.z, Vector3{  0,  0, -1 }, Vector3{  0,  0,  1 })) return false;
+
+      float tHit = tMin;
+      Vector3 nL = enterN;
+
+      if (tHit < ray.tMin) {
+         tHit = tMax;
+         nL = exitN;
+
+         if (nL.LengthSq() < 1e-12f)
+            nL = enterN;
+      }
+
+      if (tHit < ray.tMin || tHit > ray.tMax)
+         return false;
+
+      outHit.hit = true;
+      outHit.t = tHit;
+
+      // 주의:
+      // 이 point는 "투사체 중심 위치" 기준의 충돌 시점 위치임.
+      // 실제 표면 접촉점이 아님.
+      outHit.point = ray.At(tHit);
+
+      Vector3 nW = worldAxis_[0] * nL.x
+                 + worldAxis_[1] * nL.y
+                 + worldAxis_[2] * nL.z;
+
+      outHit.normal = nW;
+      outHit.collider = this;
+
+      assert(SE::Math::NearlyZero(nW.LengthSq() - 1.0f, 1e-3f) && "OBB SphereCast normal must be normalized");
+
+      return true;
+   }
+
    SE::Math::Vector3 OBBCollider::ClosestPoint(const Vector3& point) const
    {
       const Vector3 d = point - worldCenter_;

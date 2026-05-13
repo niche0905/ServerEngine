@@ -588,6 +588,7 @@
     <ClInclude Include="Service\Room\ScheduledRoomTick.h" />
     <ClInclude Include="Service\Room\ShardRoomManager.h" />
     <ClInclude Include="Service\Room\Systems\Combat\CombatSystem.h" />
+    <ClInclude Include="Service\Room\Systems\Combat\ProjectileSweepQuery.h" />
     <ClInclude Include="Service\Room\Systems\Drop\DropSystem.h" />
     <ClInclude Include="Service\Room\Systems\Loot\LootSystem.h" />
     <ClInclude Include="Service\Room\Systems\Replication\ReplicationSystem.h" />

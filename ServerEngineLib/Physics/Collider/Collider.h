@@ -41,6 +41,7 @@ namespace SE::Physics
         virtual const AABBCollider& GetWorldAABB() const = 0;
         
         virtual bool Raycast(const Ray& ray, RaycastHit& out) const = 0;
+        virtual bool SphereCast(const Math::Vector3& from, const Math::Vector3& to, float radius, RaycastHit& outHit) const = 0;
     };
     
 }

@@ -258,3 +258,51 @@ bool ServerMap::Intersect(const SE::Physics::Collider& other, SE::Physics::Colli
    
    return collided;
 }
+
+bool ServerMap::SphereCast(const SE::Math::Vector3& from, const SE::Math::Vector3& to, float radius,
+   SE::Physics::RaycastHit& outResult) const
+{
+   const SE::Math::Vector3 delta = to - from;
+   const float dist = delta.Length();
+   
+   if (dist <= 0.001f)
+      return false;
+   
+   bool hasHit = false;
+   float closestT = std::numeric_limits<float>::max();
+   
+   const SE::Math::Vector3 min{ std::min(from.x, to.x) - radius, std::min(from.y, to.y) - radius, std::min(from.z, to.z) - radius };
+   const SE::Math::Vector3 max{ std::max(from.x, to.x) + radius, std::max(from.y, to.y) + radius, std::max(from.z, to.z) + radius };
+   SE::Physics::AABBCollider query{ min, max };
+   
+   std::vector<uint32> candidateIds;
+   candidateIds.reserve(64);
+   
+   spatial_.QueryAABB(query, candidateIds);
+   
+   for (uint32 colliderId : candidateIds) {
+      const auto* collider = GetCollider(colliderId);
+      
+      if (!collider)
+         continue;
+      
+      SE::Physics::RaycastHit tempHit{};
+      if (!collider->SphereCast(from, to, radius, tempHit))
+         continue;
+      
+      if (!tempHit.hit)
+         continue;
+      
+      if (tempHit.t < 0.0f or tempHit.t > dist)
+         continue;
+      
+      if (tempHit.t >= closestT)
+         continue;
+      
+      closestT = tempHit.t;
+      outResult = tempHit;
+      hasHit = true;
+   }
+   
+   return hasHit;
+}

@@ -170,4 +170,85 @@ namespace SE::Physics
       
       return true;
    }
+
+   bool AABBCollider::SphereCast(const Math::Vector3& from, const Math::Vector3& to, float radius,
+      RaycastHit& outHit) const
+   {
+      const Math::Vector3 delta = to - from;
+      const float dist = delta.Length();
+
+      if (dist <= 0.001f)
+         return false;
+
+      const Math::Vector3 dir = delta.Normalized();
+
+      Math::Vector3 min = GetWorldAABB().GetMin();
+      Math::Vector3 max = GetWorldAABB().GetMax();
+
+      min = min - Math::Vector3{ radius, radius, radius };
+      max = max + Math::Vector3{ radius, radius, radius };
+
+      Ray ray;
+      ray.origin = from;
+      ray.direction = dir;
+
+      return RaycastExpandedAABB(ray, min, max, dist, outHit);
+   }
+
+   bool AABBCollider::RaycastExpandedAABB(const Ray& ray, const Math::Vector3& min, const Math::Vector3& max,
+      float dist, RaycastHit& outHit) const
+   {
+      constexpr float EPSILON = 1e-6f;
+
+      float tMin = 0.0f;
+      float tMax = dist;
+
+      Math::Vector3 hitNormal{ 0.0f, 0.0f, 0.0f };
+
+      auto TestAxis = [&](float origin, float dir, float minVal, float maxVal, const Math::Vector3& axisNormal) -> bool
+      {
+         if (std::abs(dir) < EPSILON)
+         {
+            return origin >= minVal && origin <= maxVal;
+         }
+
+         float invD = 1.0f / dir;
+         float t1 = (minVal - origin) * invD;
+         float t2 = (maxVal - origin) * invD;
+
+         Math::Vector3 normal = axisNormal;
+
+         if (t1 > t2)
+         {
+            std::swap(t1, t2);
+            normal = normal * -1.0f;
+         }
+
+         if (t1 > tMin)
+         {
+            tMin = t1;
+            hitNormal = normal;
+         }
+
+         tMax = std::min(tMax, t2);
+
+         return tMin <= tMax;
+      };
+
+      if (!TestAxis(ray.origin.x, ray.direction.x, min.x, max.x, Math::Vector3{ -1.0f, 0.0f, 0.0f }))
+         return false;
+
+      if (!TestAxis(ray.origin.y, ray.direction.y, min.y, max.y, Math::Vector3{ 0.0f, -1.0f, 0.0f }))
+         return false;
+
+      if (!TestAxis(ray.origin.z, ray.direction.z, min.z, max.z, Math::Vector3{ 0.0f, 0.0f, -1.0f }))
+         return false;
+
+      outHit.hit = true;
+      outHit.t = tMin;
+      outHit.point = ray.origin + ray.direction * tMin;
+      outHit.normal = hitNormal;
+
+      return true;
+   }
 }

@@ -187,6 +187,120 @@ namespace SE::Physics
       return true;
    }
 
+   bool CharacterCapsuleCollider::SphereCast(const Math::Vector3& from, const Math::Vector3& to, float radius,
+      RaycastHit& outHit) const
+   {
+      if (radius < 0.0f)
+      return false;
+
+      const Vector3 delta = to - from;
+      const float dist = delta.Length();
+
+      if (dist <= 1e-4f)
+         return false;
+
+      Ray ray;
+      ray.origin = from;
+      ray.direction = delta.Normalized();
+      ray.tMin = 0.0f;
+      ray.tMax = dist;
+
+      assert(SE::Math::NearlyZero(ray.direction.LengthSq() - 1.0f, 1e-3f) && "Ray direction must be normalized");
+
+      const float r = worldRadius_ + radius;
+      if (r <= 0.0f)
+         return false;
+
+      const float zA = worldBase_.z + worldRadius_;
+      const float zB = worldBase_.z + (worldHeight_ - worldRadius_);
+
+      const Vector3 capA{ worldBase_.x, worldBase_.y, zA };
+      const Vector3 capB{ worldBase_.x, worldBase_.y, zB };
+
+      bool hit = false;
+      float bestT = ray.tMax;
+      Vector3 bestN{0, 0, 0};
+
+      const float ox = ray.origin.x - worldBase_.x;
+      const float oy = ray.origin.y - worldBase_.y;
+      const float dx = ray.direction.x;
+      const float dy = ray.direction.y;
+
+      const float a = dx * dx + dy * dy;
+
+      if (a > 1e-12f) {
+         const float b = 2.0f * (ox * dx + oy * dy);
+         const float c = (ox * ox + oy * oy) - r * r;
+
+         const float disc = b * b - 4.0f * a * c;
+         if (disc >= 0.0f) {
+            const float sqrtDisc = std::sqrt(disc);
+            float t0 = (-b - sqrtDisc) / (2.0f * a);
+            float t1 = (-b + sqrtDisc) / (2.0f * a);
+            if (t0 > t1) std::swap(t0, t1);
+
+            auto tryBody = [&](float tCand)
+            {
+               if (tCand < ray.tMin || tCand > ray.tMax)
+                  return;
+
+               const float z = ray.origin.z + ray.direction.z * tCand;
+               if (z < zA || z > zB)
+                  return;
+
+               const Vector3 p = ray.At(tCand);
+
+               Vector3 n{ p.x - worldBase_.x, p.y - worldBase_.y, 0.0f };
+               n = n.Normalized(Vector3{1.0f, 0.0f, 0.0f});
+
+               if (!hit || tCand < bestT) {
+                  hit = true;
+                  bestT = tCand;
+                  bestN = n;
+               }
+            };
+
+            tryBody(t0);
+            tryBody(t1);
+         }
+      }
+
+      {
+         float tS;
+         Vector3 nS;
+
+         if (RaycastSphereLocal(ray, capA, r, tS, nS)) {
+            if (!hit || tS < bestT) {
+               hit = true;
+               bestT = tS;
+               bestN = nS;
+            }
+         }
+
+         if (RaycastSphereLocal(ray, capB, r, tS, nS)) {
+            if (!hit || tS < bestT) {
+               hit = true;
+               bestT = tS;
+               bestN = nS;
+            }
+         }
+      }
+
+      if (!hit)
+         return false;
+
+      outHit.hit = true;
+      outHit.t = bestT;
+
+      // 접촉점 기준
+      outHit.point = ray.At(bestT);
+
+      outHit.normal = bestN;
+      outHit.collider = this;
+
+      return true;
+   }
+
    SE::Math::Vector3 CharacterCapsuleCollider::ClosestPointOnSegment(const Vector3& point) const
    {
       const float zA = worldBase_.z + worldRadius_;

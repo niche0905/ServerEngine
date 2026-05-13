@@ -227,6 +227,168 @@ namespace SE::Physics
       return true;
    }
 
+   bool CapsuleCollider::SphereCast(const Math::Vector3& from, const Math::Vector3& to, float radius,
+      RaycastHit& outHit) const
+   {
+      if (radius < 0.0f)
+      return false;
+
+      const Vector3 delta = to - from;
+      const float dist = delta.Length();
+
+      if (dist <= 1e-4f)
+         return false;
+
+      Ray ray;
+      ray.origin = from;
+      ray.direction = delta.Normalized();
+      ray.tMin = 0.0f;
+      ray.tMax = dist;
+
+      assert(SE::Math::NearlyZero(ray.direction.LengthSq() - 1.0f, 1e-3f) && "Ray direction must be normalized");
+
+      const Vector3 A = worldPointA_;
+      const Vector3 B = worldPointB_;
+      const float r = worldRadius_ + radius;
+
+      if (r <= 0.0f)
+         return false;
+
+      const Vector3 AB = B - A;
+      const float lenSq = AB.LengthSq();
+
+      if (lenSq <= 1e-12f) {
+         float tS;
+         Vector3 nS;
+
+         if (!RaycastSphere(ray, A, r, tS, nS))
+            return false;
+
+         outHit.hit = true;
+         outHit.t = tS;
+         outHit.point = ray.At(tS) - nS * radius;
+         outHit.normal = nS;
+         outHit.collider = this;
+
+         return true;
+      }
+
+      const float len = std::sqrt(lenSq);
+      const Vector3 u = AB * (1.0f / len);
+
+      const Vector3 p = ray.origin - A;
+
+      const float pAxis = p.Dot(u);
+      const float dAxis = ray.direction.Dot(u);
+
+      const Vector3 pPerp = p - (u * pAxis);
+      const Vector3 dPerp = ray.direction - (u * dAxis);
+
+      bool hit = false;
+      float bestT = ray.tMax;
+      Vector3 bestN{0, 0, 0};
+
+      const float a = dPerp.LengthSq();
+
+      if (!SE::Math::NearlyZero(a, 1e-12f)) {
+         const float b = 2.0f * pPerp.Dot(dPerp);
+         const float c = pPerp.LengthSq() - r * r;
+
+         const float disc = b * b - 4.0f * a * c;
+         if (disc >= 0.0f) {
+            const float sqrtDisc = std::sqrt(disc);
+            float t0 = (-b - sqrtDisc) / (2.0f * a);
+            float t1 = (-b + sqrtDisc) / (2.0f * a);
+            if (t0 > t1) std::swap(t0, t1);
+
+            auto tryCylinderT = [&](float tCand)
+            {
+               if (tCand < ray.tMin || tCand > ray.tMax)
+                  return;
+
+               const float s = pAxis + tCand * dAxis;
+               if (s < 0.0f || s > len)
+                  return;
+
+               const Vector3 n = (pPerp + dPerp * tCand).Normalized(Vector3{0, 1, 0});
+
+               if (!hit || tCand < bestT) {
+                  hit = true;
+                  bestT = tCand;
+                  bestN = n;
+               }
+            };
+
+            tryCylinderT(t0);
+            tryCylinderT(t1);
+         }
+      }
+      else {
+         const float distSq = pPerp.LengthSq();
+
+         if (distSq <= r * r) {
+            if (!SE::Math::NearlyZero(dAxis, 1e-12f)) {
+               float tEnter = (0.0f - pAxis) / dAxis;
+               float tExit = (len - pAxis) / dAxis;
+
+               if (tEnter > tExit)
+                  std::swap(tEnter, tExit);
+
+               float tCand = tEnter;
+
+               if (tCand < ray.tMin || tCand > ray.tMax)
+                  tCand = tExit;
+
+               if (tCand >= ray.tMin && tCand <= ray.tMax) {
+                  const Vector3 hitP = ray.At(tCand);
+
+                  float s = pAxis + tCand * dAxis;
+                  s = SE::Math::Clamp(s, 0.0f, len);
+
+                  const Vector3 Q = A + u * s;
+                  const Vector3 n = (hitP - Q).Normalized(Vector3{0, 1, 0});
+
+                  hit = true;
+                  bestT = tCand;
+                  bestN = n;
+               }
+            }
+         }
+      }
+
+      {
+         float tS;
+         Vector3 nS;
+
+         if (RaycastSphere(ray, A, r, tS, nS)) {
+            if (!hit || tS < bestT) {
+               hit = true;
+               bestT = tS;
+               bestN = nS;
+            }
+         }
+
+         if (RaycastSphere(ray, B, r, tS, nS)) {
+            if (!hit || tS < bestT) {
+               hit = true;
+               bestT = tS;
+               bestN = nS;
+            }
+         }
+      }
+
+      if (!hit)
+         return false;
+
+      outHit.hit = true;
+      outHit.t = bestT;
+      outHit.point = ray.At(bestT);
+      outHit.normal = bestN;
+      outHit.collider = this;
+
+      return true;
+   }
+
    SE::Math::Vector3 CapsuleCollider::ClosestPointOnSegment(const Vector3& point) const
    {
       const Vector3 ab = worldPointB_ - worldPointA_;

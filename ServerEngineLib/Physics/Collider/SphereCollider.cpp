@@ -87,10 +87,78 @@ namespace SE::Physics
       return true;
    }
 
+   bool SphereCollider::SphereCast(const Math::Vector3& from, const Math::Vector3& to, float radius,
+      RaycastHit& outHit) const
+   {
+      const Math::Vector3 delta = to - from;
+      const float dist = delta.Length();
+
+      if (dist <= 0.001f)
+         return false;
+
+      const Math::Vector3 dir = delta.Normalized();
+
+      const Math::Vector3 center = GetCenter();
+      const float expandedRadius = GetRadius() + radius;
+
+      Ray ray;
+      ray.origin = from;
+      ray.direction = dir;
+
+      if (!RaycastSphere(ray, center, expandedRadius, dist, outHit))
+         return false;
+
+      return true;
+   }
+
    bool SphereCollider::Contains(const Vector3& point) const
    {
       const float dist = (point - worldCenter_).LengthSq();
       return dist <= RadiusSq();
+   }
+
+   bool SphereCollider::RaycastSphere(const Ray& ray, const Math::Vector3& center, float expandedRadius, float dist,
+      RaycastHit& outHit) const
+   {
+      Math::Vector3 oc = ray.origin - center;
+
+      float a = ray.direction.Dot(ray.direction);      // 보통 1 (normalize 되어 있으면)
+      float b = 2.0f * oc.Dot(ray.direction);
+      float c = oc.Dot(oc) - expandedRadius * expandedRadius;
+
+      float discriminant = b * b - 4.0f * a * c;
+
+      if (discriminant < 0.0f)
+         return false;
+
+      float sqrtD = std::sqrt(discriminant);
+
+      float t1 = (-b - sqrtD) / (2.0f * a);
+      float t2 = (-b + sqrtD) / (2.0f * a);
+
+      float t = -1.0f;
+
+      // 가장 가까운 양수 t 선택
+      if (t1 >= 0.0f)
+         t = t1;
+      else if (t2 >= 0.0f)
+         t = t2;
+
+      if (t < 0.0f)
+         return false;
+
+      if (t > dist)
+         return false;
+
+      outHit.hit = true;
+      outHit.t = t;
+      outHit.point = ray.origin + ray.direction * t;
+
+      Math::Vector3 normal = outHit.point - center;
+
+      outHit.normal = normal.Normalized();
+
+      return true;
    }
 
    void SphereCollider::RecalcWorldAABB()

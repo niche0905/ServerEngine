@@ -36,9 +36,11 @@ namespace SE::Physics
         const AABBCollider& GetWorldAABB() const override;
         
         virtual bool Raycast(const Ray& ray, RaycastHit& out) const override;
+        virtual bool SphereCast(const Math::Vector3& from, const Math::Vector3& to, float radius, RaycastHit& outHit) const override;
         
         bool Contains(const Vector3& point) const;
         float RadiusSq() const { return localRadius_ * localRadius_; }
+        bool RaycastSphere(const Ray& ray, const Math::Vector3& center, float expandedRadius, float dist, RaycastHit& outHit) const;
         
     private:
         void RecalcWorldAABB();

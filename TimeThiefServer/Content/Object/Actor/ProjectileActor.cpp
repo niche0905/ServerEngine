@@ -4,6 +4,7 @@
 #include "Content/Object/ObjectManager.h"
 #include "Physics/Collider/SphereCollider.h"
 #include "Service/Room/Room.h"
+#include "Service/Room/Systems/Combat/ProjectileSweepQuery.h"
 #include "Shard/GameShard.h"
 
 /*-------------------
@@ -47,7 +48,7 @@ void ProjectileActor::Init(ObjectId ownerId, const Vector3& startPos, const Vect
     {
         auto collider = std::make_unique<ColliderComponent>();
         auto sphereCollider = std::make_unique<SE::Physics::SphereCollider>(SE::Math::Vector3{0.0f, 0.0f, 0.0f}, projectileRadius_);
-        collider->Init(this, ColliderRole::Hitbox, std::move(sphereCollider));
+        collider->Init(this, ColliderRole::Hit, std::move(sphereCollider));
         
         colliders_.push_back(std::move(collider));
     }
@@ -90,7 +91,18 @@ void ProjectileActor::CheckHit(const SE::Math::Vector3& from, const SE::Math::Ve
     SE::Physics::Hit::HitResult hit{};
     
     if (auto room = GetRoom()) {
-        if (room->GetRoomGameSystem().GetCombatSystem().SweepProjectile(GetId(), GetOwner(), from, to, explosionRadius_, hit)) {
+        ProjectileSweepQuery query{
+            .projectileId = GetId(),
+            .ownerId = GetOwner(),
+            .from = from,
+            .to = to,
+            .radius = explosionRadius_,
+            .hitMap = true,
+            .hitBlockActor = true,
+            .hitHurtBox = true
+        };
+        
+        if (room->GetRoomGameSystem().GetCombatSystem().SweepProjectile(query, hit)) {
             if (hit.hit) {
                 OnHit(room->GetObjectManager(), hit.actor ? hit.actor->GetId() : ObjectId{});
             }

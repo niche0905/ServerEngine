@@ -153,6 +153,40 @@ namespace SE::Physics
       return true;
    }
 
+   bool CompoundCollider::SphereCast(const Math::Vector3& from, const Math::Vector3& to, float radius,
+      RaycastHit& outHit) const
+   {
+      if (colliders_.empty())
+         return false;
+      
+      bool hit = false;
+      float bestT = std::numeric_limits<float>::max();
+      RaycastHit bestHit;
+      
+      for (const auto& child : colliders_) {
+         if (not child) continue;
+         
+         RaycastHit tempAABB;
+         if (not child->GetWorldAABB().SphereCast(from, to, radius, tempAABB))
+            continue;
+         
+         RaycastHit h;
+         if (child->SphereCast(from, to, radius, h)) {
+            if (not hit or h.t < bestT) {
+               hit = true;
+               bestT = h.t;
+               bestHit = h;
+            }
+         }
+      }
+      
+      if (not hit)
+         return false;
+      
+      outHit = bestHit;
+      return true;
+   }
+
    void CompoundCollider::RecalcWorldAABB() const
    {
       dirtyAABB_ = false;
