@@ -16,7 +16,8 @@ void ProjectileActor::Init(ObjectId ownerId, const Vector3& startPos, const Vect
     ownerId_ = ownerId;
     damage_ = damage;
     velocity_ = velocity;
-    radius_ = explosionRadius;
+    projectileRadius_ = projectileRadius;
+    explosionRadius_ = explosionRadius;
     distanceDamageEnabled_ = distanceDamageEnabled;
     
     auto room = GetRoom();
@@ -45,7 +46,7 @@ void ProjectileActor::Init(ObjectId ownerId, const Vector3& startPos, const Vect
     // 충돌체 설정
     {
         auto collider = std::make_unique<ColliderComponent>();
-        auto sphereCollider = std::make_unique<SE::Physics::SphereCollider>(SE::Math::Vector3{0.0f, 0.0f, 0.0f}, projectileRadius);
+        auto sphereCollider = std::make_unique<SE::Physics::SphereCollider>(SE::Math::Vector3{0.0f, 0.0f, 0.0f}, projectileRadius_);
         collider->Init(this, ColliderRole::Hitbox, std::move(sphereCollider));
         
         colliders_.push_back(std::move(collider));
@@ -63,10 +64,13 @@ void ProjectileActor::Tick(float dt)
 {
     Actor::Tick(dt);
     
+    prevPos_ = GetPosition();
+    
     UpdateMovement(dt);
     
-    // TODO: 충돌 체크 및 처리 (예: Raycast 또는 Collider 간의 충돌 검사)
-    //       충돌 사실 알리기 (OnHit 호출)
+    const Vector3 currPos = GetPosition();
+    
+    CheckHit(prevPos_, currPos);
 }
 
 void ProjectileActor::HandleLifetimeExpired()
@@ -79,6 +83,19 @@ void ProjectileActor::HandleLifetimeExpired()
         return;   // Room이 없는 경우, 유효하지 않은 상태
     
     OnLifetimeExpired(room->GetObjectManager());
+}
+
+void ProjectileActor::CheckHit(const SE::Math::Vector3& from, const SE::Math::Vector3& to)
+{
+    SE::Physics::Hit::HitResult hit{};
+    
+    if (auto room = GetRoom()) {
+        if (room->GetRoomGameSystem().GetCombatSystem().SweepProjectile(GetId(), GetOwner(), from, to, explosionRadius_, hit)) {
+            if (hit.hit) {
+                OnHit(room->GetObjectManager(), hit.actor ? hit.actor->GetId() : ObjectId{});
+            }
+        }
+    }
 }
 
 void ProjectileActor::UpdateMovement(float dt)
@@ -114,7 +131,7 @@ void ProjectileActor::OnExplode(ObjectManager& om)
     if (lifetimeTimer_ != TimerId{}) {
         // Room에서 예약된 타이머 취소
         if (auto room = GetRoom()) {
-            room->GetRoomGameSystem().GetCombatSystem().ProjectileExplosion(GetId(), GetPosition(), GetOwner(), GetDamage(), radius_, distanceDamageEnabled_);
+            room->GetRoomGameSystem().GetCombatSystem().ProjectileExplosion(GetId(), GetPosition(), GetOwner(), GetDamage(), explosionRadius_, distanceDamageEnabled_);
             room->CancelScheduled(lifetimeTimer_);
         }
         else {

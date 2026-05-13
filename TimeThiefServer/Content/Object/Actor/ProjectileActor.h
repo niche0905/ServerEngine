@@ -40,6 +40,7 @@ protected:
     
 public:
     void HandleLifetimeExpired();
+    void CheckHit(const SE::Math::Vector3& from, const SE::Math::Vector3& to);
     
 protected:
     virtual void UpdateMovement(float dt);
@@ -50,7 +51,11 @@ protected:
 private:
     ObjectId ownerId_;
     int32 damage_{ 0 };
-    float radius_{ 0.0f };
+    float explosionRadius_{ 0.0f };
+    float projectileRadius_{ 0.0f };
+    
+    SE::Math::Vector3 prevPos_{};
+    
     bool distanceDamageEnabled_{ false };
     
     TimerId lifetimeTimer_{};

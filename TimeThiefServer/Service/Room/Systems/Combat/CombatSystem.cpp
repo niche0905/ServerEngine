@@ -109,6 +109,38 @@ bool CombatSystem::LaunchRocket(const SE::Math::Vector3& pos, const SE::Math::Ve
    return true;
 }
 
+bool CombatSystem::SweepProjectile(ObjectId projectileId, ObjectId ownerId, const SE::Math::Vector3& from,
+   const SE::Math::Vector3& to, float projectileRadius, SE::Physics::Hit::HitResult& outHit) const
+{
+   if (ownerRoom_ == nullptr || mapData_ == nullptr)
+      return false;
+
+   SE::Math::Vector3 delta = to - from;
+   float dist = delta.Length();
+
+   if (dist <= 0.001f)
+      return false;
+
+   SE::Math::Vector3 dir = delta.Normalized();
+
+   SE::Physics::Ray ray;
+   ray.origin = from;
+   ray.direction = dir;
+
+   SE::Physics::Hit::HitResult hit{};
+   if (!TraceHit(ray, ownerId, hit))
+      return false;
+
+   if (!hit.hit)
+      return false;
+
+   if (hit.t > dist)
+      return false;
+
+   outHit = hit;
+   return true;
+}
+
 void CombatSystem::ProjectileExplosion(ObjectId projectileId, const SE::Math::Vector3& pos, ObjectId ownerId,
                                        int32 damage, float radius, bool distanceDamageEnabled)
 {
@@ -221,7 +253,7 @@ bool CombatSystem::IsExplosionBlocked(const SE::Physics::Ray& ray, float dist, O
          if (blocked)
             return;
          
-         if (!collider or collider->GetCollider())
+         if (!collider or !collider->GetCollider())
             return;
          
          const ColliderRole role = collider->GetRole();
