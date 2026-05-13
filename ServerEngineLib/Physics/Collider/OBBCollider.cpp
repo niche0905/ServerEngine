@@ -250,16 +250,32 @@ namespace SE::Physics
       float tHit = tMin;
       Vector3 nL = enterN;
 
-      if (tHit < ray.tMin) {
+      if (enterN.LengthSq() < 1e-12f) {
          tHit = tMax;
          nL = exitN;
-
-         if (nL.LengthSq() < 1e-12f)
-            nL = enterN;
+      }
+      else if (tHit < ray.tMin) {
+         tHit = tMax;
+         nL = exitN;
       }
 
       if (tHit < ray.tMin || tHit > ray.tMax)
          return false;
+      
+      if (nL.LengthSq() < 1e-12f) {
+         const Vector3 localP = oL + dL * tHit;
+
+         const float dx = expandedHalf.x - std::abs(localP.x);
+         const float dy = expandedHalf.y - std::abs(localP.y);
+         const float dz = expandedHalf.z - std::abs(localP.z);
+
+         if (dx <= dy && dx <= dz)
+            nL = Vector3{ localP.x >= 0.0f ? 1.0f : -1.0f, 0.0f, 0.0f };
+         else if (dy <= dz)
+            nL = Vector3{ 0.0f, localP.y >= 0.0f ? 1.0f : -1.0f, 0.0f };
+         else
+            nL = Vector3{ 0.0f, 0.0f, localP.z >= 0.0f ? 1.0f : -1.0f };
+      }
 
       outHit.hit = true;
       outHit.t = tHit;
