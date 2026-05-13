@@ -136,14 +136,19 @@ namespace SE::Physics
       float tHit = tMin;
       Vector3 nL = enterN;
       
-      if (tHit < ray.tMin) {
+      if (nL.LengthSq() < 1e-12f) {
          tHit = tMax;
          nL = exitN;
-         if (nL.LengthSq() < 1e-12f)
-            nL = enterN;   // 극단적 상황 대비 (최소 fallback)
+      }
+      else if (tHit < ray.tMin) {
+         tHit = tMax;
+         nL = exitN;
       }
       
       if (tHit < ray.tMin or tHit > ray.tMax)
+         return false;
+
+      if (nL.LengthSq() < 1e-12f)
          return false;
       
       out.hit = true;
@@ -151,6 +156,7 @@ namespace SE::Physics
       out.point = ray.At(tHit);
       
       Vector3 nW = worldAxis_[0] * nL.x + worldAxis_[1] * nL.y + worldAxis_[2] * nL.z;
+      nW = nW.Normalized();
       out.normal = nW;  // axis_가 정규 직교면 nW도 정규 벡터
       // TODO: 디버그 일 때만 아래를 실행하도록 설정
       {

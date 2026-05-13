@@ -6,6 +6,7 @@
 #include "Content/Object/Actor/Pawn.h"
 #include "Content/Object/Actor/ProjectileActor.h"
 #include "Content/Object/Actor/StaticActor.h"
+#include "Content/Object/Actor/SubProjectile/RocketActor.h"
 #include "Data/Map/ServerMap.h"
 #include "Physics/Ray/RaycastHit.h"
 #include "Service/Room/Room.h"
@@ -102,7 +103,7 @@ bool CombatSystem::LaunchRocket(const SE::Math::Vector3& pos, const SE::Math::Ve
    if (!ownerPawn)
       return false;   // 유효하지 않은 발사체 소유자 Pawn
    
-   ProjectileActor* rocket = ownerRoom_->SpawnObject<ProjectileActor>(ObjectFlags::Replicable | ObjectFlags::Tickable);
+   RocketActor* rocket = ownerRoom_->SpawnObject<RocketActor>(ObjectFlags::Replicable | ObjectFlags::Tickable);
    if (!rocket)
       return false;  // 발사체 생성 실패
    
@@ -251,11 +252,9 @@ void CombatSystem::ProjectileExplosion(ObjectId projectileId, const SE::Math::Ve
       
       const float dist = std::sqrt(distSq);
       
-      toTarget.Normalized(SE::Math::Vector3{0.0f, 0.0f, 1.0f});
-      
       SE::Physics::Ray losRay;
       losRay.origin = pos;
-      losRay.direction = toTarget;
+      losRay.direction = toTarget.Normalized();
       
       if (IsExplosionBlocked(losRay, dist, targetPawn->GetId()))
          return;
