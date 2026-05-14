@@ -47,6 +47,7 @@ public:
    bool RemoveRoom(RoomId roomId);
    RoomRef FindRoom(RoomId roomId) const;
    void CloseRoom(RoomId roomId);
+   void RoomPlayerLeave(PlayerId playerId);
    
    size_t GetRoomCount() const;
    

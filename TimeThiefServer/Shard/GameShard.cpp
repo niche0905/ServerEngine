@@ -141,6 +141,18 @@ void GameShard::CloseRoom(RoomId roomId)
    RemoveRoom(roomId);
 }
 
+void GameShard::RoomPlayerLeave(PlayerId playerId)
+{
+   playerManager_.UpdateRoute(playerId, 0, 0);
+   
+   auto sessionRef = sessionManager_.FindByPlayerId(playerId);
+   if (sessionRef) {
+      if (sessionRef->GetState() == PlayerSessionState::InRoom) {
+         sessionRef->SetState(PlayerSessionState::InLobby);
+      }
+   }
+}
+
 size_t GameShard::GetRoomCount() const
 {
    return shardRoomManager_.GetRoomCount();

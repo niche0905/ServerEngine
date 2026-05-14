@@ -220,7 +220,13 @@ void Room::Close()
       closeTimerId_ = 0;
    }
    
-   // TODO: 다른 플레이어들 상태 처리
+   for (const auto& [playerId, roomPlayer] : roomPlayers_) {
+      if (not roomPlayer.joined) 
+         continue;
+      
+      ownerShard_->RoomPlayerLeave(playerId);
+   }
+   
    BroadcastRoomClose();
 }
 
@@ -295,6 +301,9 @@ bool Room::Join(PlayerId playerId, SessionId sessionId)
    
    if (!sessionRef) return false;   // 세션이 존재하지 않음 (정상적이지 않은 상황)
    
+   if (sessionRef->GetState() != PlayerSessionState::MatchingSucc)
+      return false;     // 세션이 매칭 성공 상태가 아님 (정상적이지 않은 상황)
+   
    auto it = roomPlayers_.find(playerId);
    if (it == roomPlayers_.end()) {
       return false;   // 예약 되지 않은 플레이어의 경우 입장 실패 (정상적이지 않은 상황)
@@ -317,6 +326,8 @@ bool Room::Join(PlayerId playerId, SessionId sessionId)
    
    newPlayer.joined = true;
    newPlayer.sessionId = sessionId;
+   
+   sessionRef->SetState(PlayerSessionState::InRoom);
       
    JoinPlayerProcess(sessionRef, playerPawn);
    
@@ -333,6 +344,9 @@ bool Room::Leave(PlayerId playerId)
    SendBufferRef despawnBufferToOthers;
    std::shared_ptr<PlayerSession> sessionRef = sessionManager_.FindByPlayerId(playerId);
    
+   if (!sessionRef)
+      return false;
+   
    {
       if (playerId == 0)
          return false;   // 유효하지 않은 playerId
@@ -341,7 +355,9 @@ bool Room::Leave(PlayerId playerId)
       if (it == roomPlayers_.end())
          return false;   // 방에 존재하지 않는 플레이어
       
-      if (sessionRef) 
+      if (sessionRef->GetState() != PlayerSessionState::InRoom)
+         return false;  // 세션이 방 상태가 아님 (정상적이지 않은 상황)
+         
       {
          se::room::S_RoomLeaveRes res;
          res.set_success(true);
@@ -363,6 +379,8 @@ bool Room::Leave(PlayerId playerId)
       if (pawnId != ObjectId{}) {
          DespawnObject(pawnId);   // 플레이어의 Pawn이 존재하면 제거
       }
+      
+      ownerShard_->RoomPlayerLeave(playerId);   // 샤드에 플레이어 퇴장 알리기
    }
    
    if (sessionRef and leaveResBuffer)
