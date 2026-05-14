@@ -220,16 +220,7 @@ void Room::Close()
       closeTimerId_ = 0;
    }
    
-   std::vector<PlayerId> playerIds;
-   playerIds.reserve(roomPlayers_.size());
-   
-   for (const auto& [playerId, roomPlayer] : roomPlayers_) {
-      playerIds.push_back(playerId);
-   }
-   
-   for (PlayerId playerId : playerIds) {
-      Leave(playerId);
-   }
+   BroadcastRoomClose();
 }
 
 bool Room::Init(GameShard* ownerShard, const GameDataManager& gameDataManager, const GameConfig& gameConfig)
@@ -244,7 +235,7 @@ bool Room::Init(GameShard* ownerShard, const GameDataManager& gameDataManager, c
    return true;
 }
 
-void Room::SetPlayer(const std::vector<PlayerId>& playerIds)
+void Room::SetPlayer(const std::vector<PlayerId>& playerIds, const std::vector<std::string>& playerNames)
 {
    roomPlayers_.clear();
    
@@ -263,8 +254,9 @@ void Room::SetPlayer(const std::vector<PlayerId>& playerIds)
    for (size_t i = 0; i < playerIds.size(); ++i) {
       const PlayerId playerId = playerIds[i];
 
-      RoomPlayer roomPlayer;
+      RoomPlayer roomPlayer{};
       roomPlayer.playerId = playerId;
+      roomPlayer.nickname = playerNames[i];
 
       auto playerPawn = CreatePreparedPlayerPawn(playerId, spawnPoints[i]);
       if (!playerPawn) {
@@ -1871,6 +1863,49 @@ void Room::BroadcastGameStart()
       Broadcast(gameStartBuffer);   // 모두에게 게임 시작 정보 Broadcast
 }
 
+void Room::BroadcastGameEnd(PlayerId winnerPlayerId)
+{
+   se::game::N_GameEnd noti;
+   
+   SendBufferRef gameEndBuffer = ServerPacketHandler::MakeSendBuffer(noti);
+   if (gameEndBuffer)
+      Broadcast(gameEndBuffer);   // 모두에게 게임 종료 정보 Broadcast
+}
+
+void Room::BroadcastRoomClose()
+{
+   se::room::N_RoomClosed noti;
+   {
+      noti.set_room_id(roomId_);
+      noti.set_reason(se::room::ROOM_CLOSED_REASON_GAME_FINISHED);
+   }
+   
+   SendBufferRef roomCloseBuffer = ServerPacketHandler::MakeSendBuffer(noti);
+   
+   if (roomCloseBuffer)
+      Broadcast(roomCloseBuffer);
+}
+
+void Room::NotifyPlayerGameResult(PlayerId playerId, uint32 rank, int32 score, PlayerId killerId)
+{
+   se::game::N_PlayerGameResult noti;
+   {
+      noti.set_rank(rank);
+      noti.set_score(score);
+      
+      if (killerId != 0) {
+         if (roomPlayers_.contains(killerId)) {
+            noti.set_killer(roomPlayers_[killerId].nickname);
+         }
+      }
+   }
+   
+   SendBufferRef gameResultBuffer = ServerPacketHandler::MakeSendBuffer(noti);
+   
+   if (gameResultBuffer)
+      SendToPlayer(playerId, gameResultBuffer);
+}
+
 void Room::BroadcastDeath(ObjectId objectId)
 {
    se::game::N_EntityDied noti;
@@ -2136,6 +2171,11 @@ void Room::OnRealDeath(ObjectId pawnId)
    roomPlayer.death = true;
    
    // TODO: 최종 사망한 플레이어에게 처리해 주어야 할 일 이 있다면 연기서 처리 (예: 딜량, 최종 공격자 정보 패킷 처리 등등)
+   const uint32 remainPlayerCount = RemainAlivePlayerCount();
+   const ObjectId killerId = pawn->GetLastKillerId();
+   const PlayerId killerPlayerId = GetPlayerIdByObjectId(killerId);
+   
+   NotifyPlayerGameResult(roomPlayer.playerId, remainPlayerCount + 1, 0, killerPlayerId);
    
    // 게임이 종료 조건에 도달했는지 확인 (최후의 1인 남았는지 등등)
    CheckGameEndCondition();
@@ -2178,9 +2218,11 @@ void Room::CheckGameEndCondition()
    
    if (alivePlayerCount == 1) {
       // 최후의 1인 승리 처리
+      NotifyPlayerGameResult(lastAlivePlayerId, alivePlayerCount, 0, 0);   // 승자에게 1등 통보 (킬러 정보는 없음)
    }
    else if (alivePlayerCount == 0) {
       // 모두 죽은 경우 처리 (무승부 등)
+      // 이건 처리할 게 없다 (OnRealDeath에서 이미 NotifyPlayerGameResult를 통해 결과 통보가 끝났으므로)
    }
    
    ReserveRoomClose();
@@ -2208,6 +2250,30 @@ void Room::CheckRoomCloseCondition()
       return;
    
    ownerShard_->CloseRoom(roomId_);
+}
+
+uint32 Room::RemainAlivePlayerCount() const
+{
+   int32 alivePlayerCount = 0;
+   
+   for (const auto& [playerId, roomPlayer] : roomPlayers_) {
+      if (!roomPlayer.death) {
+         ++alivePlayerCount;
+      }
+   }
+   
+   return alivePlayerCount;
+}
+
+PlayerId Room::GetPlayerIdByObjectId(ObjectId objectId) const
+{
+   for (const auto& [playerId, roomPlayer] : roomPlayers_) {
+      if (roomPlayer.pawnObjectId == objectId) {
+         return playerId;
+      }
+   }
+   
+   return 0;   // 해당 ObjectId를 가진 플레이어가 없는 경우
 }
 
 void Room::IndexObject_OnAdd(BaseObject* object)

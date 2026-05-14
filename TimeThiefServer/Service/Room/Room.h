@@ -62,7 +62,7 @@ public:
    
 public:
    bool Init(GameShard* ownerShard, const GameDataManager& gameDataManager, const GameConfig& gameConfig);
-   void SetPlayer(const std::vector<PlayerId>& playerIds);
+   void SetPlayer(const std::vector<PlayerId>& playerIds, const std::vector<std::string>& playerNames);
    void SetObject();
    
 public:
@@ -204,6 +204,9 @@ public:
    
 public:
    void BroadcastGameStart();
+   void BroadcastGameEnd(PlayerId winnerPlayerId);
+   void BroadcastRoomClose();
+   void NotifyPlayerGameResult(PlayerId playerId, uint32 rank, int32 score, PlayerId killerId);
    void BroadcastDeath(ObjectId objectId);
    void BroadcastRespawn(ObjectId objectId);
    void NotifyEntityHit(ObjectId objectId, const SE::Math::Vector3& point, int32 int32);
@@ -240,6 +243,10 @@ private:
    void ReserveRoomClose();
    void CheckRoomCloseCondition();
    
+   uint32 RemainAlivePlayerCount() const;
+   
+   PlayerId GetPlayerIdByObjectId(ObjectId objectId) const;
+   
 private:
    void IndexObject_OnAdd(BaseObject* object);
    void IndexObject_OnRemove(ObjectId objectId);
@@ -260,6 +267,8 @@ private:
    {
       PlayerId playerId = 0;
       SessionId sessionId = 0;
+      
+      std::string nickname;
       
       ObjectId pawnObjectId{};
       

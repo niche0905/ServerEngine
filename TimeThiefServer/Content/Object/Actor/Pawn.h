@@ -116,12 +116,16 @@ protected:
 protected:
     void SetDead(bool isDead) { isDead_ = isDead; }
     
+public:
+    ObjectId GetLastKillerId() const { return lastKillerId_; }
+    
 protected:
     HealthComponent                     health_;
     CooldownComponent                   cooldowns_;
     EffectComponent                     effects_;
     RespawnComponent                    respawn_;
     std::unique_ptr<CombatComponent>    combat_;
+    ObjectId                            lastKillerId_{0};
     
     bool                                isDead_{false};
     

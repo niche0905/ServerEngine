@@ -9,6 +9,7 @@
 #include "Service/Room/RoomTickScheduler.h"
 #include "Service/Room/ShardRoomManager.h"
 
+class PlayerManager;
 struct GameConfig;
 class GameDataManager;
 class RoomDirectory;
@@ -32,7 +33,7 @@ public:
    using RoomRef = std::shared_ptr<Room>;
    
 public:
-   explicit GameShard(ShardId shardId, SessionManager& sessionManager, RoomDirectory& roomDirectory, const GameDataManager& gameDataManager, const GameConfig& config);
+   explicit GameShard(ShardId shardId, SessionManager& sessionManager, RoomDirectory& roomDirectory, PlayerManager& playerManager, const GameDataManager& gameDataManager, const GameConfig& config);
    
    bool Start(ThreadManager& threadManager);
    void Stop();
@@ -67,6 +68,7 @@ public:
 private:
    SessionManager&         sessionManager_;
    RoomDirectory&          roomDirectory_;
+   PlayerManager&          playerManager_;
    const GameDataManager&  gameDataManager_;
    const GameConfig&       gameConfig_;
    

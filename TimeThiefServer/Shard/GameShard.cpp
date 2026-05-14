@@ -4,16 +4,18 @@
 #include "Core/Thread/ThreadManager.h"
 #include "Network/ServerConfig.h"
 #include "Network/Session/SessionManager/SessionManager.h"
+#include "Service/Player/PlayerManager/PlayerManager.h"
 #include "Service/Room/Room.h"
 
 /*--------------
    GameShard
 --------------*/
 
-GameShard::GameShard(ShardId shardId, SessionManager& sessionManager, RoomDirectory& roomDirectory, const GameDataManager& gameDataManager, const GameConfig& config)
+GameShard::GameShard(ShardId shardId, SessionManager& sessionManager, RoomDirectory& roomDirectory, PlayerManager& playerManager, const GameDataManager& gameDataManager, const GameConfig& config)
    : shardId_{ shardId }
    , sessionManager_{ sessionManager }
    , roomDirectory_{ roomDirectory }
+   , playerManager_{ playerManager }
    , gameDataManager_{ gameDataManager }
    , gameConfig_{ config }
    , roomTickIntervalMs_{ config.roomTickIntervalMs }
@@ -71,8 +73,19 @@ bool GameShard::CreateRoom(CreateRoomParams params)
       return false;
    }
    
+   std::vector<std::string> playerNames;
+   playerNames.reserve(params.playerIds.size());
+   for (const auto& playerId : params.playerIds) {
+      if (auto player = playerManager_.Find(playerId)) {
+         playerNames.push_back(player->nickname_);
+      }
+      else {
+         playerNames.emplace_back("UnKnown");
+      }
+   }
+   
    room->Init(this, gameDataManager_, gameConfig_);
-   room->SetPlayer(params.playerIds);
+   room->SetPlayer(params.playerIds, playerNames);
    room->SetObject();
    
    // TODO: Room 초기화 (스크립트 읽어와서 Spawn 및 세팅 하는게 좋을듯)

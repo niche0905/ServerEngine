@@ -176,6 +176,11 @@ void Pawn::OnDeath(ObjectManager& om, const DamageContext& ctx, const DamageResu
    (void)om;
    (void)dmgResult;
    
+   lastKillerId_ = ctx.attacker;
+   if (ctx.instigator != ObjectId{}) {
+      lastKillerId_ = ctx.instigator;
+   }
+   
    respawn_.MarkDead();
    // 사망 시 모든 Client에 사망 사실 Broadcast (Room에서 BroadcastDeath 패킷을 보내는 형태로)
    // 파생 클래스에서 필요에 따라 재정의 (DropOnDeath, RespawnSchedule 등)

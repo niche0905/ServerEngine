@@ -126,7 +126,7 @@ bool TimeThiefServerApp::CreateManagers()
    const int32 hc = static_cast<int32>(std::thread::hardware_concurrency());
    const int32 shardCount = (hc / 2) > 1 ? (hc / 2) : 1;   // TEMP: Network IO Worker thread의 반절
    
-   if (not shardManager_->Init(shardCount, sessionManager_.get(), roomDirectory_.get(), &gameDataManager_, configReader_->Get().game)) {
+   if (not shardManager_->Init(shardCount, sessionManager_.get(), roomDirectory_.get(), playerManager_.get(), &gameDataManager_, configReader_->Get().game)) {
       consoleLogger->Log(Color::Red, L"[TTSA] ShardManager init fail\n");
       return false;
    }
