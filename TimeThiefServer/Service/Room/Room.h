@@ -235,9 +235,12 @@ private:
    void ReplicationSpawn(Actor* actor, uint32 templateId, float yaw, uint32 amount = 0);
    
 public:
-   void HandleDamageResult(Pawn* attacker, Actor* victim, const SE::Physics::Hit::HitResult& hitResult, const DamageContext& ctx, const DamageResult& damageResult);
-   void HandlePawnDeath(ObjectId pawnId, const DamageResult& damageResult);
+   void HandleDamageResult(Pawn* attacker, Pawn* victim, const DamageResult& damageResult);
+   void HandlePawnDeath(Pawn* pawn, const DamageContext& ctx, const DamageResult& damageResult);
    void HandlePawnRespawn(ObjectId pawnId);
+   
+private:
+   void HandlePlayerKillPlayer(Pawn* killer, Pawn* victim);
    
 public:
    void OnZoneChanged(uint32 phase, const ZoneCircle& newZone, float waitDuration, float shrinkDuration);

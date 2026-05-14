@@ -44,7 +44,7 @@ DamageResult Pawn::ApplyDamage(ObjectManager& om, int32 amount, const DamageCont
       
       if (not health_.IsAlive() and not isDead_) {
          isDead_ = true;
-         OnDeath(om, result);
+         OnDeath(om, ctx, result);
       
          if (ShouldRequestDestroyOnDeath())
          {
@@ -171,7 +171,7 @@ void Pawn::Tick(float dt)
    IntegrateMove(dt);
 }
 
-void Pawn::OnDeath(ObjectManager& om, const DamageResult& dmgResult)
+void Pawn::OnDeath(ObjectManager& om, const DamageContext& ctx, const DamageResult& dmgResult)
 {
    (void)om;
    (void)dmgResult;
@@ -180,6 +180,6 @@ void Pawn::OnDeath(ObjectManager& om, const DamageResult& dmgResult)
    // 사망 시 모든 Client에 사망 사실 Broadcast (Room에서 BroadcastDeath 패킷을 보내는 형태로)
    // 파생 클래스에서 필요에 따라 재정의 (DropOnDeath, RespawnSchedule 등)
    if (auto room = GetRoom()) {
-      room->HandlePawnDeath(GetId(), dmgResult);
+      room->HandlePawnDeath(this, ctx, dmgResult);
    }
 }

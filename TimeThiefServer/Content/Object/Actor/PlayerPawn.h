@@ -151,7 +151,7 @@ protected:
     void Tick(float dt) override;
     
 protected:
-    void OnDeath(ObjectManager& om, const DamageResult& dmgResult) override;
+    virtual void OnDeath(ObjectManager& om, const DamageContext& ctx, const DamageResult& dmgResult) override;
     
     bool ShouldRequestDestroyOnDeath() const override { return false; }
     

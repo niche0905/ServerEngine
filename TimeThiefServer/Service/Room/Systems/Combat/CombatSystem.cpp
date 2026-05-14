@@ -282,7 +282,6 @@ void CombatSystem::ProjectileExplosion(ObjectId projectileId, const SE::Math::Ve
       ctx.source = DamageSource::Weapon;
       
       DamageResult damageResult = targetPawn->ApplyDamage(ownerRoom_->GetObjectManager(), finalDamage, ctx);
-      ownerRoom_->HandleDamageResult(pawn, targetPawn, SE::Physics::Hit::HitResult{}, ctx, damageResult);
    });
    
    ownerRoom_->NotifyExplosion(projectileId, playerId, pos, radius);

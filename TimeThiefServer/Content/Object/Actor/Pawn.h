@@ -108,7 +108,7 @@ protected:
     void Tick(float dt) override;
     
 protected:
-    virtual void OnDeath(ObjectManager& om, const DamageResult& dmgResult);
+    virtual void OnDeath(ObjectManager& om, const DamageContext& ctx, const DamageResult& dmgResult);
     
     // 죽었을 때 즉시 파괴 요청을 할지 여부
     virtual bool ShouldRequestDestroyOnDeath() const { return false; }

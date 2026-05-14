@@ -188,6 +188,9 @@ MoneyChangeResult PlayerPawn::AddMoney(CurrencyType currency, CurrencyAmount amo
    const MoneyChangeContext& ctx)
 {
    MoneyChangeResult result = wallet_.AddMoney(currency, amount, ctx);
+   if (result.delta == 0)
+      return result;   // 변화량이 없는 경우에는 방에 알리지 않음
+   
    if (auto room = GetRoom()) {
       room->NotifyTimePointChange(GetOwnerPlayerId(), result.after, result.delta);
    }
@@ -198,6 +201,9 @@ MoneyChangeResult PlayerPawn::SpendMoney(CurrencyType currency, CurrencyAmount a
    const MoneyChangeContext& ctx)
 {
    MoneyChangeResult result = wallet_.SpendMoney(currency, amount, ctx);
+   if (result.delta == 0)
+      return result;   // 변화량이 없는 경우에는 방에 알리지 않음
+   
    if (auto room = GetRoom()) {
       room->NotifyTimePointChange(GetOwnerPlayerId(), result.after, result.delta);
    }
@@ -358,9 +364,9 @@ void PlayerPawn::Tick(float dt)
    (void)dt;
 }
 
-void PlayerPawn::OnDeath(ObjectManager& om, const DamageResult& dmgResult)
+void PlayerPawn::OnDeath(ObjectManager& om, const DamageContext& ctx, const DamageResult& dmgResult)
 {
-   Pawn::OnDeath(om, dmgResult);
+   Pawn::OnDeath(om, ctx, dmgResult);
    
    StartDeadState(om, dmgResult);
 }

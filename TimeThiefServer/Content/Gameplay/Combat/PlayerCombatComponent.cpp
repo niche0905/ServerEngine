@@ -292,7 +292,6 @@ bool PlayerCombatComponent::TraceHit(const AttackRequest& request, const SE::Phy
     ctx.source = DamageSource::Weapon;
     
     DamageResult damageResult = damageable->ApplyDamage(room->GetObjectManager(), request.damage, ctx);
-    room->HandleDamageResult(GetOwnerPawn(), victim, outHit, ctx, damageResult);
     
     return true;
 }

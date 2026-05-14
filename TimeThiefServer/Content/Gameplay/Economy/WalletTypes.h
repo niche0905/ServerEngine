@@ -18,6 +18,7 @@ enum class MoneyChangeReason : uint8
     Unknown = 0,
     Loot,
     DropOnDeath,
+    Robbery,
     // QuestReward,
     Purchase,
     RespawnCost,

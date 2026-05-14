@@ -2023,13 +2023,10 @@ void Room::ReplicationSpawn(Actor* actor, uint32 templateId, float yaw, uint32 a
    roomGameSystem_.GetReplicationSystem().PushEvent(spawnEvent);
 }
 
-void Room::HandleDamageResult(Pawn* attacker, Actor* victim, const SE::Physics::Hit::HitResult& hitResult,
-                              const DamageContext& ctx, const DamageResult& damageResult)
+void Room::HandleDamageResult(Pawn* attacker, Pawn* victim, const DamageResult& damageResult)
 {
    if (!attacker || !victim)
       return;   // 유효하지 않은 공격자 또는 피해자
-   
-   // TODO: Hit 패킷 만들어지면 Room::BroadcastHit 작성하고 호출하기
    
    if (!damageResult.killed)
       return;
@@ -2038,26 +2035,7 @@ void Room::HandleDamageResult(Pawn* attacker, Actor* victim, const SE::Physics::
    const bool VictimIsPlayer = victim->IsPlayer();
    
    if (KillerIsPlayer and VictimIsPlayer) {
-      const PlayerId killerPlayerId = attacker->GetOwnerPlayerId();
-      
-      Pawn* victimPawn = dynamic_cast<Pawn*>(victim);
-      if (!victimPawn)
-         return;  // 피해자가 Pawn이 아님 (이 경우는 발생하지 않아야 함)
-      
-      const PlayerId victimPlayerId = victimPawn->GetOwnerPlayerId();
-      
-      if (killerPlayerId == 0 or victimPlayerId == 0)
-         return;   // 유효하지 않은 플레이어 ID (이 경우는 발생하지 않아야 함)
-      
-      // THINK: 2중 Lock 예상되는 부분...
-      //        std::mutex를 reculsive 한 것으로 바꿀까..?
-      if (!HasPlayer(killerPlayerId) || !HasPlayer(victimPlayerId))
-         return;   // 방에 존재하지 않는 플레이어가 공격자 또는 피해자인 경우 (이 경우는 발생하지 않아야 함)
-      
-      const ObjectId killerId = attacker->GetId();
-      const ObjectId victimId = victim->GetId();
-      
-      BroadcastKillPlayer(killerId, victimId);   // 모두에게 킬 정보 Broadcast
+      HandlePlayerKillPlayer(attacker, victim);   // Player Kill 처리 (예: 킬 스코어 증가, 킬 보너스 지급 등)
       return;
    }
    
@@ -2072,15 +2050,61 @@ void Room::HandleDamageResult(Pawn* attacker, Actor* victim, const SE::Physics::
    }
 }
 
-void Room::HandlePawnDeath(ObjectId pawnId, const DamageResult& damageResult)
+void Room::HandlePawnDeath(Pawn* pawn, const DamageContext& ctx, const DamageResult& damageResult)
 {
-   roomGameSystem_.OnPawnDeath(pawnId);
-   BroadcastDeath(pawnId);
+   if (!pawn)
+      return;  // 유효하지 않은 Pawn
+   
+   Pawn* attacker = nullptr;
+   
+   if (ctx.attacker != ObjectId{}) {
+      attacker = objectManager_.FindAs<Pawn>(ctx.attacker);
+   }
+   
+   if (attacker == nullptr and ctx.instigator != ObjectId{}) {
+      attacker = objectManager_.FindAs<Pawn>(ctx.instigator);
+   }
+   
+   BroadcastDeath(pawn->GetId());
+   
+   if (attacker and attacker->IsPlayer() and pawn->IsPlayer()) {
+      HandleDamageResult(attacker, pawn, damageResult);
+   }
+   
+   roomGameSystem_.OnPawnDeath(pawn->GetId());
 }
 
 void Room::HandlePawnRespawn(ObjectId pawnId)
 {
    BroadcastRespawn(pawnId);
+}
+
+void Room::HandlePlayerKillPlayer(Pawn* killer, Pawn* victim)
+{
+   constexpr int32 killRobbery = 100;
+   
+   const PlayerId killerPlayerId = killer->GetOwnerPlayerId();
+   const PlayerId victimPlayerId = victim->GetOwnerPlayerId();
+      
+   if (killerPlayerId == 0 or victimPlayerId == 0)
+      return;   // 유효하지 않은 플레이어 ID (이 경우는 발생하지 않아야 함)
+      
+   if (!HasPlayer(killerPlayerId) || !HasPlayer(victimPlayerId))
+      return;   // 방에 존재하지 않는 플레이어가 공격자 또는 피해자인 경우 (이 경우는 발생하지 않아야 함)
+   
+   PlayerPawn* killerPlayerPawn = static_cast<PlayerPawn*>(killer);
+   PlayerPawn* victimPlayerPawn = static_cast<PlayerPawn*>(victim);
+   
+   const int32 victimCurrentMoney = victimPlayerPawn->GetBalance(CurrencyType::TimePoint);
+   const int32 actualRobbery = std::min(killRobbery, victimCurrentMoney);
+   MoneyChangeResult result = victimPlayerPawn->SpendMoney(CurrencyType::TimePoint, actualRobbery, MoneyChangeContext{MoneyChangeReason::DropOnDeath});
+   if (result.accepted) {
+      MoneyChangeResult addResult = killerPlayerPawn->AddMoney(CurrencyType::TimePoint, actualRobbery, MoneyChangeContext{MoneyChangeReason::Robbery});
+   }
+   
+   const ObjectId killerId = killer->GetId();
+   const ObjectId victimId = victim->GetId();
+   BroadcastKillPlayer(killerId, victimId);   // 모두에게 킬 정보 Broadcast
 }
 
 void Room::OnZoneChanged(uint32 phase, const ZoneCircle& newZone, float waitDuration, float shrinkDuration)
