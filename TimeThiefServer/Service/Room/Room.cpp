@@ -107,8 +107,7 @@ namespace
       if (!item or !outInfo)
          return false;
       
-      // TODO: Template은 Item Id를 기반으로 지정하여야 함 (아니면 Item Info에 필드를 추가하는 방식)
-      FillSpawnInfoBase(item, 1, outInfo);
+      FillSpawnInfoBase(item, item->GetItemStack().id, outInfo);
       
       auto* detailPtr = outInfo->mutable_item_info();
       auto* posPtr = detailPtr->mutable_position();
