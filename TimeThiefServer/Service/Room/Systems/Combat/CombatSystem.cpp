@@ -60,6 +60,11 @@ bool CombatSystem::TraceHit(const SE::Physics::Ray& ray, ObjectId exceptId, SE::
       if (obj->GetId() == exceptId)
          return;   // 제외할 오브젝트는 건너뛰기
       
+      if (Pawn* pawn = dynamic_cast<Pawn*>(obj)) {
+         if (pawn->IsDead())
+            return;   // 이미 죽은 Pawn은 명중 판정에서 제외하기
+      }
+      
       obj->ForEachCollider([&](ColliderComponent* collider)
       {
          if (!collider)
@@ -243,6 +248,9 @@ void CombatSystem::ProjectileExplosion(ObjectId projectileId, const SE::Math::Ve
       Pawn* targetPawn = dynamic_cast<Pawn*>(obj);
       if (!targetPawn)
          return;   // 폭발 데미지를 적용할 수 있는 Pawn이 아닌 경우 건너뛰기
+      
+      if (targetPawn->IsDead())
+         return;   // 이미 죽은 Pawn은 명중 판정에서 제외하기
       
       const SE::Math::Vector3 targetPos = targetPawn->GetPosition();
       // TODO: Pos를 GetPosition이 아닌 가상 함수로 추가하는 편이 좋을 수 있음
