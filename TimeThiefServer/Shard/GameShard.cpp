@@ -119,6 +119,15 @@ GameShard::RoomRef GameShard::FindRoom(RoomId roomId) const
    return shardRoomManager_.FindRoom(roomId);
 }
 
+void GameShard::CloseRoom(RoomId roomId)
+{
+   if (auto room = shardRoomManager_.FindRoom(roomId)) {
+      room->Close();
+   }
+   
+   RemoveRoom(roomId);
+}
+
 size_t GameShard::GetRoomCount() const
 {
    return shardRoomManager_.GetRoomCount();

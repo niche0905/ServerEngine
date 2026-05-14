@@ -17,7 +17,7 @@ public:
    RespawnSystem() = default;
    
    bool Init(Room* ownerRoom);
-   void RequestRespawn(ObjectId objectId);
+   bool RequestRespawn(ObjectId objectId);
    void TryExecute(ObjectId objectId, uint64 token);
    
 private:

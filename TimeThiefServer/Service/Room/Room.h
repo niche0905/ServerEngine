@@ -58,6 +58,7 @@ public:
    ~Room();
    
    void PostCreate();
+   void Close();
    
 public:
    bool Init(GameShard* ownerShard, const GameDataManager& gameDataManager, const GameConfig& gameConfig);
@@ -145,18 +146,6 @@ private:
    bool SpawnStore(const Vector3& pos);
    
 public:
-   template <typename Func>
-   void ForEachPawn(Func&& func)
-   {
-      for (ObjectId pawnId : pawnObjects_) {
-         Pawn* pawn = objectManager_.FindAs<Pawn>(pawnId);
-         if (pawn) {
-            func(*pawn);
-         }
-      }
-   }
-
-public:
    bool Start();
    
    void UpdateTick(const RepFrame& frame);
@@ -243,7 +232,13 @@ private:
    void HandlePlayerKillPlayer(Pawn* killer, Pawn* victim);
    
 public:
+   void OnRealDeath(ObjectId pawnId);
    void OnZoneChanged(uint32 phase, const ZoneCircle& newZone, float waitDuration, float shrinkDuration);
+   
+private:
+   void CheckGameEndCondition();
+   void ReserveRoomClose();
+   void CheckRoomCloseCondition();
    
 private:
    void IndexObject_OnAdd(BaseObject* object);
@@ -271,6 +266,8 @@ private:
       bool joined = false;
       bool loaded = false;
       
+      bool death = false;  // 플레이어가 최종 죽음 상태인지 여부 (부활 불가능한 상태)
+      
       // TODO: Room 로직에서 필요한 추가 정보 (예: 플레이어 상태, 위치, 이동 동기화 시간 등) 캐싱
    };
 
@@ -282,13 +279,11 @@ private:
    
    std::unordered_map<PlayerId, RoomPlayer> roomPlayers_;   // Room Membership cache (플레이어 ID -> RoomPlayer 정보)
    
-   // TODO: ObjectHandle로 가지고 있는 것도 괜찮을 듯...?
-   std::unordered_set<ObjectId> pawnObjects_;               // Pawn들
-   std::vector<ObjectId> npcTickList_;                      // 매 틱마다 업데이트가 필요한 NPC들의 ID 리스트
    RoomGameSystem roomGameSystem_{};
    const GameDataManager* gameDataManager_ = nullptr;   // non-owning
    
    Random32 rng_{};
+   TimerId closeTimerId_{0};
    
    RoomState roomState_{};
     

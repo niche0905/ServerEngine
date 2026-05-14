@@ -218,15 +218,17 @@ void ZoneSystem::ApplyZoneDamage(float tickInterval)
    
    // 안정성 괜찮나..? float라 좀 걱정됨
    int32 damageInt = static_cast<int32>(std::floor(damage));
-   ownerRoom_->ForEachPawn([this, &objectManager, damageInt](Pawn& pawn)
+   ownerRoom_->GetObjectManager().ForEachAlive([this, &objectManager, damageInt](BaseObject* obj)
    {
-      if (!pawn.IsHpAlive()) // 이미 죽은 Pawn은 피해를 입힐 필요가 없음
+      auto* pawn = dynamic_cast<Pawn*>(obj);
+      
+      if (!pawn->IsHpAlive()) // 이미 죽은 Pawn은 피해를 입힐 필요가 없음
          return;
       
-      if (IsInsideSafeZone(pawn.GetPosition())) // 안전지대 안에 있는 Pawn은 피해를 입힐 필요가 없음
+      if (IsInsideSafeZone(pawn->GetPosition())) // 안전지대 안에 있는 Pawn은 피해를 입힐 필요가 없음
          return;
       
-      pawn.ApplyDamage(objectManager, damageInt, DamageContext{0, 0, 0, DamageType::Zone, DamageSource::Environment});
+      pawn->ApplyDamage(objectManager, damageInt, DamageContext{0, 0, 0, DamageType::Zone, DamageSource::Environment});
    });
 }
 

@@ -207,13 +207,26 @@ Room::~Room()
    objectManager_.ClearAll();
    
    roomPlayers_.clear();
-   pawnObjects_.clear();
-   npcTickList_.clear();
 }
 
 void Room::PostCreate()
 {
    objectManager_.SetRoom(shared_from_this());
+}
+
+void Room::Close()
+{
+   consoleLogger->Log(Color::Blue, L"[Room] Closing room. RoomId: %u\n", roomId_);
+   
+   if (closeTimerId_ != 0) {
+      CancelScheduled(closeTimerId_);
+      closeTimerId_ = 0;
+   }
+   
+   // TODO: 여기서 터진다!
+   for (const auto& [playerId, roomPlayer] : roomPlayers_) {
+      Leave(playerId);
+   }
 }
 
 bool Room::Init(GameShard* ownerShard, const GameDataManager& gameDataManager, const GameConfig& gameConfig)
@@ -309,8 +322,6 @@ bool Room::Join(PlayerId playerId, SessionId sessionId)
    newPlayer.joined = true;
    newPlayer.sessionId = sessionId;
       
-   auto& joinedPlayer = newPlayer;
-   
    JoinPlayerProcess(sessionRef, playerPawn);
    
    if (AllPlayerJoined()) {
@@ -364,6 +375,7 @@ bool Room::Leave(PlayerId playerId)
    if (despawnBufferToOthers)
       Broadcast(despawnBufferToOthers, playerId);
    
+   CheckRoomCloseCondition();
    return true;
 }
 
@@ -2107,6 +2119,27 @@ void Room::HandlePlayerKillPlayer(Pawn* killer, Pawn* victim)
    BroadcastKillPlayer(killerId, victimId);   // 모두에게 킬 정보 Broadcast
 }
 
+void Room::OnRealDeath(ObjectId pawnId)
+{
+   consoleLogger->Log(Color::Blue, L"[Room] OnRealDeath called for pawnId %u\n", pawnId.value);
+   
+   Pawn* pawn = objectManager_.FindAs<Pawn>(pawnId);
+   if (!pawn)
+      return;   // 유효하지 않은 Pawn 객체
+   
+   // Player만 확정 죽음이 있을 테니 Type 확인
+   if (not pawn->IsPlayer()) 
+      return;
+   
+   RoomPlayer& roomPlayer = roomPlayers_[pawn->GetOwnerPlayerId()];
+   roomPlayer.death = true;
+   
+   // TODO: 최종 사망한 플레이어에게 처리해 주어야 할 일 이 있다면 연기서 처리 (예: 딜량, 최종 공격자 정보 패킷 처리 등등)
+   
+   // 게임이 종료 조건에 도달했는지 확인 (최후의 1인 남았는지 등등)
+   CheckGameEndCondition();
+}
+
 void Room::OnZoneChanged(uint32 phase, const ZoneCircle& newZone, float waitDuration, float shrinkDuration)
 {
    se::game::N_TimeStormChange noti;
@@ -2127,32 +2160,65 @@ void Room::OnZoneChanged(uint32 phase, const ZoneCircle& newZone, float waitDura
    }
 }
 
+void Room::CheckGameEndCondition()
+{
+   int32 alivePlayerCount = 0;
+   PlayerId lastAlivePlayerId = 0;
+   
+   for (const auto& [playerId, roomPlayer] : roomPlayers_) {
+      if (!roomPlayer.death) {
+         ++alivePlayerCount;
+         lastAlivePlayerId = playerId;
+      }
+   }
+   
+   if (alivePlayerCount > 1)
+      return;   // 아직 게임이 끝날 조건이 아님
+   
+   if (alivePlayerCount == 1) {
+      // 최후의 1인 승리 처리
+   }
+   else if (alivePlayerCount == 0) {
+      // 모두 죽은 경우 처리 (무승부 등)
+   }
+   
+   ReserveRoomClose();
+}
+
+void Room::ReserveRoomClose()
+{
+   GameShard* ownerShard = GetOwnerShard();
+   if (!ownerShard) {
+      consoleLogger->Log(Color::Red, L"[Room] Failed to reserve room close: Owner shard not found for roomId %u\n", roomId_);
+      return;   // 유효하지 않은 GameShard (이 경우는 발생하지 않아야 함)
+   }
+   
+   RoomId roomId = GetRoomId();
+   
+   closeTimerId_ = ScheduleAfter(Duration{Seconds{30}}, [ownerShard, roomId]()
+   {
+      ownerShard->CloseRoom(roomId);
+   });
+}
+
+void Room::CheckRoomCloseCondition()
+{
+   if (not roomPlayers_.empty())
+      return;
+   
+   ownerShard_->CloseRoom(roomId_);
+}
+
 void Room::IndexObject_OnAdd(BaseObject* object)
 {
    if (not object)
       return;   // 유효하지 않은 오브젝트
    
    const ObjectId objectId = object->GetId();
-   
-   if (dynamic_cast<Pawn*>(object)) {
-      pawnObjects_.insert(objectId);
-   }
-   
-   if (dynamic_cast<MonsterPawn*>(object)) {
-      npcTickList_.push_back(objectId);
-   }
 }
 
 void Room::IndexObject_OnRemove(ObjectId objectId)
 {
-   pawnObjects_.erase(objectId);
-   
-   auto it = std::find(npcTickList_.begin(), npcTickList_.end(), objectId);
-   if (it != npcTickList_.end()) {
-      *it = npcTickList_.back();
-      npcTickList_.pop_back();
-   }
-   
    for (auto& [playerId, roomPlayer] : roomPlayers_) {
       if (roomPlayer.pawnObjectId == objectId) {
          roomPlayer.pawnObjectId = ObjectId{};   // Pawn이 제거된 경우, RoomPlayer의 Pawn Object ID 초기화

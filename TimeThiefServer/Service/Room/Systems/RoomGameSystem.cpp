@@ -3,6 +3,7 @@
 #include "Content/Object/ObjectId.h"
 #include "Data/GameDataManager.h"
 #include "Network/ServerConfig.h"
+#include "Service/Room/Room.h"
 
 /*------------------
    RoomGameSystem
@@ -62,5 +63,7 @@ void RoomGameSystem::Update(float deltaTime)
 
 void RoomGameSystem::OnPawnDeath(ObjectId pawnId)
 {
-   respawnSystem_.RequestRespawn(pawnId);
+   if (not respawnSystem_.RequestRespawn(pawnId)) {
+      ownerRoom_->OnRealDeath(pawnId);
+   }
 }
