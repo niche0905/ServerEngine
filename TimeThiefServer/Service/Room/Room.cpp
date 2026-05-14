@@ -220,6 +220,7 @@ void Room::Close()
       closeTimerId_ = 0;
    }
    
+   // TODO: 다른 플레이어들 상태 처리
    BroadcastRoomClose();
 }
 
