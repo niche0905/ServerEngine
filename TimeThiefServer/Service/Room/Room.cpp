@@ -216,15 +216,19 @@ void Room::PostCreate()
 
 void Room::Close()
 {
-   consoleLogger->Log(Color::Blue, L"[Room] Closing room. RoomId: %u\n", roomId_);
-   
    if (closeTimerId_ != 0) {
       CancelScheduled(closeTimerId_);
       closeTimerId_ = 0;
    }
    
-   // TODO: 여기서 터진다!
+   std::vector<PlayerId> playerIds;
+   playerIds.reserve(roomPlayers_.size());
+   
    for (const auto& [playerId, roomPlayer] : roomPlayers_) {
+      playerIds.push_back(playerId);
+   }
+   
+   for (PlayerId playerId : playerIds) {
       Leave(playerId);
    }
 }
@@ -2121,8 +2125,6 @@ void Room::HandlePlayerKillPlayer(Pawn* killer, Pawn* victim)
 
 void Room::OnRealDeath(ObjectId pawnId)
 {
-   consoleLogger->Log(Color::Blue, L"[Room] OnRealDeath called for pawnId %u\n", pawnId.value);
-   
    Pawn* pawn = objectManager_.FindAs<Pawn>(pawnId);
    if (!pawn)
       return;   // 유효하지 않은 Pawn 객체
