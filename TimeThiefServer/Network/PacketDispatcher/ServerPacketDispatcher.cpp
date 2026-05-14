@@ -134,7 +134,6 @@ bool ServerPacketDispatcher::Handle_C_RoomEnterReq(PacketSessionRef& session, co
     RoomId clientRoomId = pkt.room_id();
     if (clientRoomId == 0) return false;
     
-    // TODO: RoomDirectory에서 RoomId로 ShardId, RoomId 찾는 구조로 변경하기 (현재는 RoomDirectory가 ShardManager보다 아래에 있어서 ShardManager에서 RoomDirectory를 참조하는 구조로 되어 있지만, RoomDirectory가 ShardManager보다 위에 있는 구조로 변경하기)
     auto shardCandi = roomDirectory_.FindShardId(clientRoomId);
     if (!shardCandi) return false;
     ShardId shardId = *shardCandi;
