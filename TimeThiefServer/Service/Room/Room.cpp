@@ -678,8 +678,17 @@ bool Room::HandleThrowGrenade(PlayerId playerId, const se::game::C_ThrowGrenadeR
       if (!playerPawn)
          return false;
       
+      const uint32 grenadeType = pkt.grenade_type();   // TODO: 현재는 수류탄 종류 구분이 없지만, 나중에 여러 종류의 수류탄이 생긴다면 이 값을 활용해서 구분하기
       const auto& startPos = pkt.start_position();
       const auto& dir = pkt.direction();
+      
+      InventoryOpResult grenadeResult = playerPawn->ConsumeItem(grenadeType, 1, ItemChangeContext(ItemChangeReason::Consume));
+      if (!grenadeResult.accepted) {
+         consoleLogger->Log(Color::Yellow, L"[Room] Failed to consume grenade item for playerId %u. ItemId: %u\n", playerId, grenadeType);
+         return true;   // 수류탄 아이템 소비 실패 (예: 인벤토리에 수류탄이 없음)
+      }
+      
+      // NotifyThrow...
       
       // TODO: 투척 판정 및 폭발 처리 로직은 여기서 (예: GrenadePawn을 생성해서 투척, 일정 시간 후 폭발 처리 등)
       //       다음 Spawn? 로직도 여기서 진행 (Replicated가 붙은 Grenade Actor)
