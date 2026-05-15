@@ -772,7 +772,6 @@ bool Room::HandleReload(PlayerId playerId, const se::game::C_ReloadReq& pkt)
 
 bool Room::HandleWeaponChange(PlayerId playerId, const se::game::C_WeaponChangeReq& pkt)
 {
-   SendBufferRef weaponChangeBroadcastBuffer;
    std::shared_ptr<PlayerSession> sessionRef = sessionManager_.FindByPlayerId(playerId);
    
    if (!sessionRef) return false;   // 세션이 존재하지 않음 (정상적이지 않은 상황)
@@ -801,19 +800,8 @@ bool Room::HandleWeaponChange(PlayerId playerId, const se::game::C_WeaponChangeR
       playerCombatComp->SwitchWeapon(weaponId);
       
       const uint32 handWeaponId = playerCombatComp->GetCurrentWeaponId();
-      se::game::N_WeaponChanged noti;
-      {
-         auto* entityIdPtr = noti.mutable_entity_id();
-         entityIdPtr->set_value(it->second.pawnObjectId.value);
-         
-         noti.set_weapon_id(handWeaponId);
-      }
-      
-      weaponChangeBroadcastBuffer = ServerPacketHandler::MakeSendBuffer(noti);
+      NotifyWeaponChange(playerId, it->second.pawnObjectId, handWeaponId);
    }
-   
-   if (weaponChangeBroadcastBuffer)
-      Broadcast(weaponChangeBroadcastBuffer);   // 모두에게 무기 변경 정보 Broadcast (본인 플레이어에겐 잘못된 무기 교체 요구일 수도 있으므로 예외 없이 모두에게 Broadcast)
    
    return true;
 }
@@ -1952,6 +1940,16 @@ void Room::NotifyReload(PlayerId playerId, ObjectId pawnId, uint32 weaponId)
    reloadEvent.payload = ReloadEvent{weaponId};
    
    roomGameSystem_.GetReplicationSystem().PushEvent(reloadEvent);
+}
+
+void Room::NotifyWeaponChange(PlayerId playerId, ObjectId pawnId, uint32 newWeaponId)
+{
+   RepEvent weaponChangeEvent;
+   ReplicateEventSet(weaponChangeEvent, RepEventType::WeaponChange);
+   weaponChangeEvent.header.source = pawnId;
+   weaponChangeEvent.payload = WeaponChangedEvent{newWeaponId};
+   
+   roomGameSystem_.GetReplicationSystem().PushEvent(weaponChangeEvent);
 }
 
 void Room::ReplicationDespawn(ObjectId objectId)

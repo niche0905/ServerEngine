@@ -211,6 +211,7 @@ public:
    void NotifyAim(PlayerId playerId, ObjectId pawnId, bool isAiming);
    void NotifyFire(PlayerId playerId, ObjectId pawnId, const FireEvent& fireEvent);
    void NotifyReload(PlayerId playerId, ObjectId pawnId, uint32 weaponId);
+   void NotifyWeaponChange(PlayerId playerId, ObjectId pawnId, uint32 newWeaponId);
    void NotifyHit(ObjectId objectId, const SE::Math::Vector3& point, int32 damage);
    void NotifyProjectileSpawn(ProjectileActor* projectile, uint32 templateId);
    void NotifyPickupItem(ObjectId playerObjectId, ObjectId itemObjectId);
