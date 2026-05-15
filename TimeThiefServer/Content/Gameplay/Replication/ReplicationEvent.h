@@ -24,6 +24,7 @@ enum class RepEventType : uint8
     PickupItem,
     ItemChange,
     
+    Aim,                    // 조준 상태 변경 이벤트 (조준 시작, 조준 해제 등 포함) 
     Fire,                   // 발사 이벤트 (무기 종류, 발사 위치, 방향 등 포함)
     Hit,                    // 히트 이벤트 (공격이 명중한 경우, 명중 위치, 피해량 등 포함)
     
@@ -48,9 +49,10 @@ struct RepEventHeader
     RepEventType type{RepEventType::None};
     uint64 timeMs{0};
     TickSeq tick{0};
-    PlayerId playerId{0};   // optional (Owner Client 에게만 발생하는 이벤트의 경우, 예: HealthChangeEvent)
+    PlayerId playerId{0};           // optional (Owner Client 에게만 발생하는 이벤트의 경우, 예: HealthChangeEvent)
+    PlayerId exceptPlayerId{0};     // optional (모든 클라이언트에게 발생하는 이벤트 중, 특정 플레이어에게만 발생하지 않는 이벤트의 경우)
     ObjectId source{};
-    ObjectId target{};      // optional
+    ObjectId target{};              // optional
 };
 
 struct SpawnEvent
@@ -92,6 +94,11 @@ struct ItemChangeEvent
     uint32 itemId{0};
     int32 newCount{0};
     int32 deltaCount{0};
+};
+
+struct AimEvent
+{
+    bool isAimed{false};
 };
 
 struct FireEvent
@@ -137,6 +144,7 @@ using RepEventPayload = std::variant<
     MoneyChangeEvent,
     ExplosionEvent,
     ItemChangeEvent,
+    AimEvent,
     FireEvent,
     HitEvent,
     WeaponChangedEvent,

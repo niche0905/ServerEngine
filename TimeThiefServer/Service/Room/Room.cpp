@@ -584,7 +584,6 @@ bool Room::HandleMove(PlayerId playerId, const se::game::C_MoveReq& pkt)
 
 bool Room::HandleAim(PlayerId playerId, const se::game::C_AimReq& pkt)
 {
-   SendBufferRef aimBroadcastBuffer;
    std::shared_ptr<PlayerSession> sessionRef = sessionManager_.FindByPlayerId(playerId);
    
    if (!sessionRef) return false;   // 세션이 존재하지 않음 (정상적이지 않은 상황)
@@ -603,19 +602,8 @@ bool Room::HandleAim(PlayerId playerId, const se::game::C_AimReq& pkt)
       
       playerPawn->SetAiming(pkt.is_aiming());
       
-      se::game::N_Aim aimNoti;
-      {
-         auto* entityIdPtr = aimNoti.mutable_entity_id();
-         entityIdPtr->set_value(it->second.pawnObjectId.value);
-         
-         aimNoti.set_is_aiming(playerPawn->IsAiming());
-      }
-      
-      aimBroadcastBuffer = ServerPacketHandler::MakeSendBuffer(aimNoti);
+      NotifyAim(playerId, it->second.pawnObjectId, playerPawn->IsAiming());
    }
-   
-   if (aimBroadcastBuffer)
-      Broadcast(aimBroadcastBuffer, playerId);   // 에임 상태를 변경한 플레이어를 제외한 나머지 플레이어들에게 에임 상태 변경 정보 Broadcast
    
    return true;
 }
@@ -1941,6 +1929,17 @@ void Room::BroadcastRespawn(ObjectId objectId)
    if (respawnBuffer)
       Broadcast(respawnBuffer);     // 모두에게 리스폰 정보 Broadcast
                                     // Local Control Player의 경우는 Set Position 하도록 (Set Yaw 까지도 가능)
+}
+
+void Room::NotifyAim(PlayerId playerId, ObjectId pawnId, bool isAiming)
+{
+   RepEvent aimEvent;
+   ReplicateEventSet(aimEvent, RepEventType::Aim);
+   aimEvent.header.source = pawnId;
+   aimEvent.header.exceptPlayerId = playerId;
+   aimEvent.payload = AimEvent{isAiming};
+   
+   roomGameSystem_.GetReplicationSystem().PushEvent(aimEvent);
 }
 
 void Room::ReplicationDespawn(ObjectId objectId)

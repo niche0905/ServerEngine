@@ -51,6 +51,7 @@ private:
    void FlushEvent_Explosion(const RepEvent& ev, const RepFrame& frame) const;
    void FlushEvent_PickupItem(const RepEvent& ev, const RepFrame& frame) const;
    void FlushEvent_Item(const RepEvent& ev, const RepFrame& frame) const;
+   void FlushEvent_Aim(const RepEvent& ev, const RepFrame& frame) const;
    void FlushEvent_Fire(const RepEvent& ev, const RepFrame& frame) const;
    void FlushEvent_Hit(const RepEvent& ev, const RepFrame& frame) const;
    void FlushEvent_WeaponStatChange(const RepEvent& ev, const RepFrame& frame) const;

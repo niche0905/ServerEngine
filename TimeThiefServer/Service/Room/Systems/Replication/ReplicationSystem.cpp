@@ -186,6 +186,10 @@ void ReplicationSystem::DispatchImmediateEvent(const RepEvent& ev, const RepFram
       FlushEvent_Item(ev, frame);
       break;
       
+   case RepEventType::Aim:
+      FlushEvent_Aim(ev, frame);
+      break;
+      
    case RepEventType::Fire:
       FlushEvent_Fire(ev, frame);
       break;
@@ -415,6 +419,23 @@ void ReplicationSystem::FlushEvent_Item(const RepEvent& ev, const RepFrame& fram
    }
    
    ownerRoom_->SendReplication(ev.header.playerId, sendBuffer);
+}
+
+void ReplicationSystem::FlushEvent_Aim(const RepEvent& ev, const RepFrame& frame) const
+{
+   const AimEvent* aimEv = std::get_if<AimEvent>(&ev.payload);
+   if (!aimEv) {
+      consoleLogger->Log(Color::Yellow, L"[ReplicationSystem] Aim event with invalid payload, skipping. PlayerId={}", ev.header.playerId);
+      return;   // 페이로드가 AimEvent가 아닌 경우 (잘못된 이벤트)
+   }
+   
+   se::game::N_Aim aimPkt;
+   auto* entityIdPtr = aimPkt.mutable_entity_id();
+   entityIdPtr->set_value(ev.header.source.value);
+   aimPkt.set_is_aiming(aimEv->isAimed);
+   
+   SendBufferRef sendBuffer = ServerPacketHandler::MakeSendBuffer(aimPkt);
+   ownerRoom_->BroadcastReplication(sendBuffer, ev.header.exceptPlayerId);
 }
 
 void ReplicationSystem::FlushEvent_Fire(const RepEvent& ev, const RepFrame& frame) const

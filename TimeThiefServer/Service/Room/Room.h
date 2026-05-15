@@ -209,6 +209,7 @@ public:
    void NotifyPlayerGameResult(PlayerId playerId, uint32 rank, int32 score, PlayerId killerId);
    void BroadcastDeath(ObjectId objectId);
    void BroadcastRespawn(ObjectId objectId);
+   void NotifyAim(PlayerId playerId, ObjectId pawnId, bool isAiming);
    void NotifyEntityHit(ObjectId objectId, const SE::Math::Vector3& point, int32 int32);
    void NotifyProjectileSpawn(ProjectileActor* projectile, uint32 templateId);
    void NotifyPickupItem(ObjectId playerObjectId, ObjectId itemObjectId);
