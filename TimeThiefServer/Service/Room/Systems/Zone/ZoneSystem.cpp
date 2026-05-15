@@ -222,6 +222,9 @@ void ZoneSystem::ApplyZoneDamage(float tickInterval)
    {
       auto* pawn = dynamic_cast<Pawn*>(obj);
       
+      if (pawn == nullptr) // Pawn이 아닌 오브젝트는 피해를 입힐 필요가 없음 (혹은 찾을 수 없거나)
+         return;
+      
       if (!pawn->IsHpAlive()) // 이미 죽은 Pawn은 피해를 입힐 필요가 없음
          return;
       
