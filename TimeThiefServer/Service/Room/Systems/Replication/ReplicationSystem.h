@@ -51,6 +51,7 @@ private:
    void FlushEvent_Explosion(const RepEvent& ev, const RepFrame& frame) const;
    void FlushEvent_PickupItem(const RepEvent& ev, const RepFrame& frame) const;
    void FlushEvent_Item(const RepEvent& ev, const RepFrame& frame) const;
+   void FlushEvent_EquipItem(const RepEvent& ev, const RepFrame& frame) const;
    void FlushEvent_UseItem(const RepEvent& ev, const RepFrame& frame) const;
    void FlushEvent_ChestInteract(const RepEvent& ev, const RepFrame& frame) const;
    void FlushEvent_Jump(const RepEvent& ev, const RepFrame& frame) const;

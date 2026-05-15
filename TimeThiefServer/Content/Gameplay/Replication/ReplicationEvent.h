@@ -23,6 +23,7 @@ enum class RepEventType : uint8
     
     PickupItem,
     ItemChange,
+    EquipItem,
     UseItem,
     ChestInteract,
     
@@ -108,6 +109,11 @@ struct ItemChangeEvent
     int32 deltaCount{0};
 };
 
+struct EquipItemEvent
+{
+    uint32 itemId{0};
+};
+
 struct UseItemEvent
 {
     uint32 itemId{0};
@@ -182,6 +188,7 @@ using RepEventPayload = std::variant<
     MoneyChangeEvent,
     ExplosionEvent,
     ItemChangeEvent,
+    EquipItemEvent,
     UseItemEvent,
     CrouchEvent,
     WireLaunchEvent,

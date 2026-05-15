@@ -1295,7 +1295,6 @@ bool Room::HandleWireLaunch(PlayerId playerId, const se::game::C_WireLaunchReq& 
 bool Room::HandleEquipItem(PlayerId playerId, const se::game::C_EquipItemReq& pkt)
 {
    SendBufferRef equipItemResultBuffer;
-   SendBufferRef equipItemBroadcastBuffer;
    
    std::shared_ptr<PlayerSession> sessionRef = sessionManager_.FindByPlayerId(playerId);
    if (!sessionRef) return false;   // 세션이 존재하지 않음 (정상적이지 않은 상황)
@@ -1317,22 +1316,15 @@ bool Room::HandleEquipItem(PlayerId playerId, const se::game::C_EquipItemReq& pk
       
       const uint32 itemId = pkt.item_id();
       
-      auto& inventory = playerPawn->GetInventory();
-      bool hasItem = inventory.HasItem(itemId, 1);
+      bool hasItem = (playerPawn->GetItemCount(itemId) >= 1);
+      
       
       if (not hasItem) {
          // 인벤토리에 아이템이 없는 경우 (정상적이지 않은 상황)
          consoleLogger->Log(Color::Yellow, L"[Room] Equip Item Failed: Player does not have itemId %u in inventory\n", itemId);
       }
       else {
-         se::game::N_EquipItem noti;
-         {
-            auto* entityIdPtr = noti.mutable_entity_id();
-            entityIdPtr->set_value(it->second.pawnObjectId.value);
-         
-            noti.set_item_id(itemId);
-         }
-         equipItemBroadcastBuffer = ServerPacketHandler::MakeSendBuffer(noti);
+         NotifyEquipItem(playerId, it->second.pawnObjectId, itemId);
       }
       
       se::game::S_EquipItemRes res;
@@ -1350,9 +1342,6 @@ bool Room::HandleEquipItem(PlayerId playerId, const se::game::C_EquipItemReq& pk
    
    if (equipItemResultBuffer)
       SendToPlayer(playerId, equipItemResultBuffer);  // 아이템 장착 결과를 해당 플레이어에게 전송
-   
-   if (equipItemBroadcastBuffer)
-      Broadcast(equipItemBroadcastBuffer, playerId);   // 아이템을 장착한
    
    return true;
 }
@@ -2012,6 +2001,17 @@ void Room::NotifyItemChange(PlayerId playerId, uint32 itemId, int32 newCount, in
    itemChangeEvent.payload = ItemChangeEvent{itemId, newCount, deltaCount};
    
    roomGameSystem_.GetReplicationSystem().PushEvent(itemChangeEvent);
+}
+
+void Room::NotifyEquipItem(PlayerId playerId, ObjectId pawnId, uint32 itemId)
+{
+   RepEvent equipItemEvent;
+   ReplicateEventSet(equipItemEvent, RepEventType::EquipItem);
+   equipItemEvent.header.exceptPlayerId = playerId;
+   equipItemEvent.header.source = pawnId;
+   equipItemEvent.payload = EquipItemEvent{itemId};
+   
+   roomGameSystem_.GetReplicationSystem().PushEvent(equipItemEvent);
 }
 
 void Room::NotifyHealthChange(PlayerId id, int newHealth, int deltaHealth)
