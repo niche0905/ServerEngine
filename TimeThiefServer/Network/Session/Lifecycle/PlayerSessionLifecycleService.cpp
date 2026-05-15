@@ -9,6 +9,7 @@
 #include "Service/Player/PlayerManager/PlayerManager.h"
 #include "Shard/ShardManager.h"
 #include "Network/ServerConfig.h"
+#include "Service/Room/Room.h"
 
 /*---------------------------------
    PlayerSessionLifecycleService
@@ -51,6 +52,8 @@ void PlayerSessionLifecycleService::OnConnected(PlayerSession& session)
 
 void PlayerSessionLifecycleService::OnDisconnected(PlayerSession& session)
 {
+    session.SetState(PlayerSessionState::Closing);
+    
     const SessionId sessionId = session.Id();
     PlayerId playerId = session.GetPlayerId();
     if (playerId == 0) {
@@ -64,13 +67,21 @@ void PlayerSessionLifecycleService::OnDisconnected(PlayerSession& session)
         
         auto playerRef = playerManager_.Find(playerId);
         if (playerRef) {
+            auto* shardManager = &shardManager_;
             const RoomId roomId = playerRef->roomId_;
             const ShardId shardId = playerRef->shardId_;
             
             if (roomId != 0 and shardId != 0) {
-                // TODO: ShardManager에 Room 퇴장(Leave) 요청하기
-                //       shardManager_.Enqueue(shardId, [roomId, playerId]()...
-                
+                shardManager->Enqueue(shardId, [shardManager, shardId, roomId, playerId]()
+                {
+                    auto* shard = shardManager->GetShard(shardId);
+                    if (!shard) return;
+                    
+                    auto room = shard->FindRoom(roomId);
+                    if (!room) return;
+                    
+                    room->Leave(playerId);
+                });
                 // TODO: 다음 Player Manager에서 제거하는 것은 굳이 해야하나? 안해도 되지 않을까...? 참조할 놈도 없을 텐데
             }
         }

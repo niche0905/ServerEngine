@@ -389,7 +389,8 @@ bool Room::Leave(PlayerId playerId)
    if (despawnBufferToOthers)
       Broadcast(despawnBufferToOthers, playerId);
    
-   CheckRoomCloseCondition();
+   CheckGameEndCondition();      // 플레이어 퇴장으로 인해 게임 종료 조건이 충족되는지 확인
+   CheckRoomCloseCondition();    // 플레이어 퇴장으로 인해 방 종료 조건이 충족되는지 확인 (예: 모든 플레이어 퇴장)
    return true;
 }
 
