@@ -157,6 +157,8 @@ bool TimeThiefServerApp::CreateNetworkService()
    std::wstring serverIP(serverIPStr.begin(), serverIPStr.end());
    uint16 serverPort = cfg.network.gamePort;
    
+   // consoleLogger->Log(Color::Green, L"[TTSA] creating network service at %hs:%u\n", serverIPStr.c_str(), serverPort);
+   
    networkService_ = std::make_shared<IocpServerService>(
       NetAddr(serverIP, serverPort),
       [this]() -> std::shared_ptr<SessionBase>

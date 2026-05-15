@@ -11,6 +11,7 @@ void SessionManager::Add(SessionId sessionId, const SessionRef& session)
    
    std::lock_guard<std::mutex> lock(mutex_);
    
+   session->SetState(PlayerSessionState::Connected);
    sessionsById_[sessionId] = session;
 }
 
@@ -21,6 +22,7 @@ void SessionManager::RemoveBySessionId(SessionId sessionId)
    auto it = sessionsById_.find(sessionId);
    if (it == sessionsById_.end()) return;
    
+   it->second->SetState(PlayerSessionState::Closed);
    sessionsById_.erase(it);
    
    auto rit = playerIdBySessionId_.find(sessionId);

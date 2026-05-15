@@ -55,7 +55,7 @@ protected:
 private:
    IPlayerSessionLifecycle& lifecycle_;
    
-   PlayerSessionState state_ = PlayerSessionState::Connected;
+   PlayerSessionState state_ = PlayerSessionState::Created;
    
    PlayerId playerId_ = 0;   // Caching
    

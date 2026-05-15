@@ -67,12 +67,14 @@ void PlayerSessionLifecycleService::OnDisconnected(PlayerSession& session)
         
         auto playerRef = playerManager_.Find(playerId);
         if (playerRef) {
+            auto* playerManager = &playerManager_;
             auto* shardManager = &shardManager_;
+            auto* sessionManager = &sessionManager_;
             const RoomId roomId = playerRef->roomId_;
             const ShardId shardId = playerRef->shardId_;
             
             if (roomId != 0 and shardId != 0) {
-                shardManager->Enqueue(shardId, [shardManager, shardId, roomId, playerId]()
+                shardManager->Enqueue(shardId, [playerManager, shardManager, sessionManager, shardId, roomId, playerId, sessionId]()
                 {
                     auto* shard = shardManager->GetShard(shardId);
                     if (!shard) return;
@@ -81,14 +83,14 @@ void PlayerSessionLifecycleService::OnDisconnected(PlayerSession& session)
                     if (!room) return;
                     
                     room->Leave(playerId);
+                    
+                    playerManager->Remove(playerId);
+                    sessionManager->UnbindPlayer(playerId);
+                    sessionManager->RemoveBySessionId(sessionId);
                 });
-                // TODO: 다음 Player Manager에서 제거하는 것은 굳이 해야하나? 안해도 되지 않을까...? 참조할 놈도 없을 텐데
             }
         }
     }
-    
-    sessionManager_.UnbindPlayer(sessionId);
-    sessionManager_.RemoveBySessionId(sessionId);
 }
 
 bool PlayerSessionLifecycleService::HandleHandshake(PlayerSession& session, const se::auth::C_HandshakeReq& pkt)
