@@ -210,7 +210,7 @@ public:
    void BroadcastRespawn(ObjectId objectId);
    void NotifyAim(PlayerId playerId, ObjectId pawnId, bool isAiming);
    void NotifyFire(PlayerId playerId, ObjectId pawnId, const FireEvent& fireEvent);
-   void NotifyEntityHit(ObjectId objectId, const SE::Math::Vector3& point, int32 int32);
+   void NotifyHit(ObjectId objectId, const SE::Math::Vector3& point, int32 damage);
    void NotifyProjectileSpawn(ProjectileActor* projectile, uint32 templateId);
    void NotifyPickupItem(ObjectId playerObjectId, ObjectId itemObjectId);
    void NotifyItemChange(PlayerId playerId, uint32 itemId, int32 newCount, int32 deltaCount);

@@ -277,7 +277,7 @@ bool PlayerCombatComponent::TraceHit(const AttackRequest& request, const SE::Phy
     }
     
     ObjectId victimId = victim ? victim->GetId() : ObjectId{};
-    room->NotifyEntityHit(victimId, outHit.point, request.damage);
+    room->NotifyHit(victimId, outHit.point, request.damage);
     
     if (victim == nullptr) 
         return false;   // 히트한 Actor가 없는 경우

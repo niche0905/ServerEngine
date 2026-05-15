@@ -1962,12 +1962,12 @@ void Room::ReplicationDespawn(ObjectId objectId)
    roomGameSystem_.GetReplicationSystem().PushEvent(despawnEvent);
 }
 
-void Room::NotifyEntityHit(ObjectId objectId, const SE::Math::Vector3& point, int32 int32)
+void Room::NotifyHit(ObjectId objectId, const SE::Math::Vector3& point, int32 damage)
 {
    RepEvent entityHitEvent;
    ReplicateEventSet(entityHitEvent, RepEventType::Hit);
    entityHitEvent.header.source = objectId;
-   entityHitEvent.payload = HitEvent{point, int32};
+   entityHitEvent.payload = HitEvent{point, damage};
    
    roomGameSystem_.GetReplicationSystem().PushEvent(entityHitEvent);
 }
