@@ -190,6 +190,10 @@ void ReplicationSystem::DispatchImmediateEvent(const RepEvent& ev, const RepFram
       FlushEvent_UseItem(ev, frame);
       break;
       
+   case RepEventType::ChestInteract:
+      FlushEvent_ChestInteract(ev, frame);
+      break;
+      
    case RepEventType::Aim:
       FlushEvent_Aim(ev, frame);
       break;
@@ -447,6 +451,18 @@ void ReplicationSystem::FlushEvent_UseItem(const RepEvent& ev, const RepFrame& f
    noti.set_item_id(useItemEv->itemId);
    
    SendBufferRef sendBuffer = ServerPacketHandler::MakeSendBuffer(noti);
+   ownerRoom_->BroadcastReplication(sendBuffer);
+}
+
+void ReplicationSystem::FlushEvent_ChestInteract(const RepEvent& ev, const RepFrame& frame) const
+{
+   se::game::N_ChestInteracted chestInteractedPkt;
+   auto* entityIdPtr = chestInteractedPkt.mutable_entity_id();
+   entityIdPtr->set_value(ev.header.source.value);
+   auto* chestIdPtr = chestInteractedPkt.mutable_chest_entity_id();
+   chestIdPtr->set_value(ev.header.target.value);
+   
+   SendBufferRef sendBuffer = ServerPacketHandler::MakeSendBuffer(chestInteractedPkt);
    ownerRoom_->BroadcastReplication(sendBuffer);
 }
 

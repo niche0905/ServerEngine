@@ -902,7 +902,6 @@ bool Room::HandleUseItem(PlayerId playerId, const se::game::C_UseItemReq& pkt)
 
 bool Room::HandleChestInteract(PlayerId playerId, const se::game::C_ChestInteractReq& pkt)
 {
-   SendBufferRef chestInteractBroadcastBuffer;
    std::shared_ptr<PlayerSession> sessionRef = sessionManager_.FindByPlayerId(playerId);
    
    if (!sessionRef) return false;   // 세션이 존재하지 않음 (정상적이지 않은 상황)
@@ -955,19 +954,9 @@ bool Room::HandleChestInteract(PlayerId playerId, const se::game::C_ChestInterac
             }
          }
          
-         se::game::N_ChestInteracted noti;
-         {
-            auto* entityIdPtr = noti.mutable_entity_id();
-            entityIdPtr->set_value(it->second.pawnObjectId.value);
-            auto* chestIdPtr = noti.mutable_chest_entity_id();
-            chestIdPtr->set_value(chestId.value);
-         }
-         chestInteractBroadcastBuffer = ServerPacketHandler::MakeSendBuffer(noti);
+         NotifyChestInteract(playerId, it->second.pawnObjectId, chestId);
       }
    }
-   
-   if (chestInteractBroadcastBuffer)
-      Broadcast(chestInteractBroadcastBuffer, playerId);   // Chest과 상호작용한
    
    return true;
 }
@@ -1989,6 +1978,17 @@ void Room::NotifyUseItem(PlayerId playerId, ObjectId playerObjectId, uint32 item
    useItemEvent.payload = UseItemEvent{itemId};
    
    roomGameSystem_.GetReplicationSystem().PushEvent(useItemEvent);
+}
+
+void Room::NotifyChestInteract(PlayerId playerId, ObjectId pawnId, ObjectId chestId)
+{
+   RepEvent chestInteractEvent;
+   ReplicateEventSet(chestInteractEvent, RepEventType::ChestInteract);
+   // chestInteractEvent.header.exceptPlayerId = playerId;   // 그냥 기다렸다 패킷 받으면 애니메이션 재생
+   chestInteractEvent.header.source = pawnId;
+   chestInteractEvent.header.target = chestId;
+   
+   roomGameSystem_.GetReplicationSystem().PushEvent(chestInteractEvent);
 }
 
 void Room::NotifyItemChange(PlayerId playerId, uint32 itemId, int32 newCount, int32 deltaCount)

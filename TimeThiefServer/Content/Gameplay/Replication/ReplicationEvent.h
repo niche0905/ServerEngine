@@ -24,6 +24,7 @@ enum class RepEventType : uint8
     PickupItem,
     ItemChange,
     UseItem,
+    ChestInteract,
     
     Aim,                    // 조준 상태 변경 이벤트 (조준 시작, 조준 해제 등 포함) 
     Fire,                   // 발사 이벤트 (무기 종류, 발사 위치, 방향 등 포함)
