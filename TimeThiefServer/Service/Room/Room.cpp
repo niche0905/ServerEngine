@@ -329,7 +329,7 @@ bool Room::Join(PlayerId playerId, SessionId sessionId)
    
    sessionRef->SetState(PlayerSessionState::InRoom);
       
-   JoinPlayerProcess(sessionRef, playerPawn);
+   JoinPlayerProcess(playerId, playerPawn);
    
    if (AllPlayerJoined()) {
       TryTransitToLoading();
@@ -384,7 +384,7 @@ bool Room::Leave(PlayerId playerId)
    }
    
    if (sessionRef and leaveResBuffer)
-      sessionRef->Send(leaveResBuffer);   // 퇴장한 플레이어에게 퇴장 결과 전송
+      SendToPlayer(playerId, leaveResBuffer);   // 퇴장한 플레이어에게 퇴장 결과 전송
    
    if (despawnBufferToOthers)
       Broadcast(despawnBufferToOthers, playerId);
@@ -406,7 +406,7 @@ bool Room::UpdateSession(PlayerId playerId, SessionId newSessionId)
    return true;
 }
 
-void Room::JoinPlayerProcess(std::shared_ptr<PlayerSession>& session, PlayerPawn* playerPawn)
+void Room::JoinPlayerProcess(PlayerId playerId, PlayerPawn* playerPawn)
 {
    SendBufferRef enterResBuffer;
    SendBufferRef entitiesSpawnBuffer;
@@ -426,7 +426,7 @@ void Room::JoinPlayerProcess(std::shared_ptr<PlayerSession>& session, PlayerPawn
             playerIdPtr->set_value(exPlayerId);
             auto* entityIdPtr = roomPlayer->mutable_entity_id();
             entityIdPtr->set_value(exPlayer.pawnObjectId.value);
-            roomPlayer->set_nickname("Player" + std::to_string(exPlayerId));   // TEMP
+            roomPlayer->set_nickname(exPlayer.nickname);
          }
          
          auto* myEntityId = res.mutable_my_entity_id();
@@ -512,11 +512,11 @@ void Room::JoinPlayerProcess(std::shared_ptr<PlayerSession>& session, PlayerPawn
    }
    
    if (enterResBuffer)
-      session->Send(enterResBuffer);
+      SendToPlayer(playerId, enterResBuffer);
    if (entitiesSpawnBuffer)
-      session->Send(entitiesSpawnBuffer);
+      SendToPlayer(playerId, entitiesSpawnBuffer);
    if (playerInitBuffer)
-      session->Send(playerInitBuffer);
+      SendToPlayer(playerId, playerInitBuffer);
 }
 
 bool Room::HandleLoadingComplete(PlayerId playerId)
@@ -791,7 +791,7 @@ bool Room::HandleReload(PlayerId playerId, const se::game::C_ReloadReq& pkt)
    
    // TODO: 여기서 보낼 게 아니다 (재장전 완료 시간에 보내야 한다)
    if (reloadResultBuffer)
-      sessionRef->Send(reloadResultBuffer);   // 재장전 결과를 해당 플레이어에게 전송
+      SendToPlayer(playerId, reloadResultBuffer);   // 재장전 결과를 해당 플레이어에게 전송
    
    if (reloadBroadcastBuffer)
       Broadcast(reloadBroadcastBuffer, playerId);   // 재장전한 플레이어를 제외한 나머지 플레이어들에게 재장전 정보 Broadcast
@@ -1139,7 +1139,7 @@ bool Room::HandleUseStore(PlayerId playerId, const se::game::C_UseStoreReq& pkt)
    }
    
    if (useStoreResultBuffer)
-      sessionRef->Send(useStoreResultBuffer);   // 상점 이용 결과를 해당 플레이어에게 전송
+      SendToPlayer(playerId, useStoreResultBuffer);   // 상점 이용 결과를 해당 플레이어에게 전송
    
    return true;
 }
@@ -1190,7 +1190,7 @@ bool Room::HandleSetSavePoint(PlayerId playerId, const se::game::C_SetSavePointR
    }
    
    if (setSavePointResultBuffer)
-      sessionRef->Send(setSavePointResultBuffer);   // 세이브 포인트 설정 결과를 해당 플레이어에게 전송
+      SendToPlayer(playerId, setSavePointResultBuffer); // 세이브 포인트 설정 결과를 해당 플레이어에게 전송
    
    return true;
 }
@@ -1494,7 +1494,7 @@ bool Room::HandleEquipItem(PlayerId playerId, const se::game::C_EquipItemReq& pk
    }
    
    if (equipItemResultBuffer)
-      sessionRef->Send(equipItemResultBuffer);   // 아이템 장착 결과를 해당 플레이어에게 전송
+      SendToPlayer(playerId, equipItemResultBuffer);  // 아이템 장착 결과를 해당 플레이어에게 전송
    
    if (equipItemBroadcastBuffer)
       Broadcast(equipItemBroadcastBuffer, playerId);   // 아이템을 장착한
@@ -1548,7 +1548,7 @@ bool Room::HandleSkillEquip(PlayerId playerId, const se::game::C_SkillEquipReq& 
    }
    
    if (skillEquipResultBuffer)
-      sessionRef->Send(skillEquipResultBuffer);   // 스킬 장착 결과를 해당 플레이어에게 전송
+      SendToPlayer(playerId, skillEquipResultBuffer);   // 스킬 장착 결과를 해당 플레이어에게 전송
    
    return false;
 }
@@ -1841,6 +1841,9 @@ void Room::Broadcast(std::shared_ptr<SendBuffer> sendBuffer, PlayerId exceptPlay
          continue;   // 유효하지 않은 세션 ID인 플레이어는 건너뛰기
       
       if (auto session = sessionManager_.FindBySessionId(roomPlayer.sessionId)) {
+         if (session->GetState() == PlayerSessionState::Closing or session->GetState() == PlayerSessionState::Closed)
+            continue;  // 세션이 유효한 상태가 아님 (세션이 닫히는 중이거나 이미 닫힌 상태)
+         
          session->Send(sendBuffer);
       }
    }
@@ -1858,6 +1861,9 @@ bool Room::SendToPlayer(PlayerId playerId, SendBufferRef buffer)
    auto session = sessionManager_.FindByPlayerId(playerId);
    if (!session)
       return false;  // 플레이어의 세션이 존재하지 않음 (정상적이지 않은 상황)
+   
+   if (session->GetState() == PlayerSessionState::Closing or session->GetState() == PlayerSessionState::Closed)
+      return false;  // 세션이 유효한 상태가 아님 (세션이 닫히는 중이거나 이미 닫힌 상태)
    
    session->Send(buffer);
    return true;

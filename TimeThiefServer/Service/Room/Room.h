@@ -72,7 +72,7 @@ public:
    bool UpdateSession(PlayerId playerId, SessionId newSessionId);
    
 private:
-   void JoinPlayerProcess(std::shared_ptr<PlayerSession>& session, PlayerPawn* playerPawn);
+   void JoinPlayerProcess(PlayerId playerId, PlayerPawn* playerPawn);
    
 // Handle Packet
 public:
