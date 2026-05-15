@@ -232,6 +232,7 @@ public:
    void HandleDamageResult(Pawn* attacker, Pawn* victim, const DamageResult& damageResult);
    void HandlePawnDeath(Pawn* pawn, const DamageContext& ctx, const DamageResult& damageResult);
    void HandlePawnRespawn(ObjectId pawnId);
+   void HandleDespawn(ObjectId objId);
    
 private:
    void HandlePlayerKillPlayer(Pawn* killer, Pawn* victim);

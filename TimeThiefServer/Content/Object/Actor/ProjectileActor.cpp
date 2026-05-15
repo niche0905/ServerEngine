@@ -145,11 +145,11 @@ void ProjectileActor::OnExplode(ObjectManager& om)
         if (auto room = GetRoom()) {
             room->GetRoomGameSystem().GetCombatSystem().ProjectileExplosion(GetId(), GetPosition(), GetOwner(), GetDamage(), explosionRadius_, distanceDamageEnabled_);
             room->CancelScheduled(lifetimeTimer_);
+            room->HandleDespawn(GetId());
         }
         else {
             consoleLogger->Log(Color::Yellow, L"[ProjectileActor] Warning: Room not found when trying to cancel lifetime timer.");
         }
         lifetimeTimer_ = TimerId{};
     }
-    om.RequestDestroy(GetId());
 }

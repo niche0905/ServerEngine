@@ -48,7 +48,9 @@ DamageResult Pawn::ApplyDamage(ObjectManager& om, int32 amount, const DamageCont
       
          if (ShouldRequestDestroyOnDeath())
          {
-            om.RequestDestroy(GetId());
+            if (auto room = GetRoom()) {
+               room ->HandleDespawn(GetId());
+            }
          }
       }
    }

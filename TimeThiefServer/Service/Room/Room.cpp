@@ -364,13 +364,11 @@ bool Room::Leave(PlayerId playerId)
          leaveResBuffer = ServerPacketHandler::MakeSendBuffer(res);
       }
       
-      ReplicationDespawn(it->second.pawnObjectId);
-   
       const ObjectId pawnId = it->second.pawnObjectId;
       roomPlayers_.erase(it);
       
       if (pawnId != ObjectId{}) {
-         DespawnObject(pawnId);   // 플레이어의 Pawn이 존재하면 제거
+         HandleDespawn(pawnId);
       }
       
       if (sessionRef->GetState() == PlayerSessionState::InRoom)
@@ -1035,8 +1033,7 @@ bool Room::HandlePickupItem(PlayerId playerId, const se::game::C_PickupItemReq& 
       
       NotifyPickupItem(pawnId, itemObjectId);
 
-      bool itemActorRemove = DespawnObject(itemObjectId);
-      ReplicationDespawn(itemObjectId);
+      HandleDespawn(itemObjectId);
    }
    
    return true;
@@ -2145,6 +2142,12 @@ void Room::HandlePawnDeath(Pawn* pawn, const DamageContext& ctx, const DamageRes
 void Room::HandlePawnRespawn(ObjectId pawnId)
 {
    BroadcastRespawn(pawnId);
+}
+
+void Room::HandleDespawn(ObjectId objId)
+{
+   if (DespawnObject(objId))
+      ReplicationDespawn(objId);
 }
 
 void Room::HandlePlayerKillPlayer(Pawn* killer, Pawn* victim)
