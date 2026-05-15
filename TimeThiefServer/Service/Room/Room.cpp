@@ -355,7 +355,7 @@ bool Room::Leave(PlayerId playerId)
       if (it == roomPlayers_.end())
          return false;   // 방에 존재하지 않는 플레이어
       
-      if (sessionRef->GetState() != PlayerSessionState::InRoom)
+      if (sessionRef->GetState() != PlayerSessionState::InRoom and sessionRef->GetState() != PlayerSessionState::Closing)
          return false;  // 세션이 방 상태가 아님 (정상적이지 않은 상황)
          
       {
@@ -380,6 +380,8 @@ bool Room::Leave(PlayerId playerId)
          DespawnObject(pawnId);   // 플레이어의 Pawn이 존재하면 제거
       }
       
+      if (sessionRef->GetState() == PlayerSessionState::InRoom)
+         sessionRef->SetState(PlayerSessionState::InLobby);
       ownerShard_->RoomPlayerLeave(playerId);   // 샤드에 플레이어 퇴장 알리기
    }
    
