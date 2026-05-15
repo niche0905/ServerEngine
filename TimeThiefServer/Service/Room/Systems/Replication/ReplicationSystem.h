@@ -53,6 +53,13 @@ private:
    void FlushEvent_Item(const RepEvent& ev, const RepFrame& frame) const;
    void FlushEvent_UseItem(const RepEvent& ev, const RepFrame& frame) const;
    void FlushEvent_ChestInteract(const RepEvent& ev, const RepFrame& frame) const;
+   void FlushEvent_Jump(const RepEvent& ev, const RepFrame& frame) const;
+   void FlushEvent_JumpLand(const RepEvent& ev, const RepFrame& frame) const;
+   void FlushEvent_DoubleJump(const RepEvent& ev, const RepFrame& frame) const;
+   void FlushEvent_Crouch(const RepEvent& ev, const RepFrame& frame) const;
+   void FlushEvent_WireLaunch(const RepEvent& ev, const RepFrame& frame) const;
+   void FlushEvent_WireAction(const RepEvent& ev, const RepFrame& frame) const;
+   void FlushEvent_WireActionEnd(const RepEvent& ev, const RepFrame& frame) const;
    void FlushEvent_Aim(const RepEvent& ev, const RepFrame& frame) const;
    void FlushEvent_Fire(const RepEvent& ev, const RepFrame& frame) const;
    void FlushEvent_Reload(const RepEvent& ev, const RepFrame& frame) const;

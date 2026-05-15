@@ -218,6 +218,13 @@ public:
    void NotifyItemChange(PlayerId playerId, uint32 itemId, int32 newCount, int32 deltaCount);
    void NotifyUseItem(PlayerId playerId, ObjectId playerObjectId, uint32 itemId);
    void NotifyChestInteract(PlayerId playerId, ObjectId pawnId, ObjectId chestId);
+   void NotifyJump(PlayerId playerId, ObjectId pawnId);
+   void NotifyJumpLand(PlayerId playerId, ObjectId pawnId);
+   void NotifyDoubleJump(PlayerId playerId, ObjectId pawnId);
+   void NotifyCrouch(PlayerId playerId, ObjectId pawnId, bool isCrouching);
+   void NotifyWireLaunch(PlayerId playerId, ObjectId pawnId, const Vector3& startPos, const Vector3& direction);
+   void NotifyWireAction(PlayerId playerId, ObjectId pawnId, const Vector3& anchorPoint);
+   void NotifyWireEnd(PlayerId playerId, ObjectId pawnId);
    void NotifyHealthChange(PlayerId id, int newHealth, int deltaHealth);
    void NotifyMaxHealthChange(PlayerId id, int newMaxHealth, int newHealth);
    void NotifyTimePointChange(PlayerId id, int newTimePoint, int deltaTimePoint);

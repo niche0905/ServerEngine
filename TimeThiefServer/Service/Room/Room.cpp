@@ -1113,7 +1113,9 @@ bool Room::HandleSetSavePoint(PlayerId playerId, const se::game::C_SetSavePointR
 
 bool Room::HandleJump(PlayerId playerId, const se::game::C_JumpReq& pkt)
 {
-   SendBufferRef jumpBroadcastBuffer;
+   std::shared_ptr<PlayerSession> sessionRef = sessionManager_.FindByPlayerId(playerId);
+   
+   if (!sessionRef) return false;   // 세션이 존재하지 않음 (정상적이지 않은 상황)
    
    {
       if (playerId == 0)
@@ -1128,24 +1130,17 @@ bool Room::HandleJump(PlayerId playerId, const se::game::C_JumpReq& pkt)
          return false;
       
       playerPawn->SetJumping(true);
-      
-      se::game::N_Jump noti;
-      {
-         auto* entityIdPtr = noti.mutable_entity_id();
-         entityIdPtr->set_value(it->second.pawnObjectId.value);
-      }
-      jumpBroadcastBuffer = ServerPacketHandler::MakeSendBuffer(noti);
+      NotifyJump(playerId, it->second.pawnObjectId);
    }
-   
-   if (jumpBroadcastBuffer)
-      Broadcast(jumpBroadcastBuffer, playerId);   // 점프한 플레이어를 제외한 나머지 플레이어들에게 점프 정보 Broadcast
    
    return true;
 }
 
 bool Room::HandleJumpLand(PlayerId playerId, const se::game::C_JumpLand& pkt)
 {
-   SendBufferRef landBroadcastBuffer;
+   std::shared_ptr<PlayerSession> sessionRef = sessionManager_.FindByPlayerId(playerId);
+   
+   if (!sessionRef) return false;   // 세션이 존재하지 않음 (정상적이지 않은 상황)
    
    {
       if (playerId == 0)
@@ -1161,24 +1156,17 @@ bool Room::HandleJumpLand(PlayerId playerId, const se::game::C_JumpLand& pkt)
       
       playerPawn->SetJumping(false);
       playerPawn->SetDoubleJumping(false);
-      
-      se::game::N_JumpLand noti;
-      {
-         auto* entityIdPtr = noti.mutable_entity_id();
-         entityIdPtr->set_value(it->second.pawnObjectId.value);
-      }
-      landBroadcastBuffer = ServerPacketHandler::MakeSendBuffer(noti);
+      NotifyJumpLand(playerId, it->second.pawnObjectId);
    }
-   
-   if (landBroadcastBuffer)
-      Broadcast(landBroadcastBuffer, playerId);   // 착지한 플레이어를 제외한 나머지 플레이어들에게 착지 정보 Broadcast
    
    return true;
 }
 
 bool Room::HandleDoubleJump(PlayerId playerId, const se::game::C_DoubleJumpReq& pkt)
 {
-   SendBufferRef doubleJumpBroadcastBuffer;
+   std::shared_ptr<PlayerSession> sessionRef = sessionManager_.FindByPlayerId(playerId);
+   
+   if (!sessionRef) return false;   // 세션이 존재하지 않음 (정상적이지 않은 상황)
    
    {
       if (playerId == 0)
@@ -1194,25 +1182,17 @@ bool Room::HandleDoubleJump(PlayerId playerId, const se::game::C_DoubleJumpReq& 
       
       playerPawn->SetJumping(false);
       playerPawn->SetDoubleJumping(true);
-      
-      se::game::N_DoubleJump noti;
-      {
-         auto* entityIdPtr = noti.mutable_entity_id();
-         entityIdPtr->set_value(it->second.pawnObjectId.value);
-      }
-      
-      doubleJumpBroadcastBuffer = ServerPacketHandler::MakeSendBuffer(noti);
+      NotifyDoubleJump(playerId, it->second.pawnObjectId);
    }
    
-   if (doubleJumpBroadcastBuffer)
-      Broadcast(doubleJumpBroadcastBuffer, playerId);   // 더블 점프한 플레이어를 제외한 나머지 플레이어들에게 더블 점프 정보 Broadcast
-
    return true;
 }
 
 bool Room::HandleCrouch(PlayerId playerId, const se::game::C_CrouchReq& pkt)
 {
-   SendBufferRef crouchBroadcastBuffer;
+   std::shared_ptr<PlayerSession> sessionRef = sessionManager_.FindByPlayerId(playerId);
+   
+   if (!sessionRef) return false;   // 세션이 존재하지 않음 (정상적이지 않은 상황)
    
    {
       if (playerId == 0)
@@ -1227,27 +1207,17 @@ bool Room::HandleCrouch(PlayerId playerId, const se::game::C_CrouchReq& pkt)
          return false;
       
       playerPawn->SetCrouching(pkt.is_crouching());
-      
-      se::game::N_Crouch crouchNoti;
-      {
-         auto* entityIdPtr = crouchNoti.mutable_entity_id();
-         entityIdPtr->set_value(it->second.pawnObjectId.value);
-         
-         crouchNoti.set_is_crouching(playerPawn->IsCrouching());
-      }
-      
-      crouchBroadcastBuffer = ServerPacketHandler::MakeSendBuffer(crouchNoti);
+      NotifyCrouch(playerId, it->second.pawnObjectId, pkt.is_crouching());
    }
-   
-   if (crouchBroadcastBuffer)
-      Broadcast(crouchBroadcastBuffer, playerId);   // 크로치 상태를 변경한 플레이어를 제외한 나머지 플레이어들에게 크로치 상태 변경 정보 Broadcast
    
    return true;
 }
 
 bool Room::HandleWireAction(PlayerId playerId, const se::game::C_WireActionReq& pkt)
 {
-   SendBufferRef wireBroadcastBuffer;
+   std::shared_ptr<PlayerSession> sessionRef = sessionManager_.FindByPlayerId(playerId);
+   
+   if (!sessionRef) return false;   // 세션이 존재하지 않음 (정상적이지 않은 상황)
    
    {
       if (playerId == 0)
@@ -1261,28 +1231,20 @@ bool Room::HandleWireAction(PlayerId playerId, const se::game::C_WireActionReq& 
       if (!playerPawn)
          return false;
       
-      playerPawn->SetWired(true);
+      const auto& anchorPoint = pkt.anchor_point();
       
-      se::game::N_WireAction noti;
-      {
-         auto* entityIdPtr = noti.mutable_entity_id();
-         entityIdPtr->set_value(it->second.pawnObjectId.value);
-         
-         auto* anchorPosPtr = noti.mutable_anchor_point();
-         anchorPosPtr->CopyFrom(pkt.anchor_point());
-      }
-      wireBroadcastBuffer = ServerPacketHandler::MakeSendBuffer(noti);
+      playerPawn->SetWired(true);
+      NotifyWireAction(playerId, it->second.pawnObjectId, {anchorPoint.x(), anchorPoint.y(), anchorPoint.z()});
    }
-   
-   if (wireBroadcastBuffer)
-      Broadcast(wireBroadcastBuffer, playerId);   // 와이어 액션을 시작한 플레이어를 제외한 나머지 플레이어들에게 와이어 액션 정보 Broadcast
    
    return true;
 }
 
 bool Room::HandleWireActionEnd(PlayerId playerId, const se::game::C_WireActionEnd& pkt)
 {
-   SendBufferRef wireEndBroadcastBuffer;
+   std::shared_ptr<PlayerSession> sessionRef = sessionManager_.FindByPlayerId(playerId);
+   
+   if (!sessionRef) return false;   // 세션이 존재하지 않음 (정상적이지 않은 상황)
    
    {
       if (playerId == 0)
@@ -1297,24 +1259,17 @@ bool Room::HandleWireActionEnd(PlayerId playerId, const se::game::C_WireActionEn
          return false;
       
       playerPawn->SetWired(false);
-      
-      se::game::N_WireActionEnd noti;
-      {
-         auto* entityIdPtr = noti.mutable_entity_id();
-         entityIdPtr->set_value(it->second.pawnObjectId.value);
-      }
-      wireEndBroadcastBuffer = ServerPacketHandler::MakeSendBuffer(noti);
+      NotifyWireEnd(playerId, it->second.pawnObjectId);
    }
-   
-   if (wireEndBroadcastBuffer)
-      Broadcast(wireEndBroadcastBuffer, playerId);   // 와이어 액션을 종료한 플레이어를 제외한 나머지 플레이어들에게 와이어 액션 종료 정보 Broadcast
    
    return true;
 }
 
 bool Room::HandleWireLaunch(PlayerId playerId, const se::game::C_WireLaunchReq& pkt)
 {
-   SendBufferRef wireLaunchBuffer;
+   std::shared_ptr<PlayerSession> sessionRef = sessionManager_.FindByPlayerId(playerId);
+   
+   if (!sessionRef) return false;   // 세션이 존재하지 않음 (정상적이지 않은 상황)
    
    {
       if (playerId == 0)
@@ -1328,27 +1283,11 @@ bool Room::HandleWireLaunch(PlayerId playerId, const se::game::C_WireLaunchReq& 
       if (!playerPawn)
          return false;
       
-      se::game::N_WireLaunch noti;
-      {
-         auto* entityIdPtr = noti.mutable_entity_id();
-         entityIdPtr->set_value(it->second.pawnObjectId.value);
-         
-         auto* launchStartPtr = noti.mutable_start_position();
-         launchStartPtr->set_x(pkt.start_position().x());
-         launchStartPtr->set_y(pkt.start_position().y());
-         launchStartPtr->set_z(pkt.start_position().z());
-         
-         auto* launchDirPtr = noti.mutable_direction();
-         launchDirPtr->set_x(pkt.direction().x());
-         launchDirPtr->set_y(pkt.direction().y());
-         launchDirPtr->set_z(pkt.direction().z());
-      }
+      const auto& startPos = pkt.start_position();
+      const auto& direction = pkt.direction();
       
-      wireLaunchBuffer = ServerPacketHandler::MakeSendBuffer(noti);
+      NotifyWireLaunch(playerId, it->second.pawnObjectId, {startPos.x(), startPos.y(), startPos.z()}, {direction.x(), direction.y(), direction.z()});
    }
-   
-   if (wireLaunchBuffer)
-      Broadcast(wireLaunchBuffer, playerId);   // 와이어 런치를 시작한 플레이어를 제외한 나머지 플레이어들에게 와이어 런치 정보 Broadcast
    
    return true;
 }
@@ -1989,6 +1928,79 @@ void Room::NotifyChestInteract(PlayerId playerId, ObjectId pawnId, ObjectId ches
    chestInteractEvent.header.target = chestId;
    
    roomGameSystem_.GetReplicationSystem().PushEvent(chestInteractEvent);
+}
+
+void Room::NotifyJump(PlayerId playerId, ObjectId pawnId)
+{
+   RepEvent jumpEvent;
+   ReplicateEventSet(jumpEvent, RepEventType::Jump);
+   jumpEvent.header.exceptPlayerId = playerId;
+   jumpEvent.header.source = pawnId;
+   
+   roomGameSystem_.GetReplicationSystem().PushEvent(jumpEvent);
+}
+
+void Room::NotifyJumpLand(PlayerId playerId, ObjectId pawnId)
+{
+   RepEvent jumpLandEvent;
+   ReplicateEventSet(jumpLandEvent, RepEventType::JumpLand);
+   jumpLandEvent.header.exceptPlayerId = playerId;
+   jumpLandEvent.header.source = pawnId;
+   
+   roomGameSystem_.GetReplicationSystem().PushEvent(jumpLandEvent);
+}
+
+void Room::NotifyDoubleJump(PlayerId playerId, ObjectId pawnId)
+{
+   RepEvent doubleJumpEvent;
+   ReplicateEventSet(doubleJumpEvent, RepEventType::DoubleJump);
+   doubleJumpEvent.header.exceptPlayerId = playerId; 
+   doubleJumpEvent.header.source = pawnId;
+   
+   roomGameSystem_.GetReplicationSystem().PushEvent(doubleJumpEvent);
+}
+
+void Room::NotifyCrouch(PlayerId playerId, ObjectId pawnId, bool isCrouching)
+{
+   RepEvent crouchEvent;
+   ReplicateEventSet(crouchEvent, RepEventType::Crouch);
+   crouchEvent.header.exceptPlayerId = playerId;
+   crouchEvent.header.source = pawnId;
+   crouchEvent.payload = CrouchEvent{isCrouching};
+   
+   roomGameSystem_.GetReplicationSystem().PushEvent(crouchEvent);
+}
+
+void Room::NotifyWireLaunch(PlayerId playerId, ObjectId pawnId, const Vector3& startPos, const Vector3& direction)
+{
+   RepEvent wireLaunchEvent;
+   ReplicateEventSet(wireLaunchEvent, RepEventType::WireLaunch);
+   wireLaunchEvent.header.exceptPlayerId = playerId;
+   wireLaunchEvent.header.source = pawnId;
+   wireLaunchEvent.payload = WireLaunchEvent{startPos, direction};
+   
+   roomGameSystem_.GetReplicationSystem().PushEvent(wireLaunchEvent);
+}
+
+void Room::NotifyWireAction(PlayerId playerId, ObjectId pawnId, const Vector3& anchorPoint)
+{
+   RepEvent wireActionEvent;
+   ReplicateEventSet(wireActionEvent, RepEventType::WireAction);
+   wireActionEvent.header.exceptPlayerId = playerId;
+   wireActionEvent.header.source = pawnId;
+   wireActionEvent.payload = WireActionEvent{anchorPoint};
+   
+   roomGameSystem_.GetReplicationSystem().PushEvent(wireActionEvent);
+}
+
+void Room::NotifyWireEnd(PlayerId playerId, ObjectId pawnId)
+{
+   RepEvent wireEndEvent;
+   ReplicateEventSet(wireEndEvent, RepEventType::WireActionEnd);
+   wireEndEvent.header.exceptPlayerId = playerId;
+   wireEndEvent.header.source = pawnId;
+   
+   roomGameSystem_.GetReplicationSystem().PushEvent(wireEndEvent);
 }
 
 void Room::NotifyItemChange(PlayerId playerId, uint32 itemId, int32 newCount, int32 deltaCount)

@@ -194,6 +194,34 @@ void ReplicationSystem::DispatchImmediateEvent(const RepEvent& ev, const RepFram
       FlushEvent_ChestInteract(ev, frame);
       break;
       
+   case RepEventType::Jump:
+      FlushEvent_Jump(ev, frame);
+      break;
+      
+   case RepEventType::JumpLand:
+      FlushEvent_JumpLand(ev, frame);
+      break;
+      
+   case RepEventType::DoubleJump:
+      FlushEvent_DoubleJump(ev, frame);
+      break;
+      
+   case RepEventType::Crouch:
+      FlushEvent_Crouch(ev, frame);
+      break;
+      
+   case RepEventType::WireLaunch:
+      FlushEvent_WireLaunch(ev, frame);
+      break;
+      
+   case RepEventType::WireAction:
+      FlushEvent_WireAction(ev, frame);
+      break;
+      
+   case RepEventType::WireActionEnd:
+      FlushEvent_WireActionEnd(ev, frame);
+      break;
+      
    case RepEventType::Aim:
       FlushEvent_Aim(ev, frame);
       break;
@@ -464,6 +492,107 @@ void ReplicationSystem::FlushEvent_ChestInteract(const RepEvent& ev, const RepFr
    
    SendBufferRef sendBuffer = ServerPacketHandler::MakeSendBuffer(chestInteractedPkt);
    ownerRoom_->BroadcastReplication(sendBuffer);
+}
+
+void ReplicationSystem::FlushEvent_Jump(const RepEvent& ev, const RepFrame& frame) const
+{
+   se::game::N_Jump jumpPkt;
+   auto* entityIdPtr = jumpPkt.mutable_entity_id();
+   entityIdPtr->set_value(ev.header.source.value);
+   
+   SendBufferRef sendBuffer = ServerPacketHandler::MakeSendBuffer(jumpPkt);
+   ownerRoom_->BroadcastReplication(sendBuffer, ev.header.exceptPlayerId);
+}
+
+void ReplicationSystem::FlushEvent_JumpLand(const RepEvent& ev, const RepFrame& frame) const
+{
+   se::game::N_JumpLand jumpLandPkt;
+   auto* entityIdPtr = jumpLandPkt.mutable_entity_id();
+   entityIdPtr->set_value(ev.header.source.value);
+   
+   SendBufferRef sendBuffer = ServerPacketHandler::MakeSendBuffer(jumpLandPkt);
+   ownerRoom_->BroadcastReplication(sendBuffer, ev.header.exceptPlayerId);
+}
+
+void ReplicationSystem::FlushEvent_DoubleJump(const RepEvent& ev, const RepFrame& frame) const
+{
+   se::game::N_DoubleJump doubleJumpPkt;
+   auto* entityIdPtr = doubleJumpPkt.mutable_entity_id();
+   entityIdPtr->set_value(ev.header.source.value);
+   
+   SendBufferRef sendBuffer = ServerPacketHandler::MakeSendBuffer(doubleJumpPkt);
+   ownerRoom_->BroadcastReplication(sendBuffer, ev.header.exceptPlayerId);
+}
+
+void ReplicationSystem::FlushEvent_Crouch(const RepEvent& ev, const RepFrame& frame) const
+{
+   const CrouchEvent* crouchEv = std::get_if<CrouchEvent>(&ev.payload);
+   if (!crouchEv) {
+      consoleLogger->Log(Color::Yellow, L"[ReplicationSystem] Crouch event with invalid payload, skipping. PlayerId={}", ev.header.playerId);
+      return;   // 페이로드가 CrouchEvent가 아닌 경우 (잘못된 이벤트)
+   }
+   
+   se::game::N_Crouch crouchPkt;
+   auto* entityIdPtr = crouchPkt.mutable_entity_id();
+   entityIdPtr->set_value(ev.header.source.value);
+   crouchPkt.set_is_crouching(crouchEv->isCrouching);
+   
+   SendBufferRef sendBuffer = ServerPacketHandler::MakeSendBuffer(crouchPkt);
+   ownerRoom_->BroadcastReplication(sendBuffer, ev.header.exceptPlayerId);
+}
+
+void ReplicationSystem::FlushEvent_WireLaunch(const RepEvent& ev, const RepFrame& frame) const
+{
+   const WireLaunchEvent* wireLaunchEv = std::get_if<WireLaunchEvent>(&ev.payload);
+   if (!wireLaunchEv) {
+      consoleLogger->Log(Color::Yellow, L"[ReplicationSystem] WireLaunch event with invalid payload, skipping. PlayerId={}", ev.header.playerId);
+      return;   // 페이로드가 WireLaunchEvent가 아닌 경우 (잘못된 이벤트)
+   }
+   
+   se::game::N_WireLaunch wireLaunchPkt;
+   auto* entityIdPtr = wireLaunchPkt.mutable_entity_id();
+   entityIdPtr->set_value(ev.header.source.value);
+   auto* dirPtr = wireLaunchPkt.mutable_direction();
+   dirPtr->set_x(wireLaunchEv->direction.x);
+   dirPtr->set_y(wireLaunchEv->direction.y);
+   dirPtr->set_z(wireLaunchEv->direction.z);
+   auto* startPosPtr = wireLaunchPkt.mutable_start_position();
+   startPosPtr->set_x(wireLaunchEv->startPos.x);
+   startPosPtr->set_y(wireLaunchEv->startPos.y);
+   startPosPtr->set_z(wireLaunchEv->startPos.z);
+   
+   SendBufferRef sendBuffer = ServerPacketHandler::MakeSendBuffer(wireLaunchPkt);
+   ownerRoom_->BroadcastReplication(sendBuffer, ev.header.exceptPlayerId);
+}
+
+void ReplicationSystem::FlushEvent_WireAction(const RepEvent& ev, const RepFrame& frame) const
+{
+   const WireActionEvent* wireActionEv = std::get_if<WireActionEvent>(&ev.payload);
+   if (!wireActionEv) {
+      consoleLogger->Log(Color::Yellow, L"[ReplicationSystem] WireAction event with invalid payload, skipping. PlayerId={}", ev.header.playerId);
+      return;   // 페이로드가 WireActionEvent가 아닌 경우 (잘못된 이벤트)
+   }
+   
+   se::game::N_WireAction wireActionPkt;
+   auto* entityIdPtr = wireActionPkt.mutable_entity_id();
+   entityIdPtr->set_value(ev.header.source.value);
+   auto* anchorPtr = wireActionPkt.mutable_anchor_point();
+   anchorPtr->set_x(wireActionEv->anchorPoint.x);
+   anchorPtr->set_y(wireActionEv->anchorPoint.y);
+   anchorPtr->set_z(wireActionEv->anchorPoint.z);
+   
+   SendBufferRef sendBuffer = ServerPacketHandler::MakeSendBuffer(wireActionPkt);
+   ownerRoom_->BroadcastReplication(sendBuffer, ev.header.exceptPlayerId);
+}
+
+void ReplicationSystem::FlushEvent_WireActionEnd(const RepEvent& ev, const RepFrame& frame) const
+{
+   se::game::N_WireActionEnd wireActionPkt;
+   auto* entityIdPtr = wireActionPkt.mutable_entity_id();
+   entityIdPtr->set_value(ev.header.source.value);
+   
+   SendBufferRef sendBuffer = ServerPacketHandler::MakeSendBuffer(wireActionPkt);
+   ownerRoom_->BroadcastReplication(sendBuffer, ev.header.exceptPlayerId);
 }
 
 void ReplicationSystem::FlushEvent_Aim(const RepEvent& ev, const RepFrame& frame) const
