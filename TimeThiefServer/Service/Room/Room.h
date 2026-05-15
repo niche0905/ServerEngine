@@ -225,6 +225,7 @@ private:
    void ReplicateEventSet(RepEvent& ev, RepEventType eventType);
    
    void ReplicationSpawn(Actor* actor, uint32 templateId, float yaw, uint32 amount = 0);
+   void ReplicationDespawn(ObjectId objectId);
    
 public:
    void HandleDamageResult(Pawn* attacker, Pawn* victim, const DamageResult& damageResult);

@@ -341,7 +341,6 @@ bool Room::Join(PlayerId playerId, SessionId sessionId)
 bool Room::Leave(PlayerId playerId)
 {
    SendBufferRef leaveResBuffer;
-   SendBufferRef despawnBufferToOthers;
    std::shared_ptr<PlayerSession> sessionRef = sessionManager_.FindByPlayerId(playerId);
    
    if (!sessionRef)
@@ -365,13 +364,7 @@ bool Room::Leave(PlayerId playerId)
          leaveResBuffer = ServerPacketHandler::MakeSendBuffer(res);
       }
       
-      {
-         se::room::N_EntityDespawn noti;
-         auto* entityIdPtr = noti.mutable_entity_id();
-         entityIdPtr->set_value(it->second.pawnObjectId.value);
-         
-         despawnBufferToOthers = ServerPacketHandler::MakeSendBuffer(noti);
-      }
+      ReplicationDespawn(it->second.pawnObjectId);
    
       const ObjectId pawnId = it->second.pawnObjectId;
       roomPlayers_.erase(it);
@@ -387,9 +380,6 @@ bool Room::Leave(PlayerId playerId)
    
    if (sessionRef and leaveResBuffer)
       SendToPlayer(playerId, leaveResBuffer);   // 퇴장한 플레이어에게 퇴장 결과 전송
-   
-   if (despawnBufferToOthers)
-      Broadcast(despawnBufferToOthers, playerId);
    
    CheckGameEndCondition();      // 플레이어 퇴장으로 인해 게임 종료 조건이 충족되는지 확인
    CheckRoomCloseCondition();    // 플레이어 퇴장으로 인해 방 종료 조건이 충족되는지 확인 (예: 모든 플레이어 퇴장)
@@ -1027,7 +1017,6 @@ bool Room::HandleChestInteract(PlayerId playerId, const se::game::C_ChestInterac
 bool Room::HandlePickupItem(PlayerId playerId, const se::game::C_PickupItemReq& pkt)
 {
    SendBufferRef pickupBroadcastBuffer;
-   SendBufferRef itemDespawnBuffer;
    std::shared_ptr<PlayerSession> sessionRef = sessionManager_.FindByPlayerId(playerId);
    
    if (!sessionRef) return false;   // 세션이 존재하지 않음 (정상적이지 않은 상황)
@@ -1053,8 +1042,6 @@ bool Room::HandlePickupItem(PlayerId playerId, const se::game::C_PickupItemReq& 
       if (!itemObj)
          return false;
       
-      bool itemActorRemove = objectManager_.RequestDestroy(itemObjectId);
-      
       auto* item = dynamic_cast<WorldItemActor*>(itemObj);
       if (!item)
          return false;
@@ -1064,6 +1051,8 @@ bool Room::HandlePickupItem(PlayerId playerId, const se::game::C_PickupItemReq& 
          return false;
       
       playerPawn->AddItem(itemStack.id, itemStack.count, ItemChangeContext(ItemChangeReason::Loot));
+      
+      bool itemActorRemove = DespawnObject(itemObjectId);
       
       se::game::N_PickupItem pickupItemNoti;
       {
@@ -1075,20 +1064,11 @@ bool Room::HandlePickupItem(PlayerId playerId, const se::game::C_PickupItemReq& 
       }
       pickupBroadcastBuffer = ServerPacketHandler::MakeSendBuffer(pickupItemNoti);
       
-      se::room::N_EntityDespawn itemDespawnNoti;
-      {
-         auto* entityIdPtr = itemDespawnNoti.mutable_entity_id();
-         entityIdPtr->set_value(itemObjectId.value);
-      }
-      itemDespawnBuffer = ServerPacketHandler::MakeSendBuffer(itemDespawnNoti);
+      ReplicationDespawn(itemObjectId);
    }
    
    if (pickupBroadcastBuffer)
       Broadcast(pickupBroadcastBuffer);   // 아이템을 획득 (이펙트를 위해)
-   
-   // TODO: 아이템이 사라지는 패킷은 아이템 획득 이펙트가 재생된 후에 잠시 딜레이를 두고 보내는 구조로 변경하기 (클라이언트에서 아이템 획득 이펙트가 재생된 후에 아이템이 사라지는 구조로)
-   if (itemDespawnBuffer)
-      Broadcast(itemDespawnBuffer);   // 아이템이 사라졌음을 모두에게 Broadcast
    
    return true;
 }
@@ -1974,6 +1954,14 @@ void Room::BroadcastRespawn(ObjectId objectId)
    if (respawnBuffer)
       Broadcast(respawnBuffer);     // 모두에게 리스폰 정보 Broadcast
                                     // Local Control Player의 경우는 Set Position 하도록 (Set Yaw 까지도 가능)
+}
+
+void Room::ReplicationDespawn(ObjectId objectId)
+{
+   RepEvent despawnEvent;
+   ReplicateEventSet(despawnEvent, RepEventType::Despawn);
+   despawnEvent.header.source = objectId;
+   roomGameSystem_.GetReplicationSystem().PushEvent(despawnEvent);
 }
 
 void Room::NotifyEntityHit(ObjectId objectId, const SE::Math::Vector3& point, int32 int32)
