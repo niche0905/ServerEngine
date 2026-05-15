@@ -1,6 +1,5 @@
 ﻿#pragma once
 #include <mutex>
-
 #include "RoomState.h"
 #include "Content/Object/ObjectId.h"
 #include "Content/Gameplay/Combat/DamageTypes.h"
@@ -210,6 +209,7 @@ public:
    void BroadcastDeath(ObjectId objectId);
    void BroadcastRespawn(ObjectId objectId);
    void NotifyAim(PlayerId playerId, ObjectId pawnId, bool isAiming);
+   void NotifyFire(PlayerId playerId, ObjectId pawnId, const FireEvent& fireEvent);
    void NotifyEntityHit(ObjectId objectId, const SE::Math::Vector3& point, int32 int32);
    void NotifyProjectileSpawn(ProjectileActor* projectile, uint32 templateId);
    void NotifyPickupItem(ObjectId playerObjectId, ObjectId itemObjectId);
@@ -218,7 +218,6 @@ public:
    void NotifyMaxHealthChange(PlayerId id, int newMaxHealth, int newHealth);
    void NotifyTimePointChange(PlayerId id, int newTimePoint, int deltaTimePoint);
    void NotifyWeaponStatChange(PlayerId id, uint32 weaponId, const WeaponStatModifier& newStat);
-   // void BroadcastHit();
    void BroadcastKillPlayer(ObjectId killerId, ObjectId victimId);
    void NotifyZoneFlow(bool flowing);
    void NotifyExplosion(ObjectId sourceId, PlayerId ownerPlayerId, const Vector3& pos, float radius);

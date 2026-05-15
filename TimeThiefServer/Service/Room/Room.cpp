@@ -651,13 +651,7 @@ bool Room::HandleFire(PlayerId playerId, const se::game::C_FireReq& pkt)
          return true;   // 공격 시도 실패 (예: 탄약 부족, 재장전 중 등)
       }
       
-      RepEvent explosionEvent;
-      ReplicateEventSet(explosionEvent, RepEventType::Fire);
-      explosionEvent.header.playerId = playerId;
-      explosionEvent.header.source = playerPawn->GetId();
-      explosionEvent.payload = FireEvent{attackReq.weaponId, attackReq.shotSeed, attackReq.origin, attackReq.direction};
-   
-      roomGameSystem_.GetReplicationSystem().PushEvent(explosionEvent);
+      NotifyFire(playerId, it->second.pawnObjectId, FireEvent{attackReq.weaponId, attackReq.shotSeed, attackReq.origin, attackReq.direction});
    }
    
    return true;
@@ -1940,6 +1934,18 @@ void Room::NotifyAim(PlayerId playerId, ObjectId pawnId, bool isAiming)
    aimEvent.payload = AimEvent{isAiming};
    
    roomGameSystem_.GetReplicationSystem().PushEvent(aimEvent);
+}
+
+void Room::NotifyFire(PlayerId playerId, ObjectId pawnId, const FireEvent& fireEvent)
+{
+   RepEvent fireRepEvent;
+   
+   ReplicateEventSet(fireRepEvent, RepEventType::Fire);
+   fireRepEvent.header.source = pawnId;
+   fireRepEvent.header.exceptPlayerId = playerId;
+   fireRepEvent.payload = fireEvent;
+   
+   roomGameSystem_.GetReplicationSystem().PushEvent(fireRepEvent);
 }
 
 void Room::ReplicationDespawn(ObjectId objectId)
