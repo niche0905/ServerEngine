@@ -258,6 +258,16 @@ void ReplicationSystem::DispatchImmediateEvent(const RepEvent& ev, const RepFram
       FlushEvent_WeaponStatChange(ev, frame);
       break;
       
+   case RepEventType::KillPlayer:
+      FlushEvent_KillPlayer(ev, frame);
+      break;
+      
+   case RepEventType::ZoneChange:
+      FlushEvent_ZoneChange(ev, frame);
+      break;
+      
+      
+      
    case RepEventType::ZoneFlow:
       FlushEvent_ZoneFlow(ev, frame);
       break;
@@ -812,6 +822,39 @@ void ReplicationSystem::FlushEvent_WeaponStatChange(const RepEvent& ev, const Re
    
    SendBufferRef sendBuffer = ServerPacketHandler::MakeSendBuffer(noti);
    ownerRoom_->SendReplication(ev.header.playerId, sendBuffer);
+}
+
+void ReplicationSystem::FlushEvent_KillPlayer(const RepEvent& ev, const RepFrame& frame) const
+{
+   se::game::N_KillPlayer noti;
+   auto* killerIdPtr = noti.mutable_killer_id();
+   killerIdPtr->set_value(ev.header.source.value);
+   auto* victimIdPtr = noti.mutable_victim_id();
+   victimIdPtr->set_value(ev.header.target.value);
+ 
+   SendBufferRef sendBuffer = ServerPacketHandler::MakeSendBuffer(noti);
+   ownerRoom_->BroadcastReplication(sendBuffer);
+}
+
+void ReplicationSystem::FlushEvent_ZoneChange(const RepEvent& ev, const RepFrame& frame) const
+{
+   const ZoneChangeEvent* zoneChangeEv = std::get_if<ZoneChangeEvent>(&ev.payload);
+   if (!zoneChangeEv) {
+      consoleLogger->Log(Color::Yellow, L"[ReplicationSystem] ZoneChange event with invalid payload, skipping. PlayerId={}", ev.header.playerId);
+      return;   // 페이로드가 ZoneChangeEvent가 아닌 경우 (잘못된 이벤트)
+   }
+   
+   se::game::N_TimeStormChange noti;
+   auto* centerPos = noti.mutable_center();
+   centerPos->set_x(zoneChangeEv->center.x);
+   centerPos->set_y(zoneChangeEv->center.y);
+   centerPos->set_z(zoneChangeEv->center.z);
+   noti.set_radius(zoneChangeEv->radius);
+   noti.set_waiting_time(zoneChangeEv->waitDuration);
+   noti.set_shrinking_time(zoneChangeEv->shrinkDuration);
+   
+   SendBufferRef sendBuffer = ServerPacketHandler::MakeSendBuffer(noti);
+   ownerRoom_->BroadcastReplication(sendBuffer);
 }
 
 void ReplicationSystem::FlushEvent_ZoneFlow(const RepEvent& ev, const RepFrame& frame) const

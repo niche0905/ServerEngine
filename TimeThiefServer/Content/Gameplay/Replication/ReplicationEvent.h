@@ -46,6 +46,9 @@ enum class RepEventType : uint8
     
     WeaponStatChange,       // 무기 스탯 변경 이벤트 (무기 ID, 변경된 스탯과 그 값 등 포함)
     
+    KillPlayer,             // 플레이어 킬 이벤트 (킬한 플레이어 ID, 킬당한 플레이어 ID)
+    
+    ZoneChange,             // 존 변화 이벤트 (존이 시간에 따라 좁혀지는 것)
     ZoneFlow,               // 테스트 용 (Zone이 Stop 되거나 Start 될 때)
     
     
@@ -184,6 +187,14 @@ struct WeaponStatChangeEvent
     WeaponStatModifier modifier{};
 };
 
+struct ZoneChangeEvent
+{
+    SE::Math::Vector3 center{};
+    float radius{0};
+    float waitDuration{0};
+    float shrinkDuration{0};
+};
+
 struct ZoneFlowEvent
 {
     bool flowing{false};
@@ -210,6 +221,7 @@ using RepEventPayload = std::variant<
     WeaponChangedEvent,
     AimChangedEvent,
     WeaponStatChangeEvent,
+    ZoneChangeEvent,
     ZoneFlowEvent
 >;
 // TODO: 필요한 세부 Event 타입과 페이로드 정의하기 (여 위에 추가)

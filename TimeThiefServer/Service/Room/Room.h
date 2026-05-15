@@ -228,7 +228,6 @@ public:
    void NotifyMaxHealthChange(PlayerId id, int newMaxHealth, int newHealth);
    void NotifyTimePointChange(PlayerId id, int newTimePoint, int deltaTimePoint);
    void NotifyWeaponStatChange(PlayerId id, uint32 weaponId, const WeaponStatModifier& newStat);
-   void BroadcastKillPlayer(ObjectId killerId, ObjectId victimId);
    void NotifyZoneFlow(bool flowing);
    void NotifyExplosion(ObjectId sourceId, PlayerId ownerPlayerId, const Vector3& pos, float radius);
    
@@ -240,6 +239,9 @@ private:
    
    void ReplicationDeath(ObjectId objectId);
    void ReplicationRespawn(ObjectId objectId);
+   
+   void ReplicationKillPlayer(ObjectId killerId, ObjectId victimId);
+   void ReplicationZoneChange(uint32 phase, const ZoneCircle& newZone, float waitDuration, float shrinkDuration);
    
 public:
    void HandleDamageResult(Pawn* attacker, Pawn* victim, const DamageResult& damageResult);

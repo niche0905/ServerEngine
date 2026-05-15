@@ -1853,6 +1853,25 @@ void Room::ReplicationRespawn(ObjectId objectId)
    roomGameSystem_.GetReplicationSystem().PushEvent(respawnEvent);
 }
 
+void Room::ReplicationKillPlayer(ObjectId killerId, ObjectId victimId)
+{
+   RepEvent killPlayerEvent;
+   ReplicateEventSet(killPlayerEvent, RepEventType::KillPlayer);
+   killPlayerEvent.header.source = killerId;
+   killPlayerEvent.header.target = victimId;
+   
+   roomGameSystem_.GetReplicationSystem().PushEvent(killPlayerEvent);
+}
+
+void Room::ReplicationZoneChange(uint32 phase, const ZoneCircle& newZone, float waitDuration, float shrinkDuration)
+{
+   RepEvent zoneChangeEvent;
+   ReplicateEventSet(zoneChangeEvent, RepEventType::ZoneChange);
+   zoneChangeEvent.payload = ZoneChangeEvent{newZone.center, newZone.radius, waitDuration, shrinkDuration};
+   
+   roomGameSystem_.GetReplicationSystem().PushEvent(zoneChangeEvent);
+}
+
 void Room::NotifyHit(ObjectId objectId, const SE::Math::Vector3& point, int32 damage)
 {
    RepEvent entityHitEvent;
@@ -2040,22 +2059,6 @@ void Room::NotifyWeaponStatChange(PlayerId id, uint32 weaponId, const WeaponStat
    roomGameSystem_.GetReplicationSystem().PushEvent(weaponStatChangeEvent);
 }
 
-void Room::BroadcastKillPlayer(ObjectId killerId, ObjectId victimId)
-{
-   se::game::N_KillPlayer noti;
-   {
-      auto* killerIdPtr = noti.mutable_killer_id();
-      killerIdPtr->set_value(killerId.value);
-      
-      auto* victimIdPtr = noti.mutable_victim_id();
-      victimIdPtr->set_value(victimId.value);
-   }
-   
-   SendBufferRef killPlayerBuffer = ServerPacketHandler::MakeSendBuffer(noti);
-   if (killPlayerBuffer)
-      Broadcast(killPlayerBuffer);
-}
-
 void Room::NotifyZoneFlow(bool flowing)
 {
    RepEvent zoneFlowEvent;
@@ -2181,7 +2184,7 @@ void Room::HandlePlayerKillPlayer(Pawn* killer, Pawn* victim)
    
    const ObjectId killerId = killer->GetId();
    const ObjectId victimId = victim->GetId();
-   BroadcastKillPlayer(killerId, victimId);   // 모두에게 킬 정보 Broadcast
+   ReplicationKillPlayer(killerId, victimId);
 }
 
 void Room::OnRealDeath(ObjectId pawnId)
@@ -2210,22 +2213,7 @@ void Room::OnRealDeath(ObjectId pawnId)
 
 void Room::OnZoneChanged(uint32 phase, const ZoneCircle& newZone, float waitDuration, float shrinkDuration)
 {
-   se::game::N_TimeStormChange noti;
-   {
-      auto* centerPtr = noti.mutable_center();
-      centerPtr->set_x(newZone.center.x);
-      centerPtr->set_y(newZone.center.y);
-      centerPtr->set_z(newZone.center.z);
-      
-      noti.set_radius(newZone.radius);
-      noti.set_waiting_time(waitDuration);
-      noti.set_shrinking_time(shrinkDuration);
-   }
-   
-   SendBufferRef zoneChangeBuffer = ServerPacketHandler::MakeSendBuffer(noti);
-   if (zoneChangeBuffer) {
-      Broadcast(zoneChangeBuffer);
-   }
+   ReplicationZoneChange(phase, newZone, waitDuration, shrinkDuration);
 }
 
 void Room::CheckGameEndCondition()
