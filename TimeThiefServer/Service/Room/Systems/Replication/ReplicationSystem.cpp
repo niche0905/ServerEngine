@@ -289,10 +289,11 @@ void ReplicationSystem::FlushEvent_Spawn(const RepEvent& ev, const RepFrame& fra
 
 void ReplicationSystem::FlushEvent_Despawn(const RepEvent& ev, const RepFrame& frame) const
 {
-   // 이건 아마 안쓰이지 않을까 싶기도 함...
+   const ObjectId despawnObjectId = ev.header.source;
+   
    se::room::N_EntityDespawn despawnPkt;
    auto* entityIdPtr = despawnPkt.mutable_entity_id();
-   entityIdPtr->set_value(ev.header.source.value);
+   entityIdPtr->set_value(despawnObjectId.value);
    
    SendBufferRef sendBuffer = ServerPacketHandler::MakeSendBuffer(despawnPkt);
    ownerRoom_->BroadcastReplication(sendBuffer);
