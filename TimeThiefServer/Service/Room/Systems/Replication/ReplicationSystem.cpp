@@ -186,6 +186,10 @@ void ReplicationSystem::DispatchImmediateEvent(const RepEvent& ev, const RepFram
       FlushEvent_Item(ev, frame);
       break;
       
+   case RepEventType::UseItem:
+      FlushEvent_UseItem(ev, frame);
+      break;
+      
    case RepEventType::Aim:
       FlushEvent_Aim(ev, frame);
       break;
@@ -427,6 +431,23 @@ void ReplicationSystem::FlushEvent_Item(const RepEvent& ev, const RepFrame& fram
    }
    
    ownerRoom_->SendReplication(ev.header.playerId, sendBuffer);
+}
+
+void ReplicationSystem::FlushEvent_UseItem(const RepEvent& ev, const RepFrame& frame) const
+{
+   const UseItemEvent* useItemEv = std::get_if<UseItemEvent>(&ev.payload);
+   if (!useItemEv) {
+      consoleLogger->Log(Color::Yellow, L"[ReplicationSystem] UseItem event with invalid payload, skipping. PlayerId={}", ev.header.playerId);
+      return;   // 페이로드가 UseItemEvent가 아닌 경우 (잘못된 이벤트)
+   }
+   
+   se::game::N_UseItem noti;
+   auto* entityIdPtr = noti.mutable_entity_id();
+   entityIdPtr->set_value(ev.header.source.value);
+   noti.set_item_id(useItemEv->itemId);
+   
+   SendBufferRef sendBuffer = ServerPacketHandler::MakeSendBuffer(noti);
+   ownerRoom_->BroadcastReplication(sendBuffer);
 }
 
 void ReplicationSystem::FlushEvent_Aim(const RepEvent& ev, const RepFrame& frame) const

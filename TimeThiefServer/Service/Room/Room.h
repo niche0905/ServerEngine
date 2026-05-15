@@ -216,6 +216,7 @@ public:
    void NotifyProjectileSpawn(ProjectileActor* projectile, uint32 templateId);
    void NotifyPickupItem(ObjectId playerObjectId, ObjectId itemObjectId);
    void NotifyItemChange(PlayerId playerId, uint32 itemId, int32 newCount, int32 deltaCount);
+   void NotifyUseItem(PlayerId playerId, ObjectId playerObjectId, uint32 itemId);
    void NotifyHealthChange(PlayerId id, int newHealth, int deltaHealth);
    void NotifyMaxHealthChange(PlayerId id, int newMaxHealth, int newHealth);
    void NotifyTimePointChange(PlayerId id, int newTimePoint, int deltaTimePoint);

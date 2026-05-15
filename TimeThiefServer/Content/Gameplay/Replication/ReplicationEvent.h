@@ -23,6 +23,7 @@ enum class RepEventType : uint8
     
     PickupItem,
     ItemChange,
+    UseItem,
     
     Aim,                    // 조준 상태 변경 이벤트 (조준 시작, 조준 해제 등 포함) 
     Fire,                   // 발사 이벤트 (무기 종류, 발사 위치, 방향 등 포함)
@@ -98,6 +99,11 @@ struct ItemChangeEvent
     int32 deltaCount{0};
 };
 
+struct UseItemEvent
+{
+    uint32 itemId{0};
+};
+
 struct AimEvent
 {
     bool isAimed{false};
@@ -151,6 +157,7 @@ using RepEventPayload = std::variant<
     MoneyChangeEvent,
     ExplosionEvent,
     ItemChangeEvent,
+    UseItemEvent,
     AimEvent,
     FireEvent,
     ReloadEvent,

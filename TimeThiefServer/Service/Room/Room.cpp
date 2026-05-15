@@ -867,7 +867,6 @@ bool Room::HandleUseAbility(PlayerId playerId, const se::game::C_UseAbilityReq& 
 
 bool Room::HandleUseItem(PlayerId playerId, const se::game::C_UseItemReq& pkt)
 {
-   SendBufferRef itemUseBroadcastBuffer;
    std::shared_ptr<PlayerSession> sessionRef = sessionManager_.FindByPlayerId(playerId);
    
    if (!sessionRef) return false;   // 세션이 존재하지 않음 (정상적이지 않은 상황)
@@ -887,23 +886,16 @@ bool Room::HandleUseItem(PlayerId playerId, const se::game::C_UseItemReq& pkt)
       if (!playerPawn)
          return false;
       
+      const uint32 itemId = pkt.item_id();
+      if (playerPawn->GetItemCount(itemId) <= 0)
+         return false;  // 인벤토리에 해당 아이템이 없는 경우 (정상적이지 않은 상황)
+      
       // TODO: 아이템 사용 처리 로직 (예: 아이템 효과 적용, 인벤토리에서 아이템 제거 등)
       //       유효 하다면 다음으로
       //       그리고 여기서 만족하는 게 아니라 배그와 같이 사용하는 모션동안 사용이 취소될 수 있는 구조로 변경하기 (예: 회복 아이템 사용 중에 캔슬하면 아이템이 사용되지 않도록)
       
-      se::game::N_UseItem noti;
-      {
-         auto* entityIdPtr = noti.mutable_entity_id();
-         entityIdPtr->set_value(it->second.pawnObjectId.value);
-         
-         noti.set_item_id(pkt.item_id());
-      }
-      
-      itemUseBroadcastBuffer = ServerPacketHandler::MakeSendBuffer(noti);
+      NotifyUseItem(playerId, it->second.pawnObjectId, itemId);
    }
-   
-   if (itemUseBroadcastBuffer)
-      Broadcast(itemUseBroadcastBuffer, playerId);   // 본인 제외 모두에게 아이템 사용 정보 Broadcast 
    
    return true;
 }
@@ -1986,6 +1978,17 @@ void Room::NotifyPickupItem(ObjectId playerObjectId, ObjectId itemObjectId)
    pickupItemEvent.header.target = itemObjectId;
    
    roomGameSystem_.GetReplicationSystem().PushEvent(pickupItemEvent);
+}
+
+void Room::NotifyUseItem(PlayerId playerId, ObjectId playerObjectId, uint32 itemId)
+{
+   RepEvent useItemEvent;
+   ReplicateEventSet(useItemEvent, RepEventType::UseItem);
+   // useItemEvent.header.exceptPlayerId = playerId;     // 그냥 기다렸다 패킷 받으면 애니메이션 재생
+   useItemEvent.header.source = playerObjectId;
+   useItemEvent.payload = UseItemEvent{itemId};
+   
+   roomGameSystem_.GetReplicationSystem().PushEvent(useItemEvent);
 }
 
 void Room::NotifyItemChange(PlayerId playerId, uint32 itemId, int32 newCount, int32 deltaCount)
