@@ -206,8 +206,6 @@ public:
    void BroadcastGameEnd(PlayerId winnerPlayerId);
    void BroadcastRoomClose();
    void NotifyPlayerGameResult(PlayerId playerId, uint32 rank, int32 score, PlayerId killerId);
-   void BroadcastDeath(ObjectId objectId);
-   void BroadcastRespawn(ObjectId objectId);
    void NotifyAim(PlayerId playerId, ObjectId pawnId, bool isAiming);
    void NotifyFire(PlayerId playerId, ObjectId pawnId, const FireEvent& fireEvent);
    void NotifyReload(PlayerId playerId, ObjectId pawnId, uint32 weaponId);
@@ -239,6 +237,9 @@ private:
    
    void ReplicationSpawn(Actor* actor, uint32 templateId, float yaw, uint32 amount = 0);
    void ReplicationDespawn(ObjectId objectId);
+   
+   void ReplicationDeath(ObjectId objectId);
+   void ReplicationRespawn(ObjectId objectId);
    
 public:
    void HandleDamageResult(Pawn* attacker, Pawn* victim, const DamageResult& damageResult);

@@ -15,6 +15,9 @@ enum class RepEventType : uint8
     Spawn,
     Despawn,
     
+    Death,
+    Respawn,
+    
     HealthChange,
     MaxHealthChange,
     MoneyChange,
@@ -76,6 +79,12 @@ struct SpawnEvent
     SE::Math::Vector3 velocity{};       // optional, 투사체 등 움직이는 오브젝트에 대해서만 사용
     float yaw{0};                       // optional, 회전이 필요한 오브젝트에 대해서만 사용 (예: Player)
     uint32 amount;                      // optional, 아이템 스택 수량 등 필요에 따라 사용
+};
+
+struct RespawnEvent
+{
+    SE::Math::Vector3 position{};
+    float yaw{0};
 };
 
 struct HealthChangeEvent
@@ -183,6 +192,7 @@ struct ZoneFlowEvent
 using RepEventPayload = std::variant<
     std::monostate,
     SpawnEvent,
+    RespawnEvent,
     HealthChangeEvent,
     MaxHealthChangeEvent,
     MoneyChangeEvent,

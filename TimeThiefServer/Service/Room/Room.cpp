@@ -1775,48 +1775,6 @@ void Room::NotifyPlayerGameResult(PlayerId playerId, uint32 rank, int32 score, P
       SendToPlayer(playerId, gameResultBuffer);
 }
 
-void Room::BroadcastDeath(ObjectId objectId)
-{
-   se::game::N_EntityDied noti;
-   {
-      auto* entityIdPtr = noti.mutable_entity_id();
-      entityIdPtr->set_value(objectId.value);
-   }
-   
-   SendBufferRef deathBroadcastBuffer = ServerPacketHandler::MakeSendBuffer(noti);
-   
-   if (deathBroadcastBuffer)
-      Broadcast(deathBroadcastBuffer);   // 모두에게 사망 정보 Broadcast
-}
-
-void Room::BroadcastRespawn(ObjectId objectId)
-{
-   Pawn* pawn = objectManager_.FindAs<Pawn>(objectId);
-   if (pawn == nullptr)
-      return;   // 유효하지 않은 Pawn 객체
-   
-   const Vector3& respawnPos = pawn->GetSavedRespawnPosition();
-   const float respawnYaw = pawn->GetYaw();
-   
-   se::game::N_EntityRespawned noti;
-   {
-      auto* entityIdPtr = noti.mutable_entity_id();
-      entityIdPtr->set_value(objectId.value);
-      
-      auto* transformPtr = noti.mutable_transform();
-      auto* positionPtr = transformPtr->mutable_position();
-      positionPtr->set_x(respawnPos.x);
-      positionPtr->set_y(respawnPos.y);
-      positionPtr->set_z(respawnPos.z);
-      transformPtr->set_yaw(respawnYaw);
-   }
-   
-   SendBufferRef respawnBuffer = ServerPacketHandler::MakeSendBuffer(noti);
-   if (respawnBuffer)
-      Broadcast(respawnBuffer);     // 모두에게 리스폰 정보 Broadcast
-                                    // Local Control Player의 경우는 Set Position 하도록 (Set Yaw 까지도 가능)
-}
-
 void Room::NotifyAim(PlayerId playerId, ObjectId pawnId, bool isAiming)
 {
    RepEvent aimEvent;
@@ -1867,6 +1825,32 @@ void Room::ReplicationDespawn(ObjectId objectId)
    ReplicateEventSet(despawnEvent, RepEventType::Despawn);
    despawnEvent.header.source = objectId;
    roomGameSystem_.GetReplicationSystem().PushEvent(despawnEvent);
+}
+
+void Room::ReplicationDeath(ObjectId objectId)
+{
+   RepEvent deathEvent;
+   ReplicateEventSet(deathEvent, RepEventType::Death);
+   deathEvent.header.source = objectId;
+   
+   roomGameSystem_.GetReplicationSystem().PushEvent(deathEvent);
+}
+
+void Room::ReplicationRespawn(ObjectId objectId)
+{
+   Pawn* pawn = objectManager_.FindAs<Pawn>(objectId);
+   if (pawn == nullptr)
+      return;   // 유효하지 않은 Pawn 객체
+   
+   const Vector3& respawnPos = pawn->GetSavedRespawnPosition();
+   const float respawnYaw = pawn->GetYaw();
+   
+   RepEvent respawnEvent;
+   ReplicateEventSet(respawnEvent, RepEventType::Respawn);
+   respawnEvent.header.source = objectId;
+   respawnEvent.payload = RespawnEvent{respawnPos, respawnYaw};
+   
+   roomGameSystem_.GetReplicationSystem().PushEvent(respawnEvent);
 }
 
 void Room::NotifyHit(ObjectId objectId, const SE::Math::Vector3& point, int32 damage)
@@ -2152,7 +2136,7 @@ void Room::HandlePawnDeath(Pawn* pawn, const DamageContext& ctx, const DamageRes
       attacker = objectManager_.FindAs<Pawn>(ctx.instigator);
    }
    
-   BroadcastDeath(pawn->GetId());
+   ReplicationDeath(pawn->GetId());
    
    if (attacker and attacker->IsPlayer() and pawn->IsPlayer()) {
       HandleDamageResult(attacker, pawn, damageResult);
@@ -2163,7 +2147,7 @@ void Room::HandlePawnDeath(Pawn* pawn, const DamageContext& ctx, const DamageRes
 
 void Room::HandlePawnRespawn(ObjectId pawnId)
 {
-   BroadcastRespawn(pawnId);
+   ReplicationRespawn(pawnId);
 }
 
 void Room::HandleDespawn(ObjectId objId)

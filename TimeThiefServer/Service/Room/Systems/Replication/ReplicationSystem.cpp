@@ -162,6 +162,14 @@ void ReplicationSystem::DispatchImmediateEvent(const RepEvent& ev, const RepFram
       FlushEvent_Despawn(ev, frame);
       break;
       
+   case RepEventType::Death:
+      FlushEvent_Death(ev, frame);
+      break;
+      
+   case RepEventType::Respawn:
+      FlushEvent_Respawn(ev, frame);
+      break;
+      
    case RepEventType::HealthChange:
       FlushEvent_Health(ev, frame);
       break;
@@ -348,6 +356,38 @@ void ReplicationSystem::FlushEvent_Despawn(const RepEvent& ev, const RepFrame& f
    entityIdPtr->set_value(despawnObjectId.value);
    
    SendBufferRef sendBuffer = ServerPacketHandler::MakeSendBuffer(despawnPkt);
+   ownerRoom_->BroadcastReplication(sendBuffer);
+}
+
+void ReplicationSystem::FlushEvent_Death(const RepEvent& ev, const RepFrame& frame) const
+{
+   se::game::N_EntityDied deathPkt;
+   auto* entityIdPtr = deathPkt.mutable_entity_id();
+   entityIdPtr->set_value(ev.header.source.value);
+   
+   SendBufferRef sendBuffer = ServerPacketHandler::MakeSendBuffer(deathPkt);
+   ownerRoom_->BroadcastReplication(sendBuffer);
+}
+
+void ReplicationSystem::FlushEvent_Respawn(const RepEvent& ev, const RepFrame& frame) const
+{
+   const RespawnEvent* respawnEv = std::get_if<RespawnEvent>(&ev.payload);
+   if (!respawnEv) {
+      consoleLogger->Log(Color::Yellow, L"[ReplicationSystem] Respawn event with invalid payload, skipping. PlayerId={}", ev.header.playerId);
+      return;   // 페이로드가 RespawnEvent가 아닌 경우 (잘못된 이벤트)
+   }
+   
+   se::game::N_EntityRespawned respawnPkt;
+   auto* entityIdPtr = respawnPkt.mutable_entity_id();
+   entityIdPtr->set_value(ev.header.source.value);
+   auto* posPtr = respawnPkt.mutable_transform();
+   auto* positionPtr = posPtr->mutable_position();
+   positionPtr->set_x(respawnEv->position.x);
+   positionPtr->set_y(respawnEv->position.y);
+   positionPtr->set_z(respawnEv->position.z);
+   posPtr->set_yaw(respawnEv->yaw);
+   
+   SendBufferRef sendBuffer = ServerPacketHandler::MakeSendBuffer(respawnPkt);
    ownerRoom_->BroadcastReplication(sendBuffer);
 }
 
