@@ -178,6 +178,10 @@ void ReplicationSystem::DispatchImmediateEvent(const RepEvent& ev, const RepFram
       FlushEvent_Explosion(ev, frame);
       break;
       
+   case RepEventType::PickupItem:
+      FlushEvent_PickupItem(ev, frame);
+      break;
+      
    case RepEventType::ItemChange:
       FlushEvent_Item(ev, frame);
       break;
@@ -364,6 +368,21 @@ void ReplicationSystem::FlushEvent_Explosion(const RepEvent& ev, const RepFrame&
    explosionPkt.set_explosion_radius(explosionEv->explosionRadius);
    
    SendBufferRef sendBuffer = ServerPacketHandler::MakeSendBuffer(explosionPkt);
+   ownerRoom_->BroadcastReplication(sendBuffer);
+}
+
+void ReplicationSystem::FlushEvent_PickupItem(const RepEvent& ev, const RepFrame& frame) const
+{
+   const ObjectId playerId = ev.header.source;
+   const ObjectId itemObjectId = ev.header.target;
+   
+   se::game::N_PickupItem pickupItemPkt;
+   auto* entityPtr = pickupItemPkt.mutable_entity_id();
+   entityPtr->set_value(playerId.value);
+   auto* itemIdPtr = pickupItemPkt.mutable_item_entity_id();
+   itemIdPtr->set_value(itemObjectId.value);
+   
+   SendBufferRef sendBuffer = ServerPacketHandler::MakeSendBuffer(pickupItemPkt);
    ownerRoom_->BroadcastReplication(sendBuffer);
 }
 

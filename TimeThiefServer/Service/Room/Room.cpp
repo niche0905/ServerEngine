@@ -1016,7 +1016,6 @@ bool Room::HandleChestInteract(PlayerId playerId, const se::game::C_ChestInterac
 
 bool Room::HandlePickupItem(PlayerId playerId, const se::game::C_PickupItemReq& pkt)
 {
-   SendBufferRef pickupBroadcastBuffer;
    std::shared_ptr<PlayerSession> sessionRef = sessionManager_.FindByPlayerId(playerId);
    
    if (!sessionRef) return false;   // 세션이 존재하지 않음 (정상적이지 않은 상황)
@@ -1052,23 +1051,11 @@ bool Room::HandlePickupItem(PlayerId playerId, const se::game::C_PickupItemReq& 
       
       playerPawn->AddItem(itemStack.id, itemStack.count, ItemChangeContext(ItemChangeReason::Loot));
       
+      NotifyPickupItem(pawnId, itemObjectId);
+
       bool itemActorRemove = DespawnObject(itemObjectId);
-      
-      se::game::N_PickupItem pickupItemNoti;
-      {
-         auto* entityPtr = pickupItemNoti.mutable_entity_id();
-         entityPtr->set_value(pawnId.value);
-         
-         auto* itemIdPtr = pickupItemNoti.mutable_item_entity_id();
-         itemIdPtr->set_value(itemObjectId.value);
-      }
-      pickupBroadcastBuffer = ServerPacketHandler::MakeSendBuffer(pickupItemNoti);
-      
       ReplicationDespawn(itemObjectId);
    }
-   
-   if (pickupBroadcastBuffer)
-      Broadcast(pickupBroadcastBuffer);   // 아이템을 획득 (이펙트를 위해)
    
    return true;
 }
@@ -1980,6 +1967,16 @@ void Room::NotifyProjectileSpawn(ProjectileActor* projectile, uint32 templateId)
       return;   // 유효하지 않은 발사체
    
    ReplicationSpawn(projectile, templateId, projectile->GetYaw());
+}
+
+void Room::NotifyPickupItem(ObjectId playerObjectId, ObjectId itemObjectId)
+{
+   RepEvent pickupItemEvent;
+   ReplicateEventSet(pickupItemEvent, RepEventType::PickupItem);
+   pickupItemEvent.header.source = playerObjectId;
+   pickupItemEvent.header.target = itemObjectId;
+   
+   roomGameSystem_.GetReplicationSystem().PushEvent(pickupItemEvent);
 }
 
 void Room::NotifyItemChange(PlayerId playerId, uint32 itemId, int32 newCount, int32 deltaCount)

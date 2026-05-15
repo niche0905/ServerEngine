@@ -21,6 +21,7 @@ enum class RepEventType : uint8
     
     Explosion,              // 폭발 이벤트 (폭발이 발생한 위치, 범위 등 포함)
     
+    PickupItem,
     ItemChange,
     
     Fire,                   // 발사 이벤트 (무기 종류, 발사 위치, 방향 등 포함)

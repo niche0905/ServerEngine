@@ -211,6 +211,7 @@ public:
    void BroadcastRespawn(ObjectId objectId);
    void NotifyEntityHit(ObjectId objectId, const SE::Math::Vector3& point, int32 int32);
    void NotifyProjectileSpawn(ProjectileActor* projectile, uint32 templateId);
+   void NotifyPickupItem(ObjectId playerObjectId, ObjectId itemObjectId);
    void NotifyItemChange(PlayerId playerId, uint32 itemId, int32 newCount, int32 deltaCount);
    void NotifyHealthChange(PlayerId id, int newHealth, int deltaHealth);
    void NotifyMaxHealthChange(PlayerId id, int newMaxHealth, int newHealth);
