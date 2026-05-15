@@ -194,6 +194,9 @@ void ReplicationSystem::DispatchImmediateEvent(const RepEvent& ev, const RepFram
       FlushEvent_Fire(ev, frame);
       break;
       
+   case RepEventType::Reload:
+      FlushEvent_Reload(ev, frame);
+      
    case RepEventType::Hit:
       FlushEvent_Hit(ev, frame);
       break;
@@ -465,6 +468,23 @@ void ReplicationSystem::FlushEvent_Fire(const RepEvent& ev, const RepFrame& fram
    
    SendBufferRef sendBuffer = ServerPacketHandler::MakeSendBuffer(noti);
    ownerRoom_->BroadcastReplication(sendBuffer, ev.header.playerId);
+}
+
+void ReplicationSystem::FlushEvent_Reload(const RepEvent& ev, const RepFrame& frame) const
+{
+   const ReloadEvent* reloadEv = std::get_if<ReloadEvent>(&ev.payload);
+   if (!reloadEv) {
+      consoleLogger->Log(Color::Yellow, L"[ReplicationSystem] Reload event with invalid payload, skipping. PlayerId={}", ev.header.playerId);
+      return;   // 페이로드가 ReloadEvent가 아닌 경우 (잘못된 이벤트)
+   }
+   
+   se::game::N_Reload noti;
+   auto* entityIdPtr = noti.mutable_entity_id();
+   entityIdPtr->set_value(ev.header.source.value);
+   noti.set_weapon_id(reloadEv->weaponId);
+   
+   SendBufferRef sendBuffer = ServerPacketHandler::MakeSendBuffer(noti);
+   ownerRoom_->BroadcastReplication(sendBuffer, ev.header.exceptPlayerId);
 }
 
 void ReplicationSystem::FlushEvent_Hit(const RepEvent& ev, const RepFrame& frame) const

@@ -26,6 +26,7 @@ enum class RepEventType : uint8
     
     Aim,                    // 조준 상태 변경 이벤트 (조준 시작, 조준 해제 등 포함) 
     Fire,                   // 발사 이벤트 (무기 종류, 발사 위치, 방향 등 포함)
+    Reload,                 // 재장전 이벤트 (무기 종류, 재장전 시작할 때 모션)
     Hit,                    // 히트 이벤트 (공격이 명중한 경우, 명중 위치, 피해량 등 포함)
     
     WeaponStatChange,       // 무기 스탯 변경 이벤트 (무기 ID, 변경된 스탯과 그 값 등 포함)
@@ -109,6 +110,11 @@ struct FireEvent
     SE::Math::Vector3 direction{};      // normalized
 };
 
+struct ReloadEvent
+{
+    uint32 weaponId{0};
+};
+
 struct HitEvent
 {
     SE::Math::Vector3 hitPos{};
@@ -146,6 +152,7 @@ using RepEventPayload = std::variant<
     ItemChangeEvent,
     AimEvent,
     FireEvent,
+    ReloadEvent,
     HitEvent,
     WeaponChangedEvent,
     AimChangedEvent,

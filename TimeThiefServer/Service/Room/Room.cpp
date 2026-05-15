@@ -728,7 +728,6 @@ bool Room::HandleReload(PlayerId playerId, const se::game::C_ReloadReq& pkt)
 {
    // TODO: 재장전 결과 패킷 (S_ReleadRes 를 작성해서 프로토콜 업데이트 하기)
    SendBufferRef reloadResultBuffer;      // 재장전 결과를 해당 플레이어에게 보내는 패킷 (예: 재장전 성공 여부, 남은 탄창 수 등)
-   SendBufferRef reloadBroadcastBuffer;
    std::shared_ptr<PlayerSession> sessionRef = sessionManager_.FindByPlayerId(playerId);
    
    if (!sessionRef) return false;   // 세션이 존재하지 않음 (정상적이지 않은 상황)
@@ -754,29 +753,19 @@ bool Room::HandleReload(PlayerId playerId, const se::game::C_ReloadReq& pkt)
          return false;
       }
 
+      const uint32 weaponId = pkt.weapon_id();
       const uint32 handWeaponId = playerCombatComp->GetCurrentWeaponId();
-      if (handWeaponId != pkt.weapon_id()) {
+      if (handWeaponId != weaponId) {
          consoleLogger->Log(Color::Yellow, L"[Room] Reload Failed: weapon_id mismatch (handWeaponId: %u, pkt.weapon_id: %u)\n", handWeaponId, pkt.weapon_id());
       }
       playerCombatComp->TryReload();
       
-      se::game::N_Reload noti;
-      {
-         auto* entityIdPtr = noti.mutable_entity_id();
-         entityIdPtr->set_value(it->second.pawnObjectId.value);
-         
-         noti.set_weapon_id(pkt.weapon_id());
-      }
-      
-      reloadBroadcastBuffer = ServerPacketHandler::MakeSendBuffer(noti);
+      NotifyReload(playerId, it->second.pawnObjectId, weaponId);
    }
    
    // TODO: 여기서 보낼 게 아니다 (재장전 완료 시간에 보내야 한다)
    if (reloadResultBuffer)
       SendToPlayer(playerId, reloadResultBuffer);   // 재장전 결과를 해당 플레이어에게 전송
-   
-   if (reloadBroadcastBuffer)
-      Broadcast(reloadBroadcastBuffer, playerId);   // 재장전한 플레이어를 제외한 나머지 플레이어들에게 재장전 정보 Broadcast
    
    return true;
 }
@@ -1952,6 +1941,17 @@ void Room::NotifyFire(PlayerId playerId, ObjectId pawnId, const FireEvent& fireE
    fireRepEvent.payload = fireEvent;
    
    roomGameSystem_.GetReplicationSystem().PushEvent(fireRepEvent);
+}
+
+void Room::NotifyReload(PlayerId playerId, ObjectId pawnId, uint32 weaponId)
+{
+   RepEvent reloadEvent;
+   ReplicateEventSet(reloadEvent, RepEventType::Reload);
+   reloadEvent.header.source = pawnId;
+   reloadEvent.header.exceptPlayerId = playerId;
+   reloadEvent.payload = ReloadEvent{weaponId};
+   
+   roomGameSystem_.GetReplicationSystem().PushEvent(reloadEvent);
 }
 
 void Room::ReplicationDespawn(ObjectId objectId)
