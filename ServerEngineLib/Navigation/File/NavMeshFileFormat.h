@@ -7,12 +7,21 @@ namespace SE::Navigation
     constexpr uint32 kNavMeshFileMagic = 0x56414E53; // 'SNAV'
     constexpr uint32 kNavMeshFileVersion = 1;
     
+    struct NavMeshFileParams
+    {
+        float orig[3];
+        float tileWidth;
+        float tileHeight;
+        int maxTiles;
+        int maxPolys;
+    };
+    
     struct NavMeshSetHeader
     {
         uint32 magic = kNavMeshFileMagic;
         uint32 version = kNavMeshFileVersion;
         uint32 tileCount = 0;
-        dtNavMeshParams params{};
+        NavMeshFileParams params{};
     };
     
     struct NavMeshTileHeader
