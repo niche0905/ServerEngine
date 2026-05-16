@@ -4,7 +4,7 @@
 
 namespace SE::Navigation
 {
-    constexpr uint32 kNavMeshFileMagic = 0x56414E53; // 'SNAV'
+    constexpr uint32 kNavMeshFileMagic = 0x54414E53; // 'SNAV'
     constexpr uint32 kNavMeshFileVersion = 1;
     
     struct NavMeshSetHeader
