@@ -77,6 +77,9 @@ bool ServerConfigReader::ParseJsonText(const std::string& jsonText, const std::f
       if (dataFiles.isMember("map_file"))
          newConfig.dataFiles.mapFilePath = ResolvePath(dataFiles["map_file"].asString(), baseDir);
       
+      if (dataFiles.isMember("nav_mesh_file"))
+         newConfig.dataFiles.navMeshFilePath = ResolvePath(dataFiles["nav_mesh_file"].asString(), baseDir);
+      
       if (dataFiles.isMember("zone_table"))
          newConfig.dataFiles.zoneTablePath = ResolvePath(dataFiles["zone_table"].asString(), baseDir);
       

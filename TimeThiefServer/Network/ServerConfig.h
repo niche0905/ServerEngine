@@ -12,6 +12,7 @@ struct NetworkConfig
 struct DataFilesConfig
 {
     std::filesystem::path mapFilePath;
+    std::filesystem::path navMeshFilePath;
     std::filesystem::path zoneTablePath;
     std::filesystem::path lootTablePath;
     std::filesystem::path storeEntryTablePath;

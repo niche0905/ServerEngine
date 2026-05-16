@@ -1,4 +1,5 @@
 ﻿#pragma once
+#include "Navigation/NavigationService.h"
 #include "Physics/Collider/Collider.h"
 #include "Spatial/UniformGridSpatial.h"
 
@@ -24,6 +25,7 @@ class ServerMap
 {
 public:
    bool BuildFromLoadedData(const se::map::LoadedMapData& loadedData);
+   bool LoadNavigation(const std::filesystem::path& filePath);
    
    const SE::Physics::Collider* GetCollider(uint32 colliderId) const;
    void QueryAABB(const SE::Physics::AABBCollider& query, std::vector<uint32>& outColliderIds) const;
@@ -32,8 +34,12 @@ public:
    bool Intersect(const SE::Physics::Collider& other, SE::Physics::CollisionResult& outResult) const;
    bool SphereCast(const SE::Math::Vector3& from, const SE::Math::Vector3& to, float radius, SE::Physics::RaycastHit& outResult) const;
    
+   const SE::Navigation::NavigationService& GetNavigation() const { return navigationService_; }
+   
 private:
    std::vector<std::unique_ptr<SE::Physics::Collider>> colliders_;
    UniformGridSpatial spatial_{};
+   
+   SE::Navigation::NavigationService navigationService_{};
     
 };

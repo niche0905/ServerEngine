@@ -174,6 +174,11 @@ bool ServerMap::BuildFromLoadedData(const se::map::LoadedMapData& loadedData)
    return true;
 }
 
+bool ServerMap::LoadNavigation(const std::filesystem::path& filePath)
+{
+   return navigationService_.Initialize(filePath);
+}
+
 const SE::Physics::Collider* ServerMap::GetCollider(uint32 colliderId) const
 {
    if (colliderId >= colliders_.size()) {
