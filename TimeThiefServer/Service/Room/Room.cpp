@@ -346,39 +346,38 @@ bool Room::Leave(PlayerId playerId)
    if (!sessionRef)
       return false;
    
-   {
-      if (playerId == 0)
-         return false;   // 유효하지 않은 playerId
+   if (playerId == 0)
+      return false;   // 유효하지 않은 playerId
+
+   auto it = roomPlayers_.find(playerId);
+   if (it == roomPlayers_.end())
+      return false;   // 방에 존재하지 않는 플레이어
    
-      auto it = roomPlayers_.find(playerId);
-      if (it == roomPlayers_.end())
-         return false;   // 방에 존재하지 않는 플레이어
+   if (sessionRef->GetState() != PlayerSessionState::InRoom and sessionRef->GetState() != PlayerSessionState::Closing)
+      return false;  // 세션이 방 상태가 아님 (정상적이지 않은 상황)
       
-      if (sessionRef->GetState() != PlayerSessionState::InRoom and sessionRef->GetState() != PlayerSessionState::Closing)
-         return false;  // 세션이 방 상태가 아님 (정상적이지 않은 상황)
-         
-      {
-         se::room::S_RoomLeaveRes res;
-         res.set_success(true);
-         
-         leaveResBuffer = ServerPacketHandler::MakeSendBuffer(res);
-      }
+   {
+      se::room::S_RoomLeaveRes res;
+      res.set_success(true);
       
-      const ObjectId pawnId = it->second.pawnObjectId;
-      roomPlayers_.erase(it);
-      
-      if (pawnId != ObjectId{}) {
-         HandleDespawn(pawnId);
-      }
-      
-      if (sessionRef->GetState() == PlayerSessionState::InRoom)
-         sessionRef->SetState(PlayerSessionState::InLobby);
-      ownerShard_->RoomPlayerLeave(playerId);   // 샤드에 플레이어 퇴장 알리기
+      leaveResBuffer = ServerPacketHandler::MakeSendBuffer(res);
    }
    
-   if (sessionRef and leaveResBuffer)
+   const ObjectId pawnId = it->second.pawnObjectId;
+   
+   if (pawnId != ObjectId{}) {
+      HandleDespawn(pawnId);
+   }
+   
+   if (sessionRef->GetState() == PlayerSessionState::InRoom)
+      sessionRef->SetState(PlayerSessionState::InLobby);
+   
+   ownerShard_->RoomPlayerLeave(playerId);   // 샤드에 플레이어 퇴장 알리기
+   
+   if (leaveResBuffer)
       SendToPlayer(playerId, leaveResBuffer);   // 퇴장한 플레이어에게 퇴장 결과 전송
    
+   roomPlayers_.erase(it);
    CheckGameEndCondition();      // 플레이어 퇴장으로 인해 게임 종료 조건이 충족되는지 확인
    CheckRoomCloseCondition();    // 플레이어 퇴장으로 인해 방 종료 조건이 충족되는지 확인 (예: 모든 플레이어 퇴장)
    return true;
