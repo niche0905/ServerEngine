@@ -21,6 +21,18 @@ namespace SE::Nav
 
     bool ServerNavigation::LoadFromFile(const std::filesystem::path& filePath)
     {
+        // consoleLogger->Log(Color::Cyan, L"sizeof(dtReal)=%zu\n", sizeof(dtReal));
+        // consoleLogger->Log(Color::Cyan, L"sizeof(dtMeshHeader)=%zu\n", sizeof(dtMeshHeader));
+        // consoleLogger->Log(Color::Cyan, L"sizeof(dtPoly)=%zu\n", sizeof(dtPoly));
+        // consoleLogger->Log(Color::Cyan, L"sizeof(dtLink)=%zu\n", sizeof(dtLink));
+        // consoleLogger->Log(Color::Cyan, L"sizeof(dtPolyDetail)=%zu\n", sizeof(dtPolyDetail));
+        // consoleLogger->Log(Color::Cyan, L"sizeof(dtBVNode)=%zu\n", sizeof(dtBVNode));
+        // consoleLogger->Log(Color::Cyan, L"sizeof(dtOffMeshConnection)=%zu\n", sizeof(dtOffMeshConnection));
+        //
+        // consoleLogger->Log(Color::Cyan, L"DT_LARGE_WORLD_COORDINATES_DISABLED=%d\n", DT_LARGE_WORLD_COORDINATES_DISABLED);
+        // consoleLogger->Log(Color::Cyan, L"WITH_NAVMESH_SEGMENT_LINKS=%d\n", WITH_NAVMESH_SEGMENT_LINKS);
+        // consoleLogger->Log(Color::Cyan, L"WITH_NAVMESH_CLUSTER_LINKS=%d\n", WITH_NAVMESH_CLUSTER_LINKS);
+        
         Release();
         
         std::ifstream file(filePath, std::ios::binary);

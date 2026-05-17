@@ -174,6 +174,11 @@ bool ServerMap::BuildFromLoadedData(const se::map::LoadedMapData& loadedData)
    return true;
 }
 
+bool ServerMap::LoadNavigation(const std::filesystem::path& navMeshPath)
+{
+   return navigation_.LoadFromFile(navMeshPath);
+}
+
 const SE::Physics::Collider* ServerMap::GetCollider(uint32 colliderId) const
 {
    if (colliderId >= colliders_.size()) {
@@ -305,4 +310,16 @@ bool ServerMap::SphereCast(const SE::Math::Vector3& from, const SE::Math::Vector
    }
    
    return hasHit;
+}
+
+bool ServerMap::FindNearestPoly(const SE::Math::Vector3& pos, const SE::Math::Vector3& halfExtents, dtPolyRef& outRef,
+   SE::Math::Vector3& outNearest) const
+{
+   return navigation_.FindNearestPoly(pos, halfExtents, outRef, outNearest);
+}
+
+bool ServerMap::FindPath(const SE::Math::Vector3& start, const SE::Math::Vector3& end,
+   std::vector<SE::Math::Vector3>& outPath) const
+{
+   return navigation_.FindPath(start, end, outPath);
 }
