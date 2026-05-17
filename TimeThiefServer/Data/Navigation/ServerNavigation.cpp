@@ -125,6 +125,9 @@ namespace SE::Nav
         
         filter_ = new dtQueryFilter();
         
+        // consoleLogger->Log(Color::Blue, L"[Navigation] Successfully loaded navigation mesh from file: %S\n", filePath.string().c_str());
+        // consoleLogger->Log(Color::Blue, L"[Navigation] Loaded. tiles=%d, maxTiles=%d, maxPolys=%d\n", header.tileCount, header.maxTiles, header.maxPolys);
+        
         return true;
     }
 
@@ -211,6 +214,25 @@ namespace SE::Nav
             outPath.push_back(FromDetour(straightResult.getPos(i)));
         }
         
+        return true;
+    }
+
+    bool ServerNavigation::DebugValidatePoint(const SE::Math::Vector3& pos) const
+    {
+        if (!IsLoaded())
+            return false;
+        
+        dtPolyRef ref = 0;
+        SE::Math::Vector3 nearest;
+        
+        constexpr SE::Math::Vector3 halfExtents{100.0f, 100.0f, 300.0f};
+        
+        if (!FindNearestPoly(pos, halfExtents, ref, nearest)) {
+            consoleLogger->Log(Color::Red, L"[Navigation] FindNearestPoly failed. pos=(%.2f, %.2f, %.2f)\n", pos.x, pos.y, pos.z);
+            return false;
+        }
+        
+        consoleLogger->Log(Color::Green, L"[Navigation] FindNearestPoly success. ref=%llu nearest=(%.2f, %.2f, %.2f)\n", static_cast<unsigned long long>(ref), nearest.x, nearest.y, nearest.z);
         return true;
     }
 

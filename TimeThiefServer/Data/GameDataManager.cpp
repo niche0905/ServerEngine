@@ -35,12 +35,14 @@ bool GameDataManager::Init(const ServerConfig& config)
       return false;
    }
    
+   // consoleLogger->Log(Color::Blue, L"Map data loaded successfully. Collider count: %zu\n", loadedMapData.colliders.size());
+   
    if (not serverMap_.LoadNavigation(config.dataFiles.navMeshFilePath)) {
       consoleLogger->Log(Color::Red, L"[GDM] Failed to load NavMesh.\n");
       return false;
    }
    
-   // consoleLogger->Log(Color::Blue, L"Map data loaded successfully. Collider count: %zu\n", loadedMapData.colliders.size());
+   // serverMap_.GetNavigation().DebugValidatePoint(SE::Math::Vector3{0.0f, 0.0f, 100.0f});
    
    if (not ZoneTableJson::LoadFromFile(config.dataFiles.zoneTablePath, zoneTable_, &error)) {
       consoleLogger->Log(Color::Red, L"[GDM] Failed to load ZoneTable: %hs\n", error.c_str());

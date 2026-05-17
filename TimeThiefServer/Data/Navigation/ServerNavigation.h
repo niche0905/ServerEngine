@@ -35,6 +35,9 @@ namespace SE::Nav
       
       bool IsLoaded() const { return navMesh_ != nullptr and navQuery_ != nullptr; }
       
+   public:
+      bool DebugValidatePoint(const SE::Math::Vector3& pos) const;
+      
    private:
       void Release();
       
