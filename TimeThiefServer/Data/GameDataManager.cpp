@@ -35,11 +35,6 @@ bool GameDataManager::Init(const ServerConfig& config)
       return false;
    }
    
-   if (not serverMap_.LoadNavigation(config.dataFiles.navMeshFilePath)) {
-      consoleLogger->Log(Color::Red, L"[GDM] Failed to load navigation data.\n");
-      return false;
-   }
-   
    // consoleLogger->Log(Color::Blue, L"Map data loaded successfully. Collider count: %zu\n", loadedMapData.colliders.size());
    
    if (not ZoneTableJson::LoadFromFile(config.dataFiles.zoneTablePath, zoneTable_, &error)) {

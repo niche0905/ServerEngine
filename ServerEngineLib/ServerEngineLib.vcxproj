@@ -200,14 +200,6 @@
     <ClInclude Include="Core\Thread\ThreadLocalStorage.h" />
     <ClInclude Include="Core\Thread\ThreadManager.h" />
     <ClInclude Include="Math\Math.h" />
-    <ClInclude Include="Navigation\File\NavMeshFileFormat.h" />
-    <ClInclude Include="Navigation\File\NavMeshFileReader.h" />
-    <ClInclude Include="Navigation\NavigationService.h" />
-    <ClInclude Include="Navigation\NavMeshCommon.h" />
-    <ClInclude Include="Navigation\NavMeshTypes.h" />
-    <ClInclude Include="Navigation\Runtime\NavMeshLoader.h" />
-    <ClInclude Include="Navigation\Runtime\NavMeshQuery.h" />
-    <ClInclude Include="Navigation\Runtime\NavMeshRuntime.h" />
     <ClInclude Include="Network\Address\NetworkAddress.h" />
     <ClInclude Include="Network\Buffer\BaseBuffer.h" />
     <ClInclude Include="Network\Buffer\CirculationBuffer\CirculationBuffer.h" />
@@ -941,11 +933,6 @@
       <SDLCheck>true</SDLCheck>
       <LibCompiled>true</LibCompiled>
     </ClCompile>
-    <ClCompile Include="Navigation\File\NavMeshFileReader.cpp" />
-    <ClCompile Include="Navigation\NavigationService.cpp" />
-    <ClCompile Include="Navigation\Runtime\NavMeshLoader.cpp" />
-    <ClCompile Include="Navigation\Runtime\NavMeshQuery.cpp" />
-    <ClCompile Include="Navigation\Runtime\NavMeshRuntime.cpp" />
     <ClCompile Include="Network\Address\NetworkAddress.cpp">
       <RuntimeLibrary>MultiThreadedDebugDll</RuntimeLibrary>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -1894,9 +1881,6 @@
     <Content Include="Math\Vector.h" />
     <Content Include="Physics\Hitbox\HitGroup.h" />
     <Content Include="Physics\Hitbox\HitResult.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Navigation\Debug\" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

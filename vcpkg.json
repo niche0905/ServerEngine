@@ -6,7 +6,6 @@
     "boost",
     "behaviortree-cpp",
     "glm",
-    "tbb",
-    "recastnavigation"
+    "tbb"
   ]
 }
