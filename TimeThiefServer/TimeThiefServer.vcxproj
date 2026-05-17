@@ -403,6 +403,36 @@
     <ClCompile Include="Shard\GameShard.cpp" />
     <ClCompile Include="Shard\RoomDirectory.cpp" />
     <ClCompile Include="Shard\ShardManager.cpp" />
+    <ClCompile Include="ThirdParty\UEDetour\DetourAlloc.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="ThirdParty\UEDetour\DetourCommon.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="ThirdParty\UEDetour\DetourNavMesh.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="ThirdParty\UEDetour\DetourNavMeshQuery.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="ThirdParty\UEDetour\DetourNode.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
     <ClCompile Include="Utils\FilePathHelper.cpp" />
     <ClCompile Include="Utils\pch.cpp">
       <RuntimeLibrary>MultiThreadedDebugDll</RuntimeLibrary>
@@ -605,6 +635,15 @@
     <ClInclude Include="Shard\GameShard.h" />
     <ClInclude Include="Shard\RoomDirectory.h" />
     <ClInclude Include="Shard\ShardManager.h" />
+    <ClInclude Include="ThirdParty\UEDetour\DetourAlloc.h" />
+    <ClInclude Include="ThirdParty\UEDetour\DetourAssert.h" />
+    <ClInclude Include="ThirdParty\UEDetour\DetourCommon.h" />
+    <ClInclude Include="ThirdParty\UEDetour\DetourLargeWorldCoordinates.h" />
+    <ClInclude Include="ThirdParty\UEDetour\DetourNavMesh.h" />
+    <ClInclude Include="ThirdParty\UEDetour\DetourNavMeshQuery.h" />
+    <ClInclude Include="ThirdParty\UEDetour\DetourNode.h" />
+    <ClInclude Include="ThirdParty\UEDetour\DetourStatus.h" />
+    <ClInclude Include="ThirdParty\UEDetour\UEDetourCompat.h" />
     <ClInclude Include="Utils\FilePathHelper.h" />
     <ClInclude Include="Utils\pch.h" />
     <ClInclude Include="Utils\TypesDef.h" />

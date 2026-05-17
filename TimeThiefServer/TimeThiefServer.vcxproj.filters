@@ -83,6 +83,19 @@
     <ClCompile Include="Service\Room\Systems\Store\StoreSystem.cpp" />
     <ClCompile Include="Service\Room\Systems\Weapon\WeaponSystem.cpp" />
     <ClCompile Include="..\External\ProtocolShared\cpp\test\test_messages.pb.cc" />
+    <ClCompile Include="Data\Map\ServerMap.cpp" />
+    <ClCompile Include="Data\Map\Spatial\UniformGridSpatial.cpp" />
+    <ClCompile Include="Data\Tables\PlayerSpawnTableJson.cpp" />
+    <ClCompile Include="Data\Tables\StoreEntryTableJson.cpp" />
+    <ClCompile Include="Data\Tables\UpgradeTableJson.cpp" />
+    <ClCompile Include="Data\Tables\WeaponTableJson.cpp" />
+    <ClCompile Include="Service\Room\Systems\Combat\CombatSystem.cpp" />
+    <ClCompile Include="Service\Room\Systems\Upgrade\UpgradeSystem.cpp" />
+    <ClCompile Include="ThirdParty\UEDetour\DetourAlloc.cpp" />
+    <ClCompile Include="ThirdParty\UEDetour\DetourCommon.cpp" />
+    <ClCompile Include="ThirdParty\UEDetour\DetourNavMesh.cpp" />
+    <ClCompile Include="ThirdParty\UEDetour\DetourNavMeshQuery.cpp" />
+    <ClCompile Include="ThirdParty\UEDetour\DetourNode.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Content\Object\BaseObject.h" />
@@ -200,6 +213,24 @@
     <ClInclude Include="Service\Room\Systems\Respawn\RespawnSystem.h" />
     <ClInclude Include="Service\Room\Systems\Store\StoreSystem.h" />
     <ClInclude Include="Service\Room\Systems\Weapon\WeaponSystem.h" />
-    <ClInclude Include="..\External\ProtocolShared\cpp\test\test_messages.pb.h" />
+    <ClInclude Include="Data\Map\ServerMap.h" />
+    <ClInclude Include="Data\Map\Spatial\UniformGridSpatial.h" />
+    <ClInclude Include="Data\Tables\PlayerSpawnTable.h" />
+    <ClInclude Include="Data\Tables\PlayerSpawnTableJson.h" />
+    <ClInclude Include="Data\Tables\StoreEntryTableJson.h" />
+    <ClInclude Include="Data\Tables\UpgradeTableJson.h" />
+    <ClInclude Include="Data\Tables\WeaponTableJson.h" />
+    <ClInclude Include="Service\Room\Systems\Combat\CombatSystem.h" />
+    <ClInclude Include="Service\Room\Systems\Combat\ProjectileSweepQuery.h" />
+    <ClInclude Include="Service\Room\Systems\Upgrade\UpgradeSystem.h" />
+    <ClInclude Include="ThirdParty\UEDetour\DetourAlloc.h" />
+    <ClInclude Include="ThirdParty\UEDetour\DetourAssert.h" />
+    <ClInclude Include="ThirdParty\UEDetour\DetourCommon.h" />
+    <ClInclude Include="ThirdParty\UEDetour\DetourLargeWorldCoordinates.h" />
+    <ClInclude Include="ThirdParty\UEDetour\DetourNavMesh.h" />
+    <ClInclude Include="ThirdParty\UEDetour\DetourNavMeshQuery.h" />
+    <ClInclude Include="ThirdParty\UEDetour\DetourNode.h" />
+    <ClInclude Include="ThirdParty\UEDetour\DetourStatus.h" />
+    <ClInclude Include="ThirdParty\UEDetour\UEDetourCompat.h" />
   </ItemGroup>
 </Project>
