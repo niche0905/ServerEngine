@@ -1,14 +1,23 @@
 <root BTCPP_format="4" main_tree_to_execute="Test_MainTree">
     <BehaviorTree ID="Test_MainTree">
         <Fallback>
-            
+
             <Sequence>
-                <HaveTargetPlayer/>
-                <MoveTarget/>
+                <HaveTargetPlayer
+                        self_npc="{self_npc}"
+                        target_id="{target_id}"
+                        target_pawn="{target_pawn}" />
+
+                <MoveTarget
+                        self_npc="{self_npc}"
+                        target_pawn="{target_pawn}" />
             </Sequence>
 
-            <WaitForTarget/>
-            
+            <WaitForTarget
+                    self_npc="{self_npc}"
+                    target_pawn="{target_pawn}"
+                    target_id="{target_id}" />
+
         </Fallback>
     </BehaviorTree>
 </root>
