@@ -18,8 +18,15 @@ BT::PortsList WaitForTargetNode::providedPorts()
     };
 }
 
-BT::NodeStatus WaitForTargetNode::tick()
+BT::NodeStatus WaitForTargetNode::onStart()
 {
+    return onRunning();
+}
+
+BT::NodeStatus WaitForTargetNode::onRunning()
+{
+    // consoleLogger->Log(Color::Blue, L"WaitForTargetNode ticked.\n");
+    
     MonsterPawn* selfNpc = BBT::GetSelfNpc(config().blackboard);
     if (selfNpc == nullptr) {
         return BT::NodeStatus::FAILURE;
@@ -67,4 +74,8 @@ BT::NodeStatus WaitForTargetNode::tick()
     setOutput<ObjectId>(BB::TargetId, nearestTarget->GetId());
     
     return BT::NodeStatus::SUCCESS;
+}
+
+void WaitForTargetNode::onHalted()
+{
 }

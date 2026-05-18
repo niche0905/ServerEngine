@@ -20,6 +20,8 @@ BT::PortsList HaveTargetPlayerNode::providedPorts()
 
 BT::NodeStatus HaveTargetPlayerNode::tick()
 {
+    // consoleLogger->Log(Color::Blue, L"HaveTargetPlayerNode ticked.\n");
+    
     Pawn* targetPawn = nullptr;
     if (getInput<Pawn*>(BB::TargetPawn, targetPawn) and targetPawn != nullptr) {
         if (targetPawn->IsDead())
@@ -38,7 +40,7 @@ BT::NodeStatus HaveTargetPlayerNode::tick()
     }
     
     MonsterPawn* selfNpc = nullptr;
-    if (getInput<MonsterPawn*>(BB::SelfNpc, selfNpc) and selfNpc != nullptr) {
+    if (!getInput<MonsterPawn*>(BB::SelfNpc, selfNpc) or selfNpc == nullptr) {
         return BT::NodeStatus::FAILURE;
     }
     

@@ -18,8 +18,15 @@ BT::PortsList MoveTargetNode::providedPorts()
     };
 }
 
-BT::NodeStatus MoveTargetNode::tick()
+BT::NodeStatus MoveTargetNode::onStart()
 {
+    return onRunning();
+}
+
+BT::NodeStatus MoveTargetNode::onRunning()
+{
+    // consoleLogger->Log(Color::Blue, L"MoveTargetNode ticked.\n");
+    
     MonsterPawn* selfNpc = BBT::GetSelfNpc(config().blackboard);
     if (selfNpc == nullptr) {
         return BT::NodeStatus::FAILURE;
@@ -62,3 +69,14 @@ BT::NodeStatus MoveTargetNode::tick()
     
     return BT::NodeStatus::RUNNING;
 }
+
+void MoveTargetNode::onHalted()
+{
+    MonsterPawn* selfNpc = BBT::GetSelfNpc(config().blackboard);
+    if (selfNpc == nullptr) {
+        return;
+    }
+    
+    selfNpc->StopMove();
+}
+
