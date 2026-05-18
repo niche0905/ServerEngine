@@ -5,9 +5,6 @@
 
 class ObjectManager;
 
-// BT 라이브러리 wrapper 전방 선언 (아직 구현 안 됨)
-class BTBrain;
-
 /*---------------
    MonsterPawn
 ---------------*/
@@ -47,6 +44,13 @@ protected:
    virtual void OnPreDestroy() override;
    
 public:
+   void MoveTo(const Vector3& targetPos);
+   void StopMove();
+   
+private:
+   void UpdateMove(float dt);
+   
+public:
    void StartAI();
    void StopAI();
    
@@ -64,9 +68,12 @@ private:
 private:
    int32 templateId_{ 0 };
    
-   BTBrain* brain_{ nullptr };
-   
    LootSourceComponent loot_;
    MonsterAiComponent ai_;
+   
+   bool hasMovetarget_{false};
+   Vector3 moveTarget_{};
+   float moveSpeed_{600.0f};
+   float moveAcceptRadius_{ 30.0f};
     
 };

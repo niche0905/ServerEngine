@@ -64,6 +64,7 @@ void MonsterAiComponent::Tick(float dt)
       return;
    
    if (tree_ == nullptr)
+      return;
    
    PushRuntimeStateToBlackboard(dt);
    

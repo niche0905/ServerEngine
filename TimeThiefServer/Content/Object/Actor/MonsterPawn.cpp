@@ -45,10 +45,11 @@ void MonsterPawn::Tick(float dt)
    if (IsDead())
       return;
 
-   Pawn::Tick(dt);
+   // Pawn::Tick(dt);
    
    ai_.Tick(dt);
    
+   UpdateMove(dt);
 }
 
 void MonsterPawn::OnPreDestroy()
@@ -57,6 +58,47 @@ void MonsterPawn::OnPreDestroy()
    Pawn::OnPreDestroy();
    // 필요하다면 정리
    // ex) brain detach, 드랍 정리 등
+}
+
+void MonsterPawn::MoveTo(const Vector3& targetPos)
+{
+   moveTarget_ = targetPos;
+   hasMovetarget_ = true;
+}
+
+void MonsterPawn::StopMove()
+{
+   hasMovetarget_ = false;
+   SetVelocity(Vector3{});
+}
+
+void MonsterPawn::UpdateMove(float dt)
+{
+   if (!hasMovetarget_)
+      return;
+   
+   const Vector3 pos = GetPosition();
+   const Vector3 toTarget = moveTarget_ - pos;
+   
+   const float distSq = toTarget.LengthSq();
+   if (distSq <= moveAcceptRadius_ * moveAcceptRadius_) {
+      StopMove();
+      return;
+   }
+   
+   const float dist = std::sqrt(distSq);
+   const Vector3 dir = toTarget.Normalized();
+   
+   const float moveDelta = moveSpeed_ * dt;
+   
+   if (moveDelta >= dist) {
+      SetPosition(moveTarget_);
+      StopMove();
+      return;
+   }
+   
+   SetPosition(pos + dir * moveDelta);
+   SetVelocity(dir * moveDelta);
 }
 
 void MonsterPawn::StartAI()

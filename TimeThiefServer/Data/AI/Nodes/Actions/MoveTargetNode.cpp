@@ -54,8 +54,7 @@ BT::NodeStatus MoveTargetNode::tick()
     if (path.size() >= 2)
         nextMovePos = path[1];
     
-    // TODO: MoveTo 함수 만들기
-    selfNpc->SetPosition(nextMovePos);
+    selfNpc->MoveTo(nextMovePos);
     
     return BT::NodeStatus::RUNNING;
 }

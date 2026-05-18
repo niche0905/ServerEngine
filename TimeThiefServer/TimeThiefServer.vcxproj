@@ -677,9 +677,6 @@
     <Content Include="config\data\tables\ZoneDataTable.json" />
     <Content Include="config\server.dev.json" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Content\Gameplay\AI\Nodes\" />
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
