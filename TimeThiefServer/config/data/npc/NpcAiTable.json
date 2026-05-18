@@ -2,6 +2,7 @@
   {
     "npc_id": 1,
     "name": "Test_NPC",
-    "bt_xml": "Test_NPC.xml"
+    "bt_id": "Test_MainTree",
+    "bt_xml": "behavior/Test_NPC.xml"
   }
 ]

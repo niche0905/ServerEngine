@@ -285,6 +285,7 @@
     <ClCompile Include="Content\Object\Actor\WorldItemActor.cpp" />
     <ClCompile Include="Content\Object\BaseObject.cpp" />
     <ClCompile Include="Content\Shared\BaseComponent.cpp" />
+    <ClCompile Include="Data\Ai\AiManager.cpp" />
     <ClCompile Include="Data\GameDataManager.cpp" />
     <ClCompile Include="Data\Loader\ServerMapLoader.cpp" />
     <ClCompile Include="Data\Loader\ServerMapLoaderTest.cpp" />
@@ -577,6 +578,7 @@
     <ClInclude Include="Content\Object\ObjectId.h" />
     <ClInclude Include="Content\Object\ObjectManager.h" />
     <ClInclude Include="Content\Shared\BaseComponent.h" />
+    <ClInclude Include="Data\Ai\AiManager.h" />
     <ClInclude Include="Data\GameDataManager.h" />
     <ClInclude Include="Data\Loader\ServerMapLoader.h" />
     <ClInclude Include="Data\Loader\ServerMapLoaderTest.h" />
@@ -655,8 +657,8 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="CMakeLists.txt" />
+    <Content Include="config\data\npc\behavior\Test_NPC.xml" />
     <Content Include="config\data\npc\NpcAiTable.json" />
-    <Content Include="config\data\npc\Test_NPC.xml" />
     <Content Include="config\data\tables\LootTables.json" />
     <Content Include="config\data\tables\PlayerSpawnTable.json" />
     <Content Include="config\data\tables\StatUpgradeTable.json" />

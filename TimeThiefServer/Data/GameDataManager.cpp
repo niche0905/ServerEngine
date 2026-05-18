@@ -114,5 +114,10 @@ bool GameDataManager::Init(const ServerConfig& config)
       return false;
    }
    
+   if (not aiManager_.Init(npcAiTable_)) {
+      consoleLogger->Log(Color::Red, L"[GDM] Failed to initialize AiManager with loaded NpcAiTable.\n");
+      return false;
+   }
+   
    return true;
 }

@@ -49,8 +49,14 @@ bool NpcAiTable::LoadFromFile(const std::filesystem::path& filePath, std::string
             return false;
         }
         
+        if (!elem.isMember("bt_id") or !elem["bt_id"].isString()) {
+            if (outError) *outError = "Missing or invalid bt_id.";
+            return false;
+        }
+        
         NpcAiEntry entry;
         entry.npcId = elem["npc_id"].asUInt();
+        entry.btId = elem["bt_id"].asString();
         
         if (elem.isMember("name") and elem["name"].isString())
             entry.name = elem["name"].asString();
