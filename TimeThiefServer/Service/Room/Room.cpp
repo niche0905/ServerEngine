@@ -313,7 +313,7 @@ void Room::SetObject()
          return;
       
       monster->SetTemplateId(1);
-      monster->SetPosition(Vector3{ 0.0f, 300.0f, 100.0f });
+      monster->SetPosition(Vector3{ 0.0f, 0.0f, 0.0f });
       
       // TODO: 이때 시작하는 게 아닌 Game Start 할 때 시작하도록 바꾸어야 한다
       monster->StartAI();

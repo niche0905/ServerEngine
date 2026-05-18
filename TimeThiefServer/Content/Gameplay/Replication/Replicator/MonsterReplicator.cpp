@@ -19,31 +19,41 @@ ReplicateResult MonsterReplicator::FlushMonsterPeriodic(MonsterPawn& monster, Re
 {
     ReplicateResult result;
     
+    // TODO: 시간 제한 필요할 듯? last update time
+    
+    constexpr uint64 MonsterReplicateIntervalMs = 200;   // TODO: 상수나 config 값으로 빼기
+    
+    const uint64 lastMs = monster.GetReplicatedState().lastReplicatedTimeMs;
+    
     if (HasDirty(flags, ReplicationDirty::Transform)) {
-        se::game::N_Move noti;
+        
+        if ((nowMs - lastMs) >= MonsterReplicateIntervalMs)
         {
-            auto* entityIdPtr = noti.mutable_entity_id();
-            entityIdPtr->set_value(monster.GetId().value);
+            se::game::N_Move noti;
+            {
+                auto* entityIdPtr = noti.mutable_entity_id();
+                entityIdPtr->set_value(monster.GetId().value);
             
-            noti.set_object_type(se::common::OBJ_MONSTER);
+                noti.set_object_type(se::common::OBJ_MONSTER);
             
-            auto* transformPtr = noti.mutable_transform();
-            auto* positionPtr = transformPtr->mutable_position();
-            const auto& newPos = monster.GetPosition();
-            positionPtr->set_x(newPos.x);
-            positionPtr->set_y(newPos.y);
-            positionPtr->set_z(newPos.z);
-            transformPtr->set_yaw(monster.GetYaw());
+                auto* transformPtr = noti.mutable_transform();
+                auto* positionPtr = transformPtr->mutable_position();
+                const auto& newPos = monster.GetPosition();
+                positionPtr->set_x(newPos.x);
+                positionPtr->set_y(newPos.y);
+                positionPtr->set_z(newPos.z);
+                transformPtr->set_yaw(monster.GetYaw());
             
-            auto* monsterMovementPtr = noti.mutable_monster_movement();
+                auto* monsterMovementPtr = noti.mutable_monster_movement();
+            }
+        
+            SendBufferRef sendBuffer = ServerPacketHandler::MakeSendBuffer(noti);
+            // Broadcast
+            room.BroadcastReplication(sendBuffer);
+        
+            result.sent = true;
+            result.handled |= ReplicationDirty::Transform;
         }
-        
-        SendBufferRef sendBuffer = ServerPacketHandler::MakeSendBuffer(noti);
-        // Broadcast
-        room.BroadcastReplication(sendBuffer);
-        
-        result.sent = true;
-        result.handled |= ReplicationDirty::Transform;
     }
     
     return result;
