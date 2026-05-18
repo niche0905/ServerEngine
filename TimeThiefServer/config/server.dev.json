@@ -14,7 +14,8 @@
         "weapon_table": "data/tables/WeaponTable.json",
         "stat_upgrade_table": "data/tables/StatUpgradeTable.json",
         "weapon_upgrade_table": "data/tables/WeaponUpgradeTable.json",
-        "player_spawn_table": "data/tables/PlayerSpawnTable.json"
+        "player_spawn_table": "data/tables/PlayerSpawnTable.json",
+        "npc_ai_table": "data/npc/NpcAiTable.json"
     },
     "game": {
         "movement_update_hz": 10,

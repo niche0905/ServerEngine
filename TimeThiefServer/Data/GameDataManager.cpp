@@ -109,5 +109,10 @@ bool GameDataManager::Init(const ServerConfig& config)
       }
    }
    
+   if (not npcAiTable_.LoadFromFile(config.dataFiles.npcAiTablePath, &error)) {
+      consoleLogger->Log(Color::Red, L"[GDM] Failed to load NpcAiTable: %hs\n", error.c_str());
+      return false;
+   }
+   
    return true;
 }

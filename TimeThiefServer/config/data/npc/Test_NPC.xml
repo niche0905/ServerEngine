@@ -1,0 +1,11 @@
+<root main_tree_to_execute="Test_MainTree">
+    <BehaviorTree ID="Test_MainTree">
+        <Selector>
+            <Sequence>
+                <IsPlayerInRange/>
+                <Attack/>
+            </Sequence>
+            <MoveRandom/>
+        </Selector>
+    </BehaviorTree>
+</root>

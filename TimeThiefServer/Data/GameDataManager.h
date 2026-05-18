@@ -2,6 +2,7 @@
 #include "Data/Tables/ZoneTable.h"
 #include "Map/ServerMap.h"
 #include "Tables/LootTableTypes.h"
+#include "Tables/NpcAiTable.h"
 #include "Tables/PlayerSpawnTable.h"
 #include "Tables/StoreEntryTable.h"
 #include "Tables/UpgradeTable.h"
@@ -27,6 +28,7 @@ public:
    const WeaponTable& GetWeaponTable() const { return weaponTable_; }
    const UpgradeTable& GetUpgradeTable() const { return upgradeTable_; }
    const PlayerSpawnTable& GetPlayerSpawnTable() const { return playerSpawnTable_; }
+   const NpcAiTable& GetNpcAiTable() const { return npcAiTable_; }
    
 private:
    ServerMap                  serverMap_;
@@ -36,5 +38,6 @@ private:
    WeaponTable                weaponTable_;
    UpgradeTable               upgradeTable_;
    PlayerSpawnTable           playerSpawnTable_;
+   NpcAiTable                 npcAiTable_;
    
 };

@@ -101,6 +101,9 @@ bool ServerConfigReader::ParseJsonText(const std::string& jsonText, const std::f
       if (dataFiles.isMember("player_spawn_table"))
          newConfig.dataFiles.playerSpawnTablePath = ResolvePath(dataFiles["player_spawn_table"].asString(), baseDir);
       
+      if (dataFiles.isMember("npc_ai_table"))
+         newConfig.dataFiles.npcAiTablePath = ResolvePath(dataFiles["npc_ai_table"].asString(), baseDir);
+      
    }
    
    // game

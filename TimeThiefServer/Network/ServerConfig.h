@@ -20,6 +20,7 @@ struct DataFilesConfig
     std::filesystem::path weaponUpgradeTablePath;
     std::filesystem::path statUpgradeTablePath;
     std::filesystem::path playerSpawnTablePath;
+    std::filesystem::path npcAiTablePath;
 };
 
 struct GameConfig
