@@ -251,6 +251,56 @@ namespace SE::Nav
         return true;
     }
 
+    bool ServerNavigation::MoveAlongSurface(const Math::Vector3& start, const Math::Vector3& end,
+        Math::Vector3& outPos) const
+    {
+        if (!IsLoaded())
+            return false;
+
+        constexpr Math::Vector3 halfExtents{100.0f, 300.0f, 100.0f};
+
+        dtPolyRef startRef = 0;
+        Math::Vector3 nearestStart{};
+
+        if (!FindNearestPoly(start, halfExtents, startRef, nearestStart)) {
+            return false;
+        }
+
+        dtReal detourStart[3];
+        dtReal detourEnd[3];
+        dtReal result[3];
+
+        ToDetour(nearestStart, detourStart);
+        ToDetour(end, detourEnd);
+
+        dtPolyRef visited[16]{};
+        int visitedCount = 0;
+
+        const dtStatus status = navQuery_->moveAlongSurface(
+            startRef,
+            detourStart,
+            detourEnd,
+            filter_,
+            result,
+            visited,
+            &visitedCount,
+            16
+        );
+
+        if (dtStatusFailed(status)) {
+            return false;
+        }
+
+        outPos = FromDetour(result);
+
+        dtReal height = 0.0f;
+        if (dtStatusSucceed(navQuery_->getPolyHeight(visitedCount > 0 ? visited[visitedCount - 1] : startRef, result, &height))) {
+            outPos.z = height;
+        }
+        
+        return true;
+    }
+
     bool ServerNavigation::DebugValidatePoint(const SE::Math::Vector3& pos) const
     {
         if (!IsLoaded())

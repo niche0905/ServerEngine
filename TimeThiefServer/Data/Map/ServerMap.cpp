@@ -336,3 +336,9 @@ bool ServerMap::ProjectToNavMesh(const SE::Math::Vector3& pos, SE::Math::Vector3
 {
    return navigation_.ProjectToNavMesh(pos, outPos);
 }
+
+bool ServerMap::MoveAlongSurface(const SE::Math::Vector3& start, const SE::Math::Vector3& end,
+   SE::Math::Vector3& outPos) const
+{
+   return navigation_.MoveAlongSurface(start, end, outPos);
+}

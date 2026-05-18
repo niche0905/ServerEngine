@@ -35,6 +35,8 @@ namespace SE::Nav
       
       bool ProjectToNavMesh(const Math::Vector3& pos, Math::Vector3& outPos) const;
       
+      bool MoveAlongSurface(const Math::Vector3& start, const Math::Vector3& end, Math::Vector3& outPos) const;
+      
       bool IsLoaded() const { return navMesh_ != nullptr and navQuery_ != nullptr; }
       
    public:
