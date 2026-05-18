@@ -6,10 +6,13 @@ class MonsterPawn;
 namespace AiBlackboardKey
 {
     inline constexpr const char* SelfNpc                = "self_npc";
+    inline constexpr const char* ObjectManager          = "object_manager";
     inline constexpr const char* TargetPawn             = "target_pawn";
     inline constexpr const char* TargetId               = "target_id";
     inline constexpr const char* SpawnPos               = "spawn_pos";
     inline constexpr const char* MoveTarget             = "move_target";
+    
+    inline constexpr const char* DeltaTime              = "delta_time";
 }
 
 namespace AiBlackboard

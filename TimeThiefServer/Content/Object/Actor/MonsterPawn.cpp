@@ -33,7 +33,9 @@ void MonsterPawn::OnSpawn()
    respawn_.Init(this, RespawnPolicy{});
    loot_.Init(this, 1);    // TEMP: LootSourceComponent의 tableId는 1로 고정
    // TODO: AI 컴포넌트 초기화 (BT 트리 로드)
-   // ai_.Initialize(this, objectManager_, "path...");
+   if (auto room = GetRoom()) {
+      ai_.Initialize(this, &room->GetObjectManager(), 1);
+   }
    
    SetDead(false);
 }
@@ -55,6 +57,16 @@ void MonsterPawn::OnPreDestroy()
    Pawn::OnPreDestroy();
    // 필요하다면 정리
    // ex) brain detach, 드랍 정리 등
+}
+
+void MonsterPawn::StartAI()
+{
+   ai_.Start();
+}
+
+void MonsterPawn::StopAI()
+{
+   ai_.Stop();
 }
 
 void MonsterPawn::OnDeath(ObjectManager& om, const DamageContext& ctx, const DamageResult& dmgResult)

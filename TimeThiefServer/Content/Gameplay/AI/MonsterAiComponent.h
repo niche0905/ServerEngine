@@ -5,6 +5,7 @@
 #include "behaviortree_cpp/bt_factory.h"
 #include "behaviortree_cpp/blackboard.h"
 #include "behaviortree_cpp/behavior_tree.h"
+#include "Content/Object/ObjectId.h"
 
 class MonsterPawn;
 class ObjectManager;
@@ -26,7 +27,7 @@ public:
    MonsterAiComponent& operator=(const MonsterAiComponent&) = delete;
    
 public:
-   bool Initialize(MonsterPawn* owner, ObjectManager* objectManager, std::string_view treeXmlPath);
+   bool Initialize(MonsterPawn* owner, ObjectManager* objectManager, uint32 npcId);
    void Shutdown();
    
    void Tick(float dt);
@@ -42,47 +43,41 @@ public:
    const BT::Blackboard::Ptr GetBlackboard() const { return blackboard_; }
    
 public:
-   bool IsInitialized() const { return initialized_; }
-   
    void Start();
    void Stop();
    bool IsRunning() const { return running_; }
    
 public:
-   uint64 GetTargetId() const { return targetId_; }
-   void SetTargetId(uint64 targetId) { targetId_ = targetId; }
+   ObjectId GetTargetId() const { return targetId_; }
+   void SetTargetId(ObjectId targetId) { targetId_ = targetId; }
    
-   void ClearTarget() { targetId_ = 0; }
-   bool HasTarget() const { return targetId_ != 0; }
+   void ClearTarget() { targetId_ = ObjectId{}; }
+   bool HasTarget() const { return targetId_ != ObjectId{}; }
    
 // BT node API
 public:
-   bool TryFindTarget();
-   bool IsTargetAlive() const;
-   bool IsTargetInRange(float range) const;
-   
-   bool RequestMoveToTarget(float acceptanceRadius);
-   bool RequestMoveToHome(float acceptanceRadius);
-   
-   bool CanAttack() const;
-   bool TryAttack();
+   // bool TryFindTarget();
+   // bool IsTargetAlive() const;
+   // bool IsTargetInRange(float range) const;
+   //
+   // bool RequestMoveToTarget(float acceptanceRadius);
+   // bool RequestMoveToHome(float acceptanceRadius);
+   //
+   // bool CanAttack() const;
+   // bool TryAttack();
    
 private:
-   bool RegisterNodes();
-   bool CreateTreeFromFile(std::string_view treeXmlPath);
    void PushRuntimeStateToBlackboard(float dt);
    
 private:
    MonsterPawn* owner_{ nullptr };
    ObjectManager* objectManager_{ nullptr };
    
-   bool initialized_{ false };
    bool running_{ false };
    
-   uint64 targetId_{ 0 };
+   ObjectId targetId_{};
    
-   BT::BehaviorTreeFactory factory_;
    BT::Blackboard::Ptr blackboard_;
-   BT::Tree tree_;
+   std::unique_ptr<BT::Tree> tree_;
     
 };

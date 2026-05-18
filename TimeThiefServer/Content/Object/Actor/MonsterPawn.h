@@ -46,6 +46,10 @@ protected:
    virtual void Tick(float dt) override;
    virtual void OnPreDestroy() override;
    
+public:
+   void StartAI();
+   void StopAI();
+   
 protected:
    virtual void OnDeath(ObjectManager& om, const DamageContext& ctx, const DamageResult& dmgResult) override;
    

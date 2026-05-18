@@ -16,7 +16,7 @@ class AiManager
 public:
    bool Init(const NpcAiTable& table);
    
-   BT::Tree CreateTree(uint32 npcId);
+   BT::Tree CreateTree(uint32 npcId, const BT::Blackboard::Ptr& blackboard);
    
 private:
    BT::BehaviorTreeFactory factory_;

@@ -2,6 +2,8 @@
 #include <atomic>
 #include <memory>
 #include <functional>
+
+#include "Data/AI/AiManager.h"
 #include "Service/Timer/TimerTask.h"
 #include "Service/Timer/TimerQueue.h"
 #include "Service/Job/JobQueue.h"
@@ -58,6 +60,9 @@ public:
    TimerId ScheduleAfter(Duration delay, Job job);
    bool CancelTimer(TimerId timerId);
    
+public:
+   BT::Tree CreateAiTree(uint32 npcId, const BT::Blackboard::Ptr& blackboard);
+   
 private:
    void ProcessJobs();
    void ProcessTimers();
@@ -78,6 +83,7 @@ private:
    std::atomic<bool>       running_ = false;
    
    ShardRoomManager        shardRoomManager_{};
+   AiManager               aiManager_{};
    RoomTickScheduler       roomScheduler_{};
    JobQueue                jobQueue_{};
    TimerQueue              timerQueue_{};

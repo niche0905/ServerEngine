@@ -2,6 +2,7 @@
 #include "GameShard.h"
 #include "RoomDirectory.h"
 #include "Core/Thread/ThreadManager.h"
+#include "Data/GameDataManager.h"
 #include "Network/ServerConfig.h"
 #include "Network/Session/SessionManager/SessionManager.h"
 #include "Service/Player/PlayerManager/PlayerManager.h"
@@ -20,7 +21,7 @@ GameShard::GameShard(ShardId shardId, SessionManager& sessionManager, RoomDirect
    , gameConfig_{ config }
    , roomTickIntervalMs_{ config.roomTickIntervalMs }
 {
-   
+   aiManager_.Init(gameDataManager_.GetNpcAiTable());
 }
 
 bool GameShard::Start(ThreadManager& threadManager)
@@ -164,6 +165,11 @@ TimerId GameShard::ScheduleAfter(Duration delay, Job job)
 bool GameShard::CancelTimer(TimerId timerId)
 {
    return timerQueue_.Cancel(timerId);
+}
+
+BT::Tree GameShard::CreateAiTree(uint32 npcId, const BT::Blackboard::Ptr& blackboard)
+{
+   return aiManager_.CreateTree(npcId, blackboard);
 }
 
 void GameShard::ProcessJobs()

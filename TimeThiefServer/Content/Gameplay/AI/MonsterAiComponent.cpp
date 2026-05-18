@@ -1,33 +1,44 @@
 ﻿#include "pch.h"
 #include "MonsterAiComponent.h"
+#include "Content/Object/ObjectId.h"
+#include "Content/Object/Actor/MonsterPawn.h"
+#include "Data/GameDataManager.h"
+#include "Data/AI/AiBlackboard.h"
+#include "Service/Room/Room.h"
+#include "Data/AI/AiManager.h"
+#include "Shard/GameShard.h"
+
+namespace BB = AiBlackboardKey;
+class Pawn;
 
 /*----------------------
    MonsterAiComponent
 ----------------------*/
 
-bool MonsterAiComponent::Initialize(MonsterPawn* owner, ObjectManager* objectManager, std::string_view treeXmlPath)
+bool MonsterAiComponent::Initialize(MonsterPawn* owner, ObjectManager* objectManager, uint32 npcId)
 {
-   if (initialized_)
-      return false;
-   
-   if (owner == nullptr or objectManager == nullptr or treeXmlPath.empty())
+   if (owner == nullptr or objectManager == nullptr)
       return false;
    
    owner_ = owner;
    objectManager_ = objectManager;
    blackboard_ = BT::Blackboard::create();
    
-   blackboard_->set("self", owner_);
-   blackboard_->set("object_manager", objectManager_);
-   blackboard_->set("target_id", targetId_);
+   blackboard_->set<MonsterPawn*>(BB::SelfNpc, owner_);
+   blackboard_->set<ObjectManager*>(BB::ObjectManager, objectManager_);
+   blackboard_->set<Pawn*>(BB::TargetPawn, nullptr);
+   blackboard_->set<ObjectId>(BB::TargetId, ObjectId{});
    
-   if (!RegisterNodes())
+   auto room = owner_->GetRoom();
+   if (room == nullptr)
       return false;
    
-   if (!CreateTreeFromFile(treeXmlPath))
+   auto ownerShard = room->GetOwnerShard();
+   if (ownerShard == nullptr)
       return false;
    
-   initialized_ = true;
+   tree_ = std::make_unique<BT::Tree>(ownerShard->CreateAiTree(npcId, blackboard_));
+   
    running_ = true;
    return true;
 }
@@ -35,10 +46,9 @@ bool MonsterAiComponent::Initialize(MonsterPawn* owner, ObjectManager* objectMan
 void MonsterAiComponent::Shutdown()
 {
    running_ = false;
-   initialized_ = false;
-   targetId_ = 0;
+   targetId_ = ObjectId{};
    
-   tree_ = BT::Tree{};
+   tree_ = nullptr;
    blackboard_.reset();
    
    objectManager_ = nullptr;
@@ -47,18 +57,22 @@ void MonsterAiComponent::Shutdown()
 
 void MonsterAiComponent::Tick(float dt)
 {
-   if (!initialized_ or !running_)
+   if (!running_)
       return;
+   
+   if (owner_ == nullptr)
+      return;
+   
+   if (tree_ == nullptr)
    
    PushRuntimeStateToBlackboard(dt);
    
-   tree_.tickOnce();
+   tree_->tickOnce();
 }
 
 void MonsterAiComponent::Start()
 {
-   if (initialized_)
-      running_ = true;
+   running_ = true;
 }
 
 void MonsterAiComponent::Stop()
@@ -66,89 +80,67 @@ void MonsterAiComponent::Stop()
    running_ = false;
 }
 
-bool MonsterAiComponent::TryFindTarget()
-{
-   // TODO: owner_ 주변에 Target 검색 (있다면 targetId 갱신)
-   return false;
-}
-
-bool MonsterAiComponent::IsTargetAlive() const
-{
-   if (targetId_ == 0 or objectManager_ == nullptr)
-      return false;
-   
-   // TODO: targetId_에 해당하는 Object가 존재하는지, 그리고 살아있는지 확인
-   return true;
-}
-
-bool MonsterAiComponent::IsTargetInRange(float range) const
-{
-    if (targetId_ == 0 or owner_ == nullptr or objectManager_ == nullptr)
-      return false;
-   
-   // TODO: owner_와 targetId_에 해당하는 Object 간의 거리를 계산하여 range 이내인지 확인
-   return false;
-}
-
-bool MonsterAiComponent::RequestMoveToTarget(float acceptanceRadius)
-{
-   if (targetId_ == 0 or owner_ == nullptr)
-      return false;
-   
-   // TODO: target 위치를 얻어서 해당 방향으로 owner_를 이동시키는 명령을 ObjectManager에 요청 (acceptanceRadius 이내에 도달하면 성공)
-   return false;
-}
-
-bool MonsterAiComponent::RequestMoveToHome(float acceptanceRadius)
-{
-   if (owner_ == nullptr)
-      return false;
-   
-   // TODO: owner_의 home 위치를 얻어서 해당 방향으로 owner_를 이동시키는 명령을 ObjectManager에 요청 (acceptanceRadius 이내에 도달하면 성공)
-   return false;
-}
-
-bool MonsterAiComponent::CanAttack() const
-{
-   if (owner_ == nullptr)
-      return false;
-   
-   // TODO: 공격 가능 여부 판단 (예: 공격 쿨다운, 체력 상태 등)
-   return true;
-}
-
-bool MonsterAiComponent::TryAttack()
-{
-   if (!CanAttack())
-      return false;
-   
-   // TODO: targetId_에 해당하는 Object에 공격 명령을 ObjectManager에 요청 (성공 여부 반환)
-   return true;
-}
-
-bool MonsterAiComponent::RegisterNodes()
-{
-   // ex)
-   // factory_.registerNodeType<BT_FindTarget>("FindTarget");
-   
-   return false;
-}
-
-bool MonsterAiComponent::CreateTreeFromFile(std::string_view treeXmlPath)
-{
-   try
-   {
-      tree_ = factory_.createTreeFromFile(std::string(treeXmlPath), blackboard_);
-      return true;
-   }
-   catch (...)
-   {
-      return false;
-   }
-}
+// bool MonsterAiComponent::TryFindTarget()
+// {
+//    // TODO: owner_ 주변에 Target 검색 (있다면 targetId 갱신)
+//    return false;
+// }
+//
+// bool MonsterAiComponent::IsTargetAlive() const
+// {
+//    if (targetId_ == 0 or objectManager_ == nullptr)
+//       return false;
+//    
+//    // TODO: targetId_에 해당하는 Object가 존재하는지, 그리고 살아있는지 확인
+//    return true;
+// }
+//
+// bool MonsterAiComponent::IsTargetInRange(float range) const
+// {
+//     if (targetId_ == 0 or owner_ == nullptr or objectManager_ == nullptr)
+//       return false;
+//    
+//    // TODO: owner_와 targetId_에 해당하는 Object 간의 거리를 계산하여 range 이내인지 확인
+//    return false;
+// }
+//
+// bool MonsterAiComponent::RequestMoveToTarget(float acceptanceRadius)
+// {
+//    if (targetId_ == 0 or owner_ == nullptr)
+//       return false;
+//    
+//    // TODO: target 위치를 얻어서 해당 방향으로 owner_를 이동시키는 명령을 ObjectManager에 요청 (acceptanceRadius 이내에 도달하면 성공)
+//    return false;
+// }
+//
+// bool MonsterAiComponent::RequestMoveToHome(float acceptanceRadius)
+// {
+//    if (owner_ == nullptr)
+//       return false;
+//    
+//    // TODO: owner_의 home 위치를 얻어서 해당 방향으로 owner_를 이동시키는 명령을 ObjectManager에 요청 (acceptanceRadius 이내에 도달하면 성공)
+//    return false;
+// }
+//
+// bool MonsterAiComponent::CanAttack() const
+// {
+//    if (owner_ == nullptr)
+//       return false;
+//    
+//    // TODO: 공격 가능 여부 판단 (예: 공격 쿨다운, 체력 상태 등)
+//    return true;
+// }
+//
+// bool MonsterAiComponent::TryAttack()
+// {
+//    if (!CanAttack())
+//       return false;
+//    
+//    // TODO: targetId_에 해당하는 Object에 공격 명령을 ObjectManager에 요청 (성공 여부 반환)
+//    return true;
+// }
 
 void MonsterAiComponent::PushRuntimeStateToBlackboard(float dt)
 {
-   blackboard_->set("dt", dt);
-   blackboard_->set("target_id", targetId_);
+   blackboard_->set(BB::DeltaTime, dt);
 }

@@ -55,7 +55,7 @@ namespace
          return BuildChestSpawnInfo(static_cast<ChestActor*>(obj), outInfo);
          
       case ObjectType::OBJ_STORE:
-         return  BuildStoreSpawnInfo(static_cast<StoreActor*>(obj), outInfo);
+         return BuildStoreSpawnInfo(static_cast<StoreActor*>(obj), outInfo);
          
       default:
          return false;
@@ -289,6 +289,19 @@ void Room::SetObject()
    {
       auto* store = SpawnObject<StoreActor>(ObjectFlags::None);
       store->SetPosition(Vector3{ 0.0f, -300.0f, 100.0f });
+   }
+   
+   // TEMP: 몬스터 테스트 용
+   {
+      auto* monster = SpawnObject<MonsterPawn>(ObjectFlags::Replicable | ObjectFlags::Tickable);
+      if (monster == nullptr)
+         return;
+      
+      monster->SetTemplateId(1);
+      monster->SetPosition(Vector3{ 0.0f, 300.0f, 100.0f });
+      
+      // TODO: 이때 시작하는 게 아닌 Game Start 할 때 시작하도록 바꾸어야 한다
+      monster->StartAI();
    }
 }
 

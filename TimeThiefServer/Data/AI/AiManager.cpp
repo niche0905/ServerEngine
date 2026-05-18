@@ -30,11 +30,11 @@ bool AiManager::Init(const NpcAiTable& table)
    return true;
 }
 
-BT::Tree AiManager::CreateTree(uint32 npcId)
+BT::Tree AiManager::CreateTree(uint32 npcId, const BT::Blackboard::Ptr& blackboard)
 {
    const auto* entry = table_->Find(npcId);
    if (!entry)
       throw std::runtime_error("NPC AI not found");
    
-   return factory_.createTree(entry->btId);
+   return factory_.createTree(entry->btId, blackboard);
 }

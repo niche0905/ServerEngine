@@ -1,5 +1,4 @@
 ﻿#pragma once
-#include "AI/AiManager.h"
 #include "Data/Tables/ZoneTable.h"
 #include "Map/ServerMap.h"
 #include "Tables/LootTableTypes.h"
@@ -30,7 +29,6 @@ public:
    const UpgradeTable& GetUpgradeTable() const { return upgradeTable_; }
    const PlayerSpawnTable& GetPlayerSpawnTable() const { return playerSpawnTable_; }
    const NpcAiTable& GetNpcAiTable() const { return npcAiTable_; }
-   const AiManager& GetAiManager() const { return aiManager_; }
    
 private:
    ServerMap                  serverMap_;
@@ -41,6 +39,5 @@ private:
    UpgradeTable               upgradeTable_;
    PlayerSpawnTable           playerSpawnTable_;
    NpcAiTable                 npcAiTable_;
-   AiManager                  aiManager_;
    
 };
