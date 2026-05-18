@@ -62,9 +62,19 @@ namespace SE::Math
             return x * x + y * y + z * z;
         }
         
+        float Length2DSq() const
+        {
+            return x * x + y * y;
+        }
+        
         float Length() const
         {
             return std::sqrt(LengthSq());
+        }
+        
+        float Length2D() const
+        {
+            return std::sqrt(Length2DSq());
         }
         
         Vector3 Normalized(const Vector3& fallback = {0, 0, 0}) const

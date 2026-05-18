@@ -51,7 +51,7 @@ BT::NodeStatus WaitForTargetNode::onRunning()
             return;
         
         const SE::Math::Vector3& targetPos = playerPawn->GetPosition();
-        const float distSq = (targetPos - selfPos).LengthSq();
+        const float distSq = (targetPos - selfPos).Length2DSq();
         
         if (distSq > DETECT_DISTANCE_SQ)
             return;
