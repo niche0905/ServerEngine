@@ -286,7 +286,10 @@
     <ClCompile Include="Content\Object\BaseObject.cpp" />
     <ClCompile Include="Content\Shared\BaseComponent.cpp" />
     <ClCompile Include="Data\AI\AiManager.cpp" />
+    <ClCompile Include="Data\AI\Nodes\Actions\MoveTargetNode.cpp" />
+    <ClCompile Include="Data\AI\Nodes\Actions\WaitForTargetNode.cpp" />
     <ClCompile Include="Data\AI\Nodes\AiNodeRegistry.cpp" />
+    <ClCompile Include="Data\AI\Nodes\Conditions\HaveTargetPlayerNode.cpp" />
     <ClCompile Include="Data\GameDataManager.cpp" />
     <ClCompile Include="Data\Loader\ServerMapLoader.cpp" />
     <ClCompile Include="Data\Loader\ServerMapLoaderTest.cpp" />
@@ -581,7 +584,10 @@
     <ClInclude Include="Content\Shared\BaseComponent.h" />
     <ClInclude Include="Data\AI\AiBlackboard.h" />
     <ClInclude Include="Data\AI\AiManager.h" />
+    <ClInclude Include="Data\AI\Nodes\Actions\MoveTargetNode.h" />
+    <ClInclude Include="Data\AI\Nodes\Actions\WaitForTargetNode.h" />
     <ClInclude Include="Data\AI\Nodes\AiNodeRegistry.h" />
+    <ClInclude Include="Data\AI\Nodes\Conditions\HaveTargetPlayerNode.h" />
     <ClInclude Include="Data\GameDataManager.h" />
     <ClInclude Include="Data\Loader\ServerMapLoader.h" />
     <ClInclude Include="Data\Loader\ServerMapLoaderTest.h" />
@@ -673,8 +679,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Content\Gameplay\AI\Nodes\" />
-    <Folder Include="Data\AI\Nodes\Actions\" />
-    <Folder Include="Data\AI\Nodes\Conditions\" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

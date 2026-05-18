@@ -3,88 +3,6 @@
 #include "Data/Tables/NpcAiTable.h"
 #include "Nodes/AiNodeRegistry.h"
 
-//////////////////////////////////////////////////////////
-/// Test Codes
-//////////////////////////////////////////////////////////
-
-class CheckEnemy : public BT::ConditionNode
-{
-public:
-   CheckEnemy(const std::string& name, const BT::NodeConfiguration& config)
-       : ConditionNode(name, config) {}
-
-   static BT::PortsList providedPorts()
-   {
-      return {};
-   }
-   
-   BT::NodeStatus tick() override
-   {
-      bool hasEnemy = true; // TODO: 실제 로직
-      return hasEnemy ? BT::NodeStatus::SUCCESS : BT::NodeStatus::FAILURE;
-   }
-};
-
-class IsPlayerInRange : public BT::ConditionNode
-{
-public:
-   IsPlayerInRange(const std::string& name, const BT::NodeConfiguration& config)
-      :ConditionNode(name, config) {}
-
-   static BT::PortsList providedPorts()
-   {
-      return {};
-   }
-   
-   BT::NodeStatus tick() override
-   {
-      bool hasPlayer = true;
-      return hasPlayer ? BT::NodeStatus::SUCCESS : BT::NodeStatus::FAILURE;
-   }
-};
-
-class Attack : public BT::SyncActionNode
-{
-public:
-   Attack(const std::string& name, const BT::NodeConfiguration& config)
-      : SyncActionNode(name, config) {}
-   
-   static BT::PortsList providedPorts()
-   {
-      return {};
-   }
-   
-   BT::NodeStatus tick() override
-   {
-      consoleLogger->Log(Color::Magenta, L"Attack action executed.\n");
-      return BT::NodeStatus::SUCCESS;
-   }
-};
-
-class MoveRandom : public BT::SyncActionNode
-{
-public:
-   MoveRandom(const std::string& name, const BT::NodeConfiguration& config)
-      : SyncActionNode(name, config) {}
-   
-   static BT::PortsList providedPorts()
-   {
-      return {};
-   }
-   
-   BT::NodeStatus tick() override
-   {
-      consoleLogger->Log(Color::Cyan, L"MoveRandom action executed.\n");
-      return BT::NodeStatus::SUCCESS;
-   }
-};
-
-
-//////////////////////////////////////////////////////////
-/// end of Test Codes
-//////////////////////////////////////////////////////////
-
-
 /*-------------
    AiManager
 -------------*/
@@ -94,10 +12,6 @@ bool AiManager::Init(const NpcAiTable& table)
    table_ = &table;
    
    AiNodeRegistry::RegisterAll(factory_);
-   
-   factory_.registerNodeType<IsPlayerInRange>("IsPlayerInRange");
-   factory_.registerNodeType<Attack>("Attack");
-   factory_.registerNodeType<MoveRandom>("MoveRandom");
    
    for (const auto& [id, entry] : table.GetAll()) {
       try
