@@ -55,6 +55,9 @@ namespace SE::Nav
       int32                         maxSearchNodes_ = 4096;
       int32                         maxPathPolys_ = 256;
       int32                         maxStraightPath_ = 256;
+      // int32                         maxSearchNodes_ = 16384;
+      // int32                         maxPathPolys_ = 2048;
+      // int32                         maxStraightPath_ = 2048;
       
    };
 

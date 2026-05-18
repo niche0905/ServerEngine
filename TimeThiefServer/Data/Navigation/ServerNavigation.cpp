@@ -188,15 +188,24 @@ namespace SE::Nav
         dtQueryResult pathResult;
         pathResult.reserve(maxPathPolys_);
 
-        dtReal totalCost = 0.0;
 
         constexpr dtReal CostLimit = static_cast<dtReal>(FLT_MAX);
         
         dtStatus status = navQuery_->findPath(startRef, endRef, detourStart, detourEnd,
-                                                CostLimit, filter_, pathResult, &totalCost);
+                                                CostLimit, filter_, pathResult, nullptr);
         
         if (dtStatusFailed(status) || pathResult.size() <= 0)
             return false;
+
+        if (dtStatusDetail(status, DT_PARTIAL_RESULT))
+        {
+            consoleLogger->Log(Color::Yellow, L"[Nav] Partial path. pathPolys=%d\n", pathResult.size());
+        }
+
+        if (dtStatusDetail(status, DT_OUT_OF_NODES))
+        {
+            consoleLogger->Log(Color::Red, L"[Nav] FindPath reached node limit. Increase maxSearchNodes_.\n");
+        }
         
         std::vector<dtPolyRef> polys(pathResult.size());
         pathResult.copyRefs(polys.data(), static_cast<int>(polys.size()));
@@ -328,25 +337,27 @@ namespace SE::Nav
 
     void ServerNavigation::ToDetour(const SE::Math::Vector3& in, dtReal out[3])
     {
-        // Server/UE: X, Y, Z(up)
-        // Detour:    X, Y(up), Z
-        out[0] = static_cast<dtReal>(in.x);
-        out[1] = static_cast<dtReal>(in.z);
-        out[2] = static_cast<dtReal>(in.y);
+        // UE RecastHelpers.cpp 기준
+        // Unreal2RecastPoint = (-X, Z, -Y)
+        out[0] = static_cast<dtReal>(-in.x);
+        out[1] = static_cast<dtReal>( in.z);
+        out[2] = static_cast<dtReal>(-in.y);
     }
     
     void ServerNavigation::ToDetourExtents(const SE::Math::Vector3& in, dtReal out[3])
     {
-        out[0] = static_cast<dtReal>(in.x);
-        out[1] = static_cast<dtReal>(in.z);
-        out[2] = static_cast<dtReal>(in.y);
+        // Extent는 부호가 의미 없으므로 abs 축 변환
+        out[0] = static_cast<dtReal>(std::abs(in.x));
+        out[1] = static_cast<dtReal>(std::abs(in.z));
+        out[2] = static_cast<dtReal>(std::abs(in.y));
     }
 
     SE::Math::Vector3 ServerNavigation::FromDetour(const dtReal in[3])
     {
+        // Recast2UnrealPoint = (-X, -Z, Y)
         return SE::Math::Vector3(
-            static_cast<float>(in[0]),
-            static_cast<float>(in[2]),
-            static_cast<float>(in[1]));
+            static_cast<float>(-in[0]),
+            static_cast<float>(-in[2]),
+            static_cast<float>( in[1]));
     }
 }
