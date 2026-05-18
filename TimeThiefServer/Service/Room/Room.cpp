@@ -97,8 +97,23 @@ namespace
    
    bool BuildMonsterSpawnInfo(MonsterPawn* monsterPawn, se::room::SpawnInfo* outInfo)
    {
-      // TODO: 몬스터 필요한거 SpawnInfo 작성하기 (NPC 코드 부터 작성하고)
-      consoleLogger->Log(Color::Yellow, L"[Room] You Don't have Monster Spawn Build\n");
+      if (!monsterPawn or !outInfo)
+         return false;
+      
+      FillSpawnInfoBase(monsterPawn, monsterPawn->GetTemplateId(), outInfo);
+      
+      auto* detailPtr = outInfo->mutable_monster_info();
+      auto* movementPtr = detailPtr->mutable_movement();
+      
+      auto* posPtr = movementPtr->mutable_position();
+      const SE::Math::Vector3& pos = monsterPawn->GetPosition();
+      posPtr->set_x(pos.x);
+      posPtr->set_y(pos.y);
+      posPtr->set_z(pos.z);
+      
+      movementPtr->set_yaw(monsterPawn->GetYaw());
+      movementPtr->set_pitch(0.0f);    // monster가 pitch 개념이 있는지는 모르겠지만 일단 0으로 고정
+
       return false;
    }
    

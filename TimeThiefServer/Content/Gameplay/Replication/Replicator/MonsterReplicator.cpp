@@ -19,7 +19,32 @@ ReplicateResult MonsterReplicator::FlushMonsterPeriodic(MonsterPawn& monster, Re
 {
     ReplicateResult result;
     
-    // TODO: Monster Pawn과 BT 구조가 이루어지면 Replicate 대상을 다루도록
+    if (HasDirty(flags, ReplicationDirty::Transform)) {
+        se::game::N_Move noti;
+        {
+            auto* entityIdPtr = noti.mutable_entity_id();
+            entityIdPtr->set_value(monster.GetId().value);
+            
+            noti.set_object_type(se::common::OBJ_MONSTER);
+            
+            auto* transformPtr = noti.mutable_transform();
+            auto* positionPtr = transformPtr->mutable_position();
+            const auto& newPos = monster.GetPosition();
+            positionPtr->set_x(newPos.x);
+            positionPtr->set_y(newPos.y);
+            positionPtr->set_z(newPos.z);
+            transformPtr->set_yaw(monster.GetYaw());
+            
+            auto* monsterMovementPtr = noti.mutable_monster_movement();
+        }
+        
+        SendBufferRef sendBuffer = ServerPacketHandler::MakeSendBuffer(noti);
+        // Broadcast
+        room.BroadcastReplication(sendBuffer);
+        
+        result.sent = true;
+        result.handled |= ReplicationDirty::Transform;
+    }
     
     return result;
 }
