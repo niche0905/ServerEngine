@@ -176,6 +176,14 @@ bool ServerMap::BuildFromLoadedData(const se::map::LoadedMapData& loadedData)
 
 bool ServerMap::LoadNavigation(const std::filesystem::path& navMeshPath)
 {
+   // if (!navigation_.LoadFromFile(navMeshPath))
+   //    return false;
+   //
+   // navigation_.DebugPrintNavMeshBounds();
+   // if (navigation_.DebugExportObj("debug_server_navmesh.obj"))
+   //    consoleLogger->Log(Color::Blue, L"[ServerMap] NavMesh Loaded successfully.\n");
+   //
+   // return true;
    return navigation_.LoadFromFile(navMeshPath);
 }
 

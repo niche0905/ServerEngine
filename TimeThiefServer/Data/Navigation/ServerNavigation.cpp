@@ -340,6 +340,76 @@ namespace SE::Nav
         // }
     }
 
+    bool ServerNavigation::DebugExportObj(const std::filesystem::path& filePath) const
+    {
+        if (navMesh_ == nullptr)
+            return false;
+
+        std::ofstream out(filePath);
+        if (!out.is_open())
+            return false;
+
+        out << "# Server NavMesh Debug OBJ\n";
+
+        int vertexIndex = 1;
+
+        for (int tileIndex = 0; tileIndex < navMesh_->getMaxTiles(); ++tileIndex)
+        {
+            const dtMeshTile* tile = nullptr;
+            // const dtMeshTile* tile = navMesh_->getTile(tileIndex);
+            if (tile == nullptr || tile->header == nullptr || tile->verts == nullptr || tile->polys == nullptr)
+                continue;
+
+            out << "\n# Tile " << tileIndex << "\n";
+
+            for (int polyIndex = 0; polyIndex < tile->header->polyCount; ++polyIndex)
+            {
+                const dtPoly* poly = &tile->polys[polyIndex];
+
+                // OffMeshConnection은 일반 NavMesh 표면이 아니므로 제외
+                if (poly->vertCount < 3)
+                    continue;
+
+                const dtPolyDetail* detail = &tile->detailMeshes[polyIndex];
+
+                for (int triIndex = 0; triIndex < detail->triCount; ++triIndex)
+                {
+                    const unsigned char* tri = &tile->detailTris[(detail->triBase + triIndex) * 4];
+
+                    int face[3]{};
+
+                    for (int j = 0; j < 3; ++j)
+                    {
+                        const dtReal* v = nullptr;
+
+                        if (tri[j] < poly->vertCount)
+                        {
+                            v = &tile->verts[poly->verts[tri[j]] * 3];
+                        }
+                        else
+                        {
+                            const int detailVertIndex = detail->vertBase + (tri[j] - poly->vertCount);
+                            v = &tile->detailVerts[detailVertIndex * 3];
+                        }
+
+                        const SE::Math::Vector3 serverPos = FromDetour(v);
+
+                        out << "v "
+                            << serverPos.x << " "
+                            << -serverPos.y << " "
+                            << serverPos.z << "\n";
+
+                        face[j] = vertexIndex++;
+                    }
+
+                    out << "f " << face[2] << " " << face[1] << " " << face[0] << "\n";
+                }
+            }
+        }
+
+        return true;
+    }
+
     void ServerNavigation::Release()
     {
         if (filter_) {

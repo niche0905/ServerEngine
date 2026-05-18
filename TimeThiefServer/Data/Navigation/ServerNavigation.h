@@ -41,6 +41,7 @@ namespace SE::Nav
       bool DebugValidatePoint(const SE::Math::Vector3& pos) const;
       void DebugPrintNavMeshBounds() const;
       void DebugFindTilesAround(const SE::Math::Vector3& serverPos) const;
+      bool DebugExportObj(const std::filesystem::path& filePath) const;
       
    private:
       void Release();
