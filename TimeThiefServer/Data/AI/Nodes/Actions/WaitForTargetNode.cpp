@@ -53,12 +53,13 @@ BT::NodeStatus WaitForTargetNode::tick()
     if (nearestTarget == nullptr) {
         blackboard->set<Pawn*>(BB::TargetPawn, nullptr);
         blackboard->set<ObjectId>(BB::TargetId, ObjectId{});
-        return BT::NodeStatus::RUNNING;   // 아직 타겟이 감지되지 않음, 계속 대기
+        return BT::NodeStatus::FAILURE;   // 아직 타겟이 감지되지 않음, 계속 대기
     }
     
     // 타겟 발견, Blackboard에 저장
-    blackboard->set(BB::TargetPawn, nearestTarget);
-    blackboard->set(BB::TargetId, nearestTarget->GetId());
+    Pawn* targetPawn = nearestTarget;
+    blackboard->set<Pawn*>(BB::TargetPawn, targetPawn);
+    blackboard->set<ObjectId>(BB::TargetId, nearestTarget->GetId());
     
     return BT::NodeStatus::SUCCESS;
 }

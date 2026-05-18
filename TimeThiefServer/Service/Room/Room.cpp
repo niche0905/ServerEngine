@@ -114,7 +114,7 @@ namespace
       movementPtr->set_yaw(monsterPawn->GetYaw());
       movementPtr->set_pitch(0.0f);    // monster가 pitch 개념이 있는지는 모르겠지만 일단 0으로 고정
 
-      return false;
+      return true;
    }
    
    bool BuildItemSpawnInfo(WorldItemActor* item, se::room::SpawnInfo* outInfo)

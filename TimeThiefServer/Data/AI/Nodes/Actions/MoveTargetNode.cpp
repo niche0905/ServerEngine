@@ -56,5 +56,5 @@ BT::NodeStatus MoveTargetNode::tick()
     
     selfNpc->MoveTo(nextMovePos);
     
-    return BT::NodeStatus::RUNNING;
+    return BT::NodeStatus::FAILURE;
 }

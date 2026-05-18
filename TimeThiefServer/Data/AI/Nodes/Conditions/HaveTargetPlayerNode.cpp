@@ -50,7 +50,7 @@ BT::NodeStatus HaveTargetPlayerNode::tick()
         return BT::NodeStatus::FAILURE;
     
     // Blackboard에 캐싱
-    blackboard->set(BB::TargetPawn, targetPawn);
+    blackboard->set(BB::TargetPawn, foundTarget);
     
     return BT::NodeStatus::SUCCESS;
 }
