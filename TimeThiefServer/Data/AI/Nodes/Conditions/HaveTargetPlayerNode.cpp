@@ -9,14 +9,19 @@ namespace BB = AiBlackboardKey;
 namespace BBT = AiBlackboard;
 
 
+BT::PortsList HaveTargetPlayerNode::providedPorts()
+{
+    return { 
+        BT::InputPort<MonsterPawn*>(BB::SelfNpc),
+        BT::InputPort<ObjectId>(BB::TargetId), 
+        BT::OutputPort<Pawn*>(BB::TargetPawn) 
+    };
+}
+
 BT::NodeStatus HaveTargetPlayerNode::tick()
 {
-    auto blackboard = config().blackboard;
-    if (blackboard == nullptr)
-        return BT::NodeStatus::FAILURE;
-    
     Pawn* targetPawn = nullptr;
-    if (blackboard->get(BB::TargetPawn, targetPawn) and targetPawn != nullptr) {
+    if (getInput<Pawn*>(BB::TargetPawn, targetPawn) and targetPawn != nullptr) {
         if (targetPawn->IsDead())
             return BT::NodeStatus::FAILURE;
         
@@ -24,7 +29,7 @@ BT::NodeStatus HaveTargetPlayerNode::tick()
     }
     
     ObjectId targetId;
-    if (!blackboard->get(BB::TargetId, targetId)) {
+    if (!getInput<ObjectId>(BB::TargetId, targetId)) {
         return BT::NodeStatus::FAILURE;
     }
     
@@ -32,8 +37,8 @@ BT::NodeStatus HaveTargetPlayerNode::tick()
         return BT::NodeStatus::FAILURE;
     }
     
-    MonsterPawn* selfNpc = BBT::GetSelfNpc(blackboard);
-    if (selfNpc == nullptr) {
+    MonsterPawn* selfNpc = nullptr;
+    if (getInput<MonsterPawn*>(BB::SelfNpc, selfNpc) and selfNpc != nullptr) {
         return BT::NodeStatus::FAILURE;
     }
     
@@ -42,7 +47,7 @@ BT::NodeStatus HaveTargetPlayerNode::tick()
         return BT::NodeStatus::FAILURE;
     
     Pawn* foundTarget = room->GetObjectManager().FindAs<Pawn>(targetId);
-    if (foundTarget == nullptr) {
+    if (foundTarget == nullptr or foundTarget->IsDead()) {
         return BT::NodeStatus::FAILURE;
     }
     
@@ -50,7 +55,7 @@ BT::NodeStatus HaveTargetPlayerNode::tick()
         return BT::NodeStatus::FAILURE;
     
     // Blackboard에 캐싱
-    blackboard->set(BB::TargetPawn, foundTarget);
+    setOutput<Pawn*>(BB::TargetPawn, foundTarget);
     
     return BT::NodeStatus::SUCCESS;
 }

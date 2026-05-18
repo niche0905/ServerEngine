@@ -10,13 +10,17 @@ namespace BB = AiBlackboardKey;
 namespace BBT = AiBlackboard;
 
 
+BT::PortsList MoveTargetNode::providedPorts()
+{
+    return { 
+        BT::InputPort<MonsterPawn*>(BB::SelfNpc), 
+        BT::InputPort<Pawn*>(BB::TargetPawn) 
+    };
+}
+
 BT::NodeStatus MoveTargetNode::tick()
 {
-    auto blackboard = config().blackboard;
-    if (blackboard == nullptr)
-        return BT::NodeStatus::FAILURE;
-    
-    MonsterPawn* selfNpc = BBT::GetSelfNpc(blackboard);
+    MonsterPawn* selfNpc = BBT::GetSelfNpc(config().blackboard);
     if (selfNpc == nullptr) {
         return BT::NodeStatus::FAILURE;
     }
@@ -26,7 +30,7 @@ BT::NodeStatus MoveTargetNode::tick()
         return BT::NodeStatus::FAILURE;
     
     Pawn* targetPawn = nullptr;
-    if (!blackboard->get(BB::TargetPawn, targetPawn) or targetPawn == nullptr) {
+    if (!getInput<Pawn*>(BB::TargetPawn, targetPawn) or targetPawn == nullptr) {
         return BT::NodeStatus::FAILURE;
     }
     
@@ -56,5 +60,5 @@ BT::NodeStatus MoveTargetNode::tick()
     
     selfNpc->MoveTo(nextMovePos);
     
-    return BT::NodeStatus::FAILURE;
+    return BT::NodeStatus::RUNNING;
 }

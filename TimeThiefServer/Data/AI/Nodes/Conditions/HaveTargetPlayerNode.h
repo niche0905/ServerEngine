@@ -7,10 +7,7 @@ public:
     HaveTargetPlayerNode(const std::string& name, const BT::NodeConfiguration& config)
         : ConditionNode(name, config) {}
     
-    static BT::PortsList providedPorts()
-    {
-        return {};
-    }
+    static BT::PortsList providedPorts();
     
     BT::NodeStatus tick() override;
 };

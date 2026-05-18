@@ -7,10 +7,7 @@ public:
     MoveTargetNode(const std::string& name, const BT::NodeConfiguration& config)
         : SyncActionNode(name, config) {}
     
-    static BT::PortsList providedPorts()
-    {
-        return {};
-    }
+    static BT::PortsList providedPorts();
     
     BT::NodeStatus tick() override;
 };

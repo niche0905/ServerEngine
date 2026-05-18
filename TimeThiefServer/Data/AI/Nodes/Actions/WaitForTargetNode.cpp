@@ -9,13 +9,18 @@ namespace BB = AiBlackboardKey;
 namespace BBT = AiBlackboard;
 
 
+BT::PortsList WaitForTargetNode::providedPorts()
+{
+    return { 
+        BT::InputPort<MonsterPawn*>(BB::SelfNpc), 
+        BT::OutputPort<Pawn*>(BB::TargetPawn), 
+        BT::OutputPort<ObjectId>(BB::TargetId) 
+    };
+}
+
 BT::NodeStatus WaitForTargetNode::tick()
 {
-    auto blackboard = config().blackboard;
-    if (blackboard == nullptr)
-        return BT::NodeStatus::FAILURE;
-    
-    MonsterPawn* selfNpc = BBT::GetSelfNpc(blackboard);
+    MonsterPawn* selfNpc = BBT::GetSelfNpc(config().blackboard);
     if (selfNpc == nullptr) {
         return BT::NodeStatus::FAILURE;
     }
@@ -51,15 +56,15 @@ BT::NodeStatus WaitForTargetNode::tick()
     });
     
     if (nearestTarget == nullptr) {
-        blackboard->set<Pawn*>(BB::TargetPawn, nullptr);
-        blackboard->set<ObjectId>(BB::TargetId, ObjectId{});
-        return BT::NodeStatus::FAILURE;   // 아직 타겟이 감지되지 않음, 계속 대기
+        setOutput<Pawn*>(BB::TargetPawn, nullptr);
+        setOutput<ObjectId>(BB::TargetId, ObjectId{});
+        return BT::NodeStatus::RUNNING;   // 계속 대기
     }
     
     // 타겟 발견, Blackboard에 저장
     Pawn* targetPawn = nearestTarget;
-    blackboard->set<Pawn*>(BB::TargetPawn, targetPawn);
-    blackboard->set<ObjectId>(BB::TargetId, nearestTarget->GetId());
+    setOutput<Pawn*>(BB::TargetPawn, targetPawn);
+    setOutput<ObjectId>(BB::TargetId, nearestTarget->GetId());
     
     return BT::NodeStatus::SUCCESS;
 }
