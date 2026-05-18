@@ -228,6 +228,29 @@ namespace SE::Nav
         return true;
     }
 
+    bool ServerNavigation::ProjectToNavMesh(const Math::Vector3& pos, Math::Vector3& outPos) const
+    {
+        if (!IsLoaded())
+            return false;
+
+        // 너무 크면 벽 너머/다른 층 NavMesh에 붙을 수 있음.
+        // 너무 작으면 경계에서 실패할 수 있음.
+        constexpr SE::Math::Vector3 halfExtents{
+            100.0f,
+            300.0f,
+            100.0f
+        };
+
+        dtPolyRef nearestRef = 0;
+        SE::Math::Vector3 nearestPos{};
+
+        if (!FindNearestPoly(pos, halfExtents, nearestRef, nearestPos))
+            return false;
+
+        outPos = nearestPos;
+        return true;
+    }
+
     bool ServerNavigation::DebugValidatePoint(const SE::Math::Vector3& pos) const
     {
         if (!IsLoaded())

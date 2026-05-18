@@ -359,7 +359,7 @@ void PlayerPawn::OnPreDestroy()
 
 void PlayerPawn::Tick(float dt)
 {
-   Pawn::Tick(dt);
+   // Pawn::Tick(dt);
    
    (void)dt;
 }

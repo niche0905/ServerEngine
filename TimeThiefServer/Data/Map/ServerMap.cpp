@@ -323,3 +323,8 @@ bool ServerMap::FindPath(const SE::Math::Vector3& start, const SE::Math::Vector3
 {
    return navigation_.FindPath(start, end, outPath);
 }
+
+bool ServerMap::ProjectToNavMesh(const SE::Math::Vector3& pos, SE::Math::Vector3& outPos) const
+{
+   return navigation_.ProjectToNavMesh(pos, outPos);
+}

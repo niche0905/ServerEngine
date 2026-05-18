@@ -41,6 +41,7 @@ public:
    
    bool FindNearestPoly(const SE::Math::Vector3& pos, const SE::Math::Vector3& halfExtents, dtPolyRef& outRef, SE::Math::Vector3& outNearest) const;
    bool FindPath(const SE::Math::Vector3& start, const SE::Math::Vector3& end, std::vector<SE::Math::Vector3>& outPath) const;
+   bool ProjectToNavMesh(const SE::Math::Vector3& pos, SE::Math::Vector3& outPos) const;
    
 private:
    std::vector<std::unique_ptr<SE::Physics::Collider>>         colliders_;

@@ -1,6 +1,6 @@
 ﻿#include "pch.h"
 #include "MonsterPawn.h"
-
+#include "Data/GameDataManager.h"
 #include "Service/Room/Room.h"
 
 /*---------------
@@ -74,6 +74,48 @@ void MonsterPawn::StopMove()
 
 void MonsterPawn::UpdateMove(float dt)
 {
+   // if (!hasMovetarget_)
+   //    return;
+   //
+   // const Vector3 pos = GetPosition();
+   // const Vector3 toTarget = moveTarget_ - pos;
+   //
+   // const float distSq = toTarget.LengthSq();
+   // if (distSq <= moveAcceptRadius_ * moveAcceptRadius_) {
+   //    StopMove();
+   //    return;
+   // }
+   //
+   // const float dist = std::sqrt(distSq);
+   // const Vector3 dir = toTarget.Normalized();
+   //
+   // const float moveDelta = moveSpeed_ * dt;
+   //
+   // Vector3 newPos = pos;
+   //
+   // if (moveDelta >= dist) {
+   //    newPos = moveTarget_;
+   // }
+   // else {
+   //    newPos = pos + dir * moveDelta;
+   // }
+   //
+   // if (auto room = GetRoom()) {
+   //    const ServerMap& map = room->GetGameDataManager()->GetServerMap();
+   //    
+   //    Vector3 projectPos{};
+   //    if (map.ProjectToNavMesh(newPos, projectPos)) {
+   //       newPos = projectPos;
+   //    }
+   // }
+   //
+   // SetPosition(newPos);
+   // SetVelocity(dir * moveSpeed_);
+   //
+   // if (moveDelta >= dist) {
+   //    StopMove();
+   // }
+   
    if (!hasMovetarget_)
       return;
    

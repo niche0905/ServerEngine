@@ -33,6 +33,8 @@ namespace SE::Nav
     
       bool FindPath(const SE::Math::Vector3& start, const SE::Math::Vector3& end, std::vector<SE::Math::Vector3>& outPath) const;
       
+      bool ProjectToNavMesh(const Math::Vector3& pos, Math::Vector3& outPos) const;
+      
       bool IsLoaded() const { return navMesh_ != nullptr and navQuery_ != nullptr; }
       
    public:
