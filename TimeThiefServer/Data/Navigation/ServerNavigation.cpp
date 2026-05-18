@@ -128,6 +128,8 @@ namespace SE::Nav
         // consoleLogger->Log(Color::Blue, L"[Navigation] Successfully loaded navigation mesh from file: %S\n", filePath.string().c_str());
         // consoleLogger->Log(Color::Blue, L"[Navigation] Loaded. tiles=%d, maxTiles=%d, maxPolys=%d\n", header.tileCount, header.maxTiles, header.maxPolys);
         
+        // DebugPrintNavMeshBounds();
+        
         return true;
     }
 
@@ -142,7 +144,7 @@ namespace SE::Nav
         dtReal nearest[3];
         
         ToDetour(pos, p);
-        ToDetour(halfExtents, e);
+        ToDetourExtents(halfExtents, e);
         
         outRef = 0;
         
@@ -163,7 +165,7 @@ namespace SE::Nav
         if (!IsLoaded())
             return false;
         
-        constexpr SE::Math::Vector3 halfExtents{100.0f, 100.0f, 300.0f};
+        constexpr SE::Math::Vector3 halfExtents{300.0f, 300.0f, 300.0f};
         
         dtPolyRef startRef = 0;
         dtPolyRef endRef = 0;
@@ -236,6 +238,76 @@ namespace SE::Nav
         return true;
     }
 
+    void ServerNavigation::DebugPrintNavMeshBounds() const
+    {
+        if (navMesh_ == nullptr) {
+            consoleLogger->Log(Color::Red, L"[NavMesh] navMesh_ is null\n");
+            return;
+        }
+
+        const dtNavMeshParams* params = navMesh_->getParams();
+        consoleLogger->Log(Color::Cyan,
+            L"[NavMesh] orig=(%.2f %.2f %.2f), tileWidth=%.2f, tileHeight=%.2f, maxTiles=%d, maxPolys=%d\n",
+            (double)params->orig[0],
+            (double)params->orig[1],
+            (double)params->orig[2],
+            (double)params->tileWidth,
+            (double)params->tileHeight,
+            params->maxTiles,
+            params->maxPolys);
+
+        // for (int i = 0; i < navMesh_->getMaxTiles(); ++i) {
+        //     const dtMeshTile* tile = navMesh_->getTile(i);
+        //     if (tile == nullptr || tile->header == nullptr)
+        //         continue;
+        //
+        //     const dtMeshHeader* h = tile->header;
+        //
+        //     consoleLogger->Log(Color::Cyan,
+        //         L"[NavMeshTile %d] bmin=(%.2f %.2f %.2f), bmax=(%.2f %.2f %.2f), polys=%d, verts=%d\n",
+        //         i,
+        //         (double)h->bmin[0],
+        //         (double)h->bmin[1],
+        //         (double)h->bmin[2],
+        //         (double)h->bmax[0],
+        //         (double)h->bmax[1],
+        //         (double)h->bmax[2],
+        //         h->polyCount,
+        //         h->vertCount);
+        // }
+    }
+
+    void ServerNavigation::DebugFindTilesAround(const SE::Math::Vector3& serverPos) const
+    {
+        dtReal p[3];
+        ToDetour(serverPos, p);
+
+        consoleLogger->Log(Color::Cyan,
+            L"[DebugFindTilesAround] server=(%.2f %.2f %.2f), detour=(%.2f %.2f %.2f)\n",
+            serverPos.x, serverPos.y, serverPos.z,
+            (double)p[0], (double)p[1], (double)p[2]);
+
+        // for (int i = 0; i < navMesh_->getMaxTiles(); ++i) {
+        //     const dtMeshTile* tile = navMesh_->getTile(i);
+        //     if (tile == nullptr || tile->header == nullptr)
+        //         continue;
+        //
+        //     const dtMeshHeader* h = tile->header;
+        //
+        //     const bool nearX = p[0] >= h->bmin[0] - 1000.0 && p[0] <= h->bmax[0] + 1000.0;
+        //     const bool nearZ = p[2] >= h->bmin[2] - 1000.0 && p[2] <= h->bmax[2] + 1000.0;
+        //
+        //     if (nearX && nearZ) {
+        //         consoleLogger->Log(Color::Yellow,
+        //             L"[NearTile %d] bmin=(%.2f %.2f %.2f), bmax=(%.2f %.2f %.2f), polys=%d\n",
+        //             i,
+        //             (double)h->bmin[0], (double)h->bmin[1], (double)h->bmin[2],
+        //             (double)h->bmax[0], (double)h->bmax[1], (double)h->bmax[2],
+        //             h->polyCount);
+        //     }
+        // }
+    }
+
     void ServerNavigation::Release()
     {
         if (filter_) {
@@ -256,16 +328,25 @@ namespace SE::Nav
 
     void ServerNavigation::ToDetour(const SE::Math::Vector3& in, dtReal out[3])
     {
+        // Server/UE: X, Y, Z(up)
+        // Detour:    X, Y(up), Z
         out[0] = static_cast<dtReal>(in.x);
-        out[1] = static_cast<dtReal>(in.y);
-        out[2] = static_cast<dtReal>(in.z);
+        out[1] = static_cast<dtReal>(in.z);
+        out[2] = static_cast<dtReal>(in.y);
+    }
+    
+    void ServerNavigation::ToDetourExtents(const SE::Math::Vector3& in, dtReal out[3])
+    {
+        out[0] = static_cast<dtReal>(in.x);
+        out[1] = static_cast<dtReal>(in.z);
+        out[2] = static_cast<dtReal>(in.y);
     }
 
     SE::Math::Vector3 ServerNavigation::FromDetour(const dtReal in[3])
     {
         return SE::Math::Vector3(
             static_cast<float>(in[0]),
-            static_cast<float>(in[1]),
-            static_cast<float>(in[2]));
+            static_cast<float>(in[2]),
+            static_cast<float>(in[1]));
     }
 }

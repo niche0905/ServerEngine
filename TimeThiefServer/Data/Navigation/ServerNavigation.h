@@ -37,11 +37,14 @@ namespace SE::Nav
       
    public:
       bool DebugValidatePoint(const SE::Math::Vector3& pos) const;
+      void DebugPrintNavMeshBounds() const;
+      void DebugFindTilesAround(const SE::Math::Vector3& serverPos) const;
       
    private:
       void Release();
       
       static void ToDetour(const SE::Math::Vector3& in, dtReal out[3]);
+      static void ToDetourExtents(const SE::Math::Vector3& in, dtReal out[3]);
       static SE::Math::Vector3 FromDetour(const dtReal in[3]);
       
    private:
