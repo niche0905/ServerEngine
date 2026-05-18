@@ -1,5 +1,5 @@
 ﻿#pragma once
-#include "Ai/AiManager.h"
+#include "AI/AiManager.h"
 #include "Data/Tables/ZoneTable.h"
 #include "Map/ServerMap.h"
 #include "Tables/LootTableTypes.h"

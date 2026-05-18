@@ -1,6 +1,7 @@
 ﻿#include "pch.h"
 #include "AiManager.h"
 #include "Data/Tables/NpcAiTable.h"
+#include "Nodes/AiNodeRegistry.h"
 
 //////////////////////////////////////////////////////////
 /// Test Codes
@@ -92,6 +93,8 @@ bool AiManager::Init(const NpcAiTable& table)
 {
    table_ = &table;
    
+   AiNodeRegistry::RegisterAll(factory_);
+   
    factory_.registerNodeType<IsPlayerInRange>("IsPlayerInRange");
    factory_.registerNodeType<Attack>("Attack");
    factory_.registerNodeType<MoveRandom>("MoveRandom");
@@ -106,6 +109,7 @@ bool AiManager::Init(const NpcAiTable& table)
          consoleLogger->Log(Color::Red, L"[FATAL] BT Load Failed: %s\n", entry.btXmlPath.c_str());
          
          assert(false && "BehaviorTree load failed");
+         return false;
       }
    }
    
