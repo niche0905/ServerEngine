@@ -314,9 +314,6 @@ void Room::SetObject()
       
       monster->SetTemplateId(1);
       monster->SetPosition(Vector3{ -200.0f, 0.0f, 0.0f });
-      
-      // TODO: 이때 시작하는 게 아닌 Game Start 할 때 시작하도록 바꾸어야 한다
-      monster->StartAI();
    }
 }
 
@@ -1585,6 +1582,14 @@ bool Room::Start()
    
    if (!roomGameSystem_.Start())
       return false;
+   
+   objectManager_.ForEachAlive([](BaseObject* obj)
+   {
+      MonsterPawn* monsterPawn = dynamic_cast<MonsterPawn*>(obj);
+      if (monsterPawn) {
+         monsterPawn->StartAI();
+      }
+   });
    
    roomState_ = RoomState::Playing;
    if (ownerShard_)
