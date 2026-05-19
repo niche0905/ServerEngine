@@ -9,6 +9,14 @@ class dtNavMesh;
 class dtNavMeshQuery;
 class dtQueryFilter;
 
+enum class NavPathResult
+{
+   Success,
+   StartNotOnNavMesh,
+   EndNotOnNavMesh,
+   Failed
+};
+
 /*---------------------
    ServerNavigation
 ---------------------*/
@@ -31,7 +39,7 @@ namespace SE::Nav
       
       bool FindNearestPoly(const SE::Math::Vector3& pos, const SE::Math::Vector3& halfExtents, dtPolyRef& outRef, SE::Math::Vector3& outNearest) const;
     
-      bool FindPath(const SE::Math::Vector3& start, const SE::Math::Vector3& end, std::vector<SE::Math::Vector3>& outPath) const;
+      NavPathResult FindPath(const SE::Math::Vector3& start, const SE::Math::Vector3& end, std::vector<SE::Math::Vector3>& outPath) const;
       
       bool ProjectToNavMesh(const Math::Vector3& pos, Math::Vector3& outPos) const;
       
@@ -57,12 +65,12 @@ namespace SE::Nav
       dtNavMeshQuery*               navQuery_ = nullptr;
       dtQueryFilter*                filter_ = nullptr;
       
-      int32                         maxSearchNodes_ = 4096;
-      int32                         maxPathPolys_ = 256;
-      int32                         maxStraightPath_ = 256;
-      // int32                         maxSearchNodes_ = 16384;
-      // int32                         maxPathPolys_ = 2048;
-      // int32                         maxStraightPath_ = 2048;
+      // int32                         maxSearchNodes_ = 4096;
+      // int32                         maxPathPolys_ = 256;
+      // int32                         maxStraightPath_ = 256;
+      int32                         maxSearchNodes_ = 16384;
+      int32                         maxPathPolys_ = 1024;
+      int32                         maxStraightPath_ = 512;
       
    };
 

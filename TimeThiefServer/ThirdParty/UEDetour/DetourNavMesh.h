@@ -897,9 +897,11 @@ private:
 		dtPolyRef ref;
 	};
 
+public:
 	/// Returns pointer to tile in the tile array.
 	NAVMESH_API dtMeshTile* getTile(int i);
 
+private:
 	/// Returns the tile at the coordinates.
 	NAVMESH_API int getTilesAt(const int x, const int y,
 				   dtMeshTile** tiles, const int maxTiles) const;

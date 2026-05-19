@@ -25,6 +25,8 @@ BT::NodeStatus MoveTargetNode::onStart()
 
 BT::NodeStatus MoveTargetNode::onRunning()
 {
+    using namespace SE::Math;
+    
     // consoleLogger->Log(Color::Blue, L"MoveTargetNode ticked.\n");
     
     MonsterPawn* selfNpc = BBT::GetSelfNpc(config().blackboard);
@@ -53,19 +55,17 @@ BT::NodeStatus MoveTargetNode::onRunning()
     
     const ServerMap& map = room->GetGameDataManager()->GetServerMap();
     
-    std::vector<SE::Math::Vector3> path;
-    if (!map.FindPath(selfPos, targetPos, path))
-        return BT::NodeStatus::FAILURE;
+    std::vector<Vector3> path;
+    NavPathResult result = map.FindPath(selfPos, targetPos, path);
     
-    if (path.empty())
-        return BT::NodeStatus::FAILURE;
+    if (result != NavPathResult::Success || path.size() < 2) {
+        selfNpc->StopMove();
+        return BT::NodeStatus::RUNNING;
+    }
     
-    // path[0]은 너무 가까울 수 있어서 path.front() 대신 path[1]을 목표 지점으로 삼는 것도 고려할 수 있음
-    SE::Math::Vector3 nextMovePos = path.front();
-    if (path.size() >= 2)
-        nextMovePos = path[1];
-    
-    selfNpc->MoveTo(nextMovePos);
+    Vector3 next = path[1];
+    next.z = selfNpc->GetPosition().z;
+    selfNpc->MoveTo(next);
     
     return BT::NodeStatus::RUNNING;
 }

@@ -58,6 +58,12 @@ namespace SE::Nav
             return false;
         
         dtNavMeshParams params{};
+        params.walkableHeight = header.walkableHeight;
+        params.walkableRadius = header.walkableRadius;
+        params.walkableClimb = header.walkableClimb;
+        for (int i = 0; i < DT_RESOLUTION_COUNT; ++i) {
+            params.resolutionParams[i] = header.resolutionParams[i];
+        }
         params.orig[0] = header.orig[0];
         params.orig[1] = header.orig[1];
         params.orig[2] = header.orig[2];
@@ -102,14 +108,57 @@ namespace SE::Nav
             }
             
             dtTileRef resultRef = 0;
-            status = navMesh_->addTile(tileData, static_cast<int>(tileHeader.tileDataSize), DT_TILE_FREE_DATA, tileHeader.tileRef, &resultRef);
+            // status = navMesh_->addTile(tileData, static_cast<int>(tileHeader.tileDataSize), DT_TILE_FREE_DATA, tileHeader.tileRef, &resultRef);
+            status = navMesh_->addTile(tileData, static_cast<int>(tileHeader.tileDataSize), DT_TILE_FREE_DATA, 0, &resultRef);
             
             if (dtStatusFailed(status) || resultRef == 0) {
+                printf("[NavError] Failed to add tile index %d. Status Flags: %u\n", i, status);
                 dtFree(tileData, DT_ALLOC_PERM_TILE_DATA);
                 Release();
                 return false;
             }
         }
+        
+        int32_t activeTileCount = 0;
+        for (int32_t i = 0; i < navMesh_->getMaxTiles(); ++i)
+        {
+            const dtMeshTile* tile = navMesh_->getTile(i);
+            if (tile && tile->header)
+            {
+                activeTileCount++;
+            }
+        }
+        // consoleLogger->Log(Color::Blue, L"[NavMesh Debug] 파일에서 로드된 타일 개수: %d | 서버 메모리에 실제 등록된 활성 타일 개수: %d\n", header.tileCount, activeTileCount);
+        
+#if WITH_NAVMESH_SEGMENT_LINKS
+        // UE5 세그먼트 링크 재생성 후처리 패스
+        // 모든 타일이 addTile로 등록된 상태에서 수행해야 사방의 이웃 타일을 정상적으로 참조합니다.
+        for (int32_t i = 0; i < navMesh_->getMaxTiles(); ++i)
+        {
+            // 1. 인덱스로부터 타일 포인터를 가져옵니다 (getTile을 public으로 개방해야 함)
+            const dtMeshTile* tile = navMesh_->getTile(i);
+            if (tile == nullptr || tile->header == nullptr)
+            {
+                continue;
+            }
+
+            // 2. 타일 포인터로부터 고유 타일 참조 ID(dtTileRef)를 획득합니다.
+            dtTileRef tileRef = navMesh_->getTileRef(tile);
+            if (tileRef == 0)
+            {
+                continue;
+            }
+
+            // 3. UE 소스코드 방식 그대로 processSegmentLinksForTile를 호출합니다.
+            unsigned int numSkippedNeighborTiles = 0;
+            navMesh_->processSegmentLinksForTile(
+                tileRef, 
+                0,        // MaxSkippedNeigborTiles (UE 기본값 0)
+                nullptr,  // OutSkippedNeigborTiles (UE 기본값 nullptr)
+                numSkippedNeighborTiles
+            );
+        }
+#endif
         
         navQuery_ = dtAllocNavMeshQuery();
         if (!navQuery_) {
@@ -157,27 +206,48 @@ namespace SE::Nav
         return true;
     }
 
-    bool ServerNavigation::FindPath(const SE::Math::Vector3& start, const SE::Math::Vector3& end,
+    NavPathResult  ServerNavigation::FindPath(const SE::Math::Vector3& start, const SE::Math::Vector3& end,
         std::vector<SE::Math::Vector3>& outPath) const
     {
+        using namespace SE::Math;
+        
         outPath.clear();
         
         if (!IsLoaded())
-            return false;
+            return NavPathResult::Failed;
         
-        constexpr SE::Math::Vector3 halfExtents{300.0f, 300.0f, 300.0f};
+        constexpr Vector3 startExtents{200.0f, 200.0f, 800.0f};
+        constexpr Vector3 endExtents{500.0f, 500.0f, 800.0f};
+
+        constexpr float maxEndProjectXY = 80.0f;
         
         dtPolyRef startRef = 0;
         dtPolyRef endRef = 0;
         
-        SE::Math::Vector3 nearestStart;
-        SE::Math::Vector3 nearestEnd;
+        Vector3 nearestStart{};
+        Vector3 nearestEnd{};
+        if (!FindNearestPoly(start, startExtents, startRef, nearestStart))
+        {
+            return NavPathResult::StartNotOnNavMesh;
+        }
+        if (!FindNearestPoly(end, endExtents, endRef, nearestEnd))
+        {
+            return NavPathResult::EndNotOnNavMesh;
+        }
         
-        if (!FindNearestPoly(start, halfExtents, startRef, nearestStart))
-            return false;
+        const Vector3 endDiff = nearestEnd - end;
+        const float endDiffXY = std::sqrt(endDiff.x * endDiff.x + endDiff.y * endDiff.y);
 
-        if (!FindNearestPoly(end, halfExtents, endRef, nearestEnd))
-            return false;
+        if (endDiffXY > maxEndProjectXY)
+        {
+            consoleLogger->Log(Color::Yellow,
+                L"[FindPath] End projected too far. end=(%.1f %.1f %.1f) nearestEnd=(%.1f %.1f %.1f) diffXY=%.1f\n",
+                end.x, end.y, end.z,
+                nearestEnd.x, nearestEnd.y, nearestEnd.z,
+                endDiffXY);
+
+            return NavPathResult::EndNotOnNavMesh;
+        }
         
         dtReal detourStart[3];
         dtReal detourEnd[3];
@@ -188,24 +258,20 @@ namespace SE::Nav
         dtQueryResult pathResult;
         pathResult.reserve(maxPathPolys_);
 
+        constexpr dtReal costLimit = static_cast<dtReal>(FLT_MAX);
 
-        constexpr dtReal CostLimit = static_cast<dtReal>(FLT_MAX);
-        
-        dtStatus status = navQuery_->findPath(startRef, endRef, detourStart, detourEnd,
-                                                CostLimit, filter_, pathResult, nullptr);
+        dtStatus status = navQuery_->findPath(
+            startRef,
+            endRef,
+            detourStart,
+            detourEnd,
+            costLimit,
+            filter_,
+            pathResult,
+            nullptr);
         
         if (dtStatusFailed(status) || pathResult.size() <= 0)
-            return false;
-
-        if (dtStatusDetail(status, DT_PARTIAL_RESULT))
-        {
-            consoleLogger->Log(Color::Yellow, L"[Nav] Partial path. pathPolys=%d\n", pathResult.size());
-        }
-
-        if (dtStatusDetail(status, DT_OUT_OF_NODES))
-        {
-            consoleLogger->Log(Color::Red, L"[Nav] FindPath reached node limit. Increase maxSearchNodes_.\n");
-        }
+            return NavPathResult::Failed;
         
         std::vector<dtPolyRef> polys(pathResult.size());
         pathResult.copyRefs(polys.data(), static_cast<int>(polys.size()));
@@ -213,19 +279,25 @@ namespace SE::Nav
         dtQueryResult straightResult;
         straightResult.reserve(maxStraightPath_);
         
-        status = navQuery_->findStraightPath(detourStart, detourEnd, polys.data(), 
-                                        static_cast<int>(polys.size()), straightResult, 0);
+        status = navQuery_->findStraightPath(
+            detourStart,
+            detourEnd,
+            polys.data(),
+            static_cast<int>(polys.size()),
+            straightResult,
+            DT_STRAIGHTPATH_AREA_CROSSINGS);
         
         if (dtStatusFailed(status) || straightResult.size() <= 0)
-            return false;
+            return NavPathResult::Failed;
         
         outPath.reserve(straightResult.size());
 
-        for (int i = 0; i < straightResult.size(); ++i) {
+        for (int i = 0; i < straightResult.size(); ++i)
+        {
             outPath.push_back(FromDetour(straightResult.getPos(i)));
         }
         
-        return true;
+        return NavPathResult::Success;
     }
 
     bool ServerNavigation::ProjectToNavMesh(const Math::Vector3& pos, Math::Vector3& outPos) const
@@ -233,12 +305,10 @@ namespace SE::Nav
         if (!IsLoaded())
             return false;
 
-        // 너무 크면 벽 너머/다른 층 NavMesh에 붙을 수 있음.
-        // 너무 작으면 경계에서 실패할 수 있음.
         constexpr SE::Math::Vector3 halfExtents{
-            100.0f,
-            300.0f,
-            100.0f
+            100.0f,   // x
+            100.0f,   // y
+            500.0f    // z → Detour 수직 탐색 범위
         };
 
         dtPolyRef nearestRef = 0;
@@ -257,21 +327,25 @@ namespace SE::Nav
         if (!IsLoaded())
             return false;
 
-        constexpr Math::Vector3 halfExtents{100.0f, 300.0f, 100.0f};
+        constexpr Math::Vector3 halfExtents{100.0f, 100.0f, 500.0f};
 
         dtPolyRef startRef = 0;
         Math::Vector3 nearestStart{};
 
-        if (!FindNearestPoly(start, halfExtents, startRef, nearestStart)) {
+        if (!FindNearestPoly(start, halfExtents, startRef, nearestStart))
             return false;
-        }
+
+        dtPolyRef endRef = 0;
+        Math::Vector3 nearestEnd{};
+        if (!FindNearestPoly(end, halfExtents, endRef, nearestEnd))
+            return false;
 
         dtReal detourStart[3];
         dtReal detourEnd[3];
         dtReal result[3];
 
         ToDetour(nearestStart, detourStart);
-        ToDetour(end, detourEnd);
+        ToDetour(nearestEnd, detourEnd);    // end → nearestEnd로 교체
 
         dtPolyRef visited[16]{};
         int visitedCount = 0;
@@ -287,17 +361,15 @@ namespace SE::Nav
             16
         );
 
-        if (dtStatusFailed(status)) {
+        if (dtStatusFailed(status))
             return false;
-        }
 
         outPos = FromDetour(result);
 
         dtReal height = 0.0f;
-        if (dtStatusSucceed(navQuery_->getPolyHeight(visitedCount > 0 ? visited[visitedCount - 1] : startRef, result, &height))) {
+        if (dtStatusSucceed(navQuery_->getPolyHeight(visitedCount > 0 ? visited[visitedCount - 1] : startRef, result, &height)))
             outPos.z = height;
-        }
-        
+
         return true;
     }
 
@@ -338,25 +410,25 @@ namespace SE::Nav
             params->maxTiles,
             params->maxPolys);
 
-        // for (int i = 0; i < navMesh_->getMaxTiles(); ++i) {
-        //     const dtMeshTile* tile = navMesh_->getTile(i);
-        //     if (tile == nullptr || tile->header == nullptr)
-        //         continue;
-        //
-        //     const dtMeshHeader* h = tile->header;
-        //
-        //     consoleLogger->Log(Color::Cyan,
-        //         L"[NavMeshTile %d] bmin=(%.2f %.2f %.2f), bmax=(%.2f %.2f %.2f), polys=%d, verts=%d\n",
-        //         i,
-        //         (double)h->bmin[0],
-        //         (double)h->bmin[1],
-        //         (double)h->bmin[2],
-        //         (double)h->bmax[0],
-        //         (double)h->bmax[1],
-        //         (double)h->bmax[2],
-        //         h->polyCount,
-        //         h->vertCount);
-        // }
+        for (int i = 0; i < navMesh_->getMaxTiles(); ++i) {
+            const dtMeshTile* tile = navMesh_->getTile(i);
+            if (tile == nullptr || tile->header == nullptr)
+                continue;
+        
+            const dtMeshHeader* h = tile->header;
+        
+            consoleLogger->Log(Color::Cyan,
+                L"[NavMeshTile %d] bmin=(%.2f %.2f %.2f), bmax=(%.2f %.2f %.2f), polys=%d, verts=%d\n",
+                i,
+                (double)h->bmin[0],
+                (double)h->bmin[1],
+                (double)h->bmin[2],
+                (double)h->bmax[0],
+                (double)h->bmax[1],
+                (double)h->bmax[2],
+                h->polyCount,
+                h->vertCount);
+        }
     }
 
     void ServerNavigation::DebugFindTilesAround(const SE::Math::Vector3& serverPos) const
@@ -369,25 +441,25 @@ namespace SE::Nav
             serverPos.x, serverPos.y, serverPos.z,
             (double)p[0], (double)p[1], (double)p[2]);
 
-        // for (int i = 0; i < navMesh_->getMaxTiles(); ++i) {
-        //     const dtMeshTile* tile = navMesh_->getTile(i);
-        //     if (tile == nullptr || tile->header == nullptr)
-        //         continue;
-        //
-        //     const dtMeshHeader* h = tile->header;
-        //
-        //     const bool nearX = p[0] >= h->bmin[0] - 1000.0 && p[0] <= h->bmax[0] + 1000.0;
-        //     const bool nearZ = p[2] >= h->bmin[2] - 1000.0 && p[2] <= h->bmax[2] + 1000.0;
-        //
-        //     if (nearX && nearZ) {
-        //         consoleLogger->Log(Color::Yellow,
-        //             L"[NearTile %d] bmin=(%.2f %.2f %.2f), bmax=(%.2f %.2f %.2f), polys=%d\n",
-        //             i,
-        //             (double)h->bmin[0], (double)h->bmin[1], (double)h->bmin[2],
-        //             (double)h->bmax[0], (double)h->bmax[1], (double)h->bmax[2],
-        //             h->polyCount);
-        //     }
-        // }
+        for (int i = 0; i < navMesh_->getMaxTiles(); ++i) {
+            const dtMeshTile* tile = navMesh_->getTile(i);
+            if (tile == nullptr || tile->header == nullptr)
+                continue;
+        
+            const dtMeshHeader* h = tile->header;
+        
+            const bool nearX = p[0] >= h->bmin[0] - 1000.0 && p[0] <= h->bmax[0] + 1000.0;
+            const bool nearZ = p[2] >= h->bmin[2] - 1000.0 && p[2] <= h->bmax[2] + 1000.0;
+        
+            if (nearX && nearZ) {
+                consoleLogger->Log(Color::Yellow,
+                    L"[NearTile %d] bmin=(%.2f %.2f %.2f), bmax=(%.2f %.2f %.2f), polys=%d\n",
+                    i,
+                    (double)h->bmin[0], (double)h->bmin[1], (double)h->bmin[2],
+                    (double)h->bmax[0], (double)h->bmax[1], (double)h->bmax[2],
+                    h->polyCount);
+            }
+        }
     }
 
     bool ServerNavigation::DebugExportObj(const std::filesystem::path& filePath) const
@@ -405,8 +477,7 @@ namespace SE::Nav
 
         for (int tileIndex = 0; tileIndex < navMesh_->getMaxTiles(); ++tileIndex)
         {
-            const dtMeshTile* tile = nullptr;
-            // const dtMeshTile* tile = navMesh_->getTile(tileIndex);
+            const dtMeshTile* tile = navMesh_->getTile(tileIndex);
             if (tile == nullptr || tile->header == nullptr || tile->verts == nullptr || tile->polys == nullptr)
                 continue;
 

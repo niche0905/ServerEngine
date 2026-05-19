@@ -326,7 +326,7 @@ bool ServerMap::FindNearestPoly(const SE::Math::Vector3& pos, const SE::Math::Ve
    return navigation_.FindNearestPoly(pos, halfExtents, outRef, outNearest);
 }
 
-bool ServerMap::FindPath(const SE::Math::Vector3& start, const SE::Math::Vector3& end,
+NavPathResult  ServerMap::FindPath(const SE::Math::Vector3& start, const SE::Math::Vector3& end,
    std::vector<SE::Math::Vector3>& outPath) const
 {
    return navigation_.FindPath(start, end, outPath);
