@@ -1,5 +1,6 @@
 ﻿#pragma once
 #include "Actor.h"
+#include "Physics/Hitbox/HitResult.h"
 
 class ObjectManager;
 
@@ -44,9 +45,12 @@ public:
     
 protected:
     virtual void UpdateMovement(float dt);
-    virtual void OnHit(ObjectManager& om, ObjectId hitObjectId);
+    virtual void OnHit(ObjectManager& om, ObjectId hitObjectId, const SE::Physics::Hit::HitResult& hit);
     virtual void OnLifetimeExpired(ObjectManager& om);
     virtual void OnExplode(ObjectManager& om);
+    
+private:
+    SE::Math::Vector3 ComputeExplosionPosition(const SE::Physics::Hit::HitResult& hit, const SE::Math::Vector3& moveDir) const;
     
 private:
     ObjectId ownerId_;

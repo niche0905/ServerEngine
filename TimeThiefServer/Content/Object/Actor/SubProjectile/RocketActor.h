@@ -23,6 +23,6 @@ public:
    // virtual void Tick(float dt) override;
    
 public:
-   virtual void OnHit(ObjectManager& om, ObjectId hitObjectId) override;
+   virtual void OnHit(ObjectManager& om, ObjectId hitObjectId, const SE::Physics::Hit::HitResult& hit) override;
     
 };

@@ -104,7 +104,7 @@ void ProjectileActor::CheckHit(const SE::Math::Vector3& from, const SE::Math::Ve
         
         if (room->GetRoomGameSystem().GetCombatSystem().SweepProjectile(query, hit)) {
             if (hit.hit) {
-                OnHit(room->GetObjectManager(), hit.actor ? hit.actor->GetId() : ObjectId{});
+                OnHit(room->GetObjectManager(), hit.actor ? hit.actor->GetId() : ObjectId{}, hit);
             }
         }
     }
@@ -126,10 +126,20 @@ void ProjectileActor::UpdateMovement(float dt)
     SetPosition(newPos);
 }
 
-void ProjectileActor::OnHit(ObjectManager& om, ObjectId hitObjectId)
+void ProjectileActor::OnHit(ObjectManager& om, ObjectId hitObjectId, const SE::Physics::Hit::HitResult& hit)
 {
     (void)om;
     (void)hitObjectId;
+    
+    constexpr float SurfaceOffset = 2.0f;
+
+    if (hit.hit) {
+        const SE::Math::Vector3 moveDir = velocity_; // 방향만 쓰니까 normalize 안 해도 됨
+
+        SE::Math::Vector3 explodePos = ComputeExplosionPosition(hit, moveDir);
+
+        SetPosition(explodePos);
+    }
 }
 
 void ProjectileActor::OnLifetimeExpired(ObjectManager& om)
@@ -152,4 +162,25 @@ void ProjectileActor::OnExplode(ObjectManager& om)
         }
         lifetimeTimer_ = TimerId{};
     }
+}
+
+SE::Math::Vector3 ProjectileActor::ComputeExplosionPosition(const SE::Physics::Hit::HitResult& hit,
+    const SE::Math::Vector3& moveDir) const
+{
+    constexpr float BackOffset = 2.0f;
+    constexpr float NormalOffset = 1.0f;
+
+    SE::Math::Vector3 pos = hit.point;
+
+    // 우선 투사체 진행 방향 반대로 살짝 빼기
+    if (moveDir.LengthSq() > 0.0001f) {
+        pos = pos - moveDir.Normalized() * BackOffset;
+    }
+
+    // normal이 신뢰 가능하면 표면 밖으로 보정
+    if (hit.normal.LengthSq() > 0.0001f) {
+        pos = pos + hit.normal.Normalized() * NormalOffset;
+    }
+
+    return pos;
 }

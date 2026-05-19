@@ -302,8 +302,11 @@ bool CombatSystem::IsExplosionBlocked(const SE::Physics::Ray& ray, float dist, O
    {
       SE::Physics::RaycastHit mapHit{};
       if (mapData_->Raycast(ray, mapHit)) {
-         if (mapHit.hit and mapHit.t < dist - EPSILON) {
-            return true;
+         if (mapHit.hit) {
+            // 최소한 시작점 바로 근처 hit는 무시
+            if (mapHit.t > EPSILON && mapHit.t < dist - EPSILON) {
+               return true;
+            }
          }
       }
    }
