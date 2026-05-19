@@ -666,6 +666,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="CMakeLists.txt" />
+    <Content Include="config\data\npc\behavior\Cat_NPC.xml" />
     <Content Include="config\data\npc\behavior\Test_NPC.xml" />
     <Content Include="config\data\npc\NpcAiTable.json" />
     <Content Include="config\data\tables\LootTables.json" />
