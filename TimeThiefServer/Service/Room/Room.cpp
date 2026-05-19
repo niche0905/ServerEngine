@@ -1424,7 +1424,8 @@ bool Room::HandleSkillEquip(PlayerId playerId, const se::game::C_SkillEquipReq& 
 // TODO: Monster 우선 만들고 아래 핸들러 구현하기 (Monster Spawn, Monster Attack 등)
 bool Room::HandleSpawnMonster(PlayerId playerId, const se::test::C_SpawnMonsterReq& pkt)
 {
-   return false;
+   const auto& pos = pkt.spawn_position();
+   return SpawnMonster(Vector3{pos.x(), pos.y(), pos.z()}, pkt.enemy_type());    // TEMP: Table ID는 클라이언트에서 모른다
 }
 
 bool Room::HandleSpawnChest(PlayerId playerId, const se::test::C_SpawnChestReq& pkt)
@@ -1546,6 +1547,19 @@ WorldItemActor* Room::SpawnItem(const SpawnWorldItemParams& params)
    item->SetItemStack(params.itemStack);
    ReplicationSpawn(item, params.itemStack.id, item->GetYaw(), params.itemStack.count);
    return item;
+}
+
+bool Room::SpawnMonster(const Vector3& vector3, uint32 templateId)
+{
+   auto* monster = SpawnObject<MonsterPawn>(ObjectFlags::Replicable | ObjectFlags::Tickable);
+   if (!monster)
+      return false;
+      
+   monster->SetTemplateId(templateId);
+   monster->SetPosition(vector3);
+   monster->StartAI();
+   ReplicationSpawn(monster, templateId, monster->GetYaw());
+   return true;
 }
 
 bool Room::SpawnChest(const Vector3& pos, int32 tableId)

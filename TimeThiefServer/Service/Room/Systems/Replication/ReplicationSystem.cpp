@@ -326,6 +326,17 @@ void ReplicationSystem::FlushEvent_Spawn(const RepEvent& ev, const RepFrame& fra
       break;
       
 // Testing
+   case ObjectType::OBJ_MONSTER:
+      {
+         auto* monsterInfo = spawnInfo->mutable_monster_info();
+         auto* movementPtr = monsterInfo->mutable_movement();
+         auto* pos = movementPtr->mutable_position();
+         pos->set_x(spawnEv->position.x);
+         pos->set_y(spawnEv->position.y);
+         pos->set_z(spawnEv->position.z);
+         movementPtr->set_yaw(spawnEv->yaw);
+      }
+      
    case ObjectType::OBJ_CHEST:
       {
          auto* chestInfo = spawnInfo->mutable_chest_info();

@@ -141,6 +141,7 @@ public:
    WorldItemActor* SpawnItem(const SpawnWorldItemParams& params);
    
 private:
+   bool SpawnMonster(const Vector3& vector3, uint32 templateId);
    bool SpawnChest(const Vector3& pos, int32 tableId);
    bool SpawnStore(const Vector3& pos);
    
