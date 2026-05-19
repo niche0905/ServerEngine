@@ -914,6 +914,27 @@ bool Room::HandleUseItem(PlayerId playerId, const se::game::C_UseItemReq& pkt)
       if (playerPawn->GetItemCount(itemId) <= 0)
          return false;  // 인벤토리에 해당 아이템이 없는 경우 (정상적이지 않은 상황)
       
+      // TODO: 임시로 즉시 사용 (나중에 사용 모션을 적용할 경우 여기서 사용 모션 시작 처리하고, 실제 아이템 효과 적용은 모션이 끝나는 시점으로 변경하기)
+      //       Timer 사용해서 일정 시간 후에 아이템 효과 적용하는 구조로 변경하기 (예: 회복 아이템 사용 시 사용 모션이 2초 걸린다면, 2초 후에 아이템 효과가 적용되도록)
+      InventoryOpResult result = playerPawn->ConsumeItem(itemId, 1, ItemChangeContext(ItemChangeReason::Consume));
+      if (!result.accepted) {
+         return false;
+      }
+      
+      // TODO: 개선하기 (현재는 itemId로 아이템 종류 구분, 나중에 Item Data로 관리하기)
+      switch (itemId)
+      {
+      case 8:     // 작은 회복약
+         playerPawn->Heal(20);
+         break;
+      case 9:     // 큰 회복약
+         playerPawn->Heal(60);
+         break;
+      case 10:    // 스킬 부스트
+         // 스킬 쿨타임 감소 (그 뭐냐 Save Point 하는 거)
+         break;
+      }
+      
       // TODO: 아이템 사용 처리 로직 (예: 아이템 효과 적용, 인벤토리에서 아이템 제거 등)
       //       유효 하다면 다음으로
       //       그리고 여기서 만족하는 게 아니라 배그와 같이 사용하는 모션동안 사용이 취소될 수 있는 구조로 변경하기 (예: 회복 아이템 사용 중에 캔슬하면 아이템이 사용되지 않도록)
