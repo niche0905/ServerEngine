@@ -42,7 +42,7 @@ BT::NodeStatus MoveTargetNode::onRunning()
     }
     
     const auto& selfPos = selfNpc->GetPosition();
-    const auto& targetPos = targetPawn->GetPosition();
+    const auto& targetPos = targetPawn->GetPosition() - SE::Math::Vector3{0.0f, 0.0f, 90.0f};   // TEMP
     
     constexpr float ARRIVE_DISTANCE = 100.0f;
     constexpr float ARRIVE_DISTANCE_SQ = ARRIVE_DISTANCE * ARRIVE_DISTANCE;
