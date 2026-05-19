@@ -313,7 +313,7 @@ void Room::SetObject()
          return;
       
       monster->SetTemplateId(1);
-      monster->SetPosition(Vector3{ -200.0f, 0.0f, 0.0f });
+      monster->SetPosition(Vector3{ -1500.0f, 0.0f, 0.0f });
    }
 }
 
