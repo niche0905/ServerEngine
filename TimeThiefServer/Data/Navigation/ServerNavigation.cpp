@@ -240,11 +240,11 @@ namespace SE::Nav
 
         if (endDiffXY > maxEndProjectXY)
         {
-            consoleLogger->Log(Color::Yellow,
-                L"[FindPath] End projected too far. end=(%.1f %.1f %.1f) nearestEnd=(%.1f %.1f %.1f) diffXY=%.1f\n",
-                end.x, end.y, end.z,
-                nearestEnd.x, nearestEnd.y, nearestEnd.z,
-                endDiffXY);
+            // consoleLogger->Log(Color::Yellow,
+            //     L"[FindPath] End projected too far. end=(%.1f %.1f %.1f) nearestEnd=(%.1f %.1f %.1f) diffXY=%.1f\n",
+            //     end.x, end.y, end.z,
+            //     nearestEnd.x, nearestEnd.y, nearestEnd.z,
+            //     endDiffXY);
 
             return NavPathResult::EndNotOnNavMesh;
         }
