@@ -50,6 +50,7 @@ BT::NodeStatus MoveTargetNode::onRunning()
     constexpr float ARRIVE_DISTANCE_SQ = ARRIVE_DISTANCE * ARRIVE_DISTANCE;
     
     if ((targetPos - selfPos).Length2DSq() <= ARRIVE_DISTANCE_SQ) {
+        selfNpc->StopMove();
         return BT::NodeStatus::SUCCESS;   // 이미 충분히 가까이 도착한 경우
     }
     

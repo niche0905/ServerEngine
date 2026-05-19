@@ -98,7 +98,7 @@ void MonsterPawn::UpdateMove(float dt)
    }
    
    SetPosition(pos + dir * moveDelta);
-   SetVelocity(dir * moveDelta);
+   SetVelocity(dir * moveSpeed_);
 }
 
 void MonsterPawn::StartAI()
