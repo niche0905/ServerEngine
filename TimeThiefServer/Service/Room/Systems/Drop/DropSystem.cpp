@@ -25,6 +25,33 @@ namespace
 
       return origin + SE::Math::Vector3{ offsetX, offsetY, 0.0f };
    }
+   
+   SE::Math::Vector3 RandomScatterPosition(
+    const SE::Math::Vector3& origin,
+    float minRadius,
+    float maxRadius)
+   {
+      static thread_local std::mt19937 rng(std::random_device{}());
+      std::uniform_real_distribution<float> dist01(0.0f, 1.0f);
+
+      if (maxRadius < minRadius)
+         std::swap(minRadius, maxRadius);
+
+      minRadius = std::max(0.0f, minRadius);
+
+      const float u = dist01(rng);
+      const float angle = dist01(rng) * 2.0f * Pi;
+
+      // 도넛 영역의 면적 기준 균등 분포
+      const float minR2 = minRadius * minRadius;
+      const float maxR2 = maxRadius * maxRadius;
+      const float distance = std::sqrt(minR2 + u * (maxR2 - minR2));
+
+      const float offsetX = std::cos(angle) * distance;
+      const float offsetY = std::sin(angle) * distance;
+
+      return origin + SE::Math::Vector3{ offsetX, offsetY, 0.0f };
+   }
 }
 
 /*---------------
@@ -62,7 +89,7 @@ DropSpawnResult DropSystem::DropItems(const DropSpawnContext& ctx)
             
             SpawnWorldItemParams spawnParams;
             spawnParams.itemStack = itemStack;
-            spawnParams.position = RandomScatterPosition(actorPos, /*radius=*/200.0f);       // TEMP: 반경 200 유닛 내에서 흩뿌리기
+            spawnParams.position = RandomScatterPosition(actorPos, 100, 200);       // TEMP: 반경 200 유닛 내에서 흩뿌리기
                                                                                              // TODO: 이 값도 Config 값으로 뺴던가 하기
             spawnParams.position.z = actorPos.z + 50.f;                                      // TEMP: 아이템이 땅에 묻히지 않도록 Actor의 높이보다 약간 위에서 생성하기 (50 유닛)
             spawnParams.initialVelocity = SE::Math::Vector3{ 0, 0, 0 };   // TEMP: 초기 속도는 0으로 (나중에 랜덤한 초기 속도 주던가 하기)
