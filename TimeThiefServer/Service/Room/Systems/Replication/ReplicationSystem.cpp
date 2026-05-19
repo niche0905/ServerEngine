@@ -522,7 +522,7 @@ void ReplicationSystem::FlushEvent_Item(const RepEvent& ev, const RepFrame& fram
       se::game::N_ItemLost itemLostPkt;
       itemLostPkt.set_item_id(itemChangeEv->itemId);
       itemLostPkt.set_new_quantity(itemChangeEv->newCount);
-      itemLostPkt.set_quantity(itemChangeEv->deltaCount);
+      itemLostPkt.set_quantity(-itemChangeEv->deltaCount);
       
       sendBuffer = ServerPacketHandler::MakeSendBuffer(itemLostPkt);
    }
