@@ -298,12 +298,12 @@ void Room::SetObject()
    
    for (int32 i = 0; i < 5; ++i) {
       auto* chest = SpawnObject<ChestActor>(ObjectFlags::None);
-      chest->SetPosition(Vector3{ 200.0f + i * 150.0f, 300.0f, 150.0f });
+      chest->SetPosition(Vector3{ 200.0f + i * 150.0f, 300.0f, 0.0f });
    }
    
    {
       auto* store = SpawnObject<StoreActor>(ObjectFlags::None);
-      store->SetPosition(Vector3{ 0.0f, -300.0f, 100.0f });
+      store->SetPosition(Vector3{ 0.0f, -300.0f, 0.0f });
    }
    
    // TEMP: 몬스터 테스트 용

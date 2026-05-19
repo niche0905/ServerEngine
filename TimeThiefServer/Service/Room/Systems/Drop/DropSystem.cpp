@@ -64,7 +64,7 @@ DropSpawnResult DropSystem::DropItems(const DropSpawnContext& ctx)
             spawnParams.itemStack = itemStack;
             spawnParams.position = RandomScatterPosition(actorPos, /*radius=*/200.0f);       // TEMP: 반경 200 유닛 내에서 흩뿌리기
                                                                                              // TODO: 이 값도 Config 값으로 뺴던가 하기
-            spawnParams.position.z = actorPos.z;                                             // TEMP: 아이템이 땅에 묻히지 않도록 Actor의 높이보다 약간 위에서 생성하기 (50 유닛)
+            spawnParams.position.z = actorPos.z + 50.f;                                      // TEMP: 아이템이 땅에 묻히지 않도록 Actor의 높이보다 약간 위에서 생성하기 (50 유닛)
             spawnParams.initialVelocity = SE::Math::Vector3{ 0, 0, 0 };   // TEMP: 초기 속도는 0으로 (나중에 랜덤한 초기 속도 주던가 하기)
             spawnParams.reason = ctx.reason;
             
