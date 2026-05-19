@@ -221,6 +221,9 @@ bool CombatSystem::SweepProjectile(const ProjectileSweepQuery& query, SE::Physic
 void CombatSystem::ProjectileExplosion(ObjectId projectileId, const SE::Math::Vector3& pos, ObjectId ownerId,
                                        int32 damage, float radius, bool distanceDamageEnabled)
 {
+   if (radius <= 0.0f)
+      return;
+   
    if (projectileId == ObjectId{}) {
       consoleLogger->Log(Color::Yellow, L"[CombatSystem] ProjectileExplosion called with invalid projectileId\n");
       return;
@@ -272,12 +275,30 @@ void CombatSystem::ProjectileExplosion(ObjectId projectileId, const SE::Math::Ve
       
       int32 finalDamage = damage;
       
-      if (distanceDamageEnabled) {
-         const float t = std::clamp(dist / radius, 0.0f, 1.0f);
+      if (distanceDamageEnabled)
+      {
+         constexpr float FullDamageRadiusRatio = 0.5f;
+         const float fullDamageRadius = radius * FullDamageRadiusRatio;
+         const int32 minDamage = std::max(1, damage / 4);
          
-         const float multiplier = 1.0f - t;
+         if (dist <= fullDamageRadius)
+         {
+            finalDamage = damage;
+         }
+         else
+         {
+            const float t = std::clamp(
+                  (dist - fullDamageRadius) / (radius - fullDamageRadius),
+                  0.0f,
+                  1.0f
+               );
          
-         finalDamage = static_cast<int32>(std::round(static_cast<float>(damage) * multiplier));
+            const float damageF =
+               static_cast<float>(damage) +
+               static_cast<float>(minDamage - damage) * t;
+
+            finalDamage = static_cast<int32>(std::round(damageF));
+         }
       }
       
       if (finalDamage <= 0)
