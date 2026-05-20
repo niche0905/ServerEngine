@@ -29,27 +29,28 @@ namespace AiNodeRegistry
         
         // TODO: 위와 같은 방식으로 노드 등록
         
-        factory.registerNodeType<HaveTargetPlayerNode>("HaveTargetPlayer");
-        factory.registerNodeType<MoveTargetNode>("MoveTarget");
-        factory.registerNodeType<WaitForTargetNode>("WaitForTarget");
+        // Test 노드 등록
+        factory.registerNodeType<HaveTargetPlayerNode>("TestHaveTargetPlayer");
+        factory.registerNodeType<MoveTargetNode>("TestMoveTarget");
+        factory.registerNodeType<WaitForTargetNode>("TestWaitForTarget");
         
         // Cat 노드 등록
-        factory.registerNodeType<CatAcquireOrValidateTargetNode>("AcquireOrValidateTarget");
-        factory.registerNodeType<CatDecideCombatModeNode>("DecideCombatMode");
-        factory.registerNodeType<CatIsCombatModeCannonNode>("IsCombatModeCannon");
-        factory.registerNodeType<CatIsCombatModeMeleeNode>("IsCombatModeMelee");
-        factory.registerNodeType<CatIsTargetInCannonRangeNode>("IsTargetInCannonRange");
-        factory.registerNodeType<CatIsTargetInMeleeRangeNode>("IsTargetInMeleeRange");
-        factory.registerNodeType<CatDecideMeleeAttackTypeNode>("DecideMeleeAttackType");
-        factory.registerNodeType<CatIsMeleeAttackClawNode>("IsMeleeAttackClaw");
-        factory.registerNodeType<CatIsMeleeAttackBiteNode>("IsMeleeAttackBite");
-        factory.registerNodeType<CatMouthCannonCombatNode>("MouthCannonCombat");
-        factory.registerNodeType<CatFrontClawAttackNode>("FrontClawAttack");
-        factory.registerNodeType<CatBiteAttackNode>("BiteAttack");
-        factory.registerNodeType<CatMoveToCannonRangeNode>("MoveToCannonRange");
-        factory.registerNodeType<CatMoveTargetNode>("MoveTarget");
-        factory.registerNodeType<CatPatrolAroundSpawnNode>("PatrolAroundSpawn");
-        factory.registerNodeType<CatIdleNode>("Idle");
+        factory.registerNodeType<CatAcquireOrValidateTargetNode>("CatAcquireOrValidateTarget");
+        factory.registerNodeType<CatDecideCombatModeNode>("CatDecideCombatMode");
+        factory.registerNodeType<CatIsCombatModeCannonNode>("CatIsCombatModeCannon");
+        factory.registerNodeType<CatIsCombatModeMeleeNode>("CatIsCombatModeMelee");
+        factory.registerNodeType<CatIsTargetInCannonRangeNode>("CatIsTargetInCannonRange");
+        factory.registerNodeType<CatIsTargetInMeleeRangeNode>("CatIsTargetInMeleeRange");
+        factory.registerNodeType<CatDecideMeleeAttackTypeNode>("CatDecideMeleeAttackType");
+        factory.registerNodeType<CatIsMeleeAttackClawNode>("CatIsMeleeAttackClaw");
+        factory.registerNodeType<CatIsMeleeAttackBiteNode>("CatIsMeleeAttackBite");
+        factory.registerNodeType<CatMouthCannonCombatNode>("CatMouthCannonCombat");
+        factory.registerNodeType<CatFrontClawAttackNode>("CatFrontClawAttack");
+        factory.registerNodeType<CatBiteAttackNode>("CatBiteAttack");
+        factory.registerNodeType<CatMoveToCannonRangeNode>("CatMoveToCannonRange");
+        factory.registerNodeType<CatMoveTargetNode>("CatMoveTarget");
+        factory.registerNodeType<CatPatrolAroundSpawnNode>("CatPatrolAroundSpawn");
+        factory.registerNodeType<CatIdleNode>("CatIdle");
         
     }
 }

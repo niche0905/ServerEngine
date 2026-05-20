@@ -4,13 +4,13 @@
 
             <!-- 전투 -->
             <Sequence>
-                <AcquireOrValidateTarget
+                <CatAcquireOrValidateTarget
                         self_npc="{self_npc}"
                         target_id="{target_id}"
                         target_pawn="{target_pawn}"
                         combat_mode="{combat_mode}" />
 
-                <DecideCombatMode
+                <CatDecideCombatMode
                         self_npc="{self_npc}"
                         target_pawn="{target_pawn}"
                         combat_mode="{combat_mode}" />
@@ -19,22 +19,22 @@
 
                     <!-- 원거리 모드 -->
                     <Sequence>
-                        <IsCombatModeCannon
+                        <CatIsCombatModeCannon
                                 combat_mode="{combat_mode}" />
 
                         <Fallback>
                             <Sequence>
-                                <IsTargetInCannonRange
+                                <CatIsTargetInCannonRange
                                         self_npc="{self_npc}"
                                         target_pawn="{target_pawn}" />
 
-                                <MouthCannonCombat
+                                <CatMouthCannonCombat
                                         self_npc="{self_npc}"
                                         target_pawn="{target_pawn}"
                                         combat_mode="{combat_mode}" />
                             </Sequence>
 
-                            <MoveToCannonRange
+                            <CatMoveToCannonRange
                                     self_npc="{self_npc}"
                                     target_pawn="{target_pawn}" />
                         </Fallback>
@@ -42,31 +42,31 @@
 
                     <!-- 근거리 모드 -->
                     <Sequence>
-                        <IsCombatModeMelee
+                        <CatIsCombatModeMelee
                                 combat_mode="{combat_mode}" />
 
                         <Fallback>
                             <Sequence>
-                                <IsTargetInMeleeRange
+                                <CatIsTargetInMeleeRange
                                         self_npc="{self_npc}"
                                         target_pawn="{target_pawn}" />
-                                
-                                <DecideMeleeAttackType 
+
+                                <CatDecideMeleeAttackType
                                         self_npc="{self_npc}"
                                         combat_mode="{combat_mode}" />
 
                                 <Fallback>
                                     <Sequence>
-                                        <IsMeleeAttackClaw combat_mode="{combat_mode}" />
-                                        <FrontClawAttack
+                                        <CatIsMeleeAttackClaw combat_mode="{combat_mode}" />
+                                        <CatFrontClawAttack
                                                 self_npc="{self_npc}"
                                                 target_pawn="{target_pawn}"
                                                 combat_mode="{combat_mode}" />
                                     </Sequence>
 
                                     <Sequence>
-                                        <IsMeleeAttackBite combat_mode="{combat_mode}" />
-                                        <BiteAttack
+                                        <CatIsMeleeAttackBite combat_mode="{combat_mode}" />
+                                        <CatBiteAttack
                                                 self_npc="{self_npc}"
                                                 target_pawn="{target_pawn}"
                                                 combat_mode="{combat_mode}" />
@@ -74,7 +74,7 @@
                                 </Fallback>
                             </Sequence>
 
-                            <MoveTarget
+                            <CatMoveTarget
                                     self_npc="{self_npc}"
                                     target_pawn="{target_pawn}" />
                         </Fallback>
@@ -85,10 +85,10 @@
 
             <!-- 비전투 -->
             <Sequence>
-                <PatrolAroundSpawn
+                <CatPatrolAroundSpawn
                         self_npc="{self_npc}" />
 
-                <Idle
+                <CatIdle
                         self_npc="{self_npc}" />
             </Sequence>
 

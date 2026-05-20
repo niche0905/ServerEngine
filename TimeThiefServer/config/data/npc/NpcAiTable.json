@@ -4,5 +4,11 @@
     "name": "Test_NPC",
     "bt_id": "Test_MainTree",
     "bt_xml": "behavior/Test_NPC.xml"
+  },
+  {
+    "npc_id": 2,
+    "name": "Cat_Monster",
+    "bt_id": "Cat_MainTree",
+    "bt_xml": "behavior/Cat_NPC.xml"
   }
 ]

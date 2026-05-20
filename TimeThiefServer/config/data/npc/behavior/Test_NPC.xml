@@ -3,17 +3,17 @@
         <Fallback>
 
             <Sequence>
-                <HaveTargetPlayer
+                <TestHaveTargetPlayer
                         self_npc="{self_npc}"
                         target_id="{target_id}"
                         target_pawn="{target_pawn}" />
 
-                <MoveTarget
+                <TestMoveTarget
                         self_npc="{self_npc}"
                         target_pawn="{target_pawn}" />
             </Sequence>
 
-            <WaitForTarget
+            <TestWaitForTarget
                     self_npc="{self_npc}"
                     target_pawn="{target_pawn}"
                     target_id="{target_id}" />
