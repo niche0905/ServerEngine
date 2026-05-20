@@ -307,12 +307,19 @@ void Room::SetObject()
    }
    
    // TEMP: 몬스터 테스트 용
+   // {
+   //    auto* monster = SpawnObject<MonsterPawn>(ObjectFlags::Replicable | ObjectFlags::Tickable, 1);
+   //    if (monster == nullptr)
+   //       return;
+   //    
+   //    monster->SetPosition(Vector3{ -1500.0f, 0.0f, 0.0f });
+   // }
+   
    {
-      auto* monster = SpawnObject<MonsterPawn>(ObjectFlags::Replicable | ObjectFlags::Tickable);
+      auto* monster = SpawnObject<MonsterPawn>(ObjectFlags::Replicable | ObjectFlags::Tickable, 2);
       if (monster == nullptr)
          return;
       
-      monster->SetTemplateId(1);
       monster->SetPosition(Vector3{ -1500.0f, 0.0f, 0.0f });
    }
 }
@@ -1572,13 +1579,16 @@ WorldItemActor* Room::SpawnItem(const SpawnWorldItemParams& params)
 
 bool Room::SpawnMonster(const Vector3& vector3, uint32 templateId)
 {
-   auto* monster = SpawnObject<MonsterPawn>(ObjectFlags::Replicable | ObjectFlags::Tickable);
+   auto* monster = SpawnObject<MonsterPawn>(ObjectFlags::Replicable | ObjectFlags::Tickable, templateId);
    if (!monster)
       return false;
-      
-   monster->SetTemplateId(templateId);
+   
+   if (!monster)
+      return false;   
+   
    monster->SetPosition(vector3);
    monster->StartAI();
+   
    ReplicationSpawn(monster, templateId, monster->GetYaw());
    return true;
 }

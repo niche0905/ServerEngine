@@ -17,7 +17,12 @@ class ObjectManager;
 class MonsterPawn : public Pawn
 {
 public:
-   MonsterPawn() = default;
+   explicit MonsterPawn(int32 templateId)
+   : templateId_(templateId)
+   {
+   }
+   
+   MonsterPawn() = delete;
    virtual ~MonsterPawn() = default;
    
    MonsterPawn(const MonsterPawn&) = delete;
@@ -28,7 +33,6 @@ public:
    
 public:
    int32 GetTemplateId() const { return templateId_; }
-   void SetTemplateId(int32 templateId) { templateId_ = templateId; }
    
 // IDropOwner
 public:

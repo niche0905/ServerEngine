@@ -32,9 +32,9 @@ void MonsterPawn::OnSpawn()
 
    respawn_.Init(this, RespawnPolicy{});
    loot_.Init(this, 1);    // TEMP: LootSourceComponent의 tableId는 1로 고정
-   // TODO: AI 컴포넌트 초기화 (BT 트리 로드)
+
    if (auto room = GetRoom()) {
-      ai_.Initialize(this, &room->GetObjectManager(), 1);
+      ai_.Initialize(this, &room->GetObjectManager(), templateId_);
    }
    
    SetDead(false);
