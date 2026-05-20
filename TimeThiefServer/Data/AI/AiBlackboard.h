@@ -17,14 +17,7 @@ namespace AiBlackboardKey
 
 namespace AiBlackboard
 {
-    inline MonsterPawn* GetSelfNpc(const BT::Blackboard::Ptr& blackboard)
-    {
-        MonsterPawn* npc = nullptr;
-        if (!blackboard->get(AiBlackboardKey::SelfNpc, npc))
-            return nullptr;
-        
-        return npc;
-    }
+    
 }
 
 // namespace BB = AiBlackboardKey;      // cpp에서 alias 해서 사용하도록

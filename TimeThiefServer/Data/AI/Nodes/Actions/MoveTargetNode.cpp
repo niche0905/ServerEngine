@@ -7,7 +7,6 @@
 #include "Service/Room/Room.h"
 
 namespace BB = AiBlackboardKey;
-namespace BBT = AiBlackboard;
 
 
 BT::PortsList MoveTargetNode::providedPorts()
@@ -29,8 +28,8 @@ BT::NodeStatus MoveTargetNode::onRunning()
     
     // consoleLogger->Log(Color::Blue, L"MoveTargetNode ticked.\n");
     
-    MonsterPawn* selfNpc = BBT::GetSelfNpc(config().blackboard);
-    if (selfNpc == nullptr) {
+    MonsterPawn* selfNpc = nullptr;
+    if (!getInput<MonsterPawn*>(BB::SelfNpc, selfNpc) or selfNpc == nullptr) {
         return BT::NodeStatus::FAILURE;
     }
     

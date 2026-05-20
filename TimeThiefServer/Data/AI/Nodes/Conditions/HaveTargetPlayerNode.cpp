@@ -6,7 +6,6 @@
 #include "Service/Room/Room.h"
 
 namespace BB = AiBlackboardKey;
-namespace BBT = AiBlackboard;
 
 
 BT::PortsList HaveTargetPlayerNode::providedPorts()
@@ -52,9 +51,6 @@ BT::NodeStatus HaveTargetPlayerNode::tick()
     if (foundTarget == nullptr or foundTarget->IsDead()) {
         return BT::NodeStatus::FAILURE;
     }
-    
-    if (foundTarget->IsDead())
-        return BT::NodeStatus::FAILURE;
     
     // Blackboard에 캐싱
     setOutput<Pawn*>(BB::TargetPawn, foundTarget);
