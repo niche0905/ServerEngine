@@ -31,6 +31,8 @@ public:
    
    bool Init(Room* ownerRoom, const ServerMap& mapData);
    
+   bool CanSeeTarget(const SE::Physics::Ray& ray) const;
+   
    bool TraceHit(const SE::Physics::Ray& ray, ObjectId exceptId, SE::Physics::Hit::HitResult& outHit) const;
    bool LaunchRocket(const SE::Math::Vector3& pos, const SE::Math::Vector3& dir, Pawn* ownerPawn, int32 damage, float speed, uint32 lifetimeMs, float radius);
    

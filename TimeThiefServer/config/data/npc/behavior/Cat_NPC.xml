@@ -1,24 +1,26 @@
 ﻿<root BTCPP_format="4" main_tree_to_execute="Cat_MainTree">
     <BehaviorTree ID="Cat_MainTree">
-        <Fallback>
+        <ReactiveFallback>
 
             <!-- 전투 -->
             <Sequence>
                 <AcquireOrValidateTarget
                         self_npc="{self_npc}"
                         target_id="{target_id}"
-                        target_pawn="{target_pawn}" />
+                        target_pawn="{target_pawn}"
+                        combat_mode="{combat_mode}" />
 
                 <DecideCombatMode
                         self_npc="{self_npc}"
-                        target_pawn="{target_pawn}" />
+                        target_pawn="{target_pawn}"
+                        combat_mode="{combat_mode}" />
 
                 <Fallback>
 
                     <!-- 원거리 모드 -->
                     <Sequence>
                         <IsCombatModeCannon
-                                self_npc="{self_npc}" />
+                                combat_mode="{combat_mode}" />
 
                         <Fallback>
                             <Sequence>
@@ -28,7 +30,8 @@
 
                                 <MouthCannonCombat
                                         self_npc="{self_npc}"
-                                        target_pawn="{target_pawn}" />
+                                        target_pawn="{target_pawn}"
+                                        combat_mode="{combat_mode}" />
                             </Sequence>
 
                             <MoveToCannonRange
@@ -40,7 +43,7 @@
                     <!-- 근거리 모드 -->
                     <Sequence>
                         <IsCombatModeMelee
-                                self_npc="{self_npc}" />
+                                combat_mode="{combat_mode}" />
 
                         <Fallback>
                             <Sequence>
@@ -49,17 +52,24 @@
                                         target_pawn="{target_pawn}" />
                                 
                                 <DecideMeleeAttackType 
-                                        self_npc="{self_npc}" />
+                                        self_npc="{self_npc}"
+                                        combat_mode="{combat_mode}" />
 
                                 <Fallback>
                                     <Sequence>
-                                        <IsMeleeAttackClaw self_npc="{self_npc}" />
-                                        <FrontClawAttack self_npc="{self_npc}" target_pawn="{target_pawn}" />
+                                        <IsMeleeAttackClaw combat_mode="{combat_mode}" />
+                                        <FrontClawAttack
+                                                self_npc="{self_npc}"
+                                                target_pawn="{target_pawn}"
+                                                combat_mode="{combat_mode}" />
                                     </Sequence>
 
                                     <Sequence>
-                                        <IsMeleeAttackBite self_npc="{self_npc}" />
-                                        <BiteAttack self_npc="{self_npc}" target_pawn="{target_pawn}" />
+                                        <IsMeleeAttackBite combat_mode="{combat_mode}" />
+                                        <BiteAttack
+                                                self_npc="{self_npc}"
+                                                target_pawn="{target_pawn}"
+                                                combat_mode="{combat_mode}" />
                                     </Sequence>
                                 </Fallback>
                             </Sequence>
@@ -74,14 +84,14 @@
             </Sequence>
 
             <!-- 비전투 -->
-            <Fallback>
+            <Sequence>
                 <PatrolAroundSpawn
                         self_npc="{self_npc}" />
 
                 <Idle
                         self_npc="{self_npc}" />
-            </Fallback>
+            </Sequence>
 
-        </Fallback>
+        </ReactiveFallback>
     </BehaviorTree>
 </root>

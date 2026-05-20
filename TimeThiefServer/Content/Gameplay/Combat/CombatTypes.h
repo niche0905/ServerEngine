@@ -1,4 +1,6 @@
 ﻿#pragma once
+#include "Content/Object/ObjectId.h"
+#include "Data/Map/ServerMap.h"
 #include "Data/Tables/WeaponTable.h"
 #include "Utils/Types.h"
 
@@ -17,6 +19,21 @@ enum class AttackType
     Projectile,
  };
 
+enum class CombatEventType
+{
+    None,
+    
+    CatMelee,   // 근접 공격
+    CatClaw,    // 근접 공격 1
+    CatBite,    // 근접 공격 2
+    CatRange,   // 원거리 공격
+    CatCannon,  // 원거리 공격 1
+    CatCannonCastStart,
+    CatCannonFire,
+    CatCannonCancel,
+    
+};
+
 struct AttackRequest
 {
     AttackType          type = AttackType::None;
@@ -30,6 +47,17 @@ struct AttackRequest
     
     uint32              weaponId = 0;   // 공격에 사용된 무기의 ID (향후 무기 시스템이 구현되면 활용)
     uint32              shotSeed = 0;   // 총알 발사 시의 랜덤 시드 (샷건 총알 궤적 계산 등에 활용)
+};
+
+struct MeleeAttackDesc
+{
+    ObjectId attackerId;
+    CombatEventType attackType;
+    
+    SE::Physics::Collider* collider = nullptr;
+    int32 damage = 0;
+    
+    bool hitPlayersOnly = true;
 };
 
 struct WeaponState

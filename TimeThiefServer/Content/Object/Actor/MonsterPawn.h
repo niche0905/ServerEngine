@@ -44,7 +44,8 @@ protected:
    virtual void OnPreDestroy() override;
    
 public:
-   void MoveTo(const Vector3& targetPos);
+   void MoveTo(const Vector3& targetPos, float acceptRadius = 30.0f);
+   void MoveAlongPath(std::vector<Vector3> path, float acceptRadius = 30.0f);
    void StopMove();
    
 private:
@@ -71,9 +72,13 @@ private:
    LootSourceComponent loot_;
    MonsterAiComponent ai_;
    
-   bool hasMovetarget_{false};
-   Vector3 moveTarget_{};
-   float moveSpeed_{600.0f};
-   float moveAcceptRadius_{ 30.0f};
+   bool hasMovePath_{ false };
+   std::vector<Vector3> movePath_;
+   size_t movePathIndex_{ 0 };
+
+   Vector3 finalMoveTarget_{};
+   float moveSpeed_{ 600.0f };
+   float moveAcceptRadius_{ 30.0f };
+   float waypointAcceptRadius_{ 40.0f };
     
 };

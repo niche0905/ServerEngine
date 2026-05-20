@@ -25,7 +25,6 @@ bool MonsterAiComponent::Initialize(MonsterPawn* owner, ObjectManager* objectMan
    blackboard_ = BT::Blackboard::create();
    
    blackboard_->set<MonsterPawn*>(BB::SelfNpc, owner_);
-   blackboard_->set<ObjectManager*>(BB::ObjectManager, objectManager_);
    blackboard_->set<Pawn*>(BB::TargetPawn, nullptr);
    blackboard_->set<ObjectId>(BB::TargetId, ObjectId{});
    
@@ -143,5 +142,4 @@ void MonsterAiComponent::Stop()
 
 void MonsterAiComponent::PushRuntimeStateToBlackboard(float dt)
 {
-   blackboard_->set(BB::DeltaTime, dt);
 }

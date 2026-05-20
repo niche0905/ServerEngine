@@ -300,6 +300,44 @@ namespace SE::Nav
         return NavPathResult::Success;
     }
 
+    bool ServerNavigation::IsReachablePoly(dtPolyRef startRef, dtPolyRef endRef) const
+    {
+        if (startRef == 0 || endRef == 0)
+            return false;
+
+        if (startRef == endRef)
+            return true;
+        
+        return false;
+    }
+
+    bool ServerNavigation::IsReachablePosition(const SE::Math::Vector3& start, const SE::Math::Vector3& end,
+        const SE::Math::Vector3& halfExtents) const
+    {
+        if (!IsLoaded())
+            return false;
+
+        dtPolyRef startRef{};
+        dtPolyRef endRef{};
+        SE::Math::Vector3 startNearest{};
+        SE::Math::Vector3 endNearest{};
+
+        if (!FindNearestPoly(start, halfExtents, startRef, startNearest) || startRef == 0)
+            return false;
+
+        if (!FindNearestPoly(end, halfExtents, endRef, endNearest) || endRef == 0)
+            return false;
+        
+        // 임시 구현: 현재는 FindPath 기반
+        // 나중에 component ID 방식으로 교체
+        std::vector<SE::Math::Vector3> path;
+        NavPathResult result = FindPath(startNearest, endNearest, path);
+        
+        return result == NavPathResult::Success;
+
+        // return IsReachablePoly(startRef, endRef);
+    }
+
     bool ServerNavigation::ProjectToNavMesh(const Math::Vector3& pos, Math::Vector3& outPos) const
     {
         if (!IsLoaded())

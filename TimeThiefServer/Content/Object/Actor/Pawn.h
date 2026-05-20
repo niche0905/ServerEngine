@@ -49,6 +49,8 @@ public:
 // Movement
 public:
     virtual void IntegrateMove(float dt);  // 단순 이동 (물리/충돌 미적용 <- 상속받아서 구현 필요)
+    void LookAtDirection(const Vector3& dir);
+    void LookAtPosition(const Vector3& targetPos);
     
 // Damageable
 public:

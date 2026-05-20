@@ -41,6 +41,9 @@ namespace SE::Nav
     
       NavPathResult FindPath(const SE::Math::Vector3& start, const SE::Math::Vector3& end, std::vector<SE::Math::Vector3>& outPath) const;
       
+      bool IsReachablePoly(dtPolyRef startRef, dtPolyRef endRef) const;
+      bool IsReachablePosition(const SE::Math::Vector3& start, const SE::Math::Vector3& end, const SE::Math::Vector3& halfExtents) const;
+      
       bool ProjectToNavMesh(const Math::Vector3& pos, Math::Vector3& outPos) const;
       
       bool MoveAlongSurface(const Math::Vector3& start, const Math::Vector3& end, Math::Vector3& outPos) const;

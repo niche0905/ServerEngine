@@ -60,45 +60,109 @@ void MonsterPawn::OnPreDestroy()
    // ex) brain detach, 드랍 정리 등
 }
 
-void MonsterPawn::MoveTo(const Vector3& targetPos)
+void MonsterPawn::MoveTo(const Vector3& targetPos, float acceptRadius)
 {
-   moveTarget_ = targetPos;
-   hasMovetarget_ = true;
+   moveAcceptRadius_ = acceptRadius;
+   finalMoveTarget_ = targetPos;
+
+   auto room = GetRoom();
+   if (room == nullptr) {
+      StopMove();
+      return;
+   }
+
+   const ServerMap& map = room->GetGameDataManager()->GetServerMap();
+
+   std::vector<Vector3> path;
+   if (map.FindPath(GetPosition(), targetPos, path) != NavPathResult::Success || path.empty() ) {
+      StopMove();
+      return;
+   }
+
+   MoveAlongPath(std::move(path), acceptRadius);
+}
+
+void MonsterPawn::MoveAlongPath(std::vector<Vector3> path, float acceptRadius)
+{
+   if (path.empty()) {
+      StopMove();
+      return;
+   }
+
+   movePath_ = std::move(path);
+   movePathIndex_ = 0;
+
+   // 마지막 지점을 최종 목표로 저장
+   finalMoveTarget_ = movePath_.back();
+   moveAcceptRadius_ = acceptRadius;
+
+   hasMovePath_ = true;
 }
 
 void MonsterPawn::StopMove()
 {
-   hasMovetarget_ = false;
+   hasMovePath_ = false;
+   movePath_.clear();
+   movePathIndex_ = 0;
    SetVelocity(Vector3{});
 }
 
 void MonsterPawn::UpdateMove(float dt)
 {
-   if (!hasMovetarget_)
+   if (!hasMovePath_ || movePath_.empty())
       return;
-   
+
    const Vector3 pos = GetPosition();
-   const Vector3 toTarget = moveTarget_ - pos;
-   
-   const float distSq = toTarget.LengthSq();
-   if (distSq <= moveAcceptRadius_ * moveAcceptRadius_) {
+
+   const float finalDistSq = (finalMoveTarget_ - pos).LengthSq();
+   if (finalDistSq <= moveAcceptRadius_ * moveAcceptRadius_) {
       StopMove();
       return;
    }
-   
-   const float dist = std::sqrt(distSq);
-   const Vector3 dir = toTarget.Normalized();
-   
+
+   while (movePathIndex_ < movePath_.size())
+   {
+      const Vector3 waypoint = movePath_[movePathIndex_];
+      const float waypointDistSq = (waypoint - pos).LengthSq();
+
+      if (waypointDistSq > waypointAcceptRadius_ * waypointAcceptRadius_)
+         break;
+
+      ++movePathIndex_;
+   }
+
+   if (movePathIndex_ >= movePath_.size()) {
+      StopMove();
+      return;
+   }
+
+   Vector3 next = movePath_[movePathIndex_];
+
+   Vector3 toNext = next - pos;
+   toNext.z = 0.0f;
+
+   if (toNext.LengthSq() <= 0.0001f) {
+      ++movePathIndex_;
+      return;
+   }
+
+   const Vector3 dir = toNext.Normalized();
    const float moveDelta = moveSpeed_ * dt;
-   
+
+   const float dist = std::sqrt(toNext.LengthSq());
+
    if (moveDelta >= dist) {
-      SetPosition(moveTarget_);
-      StopMove();
-      return;
+      SetPosition(next);
+      ++movePathIndex_;
    }
-   
-   SetPosition(pos + dir * moveDelta);
+   else {
+      SetPosition(pos + dir * moveDelta);
+   }
+
    SetVelocity(dir * moveSpeed_);
+
+   // 바라보는 방향도 갱신
+   LookAtDirection(dir);
 }
 
 void MonsterPawn::StartAI()

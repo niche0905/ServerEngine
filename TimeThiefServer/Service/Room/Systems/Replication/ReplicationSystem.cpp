@@ -254,6 +254,14 @@ void ReplicationSystem::DispatchImmediateEvent(const RepEvent& ev, const RepFram
       FlushEvent_Hit(ev, frame);
       break;
       
+   case RepEventType::Attack:
+      FlushEvent_Attack(ev, frame);
+      break;
+      
+   case RepEventType::MonsterFire:
+      FlushEvent_MonsterFire(ev, frame);
+      break;
+      
    case RepEventType::WeaponStatChange:
       FlushEvent_WeaponStatChange(ev, frame);
       break;
@@ -773,6 +781,49 @@ void ReplicationSystem::FlushEvent_Hit(const RepEvent& ev, const RepFrame& frame
    hitPosPtr->set_y(hitEv->hitPos.y);
    hitPosPtr->set_z(hitEv->hitPos.z);
    noti.set_damage(hitEv->damage);
+   
+   SendBufferRef sendBuffer = ServerPacketHandler::MakeSendBuffer(noti);
+   ownerRoom_->BroadcastReplication(sendBuffer);
+}
+
+void ReplicationSystem::FlushEvent_Attack(const RepEvent& ev, const RepFrame& frame) const
+{
+   const AttackEvent* attackEv = std::get_if<AttackEvent>(&ev.payload);
+   if (!attackEv) {
+      consoleLogger->Log(Color::Yellow, L"[ReplicationSystem] Attack event with invalid payload, skipping. objectId={}", ev.header.source.value);
+      return;   // 페이로드가 AttackEvent가 아닌 경우 (잘못된 이벤트)
+   }
+   
+   se::game::N_Attack noti;
+   auto* entityIdPtr = noti.mutable_entity_id();
+   entityIdPtr->set_value(ev.header.source.value);
+   noti.set_attack_type(attackEv->attackId);
+   
+   SendBufferRef sendBuffer = ServerPacketHandler::MakeSendBuffer(noti);
+   ownerRoom_->BroadcastReplication(sendBuffer);
+}
+
+void ReplicationSystem::FlushEvent_MonsterFire(const RepEvent& ev, const RepFrame& frame) const
+{
+   const MonsterFireEvent* monsterFireEv = std::get_if<MonsterFireEvent>(&ev.payload);
+   if (!monsterFireEv) {
+      consoleLogger->Log(Color::Yellow, L"[ReplicationSystem] MonsterFire event with invalid payload, skipping. objectId={}", ev.header.source.value);
+      return;   // 페이로드가 MonsterFireEvent가 아닌 경우 (잘못된 이벤트)
+   }
+   
+   se::game::N_MonsterFire noti;
+   auto* entityIdPtr = noti.mutable_entity_id();
+   entityIdPtr->set_value(ev.header.source.value);
+   noti.set_attack_type(monsterFireEv->attackId);
+   auto* startPosPtr = noti.mutable_start_position();
+   startPosPtr->set_x(monsterFireEv->origin.x);
+   startPosPtr->set_y(monsterFireEv->origin.y);
+   startPosPtr->set_z(monsterFireEv->origin.z);
+   auto* dirPtr = noti.mutable_direction();
+   dirPtr->set_x(monsterFireEv->direction.x);
+   dirPtr->set_y(monsterFireEv->direction.y);
+   dirPtr->set_z(monsterFireEv->direction.z);
+   noti.set_range(monsterFireEv->range);
    
    SendBufferRef sendBuffer = ServerPacketHandler::MakeSendBuffer(noti);
    ownerRoom_->BroadcastReplication(sendBuffer);

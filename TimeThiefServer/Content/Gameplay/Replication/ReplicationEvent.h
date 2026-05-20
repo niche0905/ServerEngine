@@ -44,6 +44,9 @@ enum class RepEventType : uint8
     WeaponChange,           // 무기 변경 이벤트 (새로운 무기 ID 등 포함)
     Hit,                    // 히트 이벤트 (공격이 명중한 경우, 명중 위치, 피해량 등 포함)
     
+    Attack,
+    MonsterFire,
+    
     WeaponStatChange,       // 무기 스탯 변경 이벤트 (무기 ID, 변경된 스탯과 그 값 등 포함)
     
     KillPlayer,             // 플레이어 킬 이벤트 (킬한 플레이어 ID, 킬당한 플레이어 ID)
@@ -52,15 +55,9 @@ enum class RepEventType : uint8
     ZoneFlow,               // 테스트 용 (Zone이 Stop 되거나 Start 될 때)
     
     
-    // Death,
-    // Respawn,
-    //
     // ItemUseStart,
     // ItemUseCancel,
     // ItemUseComplete,
-    //
-    // AttackStart,
-    // AttackHit,
 };
 
 struct RepEventHeader
@@ -176,6 +173,19 @@ struct HitEvent
     int32 damage{0};
 };
 
+struct AttackEvent
+{
+    uint32 attackId;
+};
+
+struct MonsterFireEvent
+{
+    uint32 attackId{0};
+    SE::Math::Vector3 origin{};
+    SE::Math::Vector3 direction{};
+    float range{0};
+};
+
 struct AimChangedEvent
 {
     bool isAimed{false};
@@ -218,6 +228,8 @@ using RepEventPayload = std::variant<
     FireEvent,
     ReloadEvent,
     HitEvent,
+    AttackEvent,
+    MonsterFireEvent,
     WeaponChangedEvent,
     AimChangedEvent,
     WeaponStatChangeEvent,

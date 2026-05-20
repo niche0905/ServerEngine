@@ -1,6 +1,5 @@
 ﻿#include "pch.h"
 #include "Room.h"
-
 #include <random>
 #include <utility>
 #include "Content/Gameplay/Combat/PlayerCombatComponent.h"
@@ -17,6 +16,7 @@
 #include "Content/Object/Actor/ChestActor.h"
 #include "Content/Object/Actor/StoreActor.h"
 #include "Data/GameDataManager.h"
+#include "Physics/Collider/CollisionResult.h"
 
 /*-----------------
    Local Helper
@@ -1634,12 +1634,13 @@ bool Room::Start()
    return true;
 }
 
-void Room::UpdateTick(const RepFrame& frame)
+void Room::Tick(const RepFrame& frame)
 {
    // Room 정책
    // GameSystem 진행
    // Object Tick 진행
    const float deltaSeconds = frame.dt.count() / 1000.0f;
+   lastDeltaTime_ = deltaSeconds;
    
    roomGameSystem_.Update(deltaSeconds);
 
@@ -2147,6 +2148,27 @@ void Room::NotifyExplosion(ObjectId sourceId, PlayerId ownerPlayerId, const Vect
    roomGameSystem_.GetReplicationSystem().PushEvent(explosionEvent);
 }
 
+void Room::NotifyCombatEvent(ObjectId objectId, CombatEventType combatEven)
+{
+   RepEvent combatEvent;
+   ReplicateEventSet(combatEvent, RepEventType::Attack);
+   combatEvent.header.source = objectId;
+   combatEvent.payload = AttackEvent{static_cast<uint32>(combatEven)};
+   
+   roomGameSystem_.GetReplicationSystem().PushEvent(combatEvent);
+}
+
+void Room::NotifyMonsterFire(ObjectId monsterId, CombatEventType eventType, const Vector3& origin,
+   const Vector3& direction, float range)
+{
+   RepEvent monsterFireEvent;
+   ReplicateEventSet(monsterFireEvent, RepEventType::MonsterFire);
+   monsterFireEvent.header.source = monsterId;
+   monsterFireEvent.payload = MonsterFireEvent{static_cast<uint32>(eventType), origin, direction, range};
+   
+   roomGameSystem_.GetReplicationSystem().PushEvent(monsterFireEvent);
+}
+
 void Room::ReplicateEventSet(RepEvent& ev, RepEventType eventType)
 {
    ev.header.type = eventType;
@@ -2252,6 +2274,109 @@ void Room::HandlePlayerKillPlayer(Pawn* killer, Pawn* victim)
    const ObjectId killerId = killer->GetId();
    const ObjectId victimId = victim->GetId();
    ReplicationKillPlayer(killerId, victimId);
+}
+
+void Room::HandleMonsterFire(ObjectId monsterId, CombatEventType eventType, const SE::Math::Vector3& origin,
+   const SE::Math::Vector3& direction, float range, int32 damage)
+{
+   if (monsterId == ObjectId{}) {
+      return;
+   }
+   
+   if (range <= 0.0f || damage <= 0) {
+      return;
+   }
+
+   if (direction.LengthSq() <= 0.0001f) {
+      return;
+   }
+
+   const SE::Math::Vector3 fireDir = direction.Normalized();
+   SE::Physics::Ray ray(origin, fireDir, range);
+
+   
+   Actor* victim = nullptr;
+
+   SE::Physics::Hit::HitResult outHit;
+   GetRoomGameSystem().GetCombatSystem().TraceHit(ray, monsterId, outHit);
+   if (outHit.hit) {
+      victim = outHit.actor;
+   }
+   
+   const ObjectId victimId = victim ? victim->GetId() : ObjectId{};
+   NotifyMonsterFire(monsterId, eventType, origin, fireDir, range);
+   
+   if (outHit.hit)
+      NotifyHit(victimId, outHit.point, damage);
+   
+   if (victim == nullptr) 
+      return;   // 히트한 Actor가 없는 경우
+    
+   IDamageable* damageable = dynamic_cast<IDamageable*>(victim);
+   if (!damageable)
+      return;
+    
+   DamageContext ctx;
+   ctx.attacker = monsterId;
+   ctx.type = DamageType::Ranged;
+   ctx.source = DamageSource::Weapon;
+    
+   damageable->ApplyDamage(GetObjectManager(), damage, ctx);
+}
+
+void Room::HandleMonsterMelee(const MeleeAttackDesc& desc)
+{
+   if (desc.collider == nullptr) {
+      return;
+   }
+   
+   if (desc.attackerId == ObjectId{}) {
+      return;
+   }
+   
+   auto* attacker = GetObjectManager().FindAs<Pawn>(desc.attackerId);
+   if (attacker == nullptr || attacker->IsDead()) {
+      return;
+   }
+   
+   DamageContext ctx;
+   ctx.attacker = desc.attackerId;
+   ctx.type = DamageType::Melee;
+   ctx.source = DamageSource::Monster;
+   
+   std::unordered_set<ObjectId> damagedPawns;
+   
+   GetObjectManager().ForEachAlive([&](BaseObject* obj)
+   {
+      auto* pawn = dynamic_cast<Pawn*>(obj);
+      if (pawn == nullptr) return;
+      if (pawn->GetId() == desc.attackerId) return;
+      if (pawn->IsDead()) return;
+      if (damagedPawns.contains(pawn->GetId())) return;
+
+      if (desc.hitPlayersOnly && pawn->GetObjectType() != ObjectType::OBJ_PLAYER) {
+         return;
+      }
+      
+      obj->ForEachCollider([&](ColliderComponent* collider)
+      {
+         if (damagedPawns.contains(pawn->GetId())) {
+            return;
+         }
+
+         if (!collider) return;
+         if (collider->GetRole() != ColliderRole::Hurtbox) return;
+
+         const SE::Physics::Collider* hitCollider = collider->GetCollider();
+         if (!hitCollider) return;
+
+         SE::Physics::CollisionResult collisionResult;
+         if (desc.collider->Intersect(*hitCollider, collisionResult) && collisionResult.hit) {
+            damagedPawns.insert(pawn->GetId());
+            pawn->ApplyDamage(GetObjectManager(), desc.damage, ctx);
+         }
+      });
+   });
 }
 
 void Room::OnRealDeath(ObjectId pawnId)

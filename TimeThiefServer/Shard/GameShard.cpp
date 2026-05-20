@@ -214,7 +214,7 @@ void GameShard::ProcessRoomTicks()
       frame.now = now;
       frame.dt = roomTickIntervalMs_;
       
-      room->UpdateTick(frame);
+      room->Tick(frame);
       
       roomScheduler_.Schedule(roomTick.roomId, roomTick.executeAt + roomTickIntervalMs_);
    }

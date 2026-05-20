@@ -26,6 +26,21 @@ bool CombatSystem::Init(Room* ownerRoom, const ServerMap& mapData)
    return true;
 }
 
+bool CombatSystem::CanSeeTarget(const SE::Physics::Ray& ray) const
+{
+   if (mapData_ == nullptr)
+      return false;
+   
+   SE::Physics::RaycastHit hit{};
+   if (!mapData_->Raycast(ray, hit))
+      return true;
+   
+   if (!hit.hit)
+      return true;
+   
+   return false;
+}
+
 bool CombatSystem::TraceHit(const SE::Physics::Ray& ray, ObjectId exceptId, SE::Physics::Hit::HitResult& outHit) const
 {
    if (ownerRoom_ == nullptr or mapData_ == nullptr)

@@ -72,8 +72,8 @@ BT::NodeStatus MoveTargetNode::onRunning()
 
 void MoveTargetNode::onHalted()
 {
-    MonsterPawn* selfNpc = BBT::GetSelfNpc(config().blackboard);
-    if (selfNpc == nullptr) {
+    MonsterPawn* selfNpc = nullptr;
+    if (!getInput<MonsterPawn*>(BB::SelfNpc, selfNpc) or selfNpc == nullptr) {
         return;
     }
     

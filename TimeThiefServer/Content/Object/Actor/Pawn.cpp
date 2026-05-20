@@ -18,6 +18,23 @@ void Pawn::IntegrateMove(float dt)
    SetPosition(pos);
 }
 
+void Pawn::LookAtDirection(const Vector3& dir)
+{
+   if (dir.LengthSq() <= 0.0001f)
+      return;
+
+   const float yaw = std::atan2(dir.y, dir.x);
+   SetYaw(yaw);
+}
+
+void Pawn::LookAtPosition(const Vector3& targetPos)
+{
+   Vector3 dir = targetPos - GetPosition();
+   dir.z = 0.0f;
+
+   LookAtDirection(dir);
+}
+
 DamageResult Pawn::ApplyDamage(ObjectManager& om, int32 amount, const DamageContext& ctx)
 {
    if (IsDead()) {

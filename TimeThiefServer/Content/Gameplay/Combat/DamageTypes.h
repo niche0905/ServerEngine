@@ -18,6 +18,8 @@ enum class DamageSource : int8
 {
     Unknown = 0,
     
+    Monster,
+    
     Skill,
     Weapon,
     Environment,

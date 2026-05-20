@@ -21,7 +21,7 @@ ReplicateResult MonsterReplicator::FlushMonsterPeriodic(MonsterPawn& monster, Re
     
     // TODO: 시간 제한 필요할 듯? last update time
     
-    constexpr uint64 MonsterReplicateIntervalMs = 200;   // TODO: 상수나 config 값으로 빼기
+    constexpr uint64 MonsterReplicateIntervalMs = 100;   // TODO: 상수나 config 값으로 빼기
     
     const uint64 lastMs = monster.GetReplicatedState().lastReplicatedTimeMs;
     

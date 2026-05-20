@@ -332,6 +332,12 @@ NavPathResult  ServerMap::FindPath(const SE::Math::Vector3& start, const SE::Mat
    return navigation_.FindPath(start, end, outPath);
 }
 
+bool ServerMap::IsReachablePosition(const SE::Math::Vector3& start, const SE::Math::Vector3& end,
+   const SE::Math::Vector3& halfExtents) const
+{
+   return navigation_.IsReachablePosition(start, end, halfExtents);
+}
+
 bool ServerMap::ProjectToNavMesh(const SE::Math::Vector3& pos, SE::Math::Vector3& outPos) const
 {
    return navigation_.ProjectToNavMesh(pos, outPos);

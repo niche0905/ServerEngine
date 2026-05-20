@@ -1,6 +1,7 @@
 ﻿#pragma once
 #include <mutex>
 #include "RoomState.h"
+#include "Content/Gameplay/Combat/CombatTypes.h"
 #include "Content/Object/ObjectId.h"
 #include "Content/Gameplay/Combat/DamageTypes.h"
 #include "Content/Object/ObjectManager.h"
@@ -148,7 +149,8 @@ private:
 public:
    bool Start();
    
-   void UpdateTick(const RepFrame& frame);
+   void Tick(const RepFrame& frame);
+   float GetDelta() const { return lastDeltaTime_; }
    
    bool IsPlaying() const { return roomState_ == RoomState::Playing; }
    
@@ -231,6 +233,8 @@ public:
    void NotifyWeaponStatChange(PlayerId id, uint32 weaponId, const WeaponStatModifier& newStat);
    void NotifyZoneFlow(bool flowing);
    void NotifyExplosion(ObjectId sourceId, PlayerId ownerPlayerId, const Vector3& pos, float radius);
+   void NotifyCombatEvent(ObjectId objectId, CombatEventType combatEvent);
+   void NotifyMonsterFire(ObjectId monsterId, CombatEventType eventType, const Vector3& origin, const Vector3& direction, float range);
    
 private:
    void ReplicateEventSet(RepEvent& ev, RepEventType eventType);
@@ -252,6 +256,10 @@ public:
    
 private:
    void HandlePlayerKillPlayer(Pawn* killer, Pawn* victim);
+   
+public:
+   void HandleMonsterFire(ObjectId monsterId, CombatEventType eventType, const SE::Math::Vector3& origin, const SE::Math::Vector3& direction, float range, int32 damage);
+   void HandleMonsterMelee(const MeleeAttackDesc& meleeAttackDesc);
    
 public:
    void OnRealDeath(ObjectId pawnId);
@@ -314,5 +322,6 @@ private:
    TimerId closeTimerId_{0};
    
    RoomState roomState_{};
+   float lastDeltaTime_ = 0.0f;   // 마지막 Tick에서의 Delta Time (초 단위)
     
 };
