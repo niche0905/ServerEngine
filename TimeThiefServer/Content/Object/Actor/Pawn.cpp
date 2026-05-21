@@ -37,6 +37,29 @@ void Pawn::LookAtPosition(const Vector3& targetPos)
    LookAtDirection(dir);
 }
 
+Actor::Vector3 Pawn::GetForwardVector() const
+{
+   const float yawRad = GetYaw() * Pi / 180.0f;
+   return Vector3{ std::cos(yawRad), std::sin(yawRad), 0.0f };
+}
+
+Actor::Vector3 Pawn::GetRightVector() const
+{
+   const float yawRad = GetYaw() * Pi / 180.0f;
+   return Vector3{ -std::sin(yawRad), std::cos(yawRad), 0.0f };
+}
+
+Actor::Vector3 Pawn::TransformLocalOffsetToWorld(const Vector3& localOffset) const
+{
+   const Vector3 forward = GetForwardVector();
+   const Vector3 right = GetRightVector();
+
+   return GetPosition()
+       + forward * localOffset.x
+       + right   * localOffset.y
+       + Vector3{ 0.0f, 0.0f, localOffset.z };
+}
+
 DamageResult Pawn::ApplyDamage(ObjectManager& om, int32 amount, const DamageContext& ctx)
 {
    if (IsDead()) {

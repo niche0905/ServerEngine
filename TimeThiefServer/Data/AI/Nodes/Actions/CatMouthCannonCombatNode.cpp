@@ -17,7 +17,7 @@ namespace
     // 실제 포탄이 나가는 타이밍
     constexpr float FireTiming = 0.813f;
 
-    constexpr SE::Math::Vector3 AimOffset{0.0f, 0.0f, 90.0f};
+    constexpr SE::Math::Vector3 AimOffset{112.150f, 6.806f, 42.250f};
 
     // 조준 오차. 월드 기준 반지름.
     // 값은 기획에 맞게 조절.
@@ -111,9 +111,8 @@ BT::NodeStatus CatMouthCannonCombatNode::onRunning()
         auto& gameSystem = room->GetRoomGameSystem();
         CombatSystem& combatSystem = gameSystem.GetCombatSystem();
 
-        // TODO: 입 위치 대충 가져와서 Muzzle 위치로 보정 해야함 (AimOffset 이용)
         const SE::Math::Vector3 origin =
-            selfNpc_->GetPosition();
+            selfNpc_->TransformLocalOffsetToWorld(AimOffset);
 
         const SE::Math::Vector3 rawTargetPos =
             targetPawn_->GetPosition();

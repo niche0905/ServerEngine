@@ -52,6 +52,10 @@ public:
     void LookAtDirection(const Vector3& dir);
     void LookAtPosition(const Vector3& targetPos);
     
+    Vector3 GetForwardVector() const;
+    Vector3 GetRightVector() const;
+    Vector3 TransformLocalOffsetToWorld(const Vector3& localOffset) const;
+    
 // Damageable
 public:
     virtual DamageResult ApplyDamage(ObjectManager& om, int32 amount, const DamageContext& ctx) override;

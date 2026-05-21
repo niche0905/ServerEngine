@@ -32,7 +32,7 @@ BT::NodeStatus CatIsTargetInMeleeRangeNode::tick()
         return BT::NodeStatus::FAILURE;
     }
 
-    constexpr float MeleeRange = 350.0f;
+    constexpr float MeleeRange = 200.0f;
     constexpr float MeleeRangeSq = MeleeRange * MeleeRange;
 
     const SE::Math::Vector3 selfPos = selfNpc->GetPosition();

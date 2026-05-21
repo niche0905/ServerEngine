@@ -15,6 +15,8 @@ namespace
     constexpr int32 BiteDamage = 40;
 
     constexpr float BiteAttackRadius = 30.0f;
+    
+    constexpr SE::Math::Vector3 AimOffset{120.061f, 9.240f, 87.555f};
 
     void ResetCombatReservation(BT::TreeNode& node)
     {
@@ -95,7 +97,7 @@ BT::NodeStatus CatBiteAttackNode::onRunning()
     if (!hitChecked_ && elapsedTime_ >= HitTiming) {
         hitChecked_ = true;
 
-        const SE::Math::Vector3 attackPos = selfNpc_->GetPosition();        // TODO: Offset 만큼 이동 시키기
+        const SE::Math::Vector3 attackPos = selfNpc_->TransformLocalOffsetToWorld(AimOffset);
 
         MeleeAttackDesc desc;
         desc.attackerId = selfNpc_->GetId();

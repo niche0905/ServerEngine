@@ -15,6 +15,8 @@ namespace
     constexpr int32 ClawDamage = 25;
     
     constexpr float ClawAttackRadius = 60.0f;
+    
+    constexpr SE::Math::Vector3 AimOffset{142.731f, 4.982f, 101.268f};
 
     void ResetCombatReservation(BT::TreeNode& node)
     {
@@ -94,7 +96,7 @@ BT::NodeStatus CatFrontClawAttackNode::onRunning()
     if (!hitChecked_ && elapsedTime_ >= HitTiming) {
         hitChecked_ = true;
 
-        const SE::Math::Vector3 attackPos = selfNpc_->GetPosition();        // TODO: Offset 만큼 이동 시키기
+        const SE::Math::Vector3 attackPos = selfNpc_->TransformLocalOffsetToWorld(AimOffset);
 
         MeleeAttackDesc desc;
         desc.attackerId = selfNpc_->GetId();

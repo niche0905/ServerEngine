@@ -8,7 +8,7 @@
 namespace BB = AiBlackboardKey;
 namespace
 {
-    constexpr float MeleeEnterDistance = 300.0f;
+    constexpr float MeleeEnterDistance = 180.0f;
     constexpr float MeleeEnterDistanceSq = MeleeEnterDistance * MeleeEnterDistance;
 
     constexpr float MoveArriveDistance = 80.0f;
