@@ -50,7 +50,7 @@ BT::NodeStatus CatDecideCombatModeNode::tick()
     const ServerMap& map = gameDataManager->GetServerMap();
     
     const auto& selfPos = selfNpc->GetPosition();
-    const auto& targetPos = targetPawn->GetPosition(); - SE::Math::Vector3{0.0f, 0.0f, 90.0f};   // TEMP
+    const auto& targetPos = targetPawn->GetPosition() - SE::Math::Vector3{0.0f, 0.0f, 90.0f};   // TEMP
     
     const bool isReachable = map.IsReachablePosition(selfPos, targetPos, SE::Math::Vector3{200.0f, 200.0f, 300.0f});
     
