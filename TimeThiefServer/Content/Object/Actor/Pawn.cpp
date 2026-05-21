@@ -132,6 +132,8 @@ void Pawn::OnPreRespawn(ObjectManager& om)
    isDead_ = false;
    int32 maxHp = health_.GetMaxHp();
    health_.Revive(maxHp);
+   
+   SetPosition(ResolveRespawnPosition(om));
 }
 
 void Pawn::OnPostRespawn(ObjectManager& om)

@@ -80,6 +80,24 @@ void MonsterAiComponent::Stop()
    running_ = false;
 }
 
+void MonsterAiComponent::HaltTree()
+{
+   if (tree_)
+   {
+      tree_->haltTree();
+   }
+}
+
+void MonsterAiComponent::ResetBlackboard()
+{
+   if (blackboard_ == nullptr)
+      return;
+   
+   blackboard_->set<CombatEventType>(BB::CombatMode, CombatEventType::None);
+   blackboard_->set<ObjectId>(BB::TargetId, ObjectId{});
+   blackboard_->set<Pawn*>(BB::TargetPawn, nullptr);
+}
+
 // bool MonsterAiComponent::TryFindTarget()
 // {
 //    // TODO: owner_ 주변에 Target 검색 (있다면 targetId 갱신)

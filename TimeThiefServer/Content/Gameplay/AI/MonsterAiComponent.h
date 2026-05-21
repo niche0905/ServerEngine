@@ -47,6 +47,9 @@ public:
    void Stop();
    bool IsRunning() const { return running_; }
    
+   void HaltTree();
+   void ResetBlackboard();
+   
 public:
    ObjectId GetTargetId() const { return targetId_; }
    void SetTargetId(ObjectId targetId) { targetId_ = targetId; }

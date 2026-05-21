@@ -74,6 +74,24 @@ void MonsterPawn::OnPreDestroy()
    // ex) brain detach, 드랍 정리 등
 }
 
+void MonsterPawn::OnPreRespawn(ObjectManager& om)
+{
+   Pawn::OnPreRespawn(om);
+   
+   ai_.Stop();
+   ai_.HaltTree();
+   ai_.ResetBlackboard();
+
+   StopMove();
+}
+
+void MonsterPawn::OnPostRespawn(ObjectManager& om)
+{
+   Pawn::OnPostRespawn(om);
+   
+   ai_.Start();
+}
+
 void MonsterPawn::MoveTo(const Vector3& targetPos, float acceptRadius)
 {
    moveAcceptRadius_ = acceptRadius;
@@ -192,6 +210,8 @@ void MonsterPawn::StopAI()
 void MonsterPawn::OnDeath(ObjectManager& om, const DamageContext& ctx, const DamageResult& dmgResult)
 {
    Pawn::OnDeath(om, ctx, dmgResult);
+   
+   StopMove();
    
    (void)dmgResult;
    // 죽음 상태로 전환

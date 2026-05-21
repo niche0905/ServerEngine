@@ -48,6 +48,10 @@ protected:
    virtual void OnPreDestroy() override;
    
 public:
+   virtual void OnPreRespawn(ObjectManager& om) override;
+   virtual void OnPostRespawn(ObjectManager& om) override;
+   
+public:
    void MoveTo(const Vector3& targetPos, float acceptRadius = 30.0f);
    void MoveAlongPath(std::vector<Vector3> path, float acceptRadius = 30.0f);
    void StopMove();
