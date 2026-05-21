@@ -1,6 +1,7 @@
 ﻿#include "pch.h"
 #include "MonsterPawn.h"
 #include "Data/GameDataManager.h"
+#include "Physics/Collider/CapsuleCollider.h"
 #include "Service/Room/Room.h"
 
 /*---------------
@@ -35,6 +36,19 @@ void MonsterPawn::OnSpawn()
 
    if (auto room = GetRoom()) {
       ai_.Initialize(this, &room->GetObjectManager(), templateId_);
+   }
+
+   switch (templateId_)
+   {
+   case 2:     // cat
+      {
+         auto bodyCollider = std::make_unique<ColliderComponent>();
+         auto capsuleCollider = std::make_unique<SE::Physics::CapsuleCollider>(Vector3{0.0f, -36.0f, 60.0f}, Vector3{0.0f,  36.0f, 60.0f},  44.0f);
+         bodyCollider->Init(this, ColliderRole::Hurtbox, std::move(capsuleCollider));
+         
+         colliders_.push_back(std::move(bodyCollider));
+      }
+      break;
    }
    
    SetDead(false);
