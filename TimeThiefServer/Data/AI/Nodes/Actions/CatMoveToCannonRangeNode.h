@@ -17,6 +17,9 @@ public:
     void onHalted() override;
     
 private:
+    bool CanShootTarget(MonsterPawn* selfPawn, Pawn* targetPawn);
+    
+private:
     MonsterPawn* selfNpc_ = nullptr;
     Pawn* targetPawn_ = nullptr;
 

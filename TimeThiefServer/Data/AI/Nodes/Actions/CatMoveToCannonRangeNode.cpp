@@ -109,16 +109,21 @@ BT::NodeStatus CatMoveToCannonRangeNode::onRunning()
 
     const SE::Math::Vector3 selfPos = selfNpc_->GetPosition();
     const SE::Math::Vector3 targetPos = targetPawn_->GetPosition();
+    const SE::Math::Vector3 targetFootPos = targetPos - SE::Math::Vector3{0.0f, 0.0f, 90.0f};
 
     const float dt = room->GetDelta();
     elapsedRepath_ += dt;
 
-    const SE::Math::Vector3 toTarget = targetPos - selfPos;
+    const SE::Math::Vector3 toTarget = targetFootPos - selfPos;
     const float distSq = toTarget.LengthSq();
 
+    const bool goodDistance =
+    distSq >= CannonMinDistance * CannonMinDistance &&
+    distSq <= CannonMaxDistance * CannonMaxDistance;
+    
     // 이미 포격 가능한 거리면 이 노드는 성공.
-    if (distSq >= CannonMinDistance * CannonMinDistance &&
-        distSq <= CannonMaxDistance * CannonMaxDistance)
+    if (goodDistance &&
+        CanShootTarget(selfNpc_, targetPawn_))
     {
         selfNpc_->StopMove();
         return BT::NodeStatus::SUCCESS;
@@ -207,4 +212,33 @@ void CatMoveToCannonRangeNode::onHalted()
     lastTargetPos_ = {};
     elapsedRepath_ = 0.0f;
     orbitSide_ = 1;
+}
+
+bool CatMoveToCannonRangeNode::CanShootTarget(MonsterPawn* selfPawn, Pawn* targetPawn)
+{
+    auto room = selfPawn->GetRoom();
+    if (room == nullptr) {
+        return false;
+    }
+
+    constexpr float CannonRange = 2000.0f;
+
+    const SE::Math::Vector3 origin =
+        selfPawn->GetPosition() + SE::Math::Vector3{0.0f, 0.0f, 90.0f};
+
+    const SE::Math::Vector3 target =
+        targetPawn->GetPosition() + SE::Math::Vector3{0.0f, 0.0f, 90.0f};
+
+    SE::Math::Vector3 dir = target - origin;
+    if (dir.LengthSq() <= 0.0001f) {
+        return false;
+    }
+
+    dir = dir.Normalized();
+
+    SE::Physics::Ray ray(origin, dir, CannonRange);
+
+    return room->GetRoomGameSystem()
+        .GetCombatSystem()
+        .CanSeeTarget(ray);
 }
