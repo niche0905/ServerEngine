@@ -9,7 +9,7 @@ namespace BB = AiBlackboardKey;
 
 namespace
 {
-    constexpr float CannonRange = 2000.0f;
+    constexpr float CannonRange = 2500.0f;
 
     // 애니메이션 길이
     constexpr float AttackAnimDuration = 1.33f;

@@ -58,7 +58,7 @@ BT::NodeStatus CatDecideCombatModeNode::tick()
         setOutput<CombatEventType>(BB::CombatMode, CombatEventType::CatRange);
     }
     else {
-        if (BBH::RandomChance(0.3f)) {  // 30% 확률로 근접 공격
+        if (BBH::RandomChance(0.3f)) {  // 30% 확률로 원거리 공격
             setOutput<CombatEventType>(BB::CombatMode, CombatEventType::CatRange);
         }
         else {  // 70% 확률로 원거리 공격
