@@ -12,9 +12,6 @@ namespace
     constexpr float AttackAnimDuration = 1.10f;
     constexpr float HitTiming = 0.375f;
 
-    constexpr float ClawRange = 220.0f;
-    constexpr float ClawRangeSq = ClawRange * ClawRange;
-
     constexpr int32 ClawDamage = 25;
     
     constexpr float ClawAttackRadius = 60.0f;

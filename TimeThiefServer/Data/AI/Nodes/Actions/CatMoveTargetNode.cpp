@@ -8,16 +8,18 @@
 namespace BB = AiBlackboardKey;
 namespace
 {
-    constexpr float StopDistance = 100.0f;
-    constexpr float StopDistanceSq = StopDistance * StopDistance;
+    constexpr float MeleeEnterDistance = 300.0f;
+    constexpr float MeleeEnterDistanceSq = MeleeEnterDistance * MeleeEnterDistance;
+
+    constexpr float MoveArriveDistance = 80.0f;
 
     constexpr float RepathInterval = 0.25f;
     constexpr float TargetMoveRepathDistance = 120.0f;
     constexpr float TargetMoveRepathDistanceSq = TargetMoveRepathDistance * TargetMoveRepathDistance;
 
     constexpr float ApproachSideAngle = 35.0f * Pi / 180.0f;
-    constexpr float ApproachDistance = 90.0f;
-
+    constexpr float ApproachDistance = 180.0f;
+    
     SE::Math::Vector3 Normalize2D(const SE::Math::Vector3& v)
     {
         SE::Math::Vector3 result{ v.x, v.y, 0.0f };
@@ -92,12 +94,14 @@ BT::NodeStatus CatMoveTargetNode::onRunning()
     }
 
     const SE::Math::Vector3 selfPos = selfNpc_->GetPosition();
-    const SE::Math::Vector3 targetPos = targetPawn_->GetPosition();
+    const SE::Math::Vector3 targetPos = targetPawn_->GetPosition() - SE::Math::Vector3{ 0.0f, 0.0f, 90.0f };
 
-    const SE::Math::Vector3 toTarget = targetPos - selfPos;
+    SE::Math::Vector3 toTarget = targetPos - selfPos;
+    toTarget.z = 0.0f;
+
     const float distSq = toTarget.LengthSq();
 
-    if (distSq <= StopDistanceSq)
+    if (distSq <= MeleeEnterDistanceSq)
     {
         selfNpc_->StopMove();
         return BT::NodeStatus::SUCCESS;
@@ -127,7 +131,7 @@ BT::NodeStatus CatMoveTargetNode::onRunning()
 
         // 여기서는 목적지만 넘긴다.
         // SetMoveTarget 내부에서 FindPath 후 MoveAlongPath 호출.
-        selfNpc_->MoveTo(moveGoal_, StopDistance);
+        selfNpc_->MoveTo(moveGoal_, MoveArriveDistance);
     }
 
     return BT::NodeStatus::RUNNING;
