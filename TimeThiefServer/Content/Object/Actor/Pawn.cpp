@@ -23,8 +23,10 @@ void Pawn::LookAtDirection(const Vector3& dir)
    if (dir.LengthSq() <= 0.0001f)
       return;
 
-   const float yaw = std::atan2(dir.y, dir.x);
-   SetYaw(yaw);
+   const float yawRad = std::atan2(dir.y, dir.x);
+   const float yawDeg = yawRad * (180.0f / Pi);
+
+   SetYaw(yawDeg);
 }
 
 void Pawn::LookAtPosition(const Vector3& targetPos)
