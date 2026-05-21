@@ -313,6 +313,7 @@ void Room::SetObject()
    //       return;
    //    
    //    monster->SetPosition(Vector3{ -1500.0f, 0.0f, 0.0f });
+   //    monster->SetSavedRespawnPosition(monster->GetPosition());
    // }
    
    {
@@ -320,7 +321,8 @@ void Room::SetObject()
       if (monster == nullptr)
          return;
       
-      monster->SetPosition(Vector3{ -1500.0f, 0.0f, 0.0f });
+      monster->SetPosition(Vector3{ -6000.0f, 0.0f, 0.0f });
+      monster->SetSavedRespawnPosition(monster->GetPosition());
    }
 }
 
@@ -1587,6 +1589,8 @@ bool Room::SpawnMonster(const Vector3& vector3, uint32 templateId)
       return false;   
    
    monster->SetPosition(vector3);
+   monster->SetSavedRespawnPosition(monster->GetPosition());
+   
    monster->StartAI();
    
    ReplicationSpawn(monster, templateId, monster->GetYaw());
