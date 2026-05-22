@@ -46,7 +46,8 @@ BT::PortsList CatMoveTargetNode::providedPorts()
 {
     return {
         BT::InputPort<MonsterPawn*>(BB::SelfNpc),
-        BT::InputPort<Pawn*>(BB::TargetPawn)
+        BT::OutputPort<ObjectId>(BB::TargetId),
+        BT::BidirectionalPort<Pawn*>(BB::TargetPawn)
     };
 }
 
@@ -85,6 +86,8 @@ BT::NodeStatus CatMoveTargetNode::onRunning()
 
     if (selfNpc_->IsDead() || targetPawn_->IsDead()) {
         selfNpc_->StopMove();
+        setOutput<ObjectId>(BB::TargetId, ObjectId{});
+        setOutput<Pawn*>(BB::TargetPawn, nullptr);
         return BT::NodeStatus::FAILURE;
     }
 
