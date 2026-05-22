@@ -2,6 +2,9 @@
 #include "DropSystem.h"
 #include <random>
 #include "Content/Object/Actor/Actor.h"
+#include "Content/Object/Actor/MonsterPawn.h"
+#include "Content/Object/Actor/Pawn.h"
+#include "Content/Object/Actor/PlayerPawn.h"
 #include "Service/Room/Room.h"
 
 /*-----------------
@@ -68,6 +71,47 @@ bool DropSystem::Init(Room* ownerRoom)
    return true;
 }
 
+void DropSystem::OnEntityDied(ObjectId entityId)
+{
+   Pawn* pawn = ownerRoom_->GetObjectManager().FindAs<Pawn>(entityId);
+   if (!pawn)
+      return;
+   
+   DropSpawnContext ctx{};
+   ctx.reason = DropReason::Death;
+   ctx.owner = entityId;
+
+   switch (pawn->GetObjectType())
+   {
+   case ObjectType::OBJ_PLAYER:
+      {
+         PlayerPawn* playerPawn = static_cast<PlayerPawn*>(pawn);
+         auto& inventory = playerPawn->GetInventory();
+         const auto& slots = inventory.GetSlots();
+         
+         for (const auto& slot : slots) {
+            if (!slot.IsValid())
+               continue;   // 유효하지 않은 아이템 스택은 무시
+            
+            ctx.lootBundle.items.push_back(slot);
+         }
+      }
+      break;
+      
+   case ObjectType::OBJ_MONSTER:
+      {
+         MonsterPawn* monsterPawn = static_cast<MonsterPawn*>(pawn);
+         ctx.lootBundle = monsterPawn->GenerateDrops();
+      }
+      break;
+      
+   default:
+      break;
+   }
+   
+   DropItems(ctx);
+}
+
 DropSpawnResult DropSystem::DropItems(const DropSpawnContext& ctx)
 {
    if (!ownerRoom_)
@@ -103,8 +147,6 @@ DropSpawnResult DropSystem::DropItems(const DropSpawnContext& ctx)
          }
          
          return result;
-         // TODO: 돈의 경우 Loot Bundle에 포함되지 않는다 (처치 시 강탈하는 것으로)
-         
       }
       break;
    case DropMode::CorpseBox:

@@ -993,6 +993,9 @@ bool Room::HandleChestInteract(PlayerId playerId, const se::game::C_ChestInterac
             // 에러가 발생한 것
          }
          
+         constexpr int32 chestMoneyReward = 100;
+         playerPawn->AddMoney(CurrencyType::TimePoint, chestMoneyReward, MoneyChangeContext{MoneyChangeReason::Loot});
+         
          DropSpawnContext dropSpawnContext;
          dropSpawnContext.reason = DropReason::Chest;
          dropSpawnContext.owner = chestId;
@@ -2217,7 +2220,7 @@ void Room::HandleDamageResult(Pawn* attacker, Pawn* victim, const DamageResult& 
    }
    
    if (KillerIsPlayer and victim->IsMonster()) {
-      // NPC Kill 처리...
+      HandlePlayerKillMonster(attacker, victim);     // Player가 NPC에게 죽인 경우 처리)
       return;
    }
    
@@ -2244,7 +2247,7 @@ void Room::HandlePawnDeath(Pawn* pawn, const DamageContext& ctx, const DamageRes
    
    ReplicationDeath(pawn->GetId());
    
-   if (attacker and attacker->IsPlayer() and pawn->IsPlayer()) {
+   if (attacker) {
       HandleDamageResult(attacker, pawn, damageResult);
    }
    
@@ -2290,8 +2293,26 @@ void Room::HandlePlayerKillPlayer(Pawn* killer, Pawn* victim)
    ReplicationKillPlayer(killerId, victimId);
 }
 
+void Room::HandlePlayerKillMonster(Pawn* killer, Pawn* monster)
+{
+   constexpr int32 killRobbery = 100;
+   
+   const PlayerId killerPlayerId = killer->GetOwnerPlayerId();
+      
+   if (killerPlayerId == 0)
+      return;   // 유효하지 않은 플레이어 ID (이 경우는 발생하지 않아야 함)
+      
+   if (!HasPlayer(killerPlayerId))
+      return;   // 방에 존재하지 않는 플레이어가 공격자 또는 피해자인 경우 (이 경우는 발생하지 않아야 함)
+   
+   PlayerPawn* killerPlayerPawn = static_cast<PlayerPawn*>(killer);
+   GetRoomGameSystem().GetDropSystem().OnEntityDied(monster->GetId());
+   
+   MoneyChangeResult addResult = killerPlayerPawn->AddMoney(CurrencyType::TimePoint, killRobbery, MoneyChangeContext{MoneyChangeReason::Robbery});
+}
+
 void Room::HandleMonsterFire(ObjectId monsterId, CombatEventType eventType, const SE::Math::Vector3& origin,
-   const SE::Math::Vector3& direction, float range, int32 damage)
+                             const SE::Math::Vector3& direction, float range, int32 damage)
 {
    if (monsterId == ObjectId{}) {
       return;
@@ -2402,6 +2423,8 @@ void Room::OnRealDeath(ObjectId pawnId)
    // Player만 확정 죽음이 있을 테니 Type 확인
    if (not pawn->IsPlayer()) 
       return;
+   
+   GetRoomGameSystem().GetDropSystem().OnEntityDied(pawn->GetId());
    
    RoomPlayer& roomPlayer = roomPlayers_[pawn->GetOwnerPlayerId()];
    roomPlayer.death = true;

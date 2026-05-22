@@ -19,6 +19,7 @@ public:
    bool Init(Room* ownerRoom);
    
 public:
+   auto OnEntityDied(ObjectId entityId) -> void;
    DropSpawnResult DropItems(const DropSpawnContext& ctx);
    
 private:

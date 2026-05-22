@@ -256,6 +256,7 @@ public:
    
 private:
    void HandlePlayerKillPlayer(Pawn* killer, Pawn* victim);
+   void HandlePlayerKillMonster(Pawn* killer, Pawn* monster);
    
 public:
    void HandleMonsterFire(ObjectId monsterId, CombatEventType eventType, const SE::Math::Vector3& origin, const SE::Math::Vector3& direction, float range, int32 damage);
