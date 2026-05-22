@@ -11,7 +11,7 @@ namespace
     constexpr float AcquireRange = 3000.0f;
     constexpr float AcquireRangeSq = AcquireRange * AcquireRange;
     
-    constexpr float LoseRange = 5000.0f;
+    constexpr float LoseRange = 10000.0f;
     constexpr float LoseRangeSq = LoseRange * LoseRange;
 
     void ResetCombatReservation(BT::TreeNode& node)

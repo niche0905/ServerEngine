@@ -34,6 +34,9 @@ public:
 public:
    int32 GetTemplateId() const { return templateId_; }
    
+public:
+   virtual DamageResult ApplyDamage(ObjectManager& om, int32 amount, const DamageContext& ctx) override;
+   
 // IDropOwner
 public:
    virtual LootBundle GenerateDrops() override;

@@ -1,12 +1,37 @@
 ﻿#include "pch.h"
 #include "MonsterPawn.h"
+#include "PlayerPawn.h"
 #include "Data/GameDataManager.h"
 #include "Physics/Collider/CapsuleCollider.h"
 #include "Service/Room/Room.h"
+#include "Data/AI/AiBlackboard.h"
+
+namespace BB = AiBlackboardKey;
 
 /*---------------
    MonsterPawn
 ---------------*/
+
+DamageResult MonsterPawn::ApplyDamage(ObjectManager& om, int32 amount, const DamageContext& ctx)
+{
+   DamageResult pawnApplyResult = Pawn::ApplyDamage(om, amount, ctx);
+   
+   if (ctx.instigator == ObjectId{}) {
+      PlayerPawn* attacker = om.FindAs<PlayerPawn>(ctx.attacker);
+      
+      if (attacker) {
+         if (auto blackboard = ai_.GetBlackboard()) {
+            if (blackboard->get<ObjectId>(BB::TargetId) != ObjectId{} )
+               return pawnApplyResult;
+            
+            blackboard->set<Pawn*>(BB::TargetPawn, attacker);
+            blackboard->set<ObjectId>(BB::TargetId, ctx.attacker);
+         }
+      }
+   }
+
+   return pawnApplyResult;
+}
 
 LootBundle MonsterPawn::GenerateDrops()
 {
