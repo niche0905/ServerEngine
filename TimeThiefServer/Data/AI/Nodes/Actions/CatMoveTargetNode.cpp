@@ -88,6 +88,11 @@ BT::NodeStatus CatMoveTargetNode::onRunning()
         selfNpc_->StopMove();
         setOutput<ObjectId>(BB::TargetId, ObjectId{});
         setOutput<Pawn*>(BB::TargetPawn, nullptr);
+        
+        if (selfNpc_) {
+            selfNpc_->ClearTarget();
+        }
+        
         return BT::NodeStatus::FAILURE;
     }
 

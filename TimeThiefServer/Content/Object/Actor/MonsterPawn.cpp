@@ -12,6 +12,24 @@ namespace BB = AiBlackboardKey;
    MonsterPawn
 ---------------*/
 
+void MonsterPawn::SetTarget(Pawn* pawn)
+{
+   const ObjectId newTargetId = (pawn) ? pawn->GetId() : ObjectId{};
+   
+   if (ai_.GetTargetId() == newTargetId) {
+      return;
+   }
+   
+   ai_.SetTargetId(newTargetId);
+   MarkReplicationDirty(ReplicationDirty::Target);
+}
+
+void MonsterPawn::ClearTarget()
+{
+   ai_.ClearTarget();
+   MarkReplicationDirty(ReplicationDirty::Target);
+}
+
 DamageResult MonsterPawn::ApplyDamage(ObjectManager& om, int32 amount, const DamageContext& ctx)
 {
    DamageResult pawnApplyResult = Pawn::ApplyDamage(om, amount, ctx);
@@ -26,6 +44,8 @@ DamageResult MonsterPawn::ApplyDamage(ObjectManager& om, int32 amount, const Dam
             
             blackboard->set<Pawn*>(BB::TargetPawn, attacker);
             blackboard->set<ObjectId>(BB::TargetId, ctx.attacker);
+            
+            SetTarget(attacker);
          }
       }
    }

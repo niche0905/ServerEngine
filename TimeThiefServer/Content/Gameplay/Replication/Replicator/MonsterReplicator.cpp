@@ -56,5 +56,25 @@ ReplicateResult MonsterReplicator::FlushMonsterPeriodic(MonsterPawn& monster, Re
         }
     }
     
+    if (HasDirty(flags, ReplicationDirty::Target))
+    {
+        consoleLogger->Log(Color::Blue, L"Monster Set Target\n");
+        
+        se::game::N_MonsterTarget noti;
+        {
+            auto* monsterIdPtr = noti.mutable_monster_id();
+            monsterIdPtr->set_value(monster.GetId().value);
+            auto* targetIdPtr = noti.mutable_target_id();
+            targetIdPtr->set_value(monster.GetTargetId().value);
+        }
+        
+        SendBufferRef sendBuffer = ServerPacketHandler::MakeSendBuffer(noti);
+        // Broadcast
+        room.BroadcastReplication(sendBuffer);
+    
+        result.sent = true;
+        result.handled |= ReplicationDirty::Target;
+    }
+    
     return result;
 }

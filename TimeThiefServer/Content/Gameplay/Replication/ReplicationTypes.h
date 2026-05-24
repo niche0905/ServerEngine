@@ -25,6 +25,7 @@ enum class ReplicationDirty : uint32
     CombatState     = 1 << 7,   
     SkillState      = 1 << 8,   // Player Only  (스킬 해금 상태)
     WeaponStat      = 1 << 9,   // Player Only  (무기 강화 상태)
+    Target          = 1 << 10,  // NPC Only     (타겟팅 상태)
 };
 
 struct ReplicateResult

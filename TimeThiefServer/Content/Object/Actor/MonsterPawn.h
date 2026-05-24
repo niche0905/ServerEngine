@@ -34,6 +34,11 @@ public:
 public:
    int32 GetTemplateId() const { return templateId_; }
    
+   ObjectId GetTargetId() const { return ai_.GetTargetId(); }
+   
+   void SetTarget(Pawn* pawn);
+   void ClearTarget();
+   
 public:
    virtual DamageResult ApplyDamage(ObjectManager& om, int32 amount, const DamageContext& ctx) override;
    

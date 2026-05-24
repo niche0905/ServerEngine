@@ -14,11 +14,21 @@ namespace
     constexpr float LoseRange = 10000.0f;
     constexpr float LoseRangeSq = LoseRange * LoseRange;
 
-    void ResetCombatReservation(BT::TreeNode& node)
+    void ResetCombatMode(BT::TreeNode& node)
     {
         node.setOutput<CombatEventType>(BB::CombatMode, CombatEventType::None);
+    }
+
+    void ClearTargetState(BT::TreeNode& node, MonsterPawn* selfNpc)
+    {
+        ResetCombatMode(node);
+
         node.setOutput<ObjectId>(BB::TargetId, ObjectId{});
         node.setOutput<Pawn*>(BB::TargetPawn, nullptr);
+
+        if (selfNpc) {
+            selfNpc->ClearTarget();
+        }
     }
 }
 
@@ -37,18 +47,18 @@ BT::NodeStatus CatAcquireOrValidateTargetNode::tick()
 {
     MonsterPawn* selfNpc = nullptr;
     if (!getInput<MonsterPawn*>(BB::SelfNpc, selfNpc) || selfNpc == nullptr) {
-        ResetCombatReservation(*this);
+        ClearTargetState(*this, nullptr);
         return BT::NodeStatus::FAILURE;
     }
 
     if (selfNpc->IsDead()) {
-        ResetCombatReservation(*this);
+        ClearTargetState(*this, selfNpc);
         return BT::NodeStatus::FAILURE;
     }
 
     auto room = selfNpc->GetRoom();
     if (room == nullptr) {
-        ResetCombatReservation(*this);
+        ClearTargetState(*this, selfNpc);
         return BT::NodeStatus::FAILURE;
     }
     
@@ -69,19 +79,21 @@ BT::NodeStatus CatAcquireOrValidateTargetNode::tick()
                 return BT::NodeStatus::SUCCESS;
             }
 
-            ResetCombatReservation(*this);
+            ClearTargetState(*this, selfNpc);
             return BT::NodeStatus::FAILURE;
         }
 
         const float distSq =
             (targetPawn->GetPosition() - selfNpc->GetPosition()).LengthSq();
 
-        if (distSq <= LoseRangeSq || keepDeadTargetDuringAttack) {
+        if (distSq <= LoseRangeSq || keepDeadTargetDuringAttack)
+        {
             setOutput<ObjectId>(BB::TargetId, targetPawn->GetId());
+            selfNpc->SetTarget(targetPawn);
             return BT::NodeStatus::SUCCESS;
         }
 
-        ResetCombatReservation(*this);
+        ClearTargetState(*this, selfNpc);
         return BT::NodeStatus::FAILURE;
     }
 
@@ -98,11 +110,13 @@ BT::NodeStatus CatAcquireOrValidateTargetNode::tick()
             if (distSq <= LoseRangeSq)
             {
                 setOutput<Pawn*>(BB::TargetPawn, foundTarget);
+                selfNpc->SetTarget(foundTarget);
                 return BT::NodeStatus::SUCCESS;
             }
         }
 
-        ResetCombatReservation(*this);
+        // TargetId가 있었는데 더 이상 유효하지 않은 경우는 진짜 타겟 상실
+        ClearTargetState(*this, selfNpc);
     }
 
     // 3. 새 타겟 탐색
@@ -144,12 +158,15 @@ BT::NodeStatus CatAcquireOrValidateTargetNode::tick()
 
     if (bestTarget == nullptr)
     {
-        ResetCombatReservation(*this);
+        // 여기서는 CombatMode만 초기화해도 됨.
+        // 이미 위에서 유효하지 않은 TargetId/TargetPawn은 ClearTargetState로 처리했기 때문.
+        ResetCombatMode(*this);
         return BT::NodeStatus::FAILURE;
     }
 
     setOutput<ObjectId>(BB::TargetId, bestTarget->GetId());
     setOutput<Pawn*>(BB::TargetPawn, bestTarget);
+    selfNpc->SetTarget(bestTarget);
 
     return BT::NodeStatus::SUCCESS;
 }

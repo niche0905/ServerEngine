@@ -25,8 +25,8 @@ bool MonsterAiComponent::Initialize(MonsterPawn* owner, ObjectManager* objectMan
    blackboard_ = BT::Blackboard::create();
    
    blackboard_->set<MonsterPawn*>(BB::SelfNpc, owner_);
-   blackboard_->set<Pawn*>(BB::TargetPawn, nullptr);
-   blackboard_->set<ObjectId>(BB::TargetId, ObjectId{});
+   
+   ResetBlackboard();
    
    auto room = owner_->GetRoom();
    if (room == nullptr)
@@ -90,12 +90,14 @@ void MonsterAiComponent::HaltTree()
 
 void MonsterAiComponent::ResetBlackboard()
 {
-   if (blackboard_ == nullptr)
+   if (blackboard_ == nullptr or owner_ == nullptr)
       return;
    
    blackboard_->set<CombatEventType>(BB::CombatMode, CombatEventType::None);
    blackboard_->set<ObjectId>(BB::TargetId, ObjectId{});
    blackboard_->set<Pawn*>(BB::TargetPawn, nullptr);
+   
+   owner_->SetTarget(nullptr);
 }
 
 // bool MonsterAiComponent::TryFindTarget()
