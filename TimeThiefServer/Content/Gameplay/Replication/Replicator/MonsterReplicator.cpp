@@ -58,8 +58,6 @@ ReplicateResult MonsterReplicator::FlushMonsterPeriodic(MonsterPawn& monster, Re
     
     if (HasDirty(flags, ReplicationDirty::Target))
     {
-        consoleLogger->Log(Color::Blue, L"Monster Set Target\n");
-        
         se::game::N_MonsterTarget noti;
         {
             auto* monsterIdPtr = noti.mutable_monster_id();
