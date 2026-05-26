@@ -31,6 +31,10 @@ public:
 	void								Consume(size_t nums) noexcept override;
 	size_t								DataSize() const noexcept override { return size_; }
 	size_t								FreeSize() const noexcept override { return (capacity_ - writePos_); }
+	
+public:
+	size_t								WritePos() const noexcept { return writePos_; }
+	size_t								ReadPos() const noexcept { return readPos_; }
 
 private:
 	void								Clean();
