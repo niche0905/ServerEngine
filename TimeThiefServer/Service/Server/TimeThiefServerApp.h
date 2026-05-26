@@ -4,6 +4,7 @@
 #include "Service/Room/RoomIdGenerator.h"
 #include "Shard/ShardManager.h"
 
+class ServiceBase;
 class PlayerSessionLifecycleService;
 class ServerPacketDispatcher;
 class ServerConfigReader;
@@ -50,7 +51,7 @@ private:
    void MatchLoop();
    
 private:
-   std::shared_ptr<IocpServerService>              networkService_;
+   std::shared_ptr<ServiceBase>                    networkService_;
    std::unique_ptr<ServerConfigReader>             configReader_;
    std::unique_ptr<RoomDirectory>                  roomDirectory_;
    std::unique_ptr<MatchMaker>                     matchMaker_;

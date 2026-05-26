@@ -6,6 +6,9 @@ enum class ServiceType
 {
     IocpService,
 	IocpServerService,
+    
+    RioService,
+    RioServerService
 };
 
 

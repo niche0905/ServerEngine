@@ -22,7 +22,7 @@ public:
 
 	virtual void StopService() override;
 	
-	bool Dispatch(uint32 timeoutMs);
+	virtual bool Dispatch(uint32 timeoutMs) override;
 
 	// Session Management
 	virtual bool RegisterSession(std::shared_ptr<SessionBase> session) override;

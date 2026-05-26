@@ -25,6 +25,8 @@ public:
 	virtual bool CanStart() const;
 
 	virtual void StopService();
+	
+	virtual bool Dispatch(uint32 timeoutMs) = 0;
 
 	// Session Factory Setting
 	void SetSessionFactory(SessionFactory factory) { sessionFactory_ = factory; }
