@@ -232,9 +232,12 @@ public:
    void NotifyTimePointChange(PlayerId id, int newTimePoint, int deltaTimePoint);
    void NotifyWeaponStatChange(PlayerId id, uint32 weaponId, const WeaponStatModifier& newStat);
    void NotifyZoneFlow(bool flowing);
-   void NotifyExplosion(ObjectId sourceId, PlayerId ownerPlayerId, const Vector3& pos, float radius);
+   void NotifyExplosion(ObjectId sourceId, ObjectId ownerId, const Vector3& pos, float radius);
    void NotifyCombatEvent(ObjectId objectId, CombatEventType combatEvent);
    void NotifyMonsterFire(ObjectId monsterId, CombatEventType eventType, const Vector3& origin, const Vector3& direction, float range);
+   void NotifyThrowGrenade(ObjectId ownerId, ObjectId grenadeId, uint32 grenadeType, const Vector3& pos, const Vector3& dir);
+   void NotifyGrenadeMoveSync(PlayerId ownerId, ObjectId grenadeId, const Vector3& newPos, const Vector3& newRotate, const Vector3& newVel);
+   void NotifyGrenadeExplosion(PlayerId ownerId, ObjectId grenadeId, const Vector3& exPos);
    
 private:
    void ReplicateEventSet(RepEvent& ev, RepEventType eventType);

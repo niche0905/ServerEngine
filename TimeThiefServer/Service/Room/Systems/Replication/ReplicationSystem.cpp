@@ -254,6 +254,17 @@ void ReplicationSystem::DispatchImmediateEvent(const RepEvent& ev, const RepFram
       FlushEvent_Hit(ev, frame);
       break;
       
+   case RepEventType::GrenadeThrow:
+      FlushEvent_GrenadeThrow(ev, frame);
+      break;
+      
+   case RepEventType::GrenadeMoveSync:
+      FlushEvent_GrenadeMoveSync(ev, frame);
+      break;
+      
+   case RepEventType::GrenadeExplosion:
+      FlushEvent_GrenadeExplosion(ev, frame);
+      
    case RepEventType::Attack:
       FlushEvent_Attack(ev, frame);
       break;
@@ -784,6 +795,81 @@ void ReplicationSystem::FlushEvent_Hit(const RepEvent& ev, const RepFrame& frame
    
    SendBufferRef sendBuffer = ServerPacketHandler::MakeSendBuffer(noti);
    ownerRoom_->BroadcastReplication(sendBuffer);
+}
+
+void ReplicationSystem::FlushEvent_GrenadeThrow(const RepEvent& ev, const RepFrame& frame) const
+{
+   const GrenadeThrowEvent* grenadeThrowEv = std::get_if<GrenadeThrowEvent>(&ev.payload);
+   if (!grenadeThrowEv) {
+      consoleLogger->Log(Color::Yellow, L"[ReplicationSystem] GrenadeThrow event with invalid payload, skipping. PlayerId={}", ev.header.playerId);
+      return;   // 페이로드가 GrenadeThrowEvent가 아닌 경우 (잘못된 이벤트)
+   }
+   
+   se::game::N_ThrowGrenade noti;
+   auto* ownerIdPtr = noti.mutable_owner_id();
+   ownerIdPtr->set_value(ev.header.source.value);
+   auto* entityIdPtr = noti.mutable_entity_id();
+   entityIdPtr->set_value(ev.header.target.value);
+   noti.set_grenade_type(grenadeThrowEv->grenadeType);
+   auto* startPosPtr = noti.mutable_start_position();
+   startPosPtr->set_x(grenadeThrowEv->startPos.x);
+   startPosPtr->set_y(grenadeThrowEv->startPos.y);
+   startPosPtr->set_z(grenadeThrowEv->startPos.z);
+   auto* dirPtr = noti.mutable_direction();
+   dirPtr->set_x(grenadeThrowEv->direction.x);
+   dirPtr->set_y(grenadeThrowEv->direction.y);
+   dirPtr->set_z(grenadeThrowEv->direction.z);
+   
+   SendBufferRef sendBuffer = ServerPacketHandler::MakeSendBuffer(noti);
+   ownerRoom_->BroadcastReplication(sendBuffer);
+}
+
+void ReplicationSystem::FlushEvent_GrenadeMoveSync(const RepEvent& ev, const RepFrame& frame) const
+{
+   const GrenadeMoveSyncEvent* grenadeMoveSyncEv = std::get_if<GrenadeMoveSyncEvent>(&ev.payload);
+   if (!grenadeMoveSyncEv) {
+      consoleLogger->Log(Color::Yellow, L"[ReplicationSystem] GrenadeMoveSync event with invalid payload, skipping. objectId={}", ev.header.source.value);
+      return;   // 페이로드가 GrenadeMoveSyncEvent가 아닌 경우 (잘못된 이벤트)
+   }
+   
+   se::game::N_GrenadeMoveSync noti;
+   auto* entityIdPtr = noti.mutable_entity_id();
+   entityIdPtr->set_value(ev.header.source.value);
+   auto* posPtr = noti.mutable_position();
+   posPtr->set_x(grenadeMoveSyncEv->position.x);
+   posPtr->set_y(grenadeMoveSyncEv->position.y);
+   posPtr->set_z(grenadeMoveSyncEv->position.z);
+   auto* rotPtr = noti.mutable_rotation();
+   rotPtr->set_yaw(grenadeMoveSyncEv->rotation.x);
+   rotPtr->set_pitch(grenadeMoveSyncEv->rotation.y);
+   rotPtr->set_roll(grenadeMoveSyncEv->rotation.z);
+   auto* velPtr = noti.mutable_velocity();
+   velPtr->set_x(grenadeMoveSyncEv->velocity.x);
+   velPtr->set_y(grenadeMoveSyncEv->velocity.y);
+   velPtr->set_z(grenadeMoveSyncEv->velocity.z);
+   
+   SendBufferRef sendBuffer = ServerPacketHandler::MakeSendBuffer(noti);
+   ownerRoom_->BroadcastReplication(sendBuffer, ev.header.exceptPlayerId);
+}
+
+void ReplicationSystem::FlushEvent_GrenadeExplosion(const RepEvent& ev, const RepFrame& frame) const
+{
+   const GrenadeExplosionEvent* grenadeExplosionEv = std::get_if<GrenadeExplosionEvent>(&ev.payload);
+   if (!grenadeExplosionEv) {
+      consoleLogger->Log(Color::Yellow, L"[ReplicationSystem] GrenadeExplosion event with invalid payload, skipping. objectId={}", ev.header.source.value);
+      return;   // 페이로드가 GrenadeExplosionEvent가 아닌 경우 (잘못된 이벤트)
+   } 
+   
+   se::game::N_GrenadeExplosion noti;
+   auto* entityIdPtr = noti.mutable_entity_id();
+   entityIdPtr->set_value(ev.header.source.value);
+   auto* posPtr = noti.mutable_position();
+   posPtr->set_x(grenadeExplosionEv->explosionPos.x);
+   posPtr->set_y(grenadeExplosionEv->explosionPos.y);
+   posPtr->set_z(grenadeExplosionEv->explosionPos.z);
+   
+   SendBufferRef sendBuffer = ServerPacketHandler::MakeSendBuffer(noti);
+   ownerRoom_->BroadcastReplication(sendBuffer, ev.header.exceptPlayerId);
 }
 
 void ReplicationSystem::FlushEvent_Attack(const RepEvent& ev, const RepFrame& frame) const

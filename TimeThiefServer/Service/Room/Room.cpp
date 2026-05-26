@@ -15,6 +15,7 @@
 #include "Content/Gameplay/Drop/DropTypes.h"
 #include "Content/Object/Actor/ChestActor.h"
 #include "Content/Object/Actor/StoreActor.h"
+#include "Content/Object/Actor/SubProjectile/GrenadeActor.h"
 #include "Data/GameDataManager.h"
 #include "Physics/Collider/CollisionResult.h"
 
@@ -690,8 +691,6 @@ bool Room::HandleFire(PlayerId playerId, const se::game::C_FireReq& pkt)
 
 bool Room::HandleThrowGrenade(PlayerId playerId, const se::game::C_ThrowGrenadeReq& pkt)
 {
-   SendBufferRef throwBroadcastBuffer;
-   SendBufferRef grenadeSpawnBuffer;      // se::room::N_EntitySpawn 형태로 투척한 수류탄의 스폰 정보
    std::shared_ptr<PlayerSession> sessionRef = sessionManager_.FindByPlayerId(playerId);
    
    if (!sessionRef) return false;   // 세션이 존재하지 않음 (정상적이지 않은 상황)
@@ -711,9 +710,11 @@ bool Room::HandleThrowGrenade(PlayerId playerId, const se::game::C_ThrowGrenadeR
       if (!playerPawn)
          return false;
       
-      const uint32 grenadeType = pkt.grenade_type();   // TODO: 현재는 수류탄 종류 구분이 없지만, 나중에 여러 종류의 수류탄이 생긴다면 이 값을 활용해서 구분하기
+      const uint32 grenadeType = pkt.grenade_type();
       const auto& startPos = pkt.start_position();
       const auto& dir = pkt.direction();
+      
+      const Vector3 position = Vector3{startPos.x(), startPos.y(), startPos.z()};
       
       InventoryOpResult grenadeResult = playerPawn->ConsumeItem(grenadeType, 1, ItemChangeContext(ItemChangeReason::Consume));
       if (!grenadeResult.accepted) {
@@ -721,38 +722,16 @@ bool Room::HandleThrowGrenade(PlayerId playerId, const se::game::C_ThrowGrenadeR
          return true;   // 수류탄 아이템 소비 실패 (예: 인벤토리에 수류탄이 없음)
       }
       
-      // NotifyThrow...
-      
-      // TODO: 투척 판정 및 폭발 처리 로직은 여기서 (예: GrenadePawn을 생성해서 투척, 일정 시간 후 폭발 처리 등)
-      //       다음 Spawn? 로직도 여기서 진행 (Replicated가 붙은 Grenade Actor)
-      //       우선 Inventory 유효성 체크도 해야함
-      
-      se::game::N_ThrowGrenade noti;
-      {
-         auto* entityIdPtr = noti.mutable_entity_id();
-         entityIdPtr->set_value(it->second.pawnObjectId.value);
-         
-         noti.set_grenade_type(pkt.grenade_type());
-         
-         auto* startPosPtr = noti.mutable_start_position();
-         startPosPtr->set_x(startPos.x());
-         startPosPtr->set_y(startPos.y());
-         startPosPtr->set_z(startPos.z());
-         
-         auto* dirPtr = noti.mutable_direction();
-         dirPtr->set_x(dir.x());
-         dirPtr->set_y(dir.y());
-         dirPtr->set_z(dir.z());
+      GrenadeActor* grenade = SpawnObject<GrenadeActor>(ObjectFlags::None);
+      if (!grenade) {
+         consoleLogger->Log(Color::Yellow, L"[Room] Failed to spawn GrenadeActor for playerId %u\n", playerId);
+         return true;   // 수류탄 액터 생성 실패 (정상적이지 않은 상황)
       }
+      grenade->SetPosition(position);
+      ObjectId grenadeId = grenade->GetId();
       
-      throwBroadcastBuffer = ServerPacketHandler::MakeSendBuffer(noti);
+      NotifyThrowGrenade(it->second.pawnObjectId, grenadeId, grenadeType, position, Vector3{dir.x(), dir.y(), dir.z()});
    }
-   
-   if (throwBroadcastBuffer)
-      Broadcast(throwBroadcastBuffer, playerId);   // 투척한 플레이어를 제외한 나머지 플레이어들에게 투척 정보 Broadcast
-   
-   if (grenadeSpawnBuffer)
-      Broadcast(grenadeSpawnBuffer);
    
    return true;
 }
@@ -841,15 +820,83 @@ bool Room::HandleWeaponChange(PlayerId playerId, const se::game::C_WeaponChangeR
 
 bool Room::HandleGrenadeMoveSync(PlayerId playerId, const se::game::C_GrenadeMoveSyncReq& pkt)
 {
-   // TODO: 수류탄 이동 Broadcast 하기
-   //       Server에도 Actor로 가지고 있어야 할 지는 고민
+   std::shared_ptr<PlayerSession> sessionRef = sessionManager_.FindByPlayerId(playerId);
+   
+   if (!sessionRef) return false;   // 세션이 존재하지 않음 (정상적이지 않은 상황)
+   
+   {
+      if (playerId == 0)
+         return false;
+      
+      auto it = roomPlayers_.find(playerId);
+      if (it == roomPlayers_.end())
+         return false;   // 방에 존재하지 않는 플레이어
+      
+      if (not it->second.loaded)
+         return false;
+      
+      auto* playerPawn = objectManager_.FindAs<PlayerPawn>(it->second.pawnObjectId);
+      if (!playerPawn)
+         return false;
+      
+      ObjectId grenadeId{pkt.entity_id().value() };
+      auto* grenade = objectManager_.FindAs<GrenadeActor>(grenadeId);
+      if (!grenade) {
+         consoleLogger->Log(Color::Yellow, L"[Room] GrenadeActor not found for grenadeId %u during grenade move sync\n", pkt.entity_id().value());
+         return false;
+      }
+      
+      const auto& position = pkt.position();
+      const auto& rotation = pkt.rotation();
+      const auto& velocity = pkt.velocity();
+      
+      const Vector3 grenadePos{position.x(), position.y(), position.z()};
+      const Vector3 grenadeRot{rotation.yaw(), rotation.pitch(), rotation.roll()};
+      const Vector3 grenadeVel{velocity.x(), velocity.y(), velocity.z()};
+      
+      grenade->SetPosition(grenadePos);
+      
+      NotifyGrenadeMoveSync(playerId, grenadeId, grenadePos, grenadeRot, grenadeVel);
+   }
    
    return true;
 }
 
 bool Room::HandleGrenadeExplosion(PlayerId playerId, const se::game::C_GrenadeExplosionReq& pkt)
 {
-   // TODO: 수류탄 폭발 처리 (폭발 범위 내 플레이어 피해 적용, 폭발 이펙트 및 사운드 Broadcast 등)
+   std::shared_ptr<PlayerSession> sessionRef = sessionManager_.FindByPlayerId(playerId);
+   
+   if (!sessionRef) return false;   // 세션이 존재하지 않음 (정상적이지 않은 상황)
+   
+   {
+      if (playerId == 0)
+         return false;
+      
+      auto it = roomPlayers_.find(playerId);
+      if (it == roomPlayers_.end())
+         return false;   // 방에 존재하지 않는 플레이어
+      
+      if (not it->second.loaded)
+         return false;
+      
+      auto* playerPawn = objectManager_.FindAs<PlayerPawn>(it->second.pawnObjectId);
+      if (!playerPawn)
+         return false;
+      
+      ObjectId grenadeId{pkt.entity_id().value() };
+      const auto& position = pkt.position();
+      const Vector3 grenadePos{position.x(), position.y(), position.z()};
+      
+      auto* grenade = objectManager_.FindAs<GrenadeActor>(grenadeId);
+      if (!grenade) {
+         consoleLogger->Log(Color::Yellow, L"[Room] GrenadeActor not found for grenadeId %u during grenade explosion handling\n", pkt.entity_id().value());
+         return false;
+      }
+      grenade->SetPosition(grenadePos);
+      grenade->Explode(GetObjectManager());
+      
+      NotifyGrenadeExplosion(playerId, grenadeId, grenadePos);
+   }
    
    return true;
 }
@@ -2153,8 +2200,14 @@ void Room::NotifyZoneFlow(bool flowing)
    roomGameSystem_.GetReplicationSystem().PushEvent(zoneFlowEvent);
 }
 
-void Room::NotifyExplosion(ObjectId sourceId, PlayerId ownerPlayerId, const Vector3& pos, float radius)
+void Room::NotifyExplosion(ObjectId sourceId, ObjectId ownerId, const Vector3& pos, float radius)
 {
+   auto* ownerPawn = objectManager_.FindAs<Pawn>(ownerId);
+   if (!ownerPawn)
+      return;   // 유효하지 않은 폭발 소유자
+   
+   PlayerId ownerPlayerId = ownerPawn->GetOwnerPlayerId();
+   
    // 폭발 이벤트를 생성하여 클라이언트에게 전송 (폭발 이펙트 재생을 위해)
    RepEvent explosionEvent;
    ReplicateEventSet(explosionEvent, RepEventType::Explosion);
@@ -2184,6 +2237,41 @@ void Room::NotifyMonsterFire(ObjectId monsterId, CombatEventType eventType, cons
    monsterFireEvent.payload = MonsterFireEvent{static_cast<uint32>(eventType), origin, direction, range};
    
    roomGameSystem_.GetReplicationSystem().PushEvent(monsterFireEvent);
+}
+
+void Room::NotifyThrowGrenade(ObjectId ownerId, ObjectId grenadeId, uint32 grenadeType, const Vector3& pos,
+   const Vector3& dir)
+{
+   RepEvent throwGrenadeEvent;
+   ReplicateEventSet(throwGrenadeEvent, RepEventType::GrenadeThrow);
+   throwGrenadeEvent.header.source = ownerId;
+   throwGrenadeEvent.header.target = grenadeId;
+   throwGrenadeEvent.payload = GrenadeThrowEvent{grenadeType, pos, dir};
+   
+   roomGameSystem_.GetReplicationSystem().PushEvent(throwGrenadeEvent);
+}
+
+void Room::NotifyGrenadeMoveSync(PlayerId ownerId, ObjectId grenadeId, const Vector3& newPos, const Vector3& newRotate,
+                                 const Vector3& newVel)
+{
+   RepEvent grenadeMoveEvent;
+   ReplicateEventSet(grenadeMoveEvent, RepEventType::GrenadeMoveSync);
+   grenadeMoveEvent.header.source = grenadeId;
+   grenadeMoveEvent.header.exceptPlayerId = ownerId;
+   grenadeMoveEvent.payload = GrenadeMoveSyncEvent{newPos, newRotate, newVel};
+   
+   roomGameSystem_.GetReplicationSystem().PushEvent(grenadeMoveEvent);
+}
+
+void Room::NotifyGrenadeExplosion(PlayerId ownerId, ObjectId grenadeId, const Vector3& exPos)
+{
+   RepEvent grenadeExplosionEvent;
+   ReplicateEventSet(grenadeExplosionEvent, RepEventType::GrenadeExplosion);
+   grenadeExplosionEvent.header.source = grenadeId;
+   grenadeExplosionEvent.header.exceptPlayerId = ownerId;
+   grenadeExplosionEvent.payload = GrenadeExplosionEvent{exPos};
+   
+   roomGameSystem_.GetReplicationSystem().PushEvent(grenadeExplosionEvent);
 }
 
 void Room::ReplicateEventSet(RepEvent& ev, RepEventType eventType)

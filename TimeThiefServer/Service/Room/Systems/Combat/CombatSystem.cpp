@@ -248,14 +248,6 @@ void CombatSystem::ProjectileExplosion(ObjectId projectileId, const SE::Math::Ve
       consoleLogger->Log(Color::Yellow, L"[CombatSystem] ProjectileExplosion called with invalid ownerId\n");
    }
    
-   PlayerId playerId = 0;
-   Pawn* pawn = ownerRoom_->GetObjectManager().FindAs<Pawn>(ownerId);
-   if (pawn) {
-      playerId = pawn->GetOwnerPlayerId();
-   } else {
-      consoleLogger->Log(Color::Yellow, L"[CombatSystem] ProjectileExplosion: Owner Pawn not found for ownerId %u\n", ownerId.value);
-   }
-   
    const float radiusSq = radius * radius;
    
    ownerRoom_->GetObjectManager().ForEachAlive([&](BaseObject* obj)
@@ -327,8 +319,6 @@ void CombatSystem::ProjectileExplosion(ObjectId projectileId, const SE::Math::Ve
       
       DamageResult damageResult = targetPawn->ApplyDamage(ownerRoom_->GetObjectManager(), finalDamage, ctx);
    });
-   
-   ownerRoom_->NotifyExplosion(projectileId, playerId, pos, radius);
 }
 
 bool CombatSystem::IsExplosionBlocked(const SE::Physics::Ray& ray, float dist, ObjectId targetId) const
