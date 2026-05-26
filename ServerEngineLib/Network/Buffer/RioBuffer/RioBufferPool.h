@@ -4,6 +4,7 @@
 #include <mutex>
 #include <memory>
 #include <atomic>
+#include <tbb/concurrent_queue.h>
 
 class RioSendBuffer;
 
@@ -56,8 +57,7 @@ private:
     std::vector<std::unique_ptr<RioSendBuffer>> buffers_;
     std::vector<RioSendBuffer*> localFreeList_;
     
-    std::mutex remoteMutex_;
-    std::queue<RioSendBuffer*> remoteFreeQueue_;
+    tbb::concurrent_queue<RioSendBuffer*> remoteFreeQueue_;
     
     std::thread::id ownerThreadId_;
     

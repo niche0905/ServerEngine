@@ -72,11 +72,8 @@ void RioBufferPool::Clear()
    
    initialized_ = false;
    
-   {
-      std::lock_guard lock(remoteMutex_);
-      while (!remoteFreeQueue_.empty()) {
-         remoteFreeQueue_.pop();
-      }
+   RioSendBuffer* buffer = nullptr;
+   while (remoteFreeQueue_.try_pop(buffer)) {
    }
    
    localFreeList_.clear();
@@ -137,12 +134,8 @@ void RioBufferPool::DrainRemoteFrees()
    if (!IsOwnerThread())
       return;
    
-   std::lock_guard lock(remoteMutex_);
-
-   while (!remoteFreeQueue_.empty()) {
-      RioSendBuffer* buffer = remoteFreeQueue_.front();
-      remoteFreeQueue_.pop();
-      
+   RioSendBuffer* buffer = nullptr;
+   while (remoteFreeQueue_.try_pop(buffer)) {
       localFreeList_.push_back(buffer);
    }
 }
@@ -165,7 +158,6 @@ void RioBufferPool::PushLocal(RioSendBuffer* buffer)
 
 void RioBufferPool::PushRemote(RioSendBuffer* buffer)
 {
-   std::lock_guard lock(remoteMutex_);
    remoteFreeQueue_.push(buffer);
 }
 

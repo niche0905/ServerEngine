@@ -41,6 +41,9 @@ using AcceptEvent = IocpAcceptEvent;
 using RecvEvent = IocpRecvEvent;
 using SendEvent = IocpSendEvent;
 
+constexpr uint32 RioSendBlockSize = 4096;
+constexpr uint32 RioSendBlockCount = 8192;
+
 #endif
 
 class IoBackend
