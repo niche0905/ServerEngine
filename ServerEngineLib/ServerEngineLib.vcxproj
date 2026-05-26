@@ -215,6 +215,7 @@
     <ClInclude Include="Network\Event\IOCP\IocpEvent.h" />
     <ClInclude Include="Network\Event\IOCP\IocpIoEvent.h" />
     <ClInclude Include="Network\Event\RIO\RioEvent.h" />
+    <ClInclude Include="Network\Event\RIO\RioIoEvent.h" />
     <ClInclude Include="Network\IoBackend.h" />
     <ClInclude Include="Network\Session\IOCP\IocpSession.h" />
     <ClInclude Include="Network\Session\IoObject.h" />
