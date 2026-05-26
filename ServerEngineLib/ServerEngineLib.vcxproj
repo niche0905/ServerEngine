@@ -207,6 +207,8 @@
     <ClInclude Include="Network\Buffer\LinearBuffer\LinearBuffer.h" />
     <ClInclude Include="Network\Buffer\ReadView.h" />
     <ClInclude Include="Network\Buffer\RecvBuffer.h" />
+    <ClInclude Include="Network\Buffer\RioBuffer\RioBufferPool.h" />
+    <ClInclude Include="Network\Buffer\RioBuffer\RioSendBuffer.h" />
     <ClInclude Include="Network\Buffer\SendBuffer.h" />
     <ClInclude Include="Network\Event\IIoEvent.h" />
     <ClInclude Include="Network\Event\IOCP\IocpConnectionEvent.h" />
@@ -1163,6 +1165,8 @@
       <SDLCheck>true</SDLCheck>
       <LibCompiled>true</LibCompiled>
     </ClCompile>
+    <ClCompile Include="Network\Buffer\RioBuffer\RioBufferPool.cpp" />
+    <ClCompile Include="Network\Buffer\RioBuffer\RioSendBuffer.cpp" />
     <ClCompile Include="Network\Buffer\SendBuffer.cpp">
       <RuntimeLibrary>MultiThreadedDebugDll</RuntimeLibrary>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
