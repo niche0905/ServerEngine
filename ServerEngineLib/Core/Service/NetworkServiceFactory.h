@@ -7,6 +7,26 @@ class ServiceBase;
 class NetworkServiceFactory
 {
 public:
+    static std::shared_ptr<ServiceBase> CreateDefaultNetworkService(
+        const NetAddr& addr,
+        SessionFactory sessionFactory,
+        int32 maxSessionCount)
+    {
+#ifdef USE_RIO
+        return CreateNetworkService(
+            BackendType::RIO,
+            addr,
+            std::move(sessionFactory),
+            maxSessionCount);
+#else
+        return CreateNetworkService(
+            BackendType::IOCP,
+            addr,
+            std::move(sessionFactory),
+            maxSessionCount);
+#endif
+    }
+    
     static std::shared_ptr<ServiceBase> CreateNetworkService(
         BackendType backend, NetAddr addr, SessionFactory factory, int32 maxSessionCount)
     {

@@ -44,6 +44,10 @@ void ThreadManager::InitTLS()
 {
 	static std::atomic<uint32> SThreadID{ 1 };
 	TLS().thread_id = SThreadID.fetch_add(1);	// unique thread id assign
+	
+#ifdef USE_RIO
+	TLS().rioBufferPool.Init(&SocketUtils::Rio, RioSendBlockSize , RioSendBlockCount);
+#endif
 }
 
 void ThreadManager::DestroyTLS()

@@ -8,91 +8,93 @@
 
 bool RioCore::Initialize()
 {
-	SOCKET tempSocket = ::WSASocketW(AF_INET, SOCK_STREAM, IPPROTO_TCP, nullptr, 0, WSA_FLAG_REGISTERED_IO);
-	if (tempSocket == INVALID_SOCKET)
-		return false;
-
-	// RIO 함수 테이블 로드
-	GUID functionTableId = WSAID_MULTIPLE_RIO;
-	DWORD bytes = 0;
-	if (::WSAIoctl(tempSocket, SIO_GET_MULTIPLE_EXTENSION_FUNCTION_POINTER,
-		&functionTableId, sizeof(functionTableId),
-		&rio_, sizeof(rio_),
-		&bytes, nullptr, nullptr) == SOCKET_ERROR
-		) {
-
-		::closesocket(tempSocket);
-		return false;
-	}
-
+#ifdef USE_RIO
 	completionType_.Type = RIO_EVENT_COMPLETION;
 	completionType_.Event.EventHandle = ::CreateEventW(nullptr, FALSE, FALSE, nullptr);
 
-	if (completionType_.Event.EventHandle == nullptr) {
-		::closesocket(tempSocket);
+	if (completionType_.Event.EventHandle == nullptr)
 		return false;
-	}
 
-	rioCq_ = rio_.RIOCreateCompletionQueue(1024, &completionType_);
-	if (rioCq_ == RIO_INVALID_CQ) {
+	rioCq_ = SocketUtils::Rio.RIOCreateCompletionQueue(1024, &completionType_);
+
+	if (rioCq_ == RIO_INVALID_CQ)
+	{
 		::CloseHandle(completionType_.Event.EventHandle);
-		::closesocket(tempSocket);
+		completionType_.Event.EventHandle = nullptr;
 		return false;
 	}
 
-	::closesocket(tempSocket);
 	return true;
+#else
+	return false;
+#endif
 }
 
 void RioCore::Terminate()
 {
-	if (rioCq_ != RIO_INVALID_CQ) {
-		rio_.RIOCloseCompletionQueue(rioCq_);
+#ifdef USE_RIO
+	if (rioCq_ != RIO_INVALID_CQ)
+	{
+		SocketUtils::Rio.RIOCloseCompletionQueue(rioCq_);
 		rioCq_ = RIO_INVALID_CQ;
 	}
 
-	if (completionType_.Event.EventHandle != INVALID_HANDLE_VALUE) {
+	if (completionType_.Event.EventHandle != nullptr)
+	{
 		::CloseHandle(completionType_.Event.EventHandle);
-		completionType_.Event.EventHandle = INVALID_HANDLE_VALUE;
+		completionType_.Event.EventHandle = nullptr;
 	}
+#endif
 }
 
 bool RioCore::Dispatch(DWORD timeoutMs)
 {
-	RIORESULT results[1024];	// 최대 한번에 받을 수 있는 이벤트 수 (Attach 할 때 설정한 값)
-	ULONG numOfResults = static_cast<ULONG>(rio_.RIODequeueCompletion(rioCq_, results, std::size(results)));
+#ifdef USE_RIO
+	RIORESULT results[1024];
 
-	if (numOfResults == RIO_CORRUPT_CQ) {
-		// TODO: CQ가 손상된 경우에 대한 처리
+	ULONG numOfResults = SocketUtils::Rio.RIODequeueCompletion(
+		rioCq_,
+		results,
+		static_cast<ULONG>(std::size(results))
+	);
 
+	if (numOfResults == RIO_CORRUPT_CQ)
 		return false;
-	}
 
-	for (ULONG i = 0; i < numOfResults; ++i) {
+	for (ULONG i = 0; i < numOfResults; ++i)
+	{
 		RIORESULT& result = results[i];
 		RioEvent* ioEvent = reinterpret_cast<RioEvent*>(result.RequestContext);
-		
-		if (ioEvent) {
-			if (std::shared_ptr<IoObject> owner = ioEvent->GetOwner()) {
+
+		if (ioEvent)
+		{
+			if (std::shared_ptr<IoObject> owner = ioEvent->GetOwner())
+			{
 				owner->Dispatch(ioEvent, static_cast<int32>(result.BytesTransferred));
 			}
 		}
 	}
 
-	// 결과가 없으면 Completion Notify 이벤트 대기
-	if (numOfResults == 0) {
+	if (numOfResults == 0)
+	{
 		::WaitForSingleObject(completionType_.Event.EventHandle, timeoutMs);
 	}
 
+	return true;
+#else
 	return false;
+#endif
 }
 
 bool RioCore::AttachIoObject(std::shared_ptr<IoObject> ioObject)
 {
-	// 여기에 들어온 IoObject는 RIO 소켓이어야 합니다 (반드시!!)
+#ifdef USE_RIO
+	if (ioObject == nullptr)
+		return false;
+
 	SOCKET socket = reinterpret_cast<SOCKET>(ioObject->GetHandle());
 
-	RIO_RQ rq = rio_.RIOCreateRequestQueue(
+	RIO_RQ rq = SocketUtils::Rio.RIOCreateRequestQueue(
 		socket,
 		1024, 1024,
 		1024, 1024,
@@ -104,13 +106,12 @@ bool RioCore::AttachIoObject(std::shared_ptr<IoObject> ioObject)
 	if (rq == RIO_INVALID_RQ)
 		return false;
 
-	// TODO: Rio Session으로 변환 후 rq 저장
-
+	// TODO:
+	// RioSession 같은 객체에 rq 저장 필요
+	// ioObject->SetRequestQueue(rq);
 
 	return true;
-}
-
-bool RioCore::LoadRioFunctions()
-{
+#else
 	return false;
+#endif
 }

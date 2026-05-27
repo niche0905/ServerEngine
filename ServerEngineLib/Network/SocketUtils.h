@@ -30,6 +30,8 @@ public:
 	static LPFN_CONNECTEX			ConnectEx;
 	static LPFN_DISCONNECTEX		DisconnectEx;
 	static LPFN_ACCEPTEX			AcceptEx;
+	
+	static RIO_EXTENSION_FUNCTION_TABLE Rio;
 
 public:
 	// windows 소켓 초기화 및 함수	바인딩
@@ -43,6 +45,9 @@ public:
 	static SOCKET CreateSocket();
 	// 소켓 닫기
 	static void Close(SOCKET& socket);
+	
+	// RIO 함수 테이블 로드
+	static bool LoadRioFunctions();
 
 // Windows Error
 public:

@@ -17,7 +17,12 @@ enum class ServiceType
 /// RIO USE ///
 ///////////////
 
-#include "RioCore.h"
+#include "Core/IoCore/RioCore/RioCore.h"
+#include "Network/Event/RIO/RioEvent.h"
+#include "Network/Event/RIO/RioIoEvent.h"
+
+constexpr uint32 RioSendBlockSize = 4096;
+constexpr uint32 RioSendBlockCount = 8192;
 
 //using SelectedService = ServiceType::RioService;
 using IoCoreType = class RioCore;
@@ -40,9 +45,6 @@ using DisconnectEvent = IocpDisconnectEvent;
 using AcceptEvent = IocpAcceptEvent;
 using RecvEvent = IocpRecvEvent;
 using SendEvent = IocpSendEvent;
-
-constexpr uint32 RioSendBlockSize = 4096;
-constexpr uint32 RioSendBlockCount = 8192;
 
 #endif
 

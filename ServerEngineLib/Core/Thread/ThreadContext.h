@@ -1,4 +1,5 @@
 ﻿#pragma once
+#include "Network/Buffer/RioBuffer/RioBufferPool.h"
 #include "Utils/Types.h"
 
 /*-----------------
@@ -12,6 +13,10 @@
 struct ThreadContext
 {
 	uint32 thread_id;		// thread 고유 id
+	
+#ifdef USE_RIO
+	RioBufferPool rioBufferPool;
+#endif
 
 	// TODO: thread 별로 관리할 상태들 추가
 };

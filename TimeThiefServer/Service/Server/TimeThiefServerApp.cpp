@@ -161,8 +161,7 @@ bool TimeThiefServerApp::CreateNetworkService()
    
    // consoleLogger->Log(Color::Green, L"[TTSA] creating network service at %hs:%u\n", serverIPStr.c_str(), serverPort);
    
-   // TODO: 아래 BackendType 하드코딩 제거하기 (config로 빼거나, 런타임에 선택할 수 있도록, 혹은 Define으로 컴파일 타임에 선택할 수 있도록)
-   networkService_ = NetworkServiceFactory::CreateNetworkService(BackendType::IOCP, NetAddr(serverIP, serverPort), 
+   networkService_ = NetworkServiceFactory::CreateDefaultNetworkService(NetAddr(serverIP, serverPort), 
       [this]() -> std::shared_ptr<SessionBase>
       {
          return std::make_shared<PlayerSession>(*playerSessionLifecycleService_);

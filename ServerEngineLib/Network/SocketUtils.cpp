@@ -34,6 +34,12 @@ void SocketUtils::Initialize()
 	BindWindowsFunctions(dummySocket, WSAID_DISCONNECTEX, reinterpret_cast<LPVOID*>(&DisconnectEx));
 	BindWindowsFunctions(dummySocket, WSAID_ACCEPTEX, reinterpret_cast<LPVOID*>(&AcceptEx));
 	Close(dummySocket);
+	
+#ifdef USE_RIO
+	if (!LoadRioFunctions()) {
+		assert(false);
+	}
+#endif
 }
 
 void SocketUtils::Clean()
@@ -60,6 +66,34 @@ void SocketUtils::Close(SOCKET& socket)
 	}
 
 	socket = INVALID_SOCKET;
+}
+
+bool SocketUtils::LoadRioFunctions()
+{
+	SOCKET tempSocket =
+		::WSASocket(AF_INET, SOCK_STREAM, IPPROTO_TCP,
+					nullptr, 0, WSA_FLAG_REGISTERED_IO);
+
+	if (tempSocket == INVALID_SOCKET)
+		return false;
+
+	GUID functionTableId = WSAID_MULTIPLE_RIO;
+	DWORD bytes = 0;
+
+	const int result = ::WSAIoctl(
+		tempSocket,
+		SIO_GET_MULTIPLE_EXTENSION_FUNCTION_POINTER,
+		&functionTableId,
+		sizeof(functionTableId),
+		&Rio,
+		sizeof(Rio),
+		&bytes,
+		nullptr,
+		nullptr);
+
+	::closesocket(tempSocket);
+
+	return result != SOCKET_ERROR;
 }
 
 std::wstring SocketUtils::GetWinErrorToString(DWORD errorCode)
