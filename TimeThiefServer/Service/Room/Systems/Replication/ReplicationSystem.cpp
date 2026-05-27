@@ -264,6 +264,7 @@ void ReplicationSystem::DispatchImmediateEvent(const RepEvent& ev, const RepFram
       
    case RepEventType::GrenadeExplosion:
       FlushEvent_GrenadeExplosion(ev, frame);
+      break;
       
    case RepEventType::Attack:
       FlushEvent_Attack(ev, frame);
