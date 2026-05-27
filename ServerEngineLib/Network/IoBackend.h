@@ -11,6 +11,7 @@ enum class ServiceType
     RioServerService
 };
 
+// #define USE_RIO
 
 #ifdef USE_RIO
 ///////////////
@@ -25,7 +26,8 @@ constexpr uint32 RioSendBlockSize = 4096;
 constexpr uint32 RioSendBlockCount = 8192;
 
 //using SelectedService = ServiceType::RioService;
-using IoCoreType = class RioCore;
+using IoCoreType = RioCore;
+using NetworkSendBuffer = RioSendBuffer;
 
 #else // USE_IOCP
 ////////////////
@@ -39,6 +41,7 @@ using IoCoreType = class RioCore;
 
 //using SelectedService = ServiceType::IocpService;
 using IoCoreType = IocpCore;
+using NetworkSendBuffer = SendBuffer;
 
 using ConnectEvent = IocpConnectEvent;
 using DisconnectEvent = IocpDisconnectEvent;
@@ -47,6 +50,8 @@ using RecvEvent = IocpRecvEvent;
 using SendEvent = IocpSendEvent;
 
 #endif
+
+using SendBufferRef = std::shared_ptr<NetworkSendBuffer>;
 
 class IoBackend
 {

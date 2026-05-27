@@ -1,7 +1,8 @@
 ﻿#pragma once
+#include <WinSock2.h>
+#include <MSWSock.h>
+#include <WS2tcpip.h>
 #include <vector>
-#include <queue>
-#include <mutex>
 #include <memory>
 #include <atomic>
 #include <tbb/concurrent_queue.h>

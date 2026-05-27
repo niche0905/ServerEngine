@@ -222,6 +222,8 @@
     <ClInclude Include="Network\Session\IoObject.h" />
     <ClInclude Include="Network\Session\Listener.h" />
     <ClInclude Include="Network\Session\PacketSession.h" />
+    <ClInclude Include="Network\Session\RIO\IRioObject.h" />
+    <ClInclude Include="Network\Session\RIO\RioSession.h" />
     <ClInclude Include="Network\Session\SessionBase.h" />
     <ClInclude Include="Network\SocketUtils.h" />
     <ClInclude Include="Physics\Collider\AABBCollider.h" />
@@ -1626,6 +1628,8 @@
       <SDLCheck>true</SDLCheck>
       <LibCompiled>true</LibCompiled>
     </ClCompile>
+    <ClCompile Include="Network\Session\RIO\IRioObject.cpp" />
+    <ClCompile Include="Network\Session\RIO\RioSession.cpp" />
     <ClCompile Include="Network\Session\SessionBase.cpp">
       <RuntimeLibrary>MultiThreadedDebugDll</RuntimeLibrary>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>

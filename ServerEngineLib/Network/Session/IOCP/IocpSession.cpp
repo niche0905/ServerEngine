@@ -20,7 +20,7 @@ bool IocpSession::Connect(SOCKET socket)
     return PostConnect();
 }
 
-void IocpSession::Send(std::shared_ptr<SendBuffer> sendBuffer)
+void IocpSession::Send(SendBufferRef sendBuffer)
 {
 	if (IsConnected() == false)
 		return;
@@ -129,7 +129,7 @@ void IocpSession::PostSend()
 	{
 		int32 writeSize = 0;
 		while (sendQueue_.empty() == false) {
-			std::shared_ptr<SendBuffer> sendBuffer = sendQueue_.front();
+			SendBufferRef sendBuffer = sendQueue_.front();
 
 			writeSize += static_cast<int32>(sendBuffer->Size());
 			// TODO: check max write size (+ exception check)
@@ -141,7 +141,7 @@ void IocpSession::PostSend()
 
 	std::vector<WSABUF> wsabufs;
 	wsabufs.reserve(sendEvent_.sendBuffers_.size());
-	for (std::shared_ptr<SendBuffer> sendBuffer : sendEvent_.sendBuffers_) {
+	for (SendBufferRef sendBuffer : sendEvent_.sendBuffers_) {
 	
 		WSABUF wsabuf;
 		wsabuf.buf = reinterpret_cast<char*>(sendBuffer->Data());

@@ -12,6 +12,10 @@
 class RioCore : public IoCore
 {
 public:
+	RioCore();
+	~RioCore() override;
+	
+public:
 	BackendType Backend() const noexcept override { return BackendType::RIO; }
 	
 	bool Initialize() override;

@@ -29,7 +29,7 @@ public:
 // Architecture interface
 public:
 	virtual bool Connect(SOCKET socket) override;
-	virtual void Send(std::shared_ptr<SendBuffer> sendBuffer) override;
+	virtual void Send(SendBufferRef sendBuffer) override;
 
 // Network interface
 public:

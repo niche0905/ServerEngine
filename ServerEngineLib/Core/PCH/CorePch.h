@@ -1,23 +1,23 @@
 #pragma once
 
-/* =============
-	Engine Core
-   ============= */
+/* ===================
+	Windows / WinSock
+   =================== */
 
-#include "Utils/Types.h"
-#include "Utils/Container.h"
-#include "Math/Math.h"
-#include "Math/Vector.h"
-#include "Core/Thread/ThreadLocalStorage.h"
-#include "Core/Global/CoreGlobal.h"
-#include "Core/Core.h"
+#define WIN32_LEAN_AND_MEAN
+#define NOMINMAX
+
+#include <WinSock2.h>
+#include <MSWSock.h>
+#include <WS2tcpip.h>
+#include <Windows.h>
+
+#pragma comment(lib, "ws2_32.lib")
 
 /* ======================
 	C++ Standard Library
    ====================== */
 
-#define NOMINMAX
-#include <Windows.h>
 #include <iostream>
 #include <string_view>
 #include <cassert>
@@ -30,14 +30,18 @@
 #include <chrono>
 #include <algorithm>
 
-/* ===================
-    Windows / WinSock
-   =================== */
 
-#include <WinSock2.h>
-#include <MSWSock.h>
-#include <WS2tcpip.h>
-#pragma comment(lib, "ws2_32.lib")
+/* =============
+	Engine Core
+   ============= */
+
+#include "Utils/Types.h"
+#include "Utils/Container.h"
+#include "Math/Math.h"
+#include "Math/Vector.h"
+#include "Core/Thread/ThreadLocalStorage.h"
+#include "Core/Global/CoreGlobal.h"
+#include "Core/Core.h"
 
 /* ===========================
 	Platform-dependent Engine

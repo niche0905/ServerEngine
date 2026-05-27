@@ -1804,7 +1804,7 @@ bool Room::GiveMoney(PlayerId playerId, int32 amount)
    return result.accepted;
 }
 
-void Room::Broadcast(std::shared_ptr<SendBuffer> sendBuffer, PlayerId exceptPlayerId)
+void Room::Broadcast(SendBufferRef sendBuffer, PlayerId exceptPlayerId)
 {
    if (not sendBuffer)
       return;   // 유효하지 않은 SendBuffer

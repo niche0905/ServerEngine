@@ -18,7 +18,6 @@ class SessionManager
 {
 private:
    using SessionRef = std::shared_ptr<PlayerSession>;
-   using SendBufferRef = std::shared_ptr<SendBuffer>;
    
 public:
    void Add(SessionId sessionId, const SessionRef& session);   // 연결 생성

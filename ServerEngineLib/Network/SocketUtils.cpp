@@ -9,6 +9,8 @@ LPFN_CONNECTEX			SocketUtils::ConnectEx = nullptr;
 LPFN_DISCONNECTEX		SocketUtils::DisconnectEx = nullptr;
 LPFN_ACCEPTEX			SocketUtils::AcceptEx = nullptr;
 
+RIO_EXTENSION_FUNCTION_TABLE SocketUtils::Rio{};
+
 void SocketUtils::Initialize()
 {
 	WSADATA wsaData;

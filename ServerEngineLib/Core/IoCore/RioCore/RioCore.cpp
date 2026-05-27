@@ -1,10 +1,25 @@
 ﻿#include "pch.h"
 #include "RioCore.h"
 #include "Network/Event/RIO/RioEvent.h"
+#include "Network/SocketUtils.h"
+#include "Network/Session/RIO/IRioObject.h"
 
 /*------------
    RioCore
 ------------*/
+
+RioCore::RioCore()
+{
+#ifdef USE_RIO
+	const bool initSucc = Initialize();
+	assert(initSucc && "RioCore Initialize Failed");
+#endif
+}
+
+RioCore::~RioCore()
+{
+	Terminate();
+}
 
 bool RioCore::Initialize()
 {
@@ -77,6 +92,7 @@ bool RioCore::Dispatch(DWORD timeoutMs)
 
 	if (numOfResults == 0)
 	{
+		SocketUtils::Rio.RIONotify(rioCq_);
 		::WaitForSingleObject(completionType_.Event.EventHandle, timeoutMs);
 	}
 
@@ -91,13 +107,17 @@ bool RioCore::AttachIoObject(std::shared_ptr<IoObject> ioObject)
 #ifdef USE_RIO
 	if (ioObject == nullptr)
 		return false;
-
+	
+	auto rioObject = std::dynamic_pointer_cast<IRioObject>(ioObject);
+	if (rioObject == nullptr)
+		return false;
+	
 	SOCKET socket = reinterpret_cast<SOCKET>(ioObject->GetHandle());
 
 	RIO_RQ rq = SocketUtils::Rio.RIOCreateRequestQueue(
 		socket,
-		1024, 1024,
-		1024, 1024,
+		1024, 1,
+		1024, 1,
 		rioCq_,
 		rioCq_,
 		ioObject.get()
@@ -105,6 +125,9 @@ bool RioCore::AttachIoObject(std::shared_ptr<IoObject> ioObject)
 
 	if (rq == RIO_INVALID_RQ)
 		return false;
+	
+	rioObject->SetRequestQueue(rq);
+	
 
 	// TODO:
 	// RioSession 같은 객체에 rq 저장 필요

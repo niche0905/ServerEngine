@@ -36,7 +36,7 @@ public:
 public:
 	virtual bool Connect(SOCKET socket) = 0;
 	void Disconnect(std::wstring_view cause);
-	virtual void Send(std::shared_ptr<SendBuffer> sendBuffer) = 0;
+	virtual void Send(SendBufferRef sendBuffer) = 0;
 	
 	virtual HANDLE GetHandle() override { return reinterpret_cast<HANDLE>(socket_); }
 
