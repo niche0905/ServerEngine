@@ -1946,6 +1946,7 @@ void Room::NotifyWeaponChange(PlayerId playerId, ObjectId pawnId, uint32 newWeap
    RepEvent weaponChangeEvent;
    ReplicateEventSet(weaponChangeEvent, RepEventType::WeaponChange);
    weaponChangeEvent.header.source = pawnId;
+   weaponChangeEvent.header.exceptPlayerId = playerId;
    weaponChangeEvent.payload = WeaponChangedEvent{newWeaponId};
    
    roomGameSystem_.GetReplicationSystem().PushEvent(weaponChangeEvent);

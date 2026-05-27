@@ -740,7 +740,7 @@ void ReplicationSystem::FlushEvent_Fire(const RepEvent& ev, const RepFrame& fram
    dirPtr->set_z(fireEv->direction.z);
    
    SendBufferRef sendBuffer = ServerPacketHandler::MakeSendBuffer(noti);
-   ownerRoom_->BroadcastReplication(sendBuffer, ev.header.playerId);
+   ownerRoom_->BroadcastReplication(sendBuffer, ev.header.exceptPlayerId);
 }
 
 void ReplicationSystem::FlushEvent_Reload(const RepEvent& ev, const RepFrame& frame) const
@@ -774,7 +774,7 @@ void ReplicationSystem::FlushEvent_WeaponChanged(const RepEvent& ev, const RepFr
    noti.set_weapon_id(weaponChangeEv->newWeaponId);
    
    SendBufferRef sendBuffer = ServerPacketHandler::MakeSendBuffer(noti);
-   ownerRoom_->BroadcastReplication(sendBuffer, ev.header.playerId);
+   ownerRoom_->BroadcastReplication(sendBuffer, ev.header.exceptPlayerId);
 }
 
 void ReplicationSystem::FlushEvent_Hit(const RepEvent& ev, const RepFrame& frame) const
