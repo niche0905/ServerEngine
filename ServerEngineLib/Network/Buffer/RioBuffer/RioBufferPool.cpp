@@ -107,7 +107,7 @@ std::shared_ptr<RioSendBuffer> RioBufferPool::Pop()
    
    return std::shared_ptr<RioSendBuffer>(raw, [](RioSendBuffer* buffer)
    {
-      if (buffer != nullptr and buffer->ownerPool_ == nullptr)
+      if (buffer != nullptr and buffer->ownerPool_ != nullptr)
       {
          buffer->ownerPool_->Push(buffer);
       }
