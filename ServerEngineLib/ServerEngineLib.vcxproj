@@ -196,6 +196,8 @@
     <ClInclude Include="Core\Service\IOCP\IocpServerService.h" />
     <ClInclude Include="Core\Service\IOCP\IocpService.h" />
     <ClInclude Include="Core\Service\NetworkServiceFactory.h" />
+    <ClInclude Include="Core\Service\RIO\RioServerService.h" />
+    <ClInclude Include="Core\Service\RIO\RioService.h" />
     <ClInclude Include="Core\Service\ServiceBase.h" />
     <ClInclude Include="Core\Thread\ThreadContext.h" />
     <ClInclude Include="Core\Thread\ThreadLocalStorage.h" />
@@ -788,6 +790,8 @@
       <LibCompiled>true</LibCompiled>
     </ClCompile>
     <ClCompile Include="Core\Service\NetworkServiceFactory.cpp" />
+    <ClCompile Include="Core\Service\RIO\RioServerService.cpp" />
+    <ClCompile Include="Core\Service\RIO\RioService.cpp" />
     <ClCompile Include="Core\Service\ServiceBase.cpp">
       <RuntimeLibrary>MultiThreadedDebugDll</RuntimeLibrary>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>

@@ -9,6 +9,8 @@
 // Listener는 클라이언트의 접속을 수신하는 역할을 합니다
 //
 
+using IoObjectRegisterFunc = std::function<bool(std::shared_ptr<IoObject>)>;
+
 class Listener : public IoObject
 {
 public:
@@ -20,7 +22,7 @@ public:
 	virtual void Dispatch(class IIoEvent* ioEvent, int32 numOfBytes = 0) override;
 
 public:
-	bool StartListening(std::shared_ptr<ServiceBase> service);
+	bool StartListening(std::shared_ptr<ServiceBase> service, IoObjectRegisterFunc registerIoObject);
 	void CloseListener();
 
 private:

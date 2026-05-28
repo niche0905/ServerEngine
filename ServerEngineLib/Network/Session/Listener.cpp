@@ -31,7 +31,7 @@ void Listener::Dispatch(IIoEvent* ioEvent, int32 numOfBytes)
 	ProcessAccept(acceptEvent);
 }
 
-bool Listener::StartListening(std::shared_ptr<ServiceBase> service)
+bool Listener::StartListening(std::shared_ptr<ServiceBase> service, IoObjectRegisterFunc registerIoObject)
 {
 	consoleLogger->Log(Color::Green, L"[Listener] Listening Start\n");
 	
@@ -50,10 +50,10 @@ bool Listener::StartListening(std::shared_ptr<ServiceBase> service)
 		return false;
 	}
 
-	if (service_->RegisterIoObject(shared_from_this()) == false) {
+	if (registerIoObject(shared_from_this()) == false) {
 		return false;
 	}
-
+	
 	if (SocketUtils::SetReuseAddress(listenSocket_, true) == false) {
 		return false;
 	}
@@ -71,7 +71,8 @@ bool Listener::StartListening(std::shared_ptr<ServiceBase> service)
 	}
 
 	const int32 acceptCount = service_->GetMaxSessionCount();
-	acceptEvents_.resize(acceptCount);
+	acceptEvents_.reserve(acceptCount);
+	
 	for (int32 i = 0; i < acceptCount; ++i) {
 		AcceptEvent* acceptEvent = new AcceptEvent();
 		acceptEvent->SetOwner(shared_from_this());
@@ -92,6 +93,10 @@ void Listener::PostAccept(AcceptEvent* acceptEvent)
 	acceptEvent->ResetOverlapped();
 	
 	std::shared_ptr<SessionBase> session = service_->CreateSession();
+	if (session == nullptr) {
+		consoleLogger->Log(Color::Red, L"[Listener] Session Creation Error\n");
+		return;
+	}
 
 	acceptEvent->session_ = session;
 

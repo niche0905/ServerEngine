@@ -26,7 +26,11 @@ bool IocpServerService::Start()
 		return false;
 	}
 
-	if (false == listener_->StartListening(shared_from_this())) {
+	if (false == listener_->StartListening(shared_from_this(),
+		[this](std::shared_ptr<IoObject> ioObject)
+			{
+				return RegisterIoObject(ioObject);
+			})) {
 		return false;
 	}
 	
@@ -37,5 +41,8 @@ bool IocpServerService::Start()
 
 void IocpServerService::StopService()
 {
+	if (listener_)
+		listener_->CloseListener();
+	
 	IocpService::StopService();
 }
