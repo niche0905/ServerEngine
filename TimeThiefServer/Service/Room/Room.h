@@ -5,14 +5,12 @@
 #include "Content/Object/ObjectId.h"
 #include "Content/Gameplay/Combat/DamageTypes.h"
 #include "Content/Object/ObjectManager.h"
-#include "Service/Player/Player.h"
 #include "Generated/ServerPacketHandler.h"
-#include "Physics/Hitbox/HitResult.h"
-#include "Physics/Ray/Ray.h"
-#include "Physics/Ray/RaycastHit.h"
 #include "Systems/RoomGameSystem.h"
 #include "Utils/Random/WeightedRandom.h"
 
+enum class CombatEventType;
+class GrenadeActor;
 class PlayerSession;
 struct SpawnWorldItemParams;
 class WorldItemActor;
@@ -268,6 +266,9 @@ public:
 public:
    void OnRealDeath(ObjectId pawnId);
    void OnZoneChanged(uint32 phase, const ZoneCircle& newZone, float waitDuration, float shrinkDuration);
+   
+private:
+   Vector3 ValidateGrenadeExplosionPosition(const GrenadeActor& grenade, const Vector3& desiredPos) const;
    
 private:
    void CheckGameEndCondition();

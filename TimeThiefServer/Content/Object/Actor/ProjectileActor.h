@@ -52,7 +52,7 @@ protected:
 private:
     SE::Math::Vector3 ComputeExplosionPosition(const SE::Physics::Hit::HitResult& hit, const SE::Math::Vector3& moveDir) const;
     
-private:
+protected:
     ObjectId ownerId_;
     int32 damage_{ 0 };
     float explosionRadius_{ 0.0f };

@@ -45,6 +45,37 @@ namespace SE::Physics
       UpdateWorld(Vector3{0.0f, 0.0f, 0.0f}, 0.0f);
    }
 
+   bool SphereCollider::ContainsPoint(const Math::Vector3& point) const
+   {
+      return Contains(point);
+   }
+
+   bool SphereCollider::ClosestPointOnSurface(const Math::Vector3& point, Math::Vector3& outClosest,
+      Math::Vector3& outNormal) const
+   {
+      constexpr float Epsilon = 1e-6f;
+
+      if (worldRadius_ <= 0.0f)
+         return false;
+
+      Math::Vector3 dir = point - worldCenter_;
+
+      const float lenSq = dir.LengthSq();
+
+      // point가 구 중심과 거의 같은 경우 normal 방향을 정할 수 없으므로 임의 방향 사용
+      if (lenSq <= Epsilon)
+      {
+         outNormal = Math::Vector3{0.0f, 1.0f, 0.0f};
+         outClosest = worldCenter_ + outNormal * worldRadius_;
+         return true;
+      }
+
+      outNormal = dir.Normalized();
+      outClosest = worldCenter_ + outNormal * worldRadius_;
+
+      return true;
+   }
+
    const AABBCollider& SphereCollider::GetWorldAABB() const
    {
       return worldAABB_;
@@ -113,8 +144,8 @@ namespace SE::Physics
 
    bool SphereCollider::Contains(const Vector3& point) const
    {
-      const float dist = (point - worldCenter_).LengthSq();
-      return dist <= RadiusSq();
+      const float distSq = (point - worldCenter_).LengthSq();
+      return distSq <= (worldRadius_ * worldRadius_);
    }
 
    bool SphereCollider::RaycastSphere(const Ray& ray, const Math::Vector3& center, float expandedRadius, float dist,

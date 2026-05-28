@@ -320,8 +320,28 @@ bool ServerMap::SphereCast(const SE::Math::Vector3& from, const SE::Math::Vector
    return hasHit;
 }
 
+bool ServerMap::IsInsideStaticGeometry(const SE::Math::Vector3& point) const
+{
+   std::vector<uint32> candidateIds;
+   candidateIds.reserve(32);
+
+   spatial_.QueryPoint(point, candidateIds);
+
+   for (uint32 colliderId : candidateIds) {
+      const SE::Physics::Collider* colliderPtr = GetCollider(colliderId);
+
+      if (!colliderPtr)
+         continue;
+
+      if (colliderPtr->ContainsPoint(point))
+         return true;
+   }
+
+   return false;
+}
+
 bool ServerMap::FindNearestPoly(const SE::Math::Vector3& pos, const SE::Math::Vector3& halfExtents, dtPolyRef& outRef,
-   SE::Math::Vector3& outNearest) const
+                                SE::Math::Vector3& outNearest) const
 {
    return navigation_.FindNearestPoly(pos, halfExtents, outRef, outNearest);
 }
@@ -347,4 +367,56 @@ bool ServerMap::MoveAlongSurface(const SE::Math::Vector3& start, const SE::Math:
    SE::Math::Vector3& outPos) const
 {
    return navigation_.MoveAlongSurface(start, end, outPos);
+}
+
+bool ServerMap::TryPushOutStaticGeometry(const SE::Math::Vector3& point, SE::Math::Vector3& pushedPos) const
+{
+   std::vector<uint32> candidateIds;
+   candidateIds.reserve(32);
+
+   spatial_.QueryPoint(point, candidateIds);
+
+   bool found = false;
+   float bestDistSq = std::numeric_limits<float>::max();
+
+   SE::Math::Vector3 bestPoint{};
+
+   constexpr float PushOutEpsilon = 2.0f;
+
+   for (uint32 colliderId : candidateIds)
+   {
+      const SE::Physics::Collider* collider = GetCollider(colliderId);
+      if (!collider)
+         continue;
+
+      if (!collider->ContainsPoint(point))
+         continue;
+
+      SE::Math::Vector3 closest{};
+      SE::Math::Vector3 normal{};
+
+      if (!collider->ClosestPointOnSurface(point, closest, normal))
+         continue;
+
+      if (normal.LengthSq() <= 0.0001f)
+         continue;
+
+      normal = normal.Normalized();
+
+      const SE::Math::Vector3 candidate = closest + normal * PushOutEpsilon;
+      const float distSq = (candidate - point).LengthSq();
+
+      if (!found || distSq < bestDistSq)
+      {
+         found = true;
+         bestDistSq = distSq;
+         bestPoint = candidate;
+      }
+   }
+
+   if (!found)
+      return false;
+
+   pushedPos = bestPoint;
+   return true;
 }

@@ -4,6 +4,7 @@
 #include "Content/Object/Actor/MonsterPawn.h"
 #include "Content/Object/Actor/Pawn.h"
 #include "Data/GameDataManager.h"
+#include "Physics/Ray/Ray.h"
 #include "Service/Room/Room.h"
 
 namespace BB = AiBlackboardKey;

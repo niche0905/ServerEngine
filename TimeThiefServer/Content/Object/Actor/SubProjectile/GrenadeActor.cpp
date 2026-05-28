@@ -14,7 +14,7 @@ void GrenadeActor::Explode(ObjectManager& om)
 void GrenadeActor::OnExplode(ObjectManager& om)
 {
    if (auto room = GetRoom()) {
-      room->GetRoomGameSystem().GetCombatSystem().ProjectileExplosion(GetId(), GetPosition(), GetOwner(), GetDamage(), 100.0f, true);
+      room->GetRoomGameSystem().GetCombatSystem().ProjectileExplosion(GetId(), GetPosition(), GetOwner(), GetDamage(), explosionRadius_, true);
    }
    
    om.RequestDestroy(GetId());

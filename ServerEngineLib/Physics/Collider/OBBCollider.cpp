@@ -61,6 +61,118 @@ namespace SE::Physics
       UpdateWorld(Vector3{0.0f, 0.0f, 0.0f}, 0.0f);
    }
 
+   bool OBBCollider::ContainsPoint(const Math::Vector3& point) const
+   {
+      const Vector3 d = point - worldCenter_;
+
+      const float x = d.Dot(worldAxis_[0]);
+      const float y = d.Dot(worldAxis_[1]);
+      const float z = d.Dot(worldAxis_[2]);
+
+      constexpr float Epsilon = 1e-4f;
+      
+      return
+         std::fabs(x) <= worldHalf_.x + Epsilon &&
+         std::fabs(y) <= worldHalf_.y + Epsilon &&
+         std::fabs(z) <= worldHalf_.z + Epsilon;
+   }
+
+   bool OBBCollider::ClosestPointOnSurface(const Math::Vector3& point, Math::Vector3& outClosest,
+      Math::Vector3& outNormal) const
+   {
+      constexpr float Epsilon = 1e-6f;
+
+      const Vector3 d = point - worldCenter_;
+
+      const float lx = d.Dot(worldAxis_[0]);
+      const float ly = d.Dot(worldAxis_[1]);
+      const float lz = d.Dot(worldAxis_[2]);
+
+      const bool inside =
+         std::fabs(lx) <= worldHalf_.x &&
+         std::fabs(ly) <= worldHalf_.y &&
+         std::fabs(lz) <= worldHalf_.z;
+
+      // 외부 점이면 기존 ClosestPoint 사용 가능
+      if (!inside)
+      {
+         outClosest = ClosestPoint(point);
+
+         Vector3 n = point - outClosest;
+         const float lenSq = n.LengthSq();
+
+         if (lenSq <= Epsilon)
+            return false;
+
+         outNormal = n.Normalized();
+         return true;
+      }
+
+      // 내부 점이면 가장 가까운 OBB 면으로 밀어낸다
+      const float distMinX = lx + worldHalf_.x;
+      const float distMaxX = worldHalf_.x - lx;
+
+      const float distMinY = ly + worldHalf_.y;
+      const float distMaxY = worldHalf_.y - ly;
+
+      const float distMinZ = lz + worldHalf_.z;
+      const float distMaxZ = worldHalf_.z - lz;
+
+      float bestDist = distMinX;
+
+      Vector3 localClosest{ -worldHalf_.x, ly, lz };
+      Vector3 localNormal{ -1.0f, 0.0f, 0.0f };
+
+      if (distMaxX < bestDist)
+      {
+         bestDist = distMaxX;
+         localClosest = Vector3{ worldHalf_.x, ly, lz };
+         localNormal = Vector3{ 1.0f, 0.0f, 0.0f };
+      }
+
+      if (distMinY < bestDist)
+      {
+         bestDist = distMinY;
+         localClosest = Vector3{ lx, -worldHalf_.y, lz };
+         localNormal = Vector3{ 0.0f, -1.0f, 0.0f };
+      }
+
+      if (distMaxY < bestDist)
+      {
+         bestDist = distMaxY;
+         localClosest = Vector3{ lx, worldHalf_.y, lz };
+         localNormal = Vector3{ 0.0f, 1.0f, 0.0f };
+      }
+
+      if (distMinZ < bestDist)
+      {
+         bestDist = distMinZ;
+         localClosest = Vector3{ lx, ly, -worldHalf_.z };
+         localNormal = Vector3{ 0.0f, 0.0f, -1.0f };
+      }
+
+      if (distMaxZ < bestDist)
+      {
+         localClosest = Vector3{ lx, ly, worldHalf_.z };
+         localNormal = Vector3{ 0.0f, 0.0f, 1.0f };
+      }
+
+      outClosest =
+         worldCenter_
+         + worldAxis_[0] * localClosest.x
+         + worldAxis_[1] * localClosest.y
+         + worldAxis_[2] * localClosest.z;
+
+      outNormal =
+         worldAxis_[0] * localNormal.x
+         + worldAxis_[1] * localNormal.y
+         + worldAxis_[2] * localNormal.z;
+
+      outNormal = outNormal.Normalized();
+
+      return true;
+   }
+
    const AABBCollider& OBBCollider::GetWorldAABB() const
    {
       return worldAABB_;

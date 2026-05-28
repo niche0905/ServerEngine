@@ -88,6 +88,89 @@ namespace SE::Physics
       return result;
    }
 
+   bool AABBCollider::ContainsPoint(const Math::Vector3& point) const
+   {
+      return Contains(point);
+   }
+
+   bool AABBCollider::ClosestPointOnSurface(const Math::Vector3& point, Math::Vector3& outClosest,
+      Math::Vector3& outNormal) const
+   {
+      constexpr float Epsilon = 1e-6f;
+
+      // 1. 외부/경계 포함 closest point 계산
+      Math::Vector3 closest{
+         std::clamp(point.x, min_.x, max_.x),
+         std::clamp(point.y, min_.y, max_.y),
+         std::clamp(point.z, min_.z, max_.z)
+      };
+
+      // 2. 외부에 있는 점이면 clamp 결과가 표면 closest
+      if (!Contains(point))
+      {
+         Math::Vector3 normal = point - closest;
+
+         const float lenSq = normal.LengthSq();
+         if (lenSq > Epsilon)
+         {
+            outClosest = closest;
+            outNormal = normal.Normalized();
+            return true;
+         }
+
+         return false;
+      }
+
+      // 3. 내부에 있는 점이면 가장 가까운 면 선택
+      const float distMinX = std::abs(point.x - min_.x);
+      const float distMaxX = std::abs(max_.x - point.x);
+      const float distMinY = std::abs(point.y - min_.y);
+      const float distMaxY = std::abs(max_.y - point.y);
+      const float distMinZ = std::abs(point.z - min_.z);
+      const float distMaxZ = std::abs(max_.z - point.z);
+
+      float bestDist = distMinX;
+      outClosest = { min_.x, point.y, point.z };
+      outNormal = { -1.0f, 0.0f, 0.0f };
+
+      if (distMaxX < bestDist)
+      {
+         bestDist = distMaxX;
+         outClosest = { max_.x, point.y, point.z };
+         outNormal = { 1.0f, 0.0f, 0.0f };
+      }
+
+      if (distMinY < bestDist)
+      {
+         bestDist = distMinY;
+         outClosest = { point.x, min_.y, point.z };
+         outNormal = { 0.0f, -1.0f, 0.0f };
+      }
+
+      if (distMaxY < bestDist)
+      {
+         bestDist = distMaxY;
+         outClosest = { point.x, max_.y, point.z };
+         outNormal = { 0.0f, 1.0f, 0.0f };
+      }
+
+      if (distMinZ < bestDist)
+      {
+         bestDist = distMinZ;
+         outClosest = { point.x, point.y, min_.z };
+         outNormal = { 0.0f, 0.0f, -1.0f };
+      }
+
+      if (distMaxZ < bestDist)
+      {
+         bestDist = distMaxZ;
+         outClosest = { point.x, point.y, max_.z };
+         outNormal = { 0.0f, 0.0f, 1.0f };
+      }
+
+      return true;
+   }
+
    const AABBCollider& AABBCollider::GetWorldAABB() const
    {
       return *this;

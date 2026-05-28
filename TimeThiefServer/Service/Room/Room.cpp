@@ -18,6 +18,7 @@
 #include "Content/Object/Actor/SubProjectile/GrenadeActor.h"
 #include "Data/GameDataManager.h"
 #include "Physics/Collider/CollisionResult.h"
+#include "Physics/Ray/RaycastHit.h"
 
 /*-----------------
    Local Helper
@@ -885,17 +886,21 @@ bool Room::HandleGrenadeExplosion(PlayerId playerId, const se::game::C_GrenadeEx
       
       ObjectId grenadeId{pkt.entity_id().value() };
       const auto& position = pkt.position();
-      const Vector3 grenadePos{position.x(), position.y(), position.z()};
+      const Vector3 requestPos{position.x(), position.y(), position.z()};
       
       auto* grenade = objectManager_.FindAs<GrenadeActor>(grenadeId);
       if (!grenade) {
          consoleLogger->Log(Color::Yellow, L"[Room] GrenadeActor not found for grenadeId %u during grenade explosion handling\n", pkt.entity_id().value());
          return false;
       }
-      grenade->SetPosition(grenadePos);
+      
+      const Vector3 resolvedPos = ValidateGrenadeExplosionPosition(*grenade, requestPos);
+      
+      grenade->SetPosition(resolvedPos);
       grenade->Explode(GetObjectManager());
       
-      NotifyGrenadeExplosion(playerId, grenadeId, grenadePos);
+      // NotifyGrenadeExplosion(playerId, grenadeId, resolvedPos);     // 고민 해보기 (비쥬얼 적인 것과 논리적인 것을 완벽하게 일치시켜야 하는가?)
+      NotifyGrenadeExplosion(playerId, grenadeId, requestPos);
    }
    
    return true;
@@ -2418,7 +2423,6 @@ void Room::HandleMonsterFire(ObjectId monsterId, CombatEventType eventType, cons
    const SE::Math::Vector3 fireDir = direction.Normalized();
    SE::Physics::Ray ray(origin, fireDir, range);
 
-   
    Actor* victim = nullptr;
 
    SE::Physics::Hit::HitResult outHit;
@@ -2532,6 +2536,51 @@ void Room::OnRealDeath(ObjectId pawnId)
 void Room::OnZoneChanged(uint32 phase, const ZoneCircle& newZone, float waitDuration, float shrinkDuration)
 {
    ReplicationZoneChange(phase, newZone, waitDuration, shrinkDuration);
+}
+
+Room::Vector3 Room::ValidateGrenadeExplosionPosition(const GrenadeActor& grenade, const Vector3& desiredPos) const
+{
+   const ServerMap& serverMap = GetGameDataManager()->GetServerMap();
+
+   // 아예 내부가 아니면 그대로 사용
+   if (!serverMap.IsInsideStaticGeometry(desiredPos))
+      return desiredPos;
+
+   const Vector3 prevPos = grenade.GetPosition();
+   const Vector3 delta = desiredPos - prevPos;
+   const float distance = delta.Length();
+
+   // 멈춰 있거나 이동량이 거의 없는 상태에서 내부에 박힌 경우
+   if (distance <= 0.0001f)
+   {
+      Vector3 pushedPos{};
+      if (serverMap.TryPushOutStaticGeometry(desiredPos, pushedPos))
+         return pushedPos;
+
+      return prevPos;
+   }
+
+   const Vector3 dir = delta / distance;
+
+   constexpr float ExtraRange = 10.0f;
+   const float range = distance + ExtraRange;
+
+   SE::Physics::Ray ray(prevPos, dir, range);
+
+   SE::Physics::RaycastHit hit;
+
+   if (serverMap.Raycast(ray, hit) && hit.hit)
+   {
+      constexpr float PushOutEpsilon = 2.0f;
+      return hit.point + hit.normal * PushOutEpsilon;
+   }
+
+   // Raycast로 못 찾았으면 내부 위치를 직접 PushOut
+   Vector3 pushedPos;
+   if (serverMap.TryPushOutStaticGeometry(desiredPos, pushedPos))
+      return pushedPos;
+
+   return prevPos;
 }
 
 void Room::CheckGameEndCondition()

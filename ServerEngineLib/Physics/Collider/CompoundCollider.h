@@ -44,6 +44,9 @@ namespace SE::Physics
             return ref;
         }
         
+        virtual bool ContainsPoint(const Math::Vector3& point) const override;
+        virtual bool ClosestPointOnSurface(const Math::Vector3& point, Math::Vector3& outClosest, Math::Vector3& outNormal) const override;
+        
         const AABBCollider& GetWorldAABB() const override;
         
         virtual bool Raycast(const Ray& ray, RaycastHit& out) const override;

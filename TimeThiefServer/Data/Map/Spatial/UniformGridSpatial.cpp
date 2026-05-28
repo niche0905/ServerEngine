@@ -106,6 +106,31 @@ void UniformGridSpatial::Build(const std::vector<std::unique_ptr<SE::Physics::Co
    // }
 }
 
+void UniformGridSpatial::QueryPoint(const SE::Math::Vector3& point, std::vector<uint32>& outColliderIds) const
+{
+   outColliderIds.clear();
+
+   if (cells_.empty() || width_ <= 0 || height_ <= 0)
+      return;
+
+   Int2 cell = WorldToCell(point);
+
+   if (cell.x < 0 || cell.x >= width_ ||
+       cell.y < 0 || cell.y >= height_)
+   {
+      return;
+   }
+
+   const int32 index = cell.y * width_ + cell.x;
+   const GridCell& gridCell = cells_[index];
+
+   outColliderIds.reserve(outColliderIds.size() + gridCell.colliderIds.size());
+
+   for (uint32 colliderId : gridCell.colliderIds) {
+      outColliderIds.push_back(colliderId);
+   }
+}
+
 void UniformGridSpatial::QueryAABB(const SE::Physics::AABBCollider& query, std::vector<uint32>& outColliderIds) const
 {
    outColliderIds.clear();

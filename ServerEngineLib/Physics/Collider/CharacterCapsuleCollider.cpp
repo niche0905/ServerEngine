@@ -83,6 +83,40 @@ namespace SE::Physics
       UpdateWorld(Vector3{0.0f, 0.0f, 0.0f}, 0.0f);
    }
 
+   bool CharacterCapsuleCollider::ContainsPoint(const Math::Vector3& point) const
+   {
+      const float distSq = DistanceSqToSegment(point);
+      return distSq <= worldRadius_ * worldRadius_;
+   }
+
+   bool CharacterCapsuleCollider::ClosestPointOnSurface(const Math::Vector3& point, Math::Vector3& outClosest,
+      Math::Vector3& outNormal) const
+   {
+      constexpr float Epsilon = 1e-6f;
+
+      if (worldRadius_ <= 0.0f)
+         return false;
+
+      const Vector3 centerOnSegment = ClosestPointOnSegment(point);
+
+      Vector3 dir = point - centerOnSegment;
+      const float lenSq = dir.LengthSq();
+
+      // point가 캡슐 중심선 위에 거의 있는 경우
+      if (lenSq <= Epsilon)
+      {
+         // CharacterCapsule은 Z축 고정이므로 X축 방향을 기본 normal로 사용
+         outNormal = Vector3{1.0f, 0.0f, 0.0f};
+         outClosest = centerOnSegment + outNormal * worldRadius_;
+         return true;
+      }
+
+      outNormal = dir.Normalized();
+      outClosest = centerOnSegment + outNormal * worldRadius_;
+
+      return true;
+   }
+
    const AABBCollider& CharacterCapsuleCollider::GetWorldAABB() const
    {
       return worldAABB_;

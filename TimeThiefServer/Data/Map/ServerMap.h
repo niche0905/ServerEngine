@@ -35,6 +35,8 @@ public:
    bool Intersect(const SE::Physics::Collider& other, SE::Physics::CollisionResult& outResult) const;
    bool SphereCast(const SE::Math::Vector3& from, const SE::Math::Vector3& to, float radius, SE::Physics::RaycastHit& outResult) const;
    
+   bool IsInsideStaticGeometry(const SE::Math::Vector3& point) const;
+   
 public:
    const SE::Nav::ServerNavigation& GetNavigation() const { return navigation_; }
    bool HasNavigation() const { return navigation_.IsLoaded(); }
@@ -44,7 +46,8 @@ public:
    bool IsReachablePosition(const SE::Math::Vector3& start, const SE::Math::Vector3& end, const SE::Math::Vector3& halfExtents) const;
    bool ProjectToNavMesh(const SE::Math::Vector3& pos, SE::Math::Vector3& outPos) const;
    bool MoveAlongSurface(const SE::Math::Vector3& start, const SE::Math::Vector3& end, SE::Math::Vector3& outPos) const;
-   
+   bool TryPushOutStaticGeometry(const SE::Math::Vector3& point, SE::Math::Vector3& pushedPos) const;
+
 private:
    std::vector<std::unique_ptr<SE::Physics::Collider>>         colliders_;
    UniformGridSpatial                                          spatial_{};

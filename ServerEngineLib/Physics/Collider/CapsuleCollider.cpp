@@ -80,6 +80,47 @@ namespace SE::Physics
       UpdateWorld(Vector3{0.0f, 0.0f, 0.0f}, 0.0f);
    }
 
+   bool CapsuleCollider::ContainsPoint(const Math::Vector3& point) const
+   {
+      return DistanceSqToSegment(point) <= RadiusSq();
+   }
+
+   bool CapsuleCollider::ClosestPointOnSurface(const Math::Vector3& point, Math::Vector3& outClosest,
+      Math::Vector3& outNormal) const
+   {
+      constexpr float Epsilon = 1e-6f;
+
+      const Vector3 centerOnSegment = ClosestPointOnSegment(point);
+      Vector3 dir = point - centerOnSegment;
+
+      const float lenSq = dir.LengthSq();
+
+      // point가 캡슐 중심선 위에 거의 있는 경우
+      if (lenSq <= Epsilon)
+      {
+         // 방향을 특정할 수 없으므로 캡슐 축과 수직인 임의 방향 사용
+         Vector3 fallbackNormal = Vector3{1.0f, 0.0f, 0.0f};
+
+         // fallbackNormal이 캡슐 축과 거의 평행하면 다른 축 사용
+         if (std::abs(fallbackNormal.Dot(dir_)) > 0.9f)
+            fallbackNormal = Vector3{0.0f, 1.0f, 0.0f};
+
+         // 캡슐 축 성분 제거해서 축에 수직인 방향 생성
+         fallbackNormal = fallbackNormal - dir_ * fallbackNormal.Dot(dir_);
+         fallbackNormal = fallbackNormal.Normalized(Vector3{1.0f, 0.0f, 0.0f});
+
+         outNormal = fallbackNormal;
+         outClosest = centerOnSegment + outNormal * worldRadius_;
+
+         return true;
+      }
+
+      outNormal = dir.Normalized();
+      outClosest = centerOnSegment + outNormal * worldRadius_;
+
+      return true;
+   }
+
    const AABBCollider& CapsuleCollider::GetWorldAABB() const
    {
       return worldAABB_;

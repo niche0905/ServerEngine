@@ -37,6 +37,8 @@ namespace SE::Physics
         virtual void UpdateWorld(const Math::Vector3& position, float yaw) = 0;
         
         virtual bool Intersect(const Collider& other, CollisionResult& out) const;
+        virtual bool ContainsPoint(const Math::Vector3& point) const = 0;
+        virtual bool ClosestPointOnSurface(const Math::Vector3& point, Math::Vector3& outClosest, Math::Vector3& outNormal) const = 0;
         
         virtual const AABBCollider& GetWorldAABB() const = 0;
         

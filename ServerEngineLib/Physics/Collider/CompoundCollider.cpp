@@ -97,6 +97,73 @@ namespace SE::Physics
       dirtyAABB_ = true;
    }
 
+   bool CompoundCollider::ContainsPoint(const Math::Vector3& point) const
+   {
+      // Broadphase
+      if (!GetWorldAABB().ContainsPoint(point))
+         return false;
+
+      for (const auto& child : colliders_)
+      {
+         if (!child)
+            continue;
+
+         // Child AABB broadphase
+         if (!child->GetWorldAABB().ContainsPoint(point))
+            continue;
+
+         if (child->ContainsPoint(point))
+            return true;
+      }
+
+      return false;
+   }
+
+   bool CompoundCollider::ClosestPointOnSurface(const Math::Vector3& point, Math::Vector3& outClosest,
+      Math::Vector3& outNormal) const
+   {
+      if (colliders_.empty())
+         return false;
+
+      bool found = false;
+
+      Vector3 bestClosest{};
+      Vector3 bestNormal{};
+
+      float bestDistSq = std::numeric_limits<float>::max();
+
+      // 1. point가 Compound AABB와 너무 동떨어져 있으면 그래도 child 검사 가능
+      //    ClosestPointOnSurface는 "가장 가까운 표면" 용도라 AABB contains로 early return 하면 안 됨.
+      for (const auto& child : colliders_)
+      {
+         if (!child)
+            continue;
+
+         Vector3 childClosest{};
+         Vector3 childNormal{};
+
+         if (!child->ClosestPointOnSurface(point, childClosest, childNormal))
+            continue;
+
+         const float distSq = (point - childClosest).LengthSq();
+
+         if (!found || distSq < bestDistSq)
+         {
+            found = true;
+            bestDistSq = distSq;
+            bestClosest = childClosest;
+            bestNormal = childNormal;
+         }
+      }
+
+      if (!found)
+         return false;
+
+      outClosest = bestClosest;
+      outNormal = bestNormal;
+      return true;
+   }
+
    const AABBCollider& CompoundCollider::GetWorldAABB() const
    {
       if (dirtyAABB_)

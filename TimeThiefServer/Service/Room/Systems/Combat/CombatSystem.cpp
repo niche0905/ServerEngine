@@ -8,6 +8,7 @@
 #include "Content/Object/Actor/StaticActor.h"
 #include "Content/Object/Actor/SubProjectile/RocketActor.h"
 #include "Data/Map/ServerMap.h"
+#include "Physics/Ray/Ray.h"
 #include "Physics/Ray/RaycastHit.h"
 #include "Service/Room/Room.h"
 

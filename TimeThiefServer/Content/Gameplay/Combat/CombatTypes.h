@@ -1,7 +1,7 @@
 ﻿#pragma once
 #include "Content/Object/ObjectId.h"
-#include "Data/Map/ServerMap.h"
 #include "Data/Tables/WeaponTable.h"
+#include "Physics/Collider/Collider.h"
 #include "Utils/Types.h"
 
 class Actor;
