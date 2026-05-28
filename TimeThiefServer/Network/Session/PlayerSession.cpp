@@ -21,28 +21,6 @@ PlayerSession::PlayerSession(IPlayerSessionLifecycle& lifecycle)
 
 PlayerSession::~PlayerSession() = default;
 
-void PlayerSession::Dispatch(class IIoEvent* ioEvent, int32 numOfBytes)
-{
-   switch (ioEvent->GetType())
-   {
-      case IoEventType::Connect:
-         ProcessConnect();
-         break;
-      case IoEventType::Disconnect:
-         ProcessDisconnect();
-         break;
-      case IoEventType::Recv:
-         ProcessRecv(numOfBytes);
-         break;
-      case IoEventType::Send:
-         ProcessSend(numOfBytes);
-         break;
-      default:
-         assert(false && "PlayerSession::Dispatch - Unknown IoEventType");
-         break;
-   }
-}
-
 bool PlayerSession::CanPacketProcess(const byte* buffer, int32 len)
 {
    if (len < GetPacketHeaderSize())

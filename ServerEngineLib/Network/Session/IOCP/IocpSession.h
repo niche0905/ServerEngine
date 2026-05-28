@@ -30,7 +30,9 @@ public:
 public:
 	virtual bool Connect(SOCKET socket) override;
 	virtual void Send(SendBufferRef sendBuffer) override;
-
+	
+	virtual void Dispatch(class IIoEvent* ioEvent, int32 numOfBytes) override;
+	
 // Network interface
 public:
 	virtual byte* GetRecvBuffer() override;

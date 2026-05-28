@@ -42,6 +42,28 @@ void IocpSession::Send(SendBufferRef sendBuffer)
 	}
 }
 
+void IocpSession::Dispatch(class IIoEvent* ioEvent, int32 numOfBytes)
+{
+	switch (ioEvent->GetType())
+	{
+	case IoEventType::Connect:
+		ProcessConnect();
+		break;
+	case IoEventType::Disconnect:
+		ProcessDisconnect();
+		break;
+	case IoEventType::Recv:
+		ProcessRecv(numOfBytes);
+		break;
+	case IoEventType::Send:
+		ProcessSend(numOfBytes);
+		break;
+	default:
+		assert(false && "PlayerSession::Dispatch - Unknown IoEventType");
+		break;
+	}
+}
+
 byte* IocpSession::GetRecvBuffer()
 {
     return recvBuffer_.Data();

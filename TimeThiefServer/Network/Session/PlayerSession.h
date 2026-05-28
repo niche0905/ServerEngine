@@ -20,8 +20,6 @@ public:
    PlayerSession(IPlayerSessionLifecycle& lifecycle);
    virtual ~PlayerSession() override;
    
-   void Dispatch(class IIoEvent* ioEvent, int32 numOfBytes) override;
-   
    // TEMP: 간단한 문자열 통신 테스트
    int32 GetPacketHeaderSize() const override
    {
