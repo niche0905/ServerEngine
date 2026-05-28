@@ -151,7 +151,7 @@ bool TimeThiefServerApp::CreateManagers()
 
 bool TimeThiefServerApp::CreateNetworkService()
 {
-   playerSessionLifecycleService_ = std::make_unique<PlayerSessionLifecycleService>(*sessionManager_, *playerManager_, *shardManager_, configReader_->Get().game);
+   playerSessionLifecycleService_ = std::make_unique<PlayerSessionLifecycleService>(*sessionManager_, *playerManager_, *shardManager_, *matchMaker_, configReader_->Get().game);
    
    const auto& cfg = configReader_->Get();
    

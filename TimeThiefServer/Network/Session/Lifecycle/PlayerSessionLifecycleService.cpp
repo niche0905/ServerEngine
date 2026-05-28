@@ -9,6 +9,7 @@
 #include "Service/Player/PlayerManager/PlayerManager.h"
 #include "Shard/ShardManager.h"
 #include "Network/ServerConfig.h"
+#include "Service/MatchMaking/MatchMaker.h"
 #include "Service/Room/Room.h"
 
 /*---------------------------------
@@ -16,10 +17,11 @@
 ---------------------------------*/
 
 PlayerSessionLifecycleService::PlayerSessionLifecycleService(SessionManager& sessionManager,
-    PlayerManager& playerManager, ShardManager& shardManager, const GameConfig& gameConfig)
+    PlayerManager& playerManager, ShardManager& shardManager, MatchMaker& matchMaker, const GameConfig& gameConfig)
         : sessionManager_(sessionManager)
         , playerManager_(playerManager)
         , shardManager_(shardManager)
+        , matchMaker_(matchMaker)
         , movementUpdateHz_(gameConfig.movementUpdateHz)
         , pingIntervalMs_(gameConfig.pingIntervalMs)
 {
@@ -72,6 +74,9 @@ void PlayerSessionLifecycleService::OnDisconnected(PlayerSession& session)
             auto* sessionManager = &sessionManager_;
             const RoomId roomId = playerRef->roomId_;
             const ShardId shardId = playerRef->shardId_;
+            
+            // 플레이어가 매칭 대기 중일 수 있으니 매칭 취소도 시도
+            matchMaker_.Cancel(playerId);
             
             if (roomId != 0 and shardId != 0) {
                 shardManager->Enqueue(shardId, [playerManager, shardManager, sessionManager, shardId, roomId, playerId, sessionId]()

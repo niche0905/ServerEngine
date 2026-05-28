@@ -11,6 +11,7 @@ namespace se::common
 class SessionManager;
 class PlayerManager;
 class ShardManager;
+class MatchMaker;
 class ServerConfigReader;  // 이거까지 필요한가?
 
 /*---------------------------------
@@ -23,7 +24,7 @@ class ServerConfigReader;  // 이거까지 필요한가?
 class PlayerSessionLifecycleService : public IPlayerSessionLifecycle
 {
 public:
-   PlayerSessionLifecycleService(SessionManager& sessionManager, PlayerManager& playerManager, ShardManager& shardManager, const GameConfig& gameConfig);
+   PlayerSessionLifecycleService(SessionManager& sessionManager, PlayerManager& playerManager, ShardManager& shardManager, MatchMaker& matchMaker, const GameConfig& gameConfig);
    virtual ~PlayerSessionLifecycleService() override = default;
    
 public:
@@ -39,6 +40,7 @@ private:
    SessionManager&   sessionManager_;
    PlayerManager&    playerManager_;
    ShardManager&     shardManager_;
+   MatchMaker&       matchMaker_;
    
 private:
    int32 movementUpdateHz_ = 5;
