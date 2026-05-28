@@ -26,8 +26,12 @@ constexpr uint32 RioSendBlockSize = 4096;
 constexpr uint32 RioSendBlockCount = 8192;
 
 //using SelectedService = ServiceType::RioService;
-using IoCoreType = RioCore;
+using IoCoreType = class RioCore;
+using NetworkSession = class RioSession;
 using NetworkSendBuffer = RioSendBuffer;
+
+using RecvEvent = RioRecvEvent;
+using SendEvent = RioSendEvent;
 
 #else // USE_IOCP
 ////////////////
@@ -40,7 +44,8 @@ using NetworkSendBuffer = RioSendBuffer;
 #include "Network/Event/IOCP/IocpIoEvent.h"
 
 //using SelectedService = ServiceType::IocpService;
-using IoCoreType = IocpCore;
+using IoCoreType = class IocpCore;
+using NetworkSession = class IocpSession;
 using NetworkSendBuffer = SendBuffer;
 
 using ConnectEvent = IocpConnectEvent;

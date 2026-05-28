@@ -1,5 +1,6 @@
 ﻿#pragma once
 #include "PlayerSessionState.h"
+#include "Network/IoBackend.h"
 #include "Network/Session/IOCP/IocpSession.h"
 #include "Protocol/Framing/PacketHeader.h"
 #include "Protocol.pb.h"
@@ -14,7 +15,7 @@ class IPlayerSessionLifecycle;
 //
 
 // TODO: Temp로 IocpSession 상속, 추후 필요에 따라 기능 추가 예정
-class PlayerSession : public IocpSession
+class PlayerSession : public NetworkSession
 {
 public:
    PlayerSession(IPlayerSessionLifecycle& lifecycle);

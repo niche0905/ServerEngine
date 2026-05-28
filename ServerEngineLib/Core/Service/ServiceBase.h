@@ -10,6 +10,7 @@
 // 다양한 종류의 Service가 이 클래스를 상속받아 구현됩니다
 //
 
+class SessionBase;
 using SessionFactory = std::function<std::shared_ptr<SessionBase>(void)>;
 
 class ServiceBase : public std::enable_shared_from_this<ServiceBase>
