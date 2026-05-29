@@ -2,6 +2,7 @@
 #include "PlayerSessionState.h"
 #include "Network/IoBackend.h"
 #include "Network/Session/IOCP/IocpSession.h"
+#include "Network/Session/RIO/RioSession.h"
 #include "Protocol/Framing/PacketHeader.h"
 #include "Protocol.pb.h"
 

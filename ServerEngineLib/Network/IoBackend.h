@@ -11,7 +11,7 @@ enum class ServiceType
     RioServerService
 };
 
-#define USE_RIO
+// #define USE_RIO
 
 #include "Network/Event/IOCP/IocpConnectionEvent.h"
 
@@ -60,6 +60,7 @@ using SendEvent = IocpSendEvent;
 #endif
 
 using SendBufferRef = std::shared_ptr<NetworkSendBuffer>;
+SendBufferRef MakeNetworkSendBuffer(int32 packetSize);
 
 class IoBackend
 {

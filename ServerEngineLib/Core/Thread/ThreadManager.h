@@ -31,7 +31,7 @@ public:
 	// 모든 thread에서 공통으로 처리할 작업
 	static void DoGlobalWork();
 
-private:
+public:
 	// thread 별로 TLS 초기화 및 종료
 	static void InitTLS();
 	static void DestroyTLS();

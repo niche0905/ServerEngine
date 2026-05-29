@@ -1404,6 +1404,7 @@
       <SDLCheck>true</SDLCheck>
       <LibCompiled>true</LibCompiled>
     </ClCompile>
+    <ClCompile Include="Network\IoBackend.cpp" />
     <ClCompile Include="Network\Session\IOCP\IocpSession.cpp">
       <RuntimeLibrary>MultiThreadedDebugDll</RuntimeLibrary>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>

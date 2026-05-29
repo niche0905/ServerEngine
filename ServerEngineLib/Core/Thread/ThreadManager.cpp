@@ -8,7 +8,7 @@
 
 ThreadManager::ThreadManager()
 {
-	InitTLS();	// for main thread TLS
+	// InitTLS();	// for main thread TLS
 }
 
 ThreadManager::~ThreadManager()

@@ -114,6 +114,8 @@ bool TimeThiefServerApp::LoadConfig(int argc, char* argv[])
 
 bool TimeThiefServerApp::CreateManagers()
 {
+   ThreadManager::InitTLS();
+   
    sessionManager_      = std::make_unique<SessionManager>();
    playerManager_       = std::make_unique<PlayerManager>();
    roomDirectory_       = std::make_unique<RoomDirectory>();

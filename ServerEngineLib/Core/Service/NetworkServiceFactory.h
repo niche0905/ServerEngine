@@ -1,6 +1,7 @@
 ﻿#pragma once
 #include "ServiceBase.h"
 #include "IOCP/IocpServerService.h"
+#include "RIO/RioServerService.h"
 
 class ServiceBase;
 
@@ -36,8 +37,7 @@ public:
             return std::make_shared<IocpServerService>(addr, factory, maxSessionCount);
             
         case BackendType::RIO:
-            // RIO 기반 네트워크 서비스 구현이 필요할 때 여기에 추가
-            return nullptr;
+            return std::make_shared<RioServerService>(addr, factory, maxSessionCount);
             
         default:
             return nullptr;

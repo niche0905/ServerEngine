@@ -6,6 +6,7 @@
 #include "Network/Event/RIO/RioEvent.h"
 #include "Network/SocketUtils.h"
 #include "Network/Session/RIO/IRioObject.h"
+#include "Utils/Logger/ConsoleLogger.h"
 
 /*------------
    RioCore
@@ -106,15 +107,19 @@ bool RioCore::AttachIoObject(std::shared_ptr<IoObject> ioObject)
 
 	RIO_RQ rq = SocketUtils::Rio.RIOCreateRequestQueue(
 		socket,
-		1024, 1,
-		1024, 1,
+		64, 1,
+		64, 1,
 		rioCq_,
 		rioCq_,
 		ioObject.get()
 	);
 
-	if (rq == RIO_INVALID_RQ)
+	if (rq == RIO_INVALID_RQ) {
+		int32 errorCode = ::WSAGetLastError();
+		std::wstring message = SocketUtils::GetWinErrorToString(errorCode);
+		consoleLogger->Log(Color::Yellow, L"[Session] ERROR in RioCore::AttachIoObejct (code: %d): %s\n", errorCode, message.c_str());
 		return false;
+	}
 	
 	rioObject->SetRequestQueue(rq);
 
