@@ -102,14 +102,14 @@ void RioSession::PostRecv()
    if (rio_ == nullptr || rq_ == RIO_INVALID_RQ)
       return;
 
-   if (recvBuffer_.FreeSize() == 0)
-   {
+   if (recvBuffer_.FreeSize() == 0) {
       Disconnect(L"RioSession::PostRecv FreeSize 0");
       return;
    }
 
    recvEvent_.SetOwner(shared_from_this());
 
+   recvBuffer_.PrepareWrite();
    RIO_BUF rioBuf = recvBuffer_.MakeRecvRioBuf();
 
    if (rio_->RIOReceive(

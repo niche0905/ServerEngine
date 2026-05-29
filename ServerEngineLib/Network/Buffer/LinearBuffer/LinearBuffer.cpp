@@ -34,6 +34,11 @@ void LinearBuffer::OnRead(size_t nums)
 	return;
 }
 
+void LinearBuffer::PrepareWrite()
+{
+	Clean();
+}
+
 DWORD LinearBuffer::PrepareRecv(WSABUF(&wsabuf)[2]) noexcept
 {
 	const size_t freeSize = FreeSize();

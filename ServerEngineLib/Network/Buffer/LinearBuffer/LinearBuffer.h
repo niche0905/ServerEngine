@@ -22,6 +22,8 @@ public:
 	const byte*							Data() const override { return buffer_.data(); }
 	bool								OnWrite(byte* data, size_t nums) override;
 	void								OnRead(size_t nums) override;
+	
+	void								PrepareWrite();
 
 public:
 	DWORD								PrepareRecv(WSABUF(&wsabuf)[2]) noexcept override;
