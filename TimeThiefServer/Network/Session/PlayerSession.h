@@ -1,8 +1,11 @@
 ﻿#pragma once
 #include "PlayerSessionState.h"
 #include "Network/IoBackend.h"
-#include "Network/Session/IOCP/IocpSession.h"
+#ifdef USE_RIO
 #include "Network/Session/RIO/RioSession.h"
+#else
+#include "Network/Session/IOCP/IocpSession.h"
+#endif
 #include "Protocol/Framing/PacketHeader.h"
 #include "Protocol.pb.h"
 
