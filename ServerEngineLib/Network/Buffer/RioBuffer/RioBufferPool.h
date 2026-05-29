@@ -6,8 +6,7 @@
 #include <memory>
 #include <atomic>
 #include <tbb/concurrent_queue.h>
-
-class RioSendBuffer;
+#include "Network/Buffer/RioBuffer/RioSendBuffer.h"
 
 /*-----------------
    RioBufferPool

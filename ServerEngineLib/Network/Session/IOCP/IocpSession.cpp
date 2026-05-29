@@ -1,4 +1,7 @@
 #include "pch.h"
+
+#ifndef USE_RIO
+
 #include "IocpSession.h"
 
 /*---------------
@@ -233,7 +236,7 @@ void IocpSession::ProcessRecv(int32 numOfBytes)
 	}
 
 	std::vector<byte> processBuffer_;
-	processBuffer_.reserve(dataSize);
+	processBuffer_.resize(dataSize);
 	recvBuffer_.PeekInto(processBuffer_.data(), dataSize);
 
 	int32 processedBytes = OnRecv(processBuffer_.data(), dataSize);
@@ -269,3 +272,5 @@ void IocpSession::ProcessSend(int32 numOfBytes)
 		PostSend();
 	}
 }
+
+#endif

@@ -15,11 +15,6 @@
 class IocpSession : public PacketSession
 {
 private:
-	using ConnectEvent =		IocpConnectEvent;
-	using DisconnectEvent =		IocpDisconnectEvent;
-	using RecvEvent =			IocpRecvEvent;
-	using SendEvent =			IocpSendEvent;
-
 	using RecvBuffer =			LinearBuffer;
 
 public:

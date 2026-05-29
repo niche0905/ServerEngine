@@ -1,4 +1,7 @@
 ﻿#include "pch.h"
+
+#ifdef USE_RIO
+
 #include "RioSession.h"
 #include "Network/Buffer/RioBuffer/RioSendBuffer.h"
 
@@ -269,3 +272,5 @@ void RioSession::ProcessSend(int32 numOfBytes)
       PostSend();
    }
 }
+
+#endif
