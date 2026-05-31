@@ -356,6 +356,7 @@ void ReplicationSystem::FlushEvent_Spawn(const RepEvent& ev, const RepFrame& fra
          pos->set_z(spawnEv->position.z);
          movementPtr->set_yaw(spawnEv->yaw);
       }
+      break;
       
    case ObjectType::OBJ_CHEST:
       {
