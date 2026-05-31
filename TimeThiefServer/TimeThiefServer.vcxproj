@@ -313,6 +313,8 @@
     <ClCompile Include="Data\Map\ServerMap.cpp" />
     <ClCompile Include="Data\Map\Spatial\UniformGridSpatial.cpp" />
     <ClCompile Include="Data\Navigation\ServerNavigation.cpp" />
+    <ClCompile Include="Data\Placements\InteractionPlacementJson.cpp" />
+    <ClCompile Include="Data\Placements\MonsterPlacementJson.cpp" />
     <ClCompile Include="Data\Tables\LootTableJson.cpp" />
     <ClCompile Include="Data\Tables\NpcAiTable.cpp" />
     <ClCompile Include="Data\Tables\PlayerSpawnTableJson.cpp" />
@@ -630,6 +632,9 @@
     <ClInclude Include="Data\Map\Spatial\UniformGridSpatial.h" />
     <ClInclude Include="Data\Navigation\ServerNavFileFormat.h" />
     <ClInclude Include="Data\Navigation\ServerNavigation.h" />
+    <ClInclude Include="Data\Placements\InteractionPlacementJson.h" />
+    <ClInclude Include="Data\Placements\MonsterPlacementJson.h" />
+    <ClInclude Include="Data\Placements\PlacementTypes.h" />
     <ClInclude Include="Data\Tables\LootTableJson.h" />
     <ClInclude Include="Data\Tables\LootTableTypes.h" />
     <ClInclude Include="Data\Tables\NpcAiTable.h" />
@@ -700,6 +705,8 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="CMakeLists.txt" />
+    <Content Include="config\data\map\placements\InteractionSpawnLocations.json" />
+    <Content Include="config\data\map\placements\MonsterSpawnLocations.json" />
     <Content Include="config\data\npc\behavior\Cat_NPC.xml" />
     <Content Include="config\data\npc\behavior\Test_NPC.xml" />
     <Content Include="config\data\npc\NpcAiTable.json" />

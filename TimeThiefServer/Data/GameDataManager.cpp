@@ -2,6 +2,8 @@
 #include "GameDataManager.h"
 #include "Loader/ServerMapLoader.h"
 #include "Network/ServerConfig.h"
+#include "Placements/InteractionPlacementJson.h"
+#include "Placements/MonsterPlacementJson.h"
 #include "Tables/LootTableJson.h"
 #include "Tables/PlayerSpawnTableJson.h"
 #include "Tables/StoreEntryTableJson.h"
@@ -111,6 +113,16 @@ bool GameDataManager::Init(const ServerConfig& config)
    
    if (not npcAiTable_.LoadFromFile(config.dataFiles.npcAiTablePath, &error)) {
       consoleLogger->Log(Color::Red, L"[GDM] Failed to load NpcAiTable: %hs\n", error.c_str());
+      return false;
+   }
+
+   if (not InteractionPlacementJson::LoadFromFile(config.dataFiles.placementInteractionTablePath, mapPlacementData_.interactions, &error)) {
+      consoleLogger->Log(Color::Red, L"[GDM] Failed to load InteractionPlacement: %hs\n", error.c_str());
+      return false;
+   }
+
+   if (not MonsterPlacementJson::LoadFromFile(config.dataFiles.placementMonsterTablePath, mapPlacementData_.monsters, &error)) {
+      consoleLogger->Log(Color::Red, L"[GDM] Failed to load MonsterPlacement: %hs\n", error.c_str());
       return false;
    }
    

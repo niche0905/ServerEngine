@@ -296,35 +296,42 @@ void Room::SetPlayer(const std::vector<PlayerId>& playerIds, const std::vector<s
 
 void Room::SetObject()
 {
-   // TODO: 변경하기 (기본 Spawn 정보 기반 Spawn)
-   
-   for (int32 i = 0; i < 5; ++i) {
-      auto* chest = SpawnObject<ChestActor>(ObjectFlags::None);
-      chest->SetPosition(Vector3{ 200.0f + i * 500.0f, 300.0f, 0.0f });
+   const MapPlacementData& placementData = gameDataManager_->GetMapPlacementData();
+
+   for (const StorePlacement& store : placementData.interactions.stores) {
+      const PlacementTransform& transform = store.transform;
+      CreateStoreActor(transform.position, transform.yaw);
    }
-   
-   {
-      auto* store = SpawnObject<StoreActor>(ObjectFlags::None);
-      store->SetPosition(Vector3{ 0.0f, -300.0f, 0.0f });
+
+   for (const ChestPlacement& chest : placementData.interactions.chests) {
+      const PlacementTransform& transform = chest.transform;
+      CreateChestActor(transform.position, chest.lootTableId, transform.yaw);
    }
-   
-   // TEMP: 몬스터 테스트 용
-   // {
-   //    auto* monster = SpawnObject<MonsterPawn>(ObjectFlags::Replicable | ObjectFlags::Tickable, 1);
-   //    if (monster == nullptr)
-   //       return;
-   //    
-   //    monster->SetPosition(Vector3{ -1500.0f, 0.0f, 0.0f });
-   //    monster->SetSavedRespawnPosition(monster->GetPosition());
-   // }
-   
-   {
-      auto* monster = SpawnObject<MonsterPawn>(ObjectFlags::Replicable | ObjectFlags::Tickable, 2);
-      if (monster == nullptr)
-         return;
-      
-      monster->SetPosition(Vector3{ -6000.0f, 0.0f, 0.0f });
-      monster->SetSavedRespawnPosition(monster->GetPosition());
+
+   for (const MonsterSpawnGroupPlacement& monsterGroup : placementData.monsters.spawnGroups) {
+      if (monsterGroup.isBoss)
+         continue;
+
+      const size_t candidateCount = monsterGroup.spawnCandidates.size();
+      if (candidateCount == 0)
+         continue;
+
+      const size_t spawnCount = std::min<size_t>(monsterGroup.spawnCount, candidateCount);
+      std::vector<size_t> shuffledIndices;
+      shuffledIndices.reserve(candidateCount);
+      for (size_t i = 0; i < candidateCount; ++i) {
+         shuffledIndices.push_back(i);
+      }
+
+      for (size_t i = candidateCount; i > 1; --i) {
+         const size_t j = static_cast<size_t>(rng_.NextU32(static_cast<uint32>(i)));
+         std::swap(shuffledIndices[i - 1], shuffledIndices[j]);
+      }
+
+      for (size_t i = 0; i < spawnCount; ++i) {
+         const PlacementTransform& transform = monsterGroup.spawnCandidates[shuffledIndices[i]];
+         CreateMonsterActor(transform.position, monsterGroup.templateId, transform.yaw);
+      }
    }
 }
 
@@ -1634,17 +1641,43 @@ WorldItemActor* Room::SpawnItem(const SpawnWorldItemParams& params)
    return item;
 }
 
-bool Room::SpawnMonster(const Vector3& vector3, uint32 templateId)
+StoreActor* Room::CreateStoreActor(const Vector3& pos, float yaw)
+{
+   auto* store = SpawnObject<StoreActor>(ObjectFlags::None);
+   if (!store)
+      return nullptr;
+
+   store->SetTransform(pos, yaw);
+   return store;
+}
+
+ChestActor* Room::CreateChestActor(const Vector3& pos, int32 tableId, float yaw)
+{
+   auto* chest = SpawnObject<ChestActor>(ObjectFlags::None);
+   if (!chest)
+      return nullptr;
+
+   chest->SetTransform(pos, yaw);
+   chest->SetTableId(tableId);
+   return chest;
+}
+
+MonsterPawn* Room::CreateMonsterActor(const Vector3& pos, uint32 templateId, float yaw)
 {
    auto* monster = SpawnObject<MonsterPawn>(ObjectFlags::Replicable | ObjectFlags::Tickable, templateId);
    if (!monster)
-      return false;
+      return nullptr;
    
-   if (!monster)
-      return false;   
-   
-   monster->SetPosition(vector3);
+   monster->SetTransform(pos, yaw);
    monster->SetSavedRespawnPosition(monster->GetPosition());
+   return monster;
+}
+
+bool Room::SpawnMonster(const Vector3& pos, uint32 templateId, float yaw)
+{
+   MonsterPawn* monster = CreateMonsterActor(pos, templateId, yaw);
+   if (!monster)
+      return false;
    
    monster->StartAI();
    
@@ -1652,27 +1685,22 @@ bool Room::SpawnMonster(const Vector3& vector3, uint32 templateId)
    return true;
 }
 
-bool Room::SpawnChest(const Vector3& pos, int32 tableId)
+bool Room::SpawnChest(const Vector3& pos, int32 tableId, float yaw)
 {
-   auto* chest = SpawnObject<ChestActor>(ObjectFlags::None);
+   ChestActor* chest = CreateChestActor(pos, tableId, yaw);
    if (!chest)
       return false;
-   
-   chest->SetPosition(pos);
-   chest->SetTableId(tableId);
    
    ReplicationSpawn(chest, /*templateId=*/0, chest->GetYaw());    // TODO: templateId는 나중에 생각하기
    
    return true;
 }
 
-bool Room::SpawnStore(const Vector3& pos)
+bool Room::SpawnStore(const Vector3& pos, float yaw)
 {
-   auto* store = SpawnObject<StoreActor>(ObjectFlags::None);
+   StoreActor* store = CreateStoreActor(pos, yaw);
    if (!store)
       return false;
-   
-   store->SetPosition(pos);
    
    ReplicationSpawn(store, /*templateId=*/0, store->GetYaw());    // TODO: templateId는 나중에 생각하기
    

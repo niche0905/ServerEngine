@@ -104,6 +104,12 @@ bool ServerConfigReader::ParseJsonText(const std::string& jsonText, const std::f
       if (dataFiles.isMember("npc_ai_table"))
          newConfig.dataFiles.npcAiTablePath = ResolvePath(dataFiles["npc_ai_table"].asString(), baseDir);
       
+      if (dataFiles.isMember("placement_interaction_table"))
+         newConfig.dataFiles.placementInteractionTablePath = ResolvePath(dataFiles["placement_interaction_table"].asString(), baseDir);
+      
+      if (dataFiles.isMember("placement_monster_table"))
+         newConfig.dataFiles.placementMonsterTablePath = ResolvePath(dataFiles["placement_monster_table"].asString(), baseDir);
+      
    }
    
    // game

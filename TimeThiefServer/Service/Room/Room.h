@@ -10,8 +10,11 @@
 #include "Utils/Random/WeightedRandom.h"
 
 enum class CombatEventType;
+class ChestActor;
 class GrenadeActor;
+class MonsterPawn;
 class PlayerSession;
+class StoreActor;
 struct SpawnWorldItemParams;
 class WorldItemActor;
 struct GameConfig;
@@ -140,9 +143,13 @@ public:
    WorldItemActor* SpawnItem(const SpawnWorldItemParams& params);
    
 private:
-   bool SpawnMonster(const Vector3& vector3, uint32 templateId);
-   bool SpawnChest(const Vector3& pos, int32 tableId);
-   bool SpawnStore(const Vector3& pos);
+   StoreActor* CreateStoreActor(const Vector3& pos, float yaw);
+   ChestActor* CreateChestActor(const Vector3& pos, int32 tableId, float yaw);
+   MonsterPawn* CreateMonsterActor(const Vector3& pos, uint32 templateId, float yaw);
+
+   bool SpawnMonster(const Vector3& pos, uint32 templateId, float yaw = 0.0f);
+   bool SpawnChest(const Vector3& pos, int32 tableId, float yaw = 0.0f);
+   bool SpawnStore(const Vector3& pos, float yaw = 0.0f);
    
 public:
    bool Start();

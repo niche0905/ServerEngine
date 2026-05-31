@@ -1,6 +1,7 @@
 ﻿#pragma once
 #include "Data/Tables/ZoneTable.h"
 #include "Map/ServerMap.h"
+#include "Placements/PlacementTypes.h"
 #include "Tables/LootTableTypes.h"
 #include "Tables/NpcAiTable.h"
 #include "Tables/PlayerSpawnTable.h"
@@ -29,6 +30,7 @@ public:
    const UpgradeTable& GetUpgradeTable() const { return upgradeTable_; }
    const PlayerSpawnTable& GetPlayerSpawnTable() const { return playerSpawnTable_; }
    const NpcAiTable& GetNpcAiTable() const { return npcAiTable_; }
+   const MapPlacementData& GetMapPlacementData() const { return mapPlacementData_; }
    
 private:
    ServerMap                  serverMap_;
@@ -39,5 +41,6 @@ private:
    UpgradeTable               upgradeTable_;
    PlayerSpawnTable           playerSpawnTable_;
    NpcAiTable                 npcAiTable_;
+   MapPlacementData           mapPlacementData_;
    
 };

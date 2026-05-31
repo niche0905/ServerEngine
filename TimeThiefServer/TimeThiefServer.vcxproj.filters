@@ -85,6 +85,8 @@
     <ClCompile Include="..\External\ProtocolShared\cpp\test\test_messages.pb.cc" />
     <ClCompile Include="Data\Map\ServerMap.cpp" />
     <ClCompile Include="Data\Map\Spatial\UniformGridSpatial.cpp" />
+    <ClCompile Include="Data\Placements\InteractionPlacementJson.cpp" />
+    <ClCompile Include="Data\Placements\MonsterPlacementJson.cpp" />
     <ClCompile Include="Data\Tables\PlayerSpawnTableJson.cpp" />
     <ClCompile Include="Data\Tables\StoreEntryTableJson.cpp" />
     <ClCompile Include="Data\Tables\UpgradeTableJson.cpp" />
@@ -215,6 +217,9 @@
     <ClInclude Include="Service\Room\Systems\Weapon\WeaponSystem.h" />
     <ClInclude Include="Data\Map\ServerMap.h" />
     <ClInclude Include="Data\Map\Spatial\UniformGridSpatial.h" />
+    <ClInclude Include="Data\Placements\InteractionPlacementJson.h" />
+    <ClInclude Include="Data\Placements\MonsterPlacementJson.h" />
+    <ClInclude Include="Data\Placements\PlacementTypes.h" />
     <ClInclude Include="Data\Tables\PlayerSpawnTable.h" />
     <ClInclude Include="Data\Tables\PlayerSpawnTableJson.h" />
     <ClInclude Include="Data\Tables\StoreEntryTableJson.h" />
