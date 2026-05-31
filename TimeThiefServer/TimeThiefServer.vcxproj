@@ -711,6 +711,7 @@
     <Content Include="config\data\npc\behavior\Test_NPC.xml" />
     <Content Include="config\data\npc\NpcAiTable.json" />
     <Content Include="config\data\tables\LootTables.json" />
+    <Content Include="config\data\tables\MonsterTemplates.json" />
     <Content Include="config\data\tables\PlayerSpawnTable.json" />
     <Content Include="config\data\tables\StatUpgradeTable.json" />
     <Content Include="config\data\tables\StoreEntryTable.json" />
