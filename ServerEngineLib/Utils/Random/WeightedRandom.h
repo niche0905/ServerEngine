@@ -140,7 +140,7 @@ inline void ChooseManyIndicesByWeight(int32 count, int32 k, bool allowDuplicates
         const int32 chosenOriginal = candidates[static_cast<size_t>(chosenCandPos)];
         outIndices.push_back(chosenOriginal);
         
-        candidates[static_cast<size_t>(chosenOriginal)] = candidates.back();
+        candidates[static_cast<size_t>(chosenCandPos)] = candidates.back();
         candidates.pop_back();
         
         if (candidates.empty()) break;
