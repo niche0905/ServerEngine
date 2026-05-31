@@ -2,7 +2,7 @@
 	"monster_spawn_groups": [
 		{
 			"type": "cat",
-			"spawn_num": 40,
+			"spawn_num": 20,
 			"transform": [
 				{
 					"position":
