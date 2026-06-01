@@ -44,11 +44,9 @@ BT::NodeStatus CatIsTargetInCannonRangeNode::tick()
     constexpr float CannonRange = 2000.0f;
     constexpr float CannonRangeSq = CannonRange * CannonRange;
 
-    const SE::Math::Vector3 selfPos =
-        selfNpc->GetPosition();     // Muzzle offset 적용
+    const SE::Math::Vector3 selfPos = selfNpc->GetPosition();
 
-    const SE::Math::Vector3 targetPos =
-        targetPawn->GetPosition() - SE::Math::Vector3{0.0f, 0.0f, 90.0f};
+    const SE::Math::Vector3 targetPos = targetPawn->GetPosition();
 
     const float distSq = (targetPos - selfPos).LengthSq();
 

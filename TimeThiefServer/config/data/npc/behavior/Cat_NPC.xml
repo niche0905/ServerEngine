@@ -49,7 +49,8 @@
                             <Sequence>
                                 <CatIsTargetInMeleeRange
                                         self_npc="{self_npc}"
-                                        target_pawn="{target_pawn}" />
+                                        target_pawn="{target_pawn}"
+                                        combat_mode="{combat_mode}" />
 
                                 <CatDecideMeleeAttackType
                                         self_npc="{self_npc}"

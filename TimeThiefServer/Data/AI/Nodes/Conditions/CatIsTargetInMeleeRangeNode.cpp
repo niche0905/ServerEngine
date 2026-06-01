@@ -12,7 +12,8 @@ BT::PortsList CatIsTargetInMeleeRangeNode::providedPorts()
 {
     return {
         BT::InputPort<MonsterPawn*>(BB::SelfNpc),
-        BT::InputPort<Pawn*>(BB::TargetPawn)
+        BT::InputPort<Pawn*>(BB::TargetPawn),
+        BT::InputPort<CombatEventType>(BB::CombatMode)
     };
 }
 
@@ -28,7 +29,21 @@ BT::NodeStatus CatIsTargetInMeleeRangeNode::tick()
         return BT::NodeStatus::FAILURE;
     }
 
-    if (selfNpc->IsDead() || targetPawn->IsDead()) {
+    if (selfNpc->IsDead()) {
+        return BT::NodeStatus::FAILURE;
+    }
+
+    CombatEventType mode = CombatEventType::None;
+    if (getInput<CombatEventType>(BB::CombatMode, mode))
+    {
+        if (mode == CombatEventType::CatClaw ||
+            mode == CombatEventType::CatBite)
+        {
+            return BT::NodeStatus::SUCCESS;
+        }
+    }
+
+    if (targetPawn->IsDead()) {
         return BT::NodeStatus::FAILURE;
     }
 

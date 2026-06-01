@@ -13,6 +13,8 @@ namespace
     constexpr float CannonDesiredDistance = 1500.0f;
     constexpr float CannonMinDistance = 900.0f;
     constexpr float CannonMaxDistance = 1800.0f;
+    constexpr float CannonFireRange = 2000.0f;
+    constexpr float CannonFireRangeSq = CannonFireRange * CannonFireRange;
 
     constexpr float ArriveDistance = 120.0f;
     constexpr float ArriveDistanceSq = ArriveDistance * ArriveDistance;
@@ -110,12 +112,11 @@ BT::NodeStatus CatMoveToCannonRangeNode::onRunning()
 
     const SE::Math::Vector3 selfPos = selfNpc_->GetPosition();
     const SE::Math::Vector3 targetPos = targetPawn_->GetPosition();
-    const SE::Math::Vector3 targetFootPos = targetPos - SE::Math::Vector3{0.0f, 0.0f, 90.0f};
 
     const float dt = room->GetDelta();
     elapsedRepath_ += dt;
 
-    const SE::Math::Vector3 toTarget = targetFootPos - selfPos;
+    const SE::Math::Vector3 toTarget = targetPos - selfPos;
     const float distSq = toTarget.LengthSq();
 
     const bool goodDistance =
@@ -157,6 +158,11 @@ BT::NodeStatus CatMoveToCannonRangeNode::onRunning()
         SE::Math::Vector3 navPos{};
         if (!map.ProjectToNavMesh(desiredPos, navPos))
         {
+            if (distSq <= CannonFireRangeSq) {
+                selfNpc_->StopMove();
+                return BT::NodeStatus::SUCCESS;
+            }
+
             // 한쪽이 막혔으면 반대쪽도 시도
             orbitSide_ *= -1;
 
@@ -165,6 +171,11 @@ BT::NodeStatus CatMoveToCannonRangeNode::onRunning()
             desiredPos.z = targetPos.z;
 
             if (!map.ProjectToNavMesh(desiredPos, navPos)) {
+                if (distSq <= CannonFireRangeSq) {
+                    selfNpc_->StopMove();
+                    return BT::NodeStatus::SUCCESS;
+                }
+
                 return BT::NodeStatus::FAILURE;
             }
         }
@@ -172,6 +183,11 @@ BT::NodeStatus CatMoveToCannonRangeNode::onRunning()
         std::vector<SE::Math::Vector3> path;
         if (map.FindPath(selfPos, navPos, path) != NavPathResult::Success)
         {
+            if (distSq <= CannonFireRangeSq) {
+                selfNpc_->StopMove();
+                return BT::NodeStatus::SUCCESS;
+            }
+
             orbitSide_ *= -1;
 
             orbitDir = Rotate2D(targetToSelf, -orbitAngle);
@@ -179,11 +195,21 @@ BT::NodeStatus CatMoveToCannonRangeNode::onRunning()
             desiredPos.z = targetPos.z;
 
             if (!map.ProjectToNavMesh(desiredPos, navPos)) {
+                if (distSq <= CannonFireRangeSq) {
+                    selfNpc_->StopMove();
+                    return BT::NodeStatus::SUCCESS;
+                }
+
                 return BT::NodeStatus::FAILURE;
             }
 
             path.clear();
             if (map.FindPath(selfPos, navPos, path) != NavPathResult::Success) {
+                if (distSq <= CannonFireRangeSq) {
+                    selfNpc_->StopMove();
+                    return BT::NodeStatus::SUCCESS;
+                }
+
                 return BT::NodeStatus::FAILURE;
             }
         }
@@ -225,10 +251,10 @@ bool CatMoveToCannonRangeNode::CanShootTarget(MonsterPawn* selfPawn, Pawn* targe
     constexpr float CannonRange = 2000.0f;
 
     const SE::Math::Vector3 origin =
-        selfPawn->GetPosition() + SE::Math::Vector3{0.0f, 0.0f, 90.0f};
+        selfPawn->GetPosition();
 
     const SE::Math::Vector3 target =
-        targetPawn->GetPosition() + SE::Math::Vector3{0.0f, 0.0f, 90.0f};
+        targetPawn->GetPosition();
 
     SE::Math::Vector3 dir = target - origin;
     if (dir.LengthSq() <= 0.0001f) {
