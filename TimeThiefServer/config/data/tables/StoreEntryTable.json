@@ -29,6 +29,13 @@
       "item_count": 1
     },
     {
+      "entry_id": 13,
+      "cost": 600,
+      "type": 1,
+      "item_id": 13,
+      "item_count": 1
+    },
+    {
       "entry_id": 5,
       "cost": 1000,
       "type": 2,
