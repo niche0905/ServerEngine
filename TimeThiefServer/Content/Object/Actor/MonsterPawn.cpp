@@ -76,8 +76,24 @@ void MonsterPawn::OnSpawn()
 {
    Pawn::OnSpawn();
 
-   respawn_.Init(this, RespawnPolicy{});
-   loot_.Init(this, 1);    // TEMP: LootSourceComponent의 tableId는 1로 고정
+   RespawnPolicy respawnPolicy{};
+   respawnPolicy.invulMs = 1000;
+
+   int32 lootTableId = 1;
+
+   if (auto room = GetRoom()) {
+      if (auto* gameDataManager = room->GetGameDataManager()) {
+         if (const MonsterTemplateDef* monsterTemplate = gameDataManager->GetMonsterTemplateTable().GetTemplate(templateId_)) {
+            health_.Init(this, monsterTemplate->maxHp);
+            respawnPolicy.delayMs = static_cast<uint32>(monsterTemplate->respawnTimeSec) * 1000;
+            lootTableId = monsterTemplate->lootTableId;
+            dropPoint_ = monsterTemplate->dropPoint;
+         }
+      }
+   }
+
+   respawn_.Init(this, respawnPolicy);
+   loot_.Init(this, lootTableId);
 
    if (auto room = GetRoom()) {
       ai_.Initialize(this, &room->GetObjectManager(), templateId_);

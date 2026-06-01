@@ -33,6 +33,7 @@ public:
    
 public:
    int32 GetTemplateId() const { return templateId_; }
+   int32 GetDropPoint() const { return dropPoint_; }
    
    ObjectId GetTargetId() const { return ai_.GetTargetId(); }
    
@@ -84,6 +85,7 @@ private:
    
 private:
    int32 templateId_{ 0 };
+   int32 dropPoint_{ 0 };
    
    LootSourceComponent loot_;
    MonsterAiComponent ai_;
