@@ -32,7 +32,7 @@
       "reload_time": 3.0,
       "range": 200.0,
       "projectile_speed": 2000.0,
-      "explosion_radius": 300.0
+      "explosion_radius": 480.0
     }
   ]
 }

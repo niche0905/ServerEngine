@@ -735,7 +735,7 @@ bool Room::HandleThrowGrenade(PlayerId playerId, const se::game::C_ThrowGrenadeR
          consoleLogger->Log(Color::Yellow, L"[Room] Failed to spawn GrenadeActor for playerId %u\n", playerId);
          return true;   // 수류탄 액터 생성 실패 (정상적이지 않은 상황)
       }
-      grenade->Init(playerPawn->GetId(), position, Vector3{}, 100, 0, 10.0f, 450.0f, true);
+      grenade->Init(playerPawn->GetId(), position, Vector3{}, 100, 0, 10.0f, 480.0f, true);
       ObjectId grenadeId = grenade->GetId();
       
       NotifyThrowGrenade(it->second.pawnObjectId, grenadeId, grenadeType, position, Vector3{dir.x(), dir.y(), dir.z()});
