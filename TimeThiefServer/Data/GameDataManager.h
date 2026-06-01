@@ -3,6 +3,7 @@
 #include "Map/ServerMap.h"
 #include "Placements/PlacementTypes.h"
 #include "Tables/LootTableTypes.h"
+#include "Tables/MonsterTemplateTable.h"
 #include "Tables/NpcAiTable.h"
 #include "Tables/PlayerSpawnTable.h"
 #include "Tables/StoreEntryTable.h"
@@ -25,6 +26,7 @@ public:
    const ServerMap& GetServerMap() const { return serverMap_; }
    const ZoneTable& GetZoneTable() const { return zoneTable_; }
    const LootTable& GetLootTable() const { return lootTable_; }
+   const MonsterTemplateTable& GetMonsterTemplateTable() const { return monsterTemplateTable_; }
    const StoreEntryTable& GetStoreEntryTable() const { return storeEntryTable_; }
    const WeaponTable& GetWeaponTable() const { return weaponTable_; }
    const UpgradeTable& GetUpgradeTable() const { return upgradeTable_; }
@@ -36,6 +38,7 @@ private:
    ServerMap                  serverMap_;
    ZoneTable                  zoneTable_;
    LootTable                  lootTable_;
+   MonsterTemplateTable       monsterTemplateTable_;
    StoreEntryTable            storeEntryTable_;
    WeaponTable                weaponTable_;
    UpgradeTable               upgradeTable_;

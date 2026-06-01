@@ -4,6 +4,7 @@
       "template_id": 2,
       "name": "Cat",
       "max_hp": 120,
+      "drop_point": 80,
       "respawn_time": 30,
       "loot_table": 1
     }

@@ -88,6 +88,7 @@
     <ClCompile Include="Data\Placements\InteractionPlacementJson.cpp" />
     <ClCompile Include="Data\Placements\MonsterPlacementJson.cpp" />
     <ClCompile Include="Data\Tables\PlayerSpawnTableJson.cpp" />
+    <ClCompile Include="Data\Tables\MonsterTemplateTableJson.cpp" />
     <ClCompile Include="Data\Tables\StoreEntryTableJson.cpp" />
     <ClCompile Include="Data\Tables\UpgradeTableJson.cpp" />
     <ClCompile Include="Data\Tables\WeaponTableJson.cpp" />
@@ -222,6 +223,8 @@
     <ClInclude Include="Data\Placements\PlacementTypes.h" />
     <ClInclude Include="Data\Tables\PlayerSpawnTable.h" />
     <ClInclude Include="Data\Tables\PlayerSpawnTableJson.h" />
+    <ClInclude Include="Data\Tables\MonsterTemplateTable.h" />
+    <ClInclude Include="Data\Tables\MonsterTemplateTableJson.h" />
     <ClInclude Include="Data\Tables\StoreEntryTableJson.h" />
     <ClInclude Include="Data\Tables\UpgradeTableJson.h" />
     <ClInclude Include="Data\Tables\WeaponTableJson.h" />

@@ -5,6 +5,7 @@
 #include "Placements/InteractionPlacementJson.h"
 #include "Placements/MonsterPlacementJson.h"
 #include "Tables/LootTableJson.h"
+#include "Tables/MonsterTemplateTableJson.h"
 #include "Tables/PlayerSpawnTableJson.h"
 #include "Tables/StoreEntryTableJson.h"
 #include "Tables/UpgradeTableJson.h"
@@ -72,6 +73,18 @@ bool GameDataManager::Init(const ServerConfig& config)
    if (!lootTable_.IsValid()) {
       consoleLogger->Log(Color::Red, L"[GDM] Loaded LootTable is invalid.\n");
       return false;
+   }
+
+   if (not MonsterTemplateTableJson::LoadFromFile(config.dataFiles.monsterTemplateTablePath, monsterTemplateTable_, &error)) {
+      consoleLogger->Log(Color::Red, L"[GDM] Failed to load MonsterTemplateTable: %hs\n", error.c_str());
+      return false;
+   }
+
+   for (const auto& [templateId, monsterTemplate] : monsterTemplateTable_.templates) {
+      if (!lootTable_.HasTable(monsterTemplate.lootTableId)) {
+         consoleLogger->Log(Color::Red, L"[GDM] MonsterTemplate %u references missing LootTable %d.\n", templateId, monsterTemplate.lootTableId);
+         return false;
+      }
    }
    
    if (not StoreEntryTableJson::LoadFromFile(config.dataFiles.storeEntryTablePath, storeEntryTable_, &error)) {
