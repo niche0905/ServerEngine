@@ -85,9 +85,9 @@ void PlayerSessionLifecycleService::OnDisconnected(PlayerSession& session)
                     if (!shard) return;
                     
                     auto room = shard->FindRoom(roomId);
-                    if (!room) return;
-                    
-                    room->Leave(playerId);
+                    if (room) {
+                        room->Leave(playerId);
+                    }
                     
                     playerManager->Remove(playerId);
                     sessionManager->UnbindPlayer(playerId);

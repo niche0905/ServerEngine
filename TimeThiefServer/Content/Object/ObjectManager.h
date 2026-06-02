@@ -67,6 +67,7 @@ public:
       const Entry& e = entries_[idx];
       if (e.ptr == nullptr) return nullptr;
       if (e.generation != id.Gen()) return nullptr;
+      if (!e.ptr->IsActive()) return nullptr;
       
       return e.ptr;
    }

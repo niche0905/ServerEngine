@@ -733,6 +733,7 @@ bool Room::HandleThrowGrenade(PlayerId playerId, const se::game::C_ThrowGrenadeR
       GrenadeActor* grenade = SpawnObject<GrenadeActor>(ObjectFlags::None);
       if (!grenade) {
          consoleLogger->Log(Color::Yellow, L"[Room] Failed to spawn GrenadeActor for playerId %u\n", playerId);
+         playerPawn->AddItem(grenadeType, 1, ItemChangeContext(ItemChangeReason::System));
          return true;   // 수류탄 액터 생성 실패 (정상적이지 않은 상황)
       }
       grenade->Init(playerPawn->GetId(), position, Vector3{}, 100, 0, 10.0f, 480.0f, true);
@@ -853,6 +854,10 @@ bool Room::HandleGrenadeMoveSync(PlayerId playerId, const se::game::C_GrenadeMov
          consoleLogger->Log(Color::Yellow, L"[Room] GrenadeActor not found for grenadeId %u during grenade move sync\n", pkt.entity_id().value());
          return false;
       }
+      if (grenade->GetOwner() != playerPawn->GetId()) {
+         consoleLogger->Log(Color::Yellow, L"[Room] Grenade owner mismatch for grenadeId %u during grenade move sync\n", pkt.entity_id().value());
+         return false;
+      }
       
       const auto& position = pkt.position();
       const auto& rotation = pkt.rotation();
@@ -898,6 +903,10 @@ bool Room::HandleGrenadeExplosion(PlayerId playerId, const se::game::C_GrenadeEx
       auto* grenade = objectManager_.FindAs<GrenadeActor>(grenadeId);
       if (!grenade) {
          consoleLogger->Log(Color::Yellow, L"[Room] GrenadeActor not found for grenadeId %u during grenade explosion handling\n", pkt.entity_id().value());
+         return false;
+      }
+      if (grenade->GetOwner() != playerPawn->GetId()) {
+         consoleLogger->Log(Color::Yellow, L"[Room] Grenade owner mismatch for grenadeId %u during grenade explosion handling\n", pkt.entity_id().value());
          return false;
       }
       
@@ -1746,7 +1755,7 @@ void Room::Tick(const RepFrame& frame)
       obj->__Tick(deltaSeconds);
    });
    
-   // objectManager_.SweepDestroy();   // 오브젝트 제거 처리
+   objectManager_.SweepDestroy();   // 오브젝트 제거 처리
 
    roomGameSystem_.GetReplicationSystem().FlushImmediate(frame);
    roomGameSystem_.GetReplicationSystem().FlushPeriodic(frame);

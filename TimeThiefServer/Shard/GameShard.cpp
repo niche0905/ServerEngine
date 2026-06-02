@@ -139,6 +139,7 @@ void GameShard::CloseRoom(RoomId roomId)
       room->Close();
    }
    
+   roomDirectory_.UnregisterRoom(roomId);
    RemoveRoom(roomId);
 }
 
