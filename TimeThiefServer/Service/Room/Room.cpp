@@ -737,7 +737,8 @@ bool Room::HandleThrowGrenade(PlayerId playerId, const se::game::C_ThrowGrenadeR
          playerPawn->AddItem(grenadeType, 1, ItemChangeContext(ItemChangeReason::System));
          return true;   // 수류탄 액터 생성 실패 (정상적이지 않은 상황)
       }
-      grenade->Init(playerPawn->GetId(), position, Vector3{}, 100, 0, 10.0f, 480.0f, true);
+      int32 damage = grenadeType == 11 ? 100 : 0;   // TEMP: grenadeType이 11이면 피해 100, 아니면 피해 0(연막탄)으로 간주하기
+      grenade->Init(playerPawn->GetId(), position, Vector3{}, damage, 0, 10.0f, 480.0f, true);
       ObjectId grenadeId = grenade->GetId();
       
       NotifyThrowGrenade(it->second.pawnObjectId, grenadeId, grenadeType, position, Vector3{dir.x(), dir.y(), dir.z()});

@@ -237,6 +237,9 @@ bool CombatSystem::SweepProjectile(const ProjectileSweepQuery& query, SE::Physic
 void CombatSystem::ProjectileExplosion(ObjectId projectileId, const SE::Math::Vector3& pos, ObjectId ownerId,
                                        int32 damage, float radius, bool distanceDamageEnabled)
 {
+   if (damage <= 0)
+      return;   // 데미지가 0 이하인 경우 폭발 처리할 필요 없음
+   
    if (radius <= 0.0f)
       return;
    
