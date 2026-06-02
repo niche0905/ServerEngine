@@ -39,6 +39,7 @@ public:
     virtual PlayerId GetOwnerPlayerId() const override { return playerId_; }
     
     void SetOwnerPlayerId(PlayerId playerId) { playerId_ = playerId; }
+    void SetRespawnCostTimePoint(int32 cost) { respawnCostTimePoint_ = cost; }
     
 protected:
     virtual int32 ResolveIncomingDamage(int32 amount, const DamageContext& ctx) override;
@@ -176,6 +177,7 @@ private:
     SaveComponent               save_{};
     
     int32                       speed_{};
+    int32                       respawnCostTimePoint_{100};
     
     ActionState                 actionState_{};
     

@@ -131,6 +131,25 @@ bool ServerConfigReader::ParseJsonText(const std::string& jsonText, const std::f
       
       if (game.isMember("zone_damage_tick_interval"))
          newConfig.game.zoneDamageTickInterval = game["zone_damage_tick_interval"].asFloat();
+
+      if (game.isMember("economy")) {
+         const Json::Value& economy = game["economy"];
+
+         if (economy.isMember("respawn_cost_time_point"))
+            newConfig.game.economy.respawnCostTimePoint = std::max(0, economy["respawn_cost_time_point"].asInt());
+
+         if (economy.isMember("player_kill_robbery_time_point"))
+            newConfig.game.economy.playerKillRobberyTimePoint = std::max(0, economy["player_kill_robbery_time_point"].asInt());
+
+         if (economy.isMember("chest_money_reward_min"))
+            newConfig.game.economy.chestMoneyRewardMin = std::max(0, economy["chest_money_reward_min"].asInt());
+
+         if (economy.isMember("chest_money_reward_max"))
+            newConfig.game.economy.chestMoneyRewardMax = std::max(0, economy["chest_money_reward_max"].asInt());
+
+         if (newConfig.game.economy.chestMoneyRewardMin > newConfig.game.economy.chestMoneyRewardMax)
+            std::swap(newConfig.game.economy.chestMoneyRewardMin, newConfig.game.economy.chestMoneyRewardMax);
+      }
       
       if (game.isMember("match_size")) {
          int32 matchSize = game["match_size"].asInt();

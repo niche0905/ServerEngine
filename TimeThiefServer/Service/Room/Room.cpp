@@ -250,8 +250,9 @@ void Room::Close()
 bool Room::Init(GameShard* ownerShard, const GameDataManager& gameDataManager, const GameConfig& gameConfig)
 {
    ownerShard_ = ownerShard;
+   gameConfig_ = gameConfig;
    
-   if (!roomGameSystem_.Init(this, gameDataManager, gameConfig))
+   if (!roomGameSystem_.Init(this, gameDataManager, gameConfig_))
       return false;
    
    gameDataManager_ = &gameDataManager;
@@ -1061,7 +1062,7 @@ bool Room::HandleChestInteract(PlayerId playerId, const se::game::C_ChestInterac
             // 에러가 발생한 것
          }
          
-         constexpr int32 chestMoneyReward = 100;
+         const int32 chestMoneyReward = rng_.NextI32(gameConfig_.economy.chestMoneyRewardMin, gameConfig_.economy.chestMoneyRewardMax);
          playerPawn->AddMoney(CurrencyType::TimePoint, chestMoneyReward, MoneyChangeContext{MoneyChangeReason::Loot});
          
          DropSpawnContext dropSpawnContext;
@@ -1809,6 +1810,7 @@ PlayerPawn* Room::CreatePreparedPlayerPawn(PlayerId playerId, const Vector3& spa
    playerPawn->SetPosition(spawnPos);
    playerPawn->SetSavedRespawnPosition(spawnPos);
    playerPawn->SetOwnerPlayerId(playerId);
+   playerPawn->SetRespawnCostTimePoint(gameConfig_.economy.respawnCostTimePoint);
    return playerPawn;
 }
 
@@ -2398,7 +2400,7 @@ void Room::HandleDespawn(ObjectId objId)
 
 void Room::HandlePlayerKillPlayer(Pawn* killer, Pawn* victim)
 {
-   constexpr int32 killRobbery = 100;
+   const int32 killRobbery = gameConfig_.economy.playerKillRobberyTimePoint;
    
    const PlayerId killerPlayerId = killer->GetOwnerPlayerId();
    const PlayerId victimPlayerId = victim->GetOwnerPlayerId();
@@ -2426,8 +2428,6 @@ void Room::HandlePlayerKillPlayer(Pawn* killer, Pawn* victim)
 
 void Room::HandlePlayerKillMonster(Pawn* killer, Pawn* monster)
 {
-   constexpr int32 killRobbery = 100;
-   
    const PlayerId killerPlayerId = killer->GetOwnerPlayerId();
       
    if (killerPlayerId == 0)
@@ -2437,9 +2437,14 @@ void Room::HandlePlayerKillMonster(Pawn* killer, Pawn* monster)
       return;   // 방에 존재하지 않는 플레이어가 공격자 또는 피해자인 경우 (이 경우는 발생하지 않아야 함)
    
    PlayerPawn* killerPlayerPawn = static_cast<PlayerPawn*>(killer);
+   MonsterPawn* monsterPawn = static_cast<MonsterPawn*>(monster);
+   const int32 dropPoint = monsterPawn->GetDropPoint();
+
    GetRoomGameSystem().GetDropSystem().OnEntityDied(monster->GetId());
    
-   MoneyChangeResult addResult = killerPlayerPawn->AddMoney(CurrencyType::TimePoint, killRobbery, MoneyChangeContext{MoneyChangeReason::Robbery});
+   if (dropPoint > 0) {
+      MoneyChangeResult addResult = killerPlayerPawn->AddMoney(CurrencyType::TimePoint, dropPoint, MoneyChangeContext{MoneyChangeReason::Robbery});
+   }
 }
 
 void Room::HandleMonsterFire(ObjectId monsterId, CombatEventType eventType, const SE::Math::Vector3& origin,

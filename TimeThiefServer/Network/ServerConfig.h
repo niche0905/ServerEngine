@@ -26,6 +26,14 @@ struct DataFilesConfig
     std::filesystem::path placementMonsterTablePath;
 };
 
+struct EconomyConfig
+{
+    int32 respawnCostTimePoint = 100;        // 리스폰 비용
+    int32 playerKillRobberyTimePoint = 100;  // 플레이어 처치 시 강탈량
+    int32 chestMoneyRewardMin = 60;          // 상자 화폐 보상 최소값
+    int32 chestMoneyRewardMax = 120;         // 상자 화폐 보상 최대값
+};
+
 struct GameConfig
 {
     int32 movementUpdateHz = 10;   // 플레이어 이동 업데이트 주기 (Hz)
@@ -34,6 +42,8 @@ struct GameConfig
     int32 roomTickIntervalMs = 50;   // Room Tick 간격 (ms) - 20Hz -> 50ms/틱
     
     float zoneDamageTickInterval = 1.0f;   // 존 데미지 Tick 간격 (초)
+
+    EconomyConfig economy;
     
     int32 matchSize = 8;   // 매치당 필요한 플레이어 수
     

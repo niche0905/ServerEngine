@@ -130,10 +130,8 @@ void PlayerPawn::OnPostRespawn(ObjectManager& om)
 
 bool PlayerPawn::TryReserveRespawn()
 {
-   int32 respawnCost = 100;   // TEMP: 리스폰 비용 (예: 100 타임포인트)
-   
    MoneyChangeContext ctx{ MoneyChangeReason::RespawnCost };
-   MoneyChangeResult result = SpendMoney(CurrencyType::TimePoint, respawnCost, ctx);
+   MoneyChangeResult result = SpendMoney(CurrencyType::TimePoint, respawnCostTimePoint_, ctx);
    
    return result.accepted;    // 리스폰 비용을 지불하였으면
                               // 일단은 Respawn 예약을 할 때 비용을 지불하는 것으로

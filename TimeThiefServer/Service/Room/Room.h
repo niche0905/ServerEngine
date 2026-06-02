@@ -6,6 +6,7 @@
 #include "Content/Gameplay/Combat/DamageTypes.h"
 #include "Content/Object/ObjectManager.h"
 #include "Generated/ServerPacketHandler.h"
+#include "Network/ServerConfig.h"
 #include "Systems/RoomGameSystem.h"
 #include "Utils/Random/WeightedRandom.h"
 
@@ -17,7 +18,6 @@ class PlayerSession;
 class StoreActor;
 struct SpawnWorldItemParams;
 class WorldItemActor;
-struct GameConfig;
 class PlayerPawn;
 class GameShard;
 class GameDataManager;
@@ -184,6 +184,7 @@ public:
    void SetRoomState(RoomState state) { roomState_ = state; }
    
    const GameDataManager* GetGameDataManager() const { return gameDataManager_; }
+   const GameConfig& GetGameConfig() const { return gameConfig_; }
    
 public:
    TickSeq GetTickSeq() const { return tickSeq_; }
@@ -329,6 +330,7 @@ private:
    
    RoomGameSystem roomGameSystem_{};
    const GameDataManager* gameDataManager_ = nullptr;   // non-owning
+   GameConfig gameConfig_{};
    
    Random32 rng_{};
    TimerId closeTimerId_{0};
