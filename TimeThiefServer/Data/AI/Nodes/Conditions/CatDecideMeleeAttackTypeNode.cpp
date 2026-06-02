@@ -38,6 +38,7 @@ BT::NodeStatus CatDecideMeleeAttackTypeNode::tick()
             return BT::NodeStatus::SUCCESS;
 
         case CombatEventType::CatMelee:
+        case CombatEventType::None:
             break;
 
         default:

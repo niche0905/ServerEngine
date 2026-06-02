@@ -3,6 +3,7 @@
 #include "Data/AI/AiBlackboard.h"
 #include "Content/Object/Actor/MonsterPawn.h"
 #include "Content/Object/Actor/Pawn.h"
+#include "Physics/Collider/CapsuleCollider.h"
 #include "Physics/Collider/SphereCollider.h"
 #include "Service/Room/Room.h"
 
@@ -14,9 +15,10 @@ namespace
 
     constexpr int32 BiteDamage = 40;
 
-    constexpr float BiteAttackRadius = 30.0f;
+    constexpr float BiteAttackRadius = 85.0f;
     
-    constexpr SE::Math::Vector3 AimOffset{120.061f, 9.240f, 87.555f};
+    constexpr SE::Math::Vector3 AttackStartOffset{65.0f, 0.0f, 80.0f};
+    constexpr SE::Math::Vector3 AttackEndOffset{170.0f, 0.0f, 80.0f};
 
     void ResetCombatReservation(BT::TreeNode& node)
     {
@@ -97,13 +99,14 @@ BT::NodeStatus CatBiteAttackNode::onRunning()
     if (!hitChecked_ && elapsedTime_ >= HitTiming) {
         hitChecked_ = true;
 
-        const SE::Math::Vector3 attackPos = selfNpc_->TransformLocalOffsetToWorld(AimOffset);
+        const SE::Math::Vector3 attackStart = selfNpc_->TransformLocalOffsetToWorld(AttackStartOffset);
+        const SE::Math::Vector3 attackEnd = selfNpc_->TransformLocalOffsetToWorld(AttackEndOffset);
 
         MeleeAttackDesc desc;
         desc.attackerId = selfNpc_->GetId();
         desc.attackType = CombatEventType::CatBite;
         desc.damage = BiteDamage;
-        SE::Physics::SphereCollider collider(attackPos, BiteAttackRadius);
+        SE::Physics::CapsuleCollider collider(attackStart, attackEnd, BiteAttackRadius);
         desc.collider = &collider;
 
         room->HandleMonsterMelee(desc);

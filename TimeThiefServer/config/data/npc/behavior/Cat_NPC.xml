@@ -78,7 +78,8 @@
                             <CatMoveTarget
                                     self_npc="{self_npc}"
                                     target_id="{target_id}"
-                                    target_pawn="{target_pawn}" />
+                                    target_pawn="{target_pawn}"
+                                    combat_mode="{combat_mode}" />
                         </Fallback>
                     </Sequence>
 

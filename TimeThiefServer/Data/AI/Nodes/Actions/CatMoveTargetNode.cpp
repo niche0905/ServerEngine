@@ -3,6 +3,7 @@
 #include "Data/AI/AiBlackboard.h"
 #include "Content/Object/Actor/MonsterPawn.h"
 #include "Content/Object/Actor/Pawn.h"
+#include "Data/GameDataManager.h"
 #include "Service/Room/Room.h"
 
 namespace BB = AiBlackboardKey;
@@ -19,6 +20,7 @@ namespace
 
     constexpr float ApproachSideAngle = 35.0f * Pi / 180.0f;
     constexpr float ApproachDistance = 180.0f;
+    constexpr float DirectApproachDistance = 120.0f;
     
     SE::Math::Vector3 Normalize2D(const SE::Math::Vector3& v)
     {
@@ -47,7 +49,8 @@ BT::PortsList CatMoveTargetNode::providedPorts()
     return {
         BT::InputPort<MonsterPawn*>(BB::SelfNpc),
         BT::OutputPort<ObjectId>(BB::TargetId),
-        BT::BidirectionalPort<Pawn*>(BB::TargetPawn)
+        BT::BidirectionalPort<Pawn*>(BB::TargetPawn),
+        BT::OutputPort<CombatEventType>(BB::CombatMode)
     };
 }
 
@@ -130,16 +133,23 @@ BT::NodeStatus CatMoveTargetNode::onRunning()
 
         const SE::Math::Vector3 targetToSelf = Normalize2D(selfPos - targetPos);
 
-        // 정면으로 꽂히지 않도록 살짝 좌/우로 비틀어서 접근
-        SE::Math::Vector3 approachDir =
+        // 정면으로 꽂히지 않도록 살짝 좌/우로 비틀어서 접근한다.
+        // 후보 지점이 NavMesh 밖이면 MoveTo 내부에서 StopMove만 되고 이 노드가
+        // RUNNING에 머무를 수 있으므로, 여기서 경로 생성까지 검증한다.
+        const SE::Math::Vector3 primaryDir =
             Rotate2D(targetToSelf, orbitSide_ * ApproachSideAngle);
+        const SE::Math::Vector3 secondaryDir =
+            Rotate2D(targetToSelf, -orbitSide_ * ApproachSideAngle);
 
-        moveGoal_ = targetPos + approachDir * ApproachDistance;
-        moveGoal_.z = targetPos.z;
-
-        // 여기서는 목적지만 넘긴다.
-        // SetMoveTarget 내부에서 FindPath 후 MoveAlongPath 호출.
-        selfNpc_->MoveTo(moveGoal_, MoveArriveDistance);
+        if (!TryMoveToGoal(selfPos, targetPos + primaryDir * ApproachDistance) &&
+            !TryMoveToGoal(selfPos, targetPos + secondaryDir * ApproachDistance) &&
+            !TryMoveToGoal(selfPos, targetPos + targetToSelf * DirectApproachDistance))
+        {
+            selfNpc_->StopMove();
+            setOutput<CombatEventType>(BB::CombatMode, CombatEventType::None);
+            orbitSide_ *= -1;
+            return BT::NodeStatus::FAILURE;
+        }
     }
 
     return BT::NodeStatus::RUNNING;
@@ -157,4 +167,35 @@ void CatMoveTargetNode::onHalted()
     lastTargetPos_ = {};
     elapsedRepath_ = 0.0f;
     orbitSide_ = 1;
+}
+
+bool CatMoveTargetNode::TryMoveToGoal(const SE::Math::Vector3& selfPos, const SE::Math::Vector3& goal)
+{
+    if (selfNpc_ == nullptr) {
+        return false;
+    }
+
+    auto room = selfNpc_->GetRoom();
+    if (room == nullptr || room->GetGameDataManager() == nullptr) {
+        return false;
+    }
+
+    const ServerMap& map = room->GetGameDataManager()->GetServerMap();
+
+    SE::Math::Vector3 desiredGoal = goal;
+    desiredGoal.z = goal.z;
+
+    SE::Math::Vector3 navGoal{};
+    if (!map.ProjectToNavMesh(desiredGoal, navGoal)) {
+        return false;
+    }
+
+    std::vector<SE::Math::Vector3> path;
+    if (map.FindPath(selfPos, navGoal, path) != NavPathResult::Success || path.empty()) {
+        return false;
+    }
+
+    moveGoal_ = navGoal;
+    selfNpc_->MoveAlongPath(std::move(path), MoveArriveDistance);
+    return true;
 }

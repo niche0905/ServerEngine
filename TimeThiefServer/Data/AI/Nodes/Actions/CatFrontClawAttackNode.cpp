@@ -3,6 +3,7 @@
 #include "Data/AI/AiBlackboard.h"
 #include "Content/Object/Actor/MonsterPawn.h"
 #include "Content/Object/Actor/Pawn.h"
+#include "Physics/Collider/CapsuleCollider.h"
 #include "Physics/Collider/SphereCollider.h"
 #include "Service/Room/Room.h"
 
@@ -14,9 +15,10 @@ namespace
 
     constexpr int32 ClawDamage = 25;
     
-    constexpr float ClawAttackRadius = 60.0f;
+    constexpr float ClawAttackRadius = 95.0f;
     
-    constexpr SE::Math::Vector3 AimOffset{142.731f, 4.982f, 101.268f};
+    constexpr SE::Math::Vector3 AttackStartOffset{75.0f, 0.0f, 90.0f};
+    constexpr SE::Math::Vector3 AttackEndOffset{195.0f, 0.0f, 90.0f};
 
     void ResetCombatReservation(BT::TreeNode& node)
     {
@@ -96,13 +98,14 @@ BT::NodeStatus CatFrontClawAttackNode::onRunning()
     if (!hitChecked_ && elapsedTime_ >= HitTiming) {
         hitChecked_ = true;
 
-        const SE::Math::Vector3 attackPos = selfNpc_->TransformLocalOffsetToWorld(AimOffset);
+        const SE::Math::Vector3 attackStart = selfNpc_->TransformLocalOffsetToWorld(AttackStartOffset);
+        const SE::Math::Vector3 attackEnd = selfNpc_->TransformLocalOffsetToWorld(AttackEndOffset);
 
         MeleeAttackDesc desc;
         desc.attackerId = selfNpc_->GetId();
         desc.attackType = CombatEventType::CatClaw;
         desc.damage = ClawDamage;
-        SE::Physics::SphereCollider collider(attackPos, ClawAttackRadius);
+        SE::Physics::CapsuleCollider collider(attackStart, attackEnd, ClawAttackRadius);
         desc.collider = &collider;
             
         room->HandleMonsterMelee(desc);

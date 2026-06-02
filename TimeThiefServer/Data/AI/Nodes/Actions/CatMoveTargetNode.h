@@ -17,6 +17,9 @@ public:
     void onHalted() override;
     
 private:
+    bool TryMoveToGoal(const SE::Math::Vector3& selfPos, const SE::Math::Vector3& goal);
+    
+private:
     MonsterPawn* selfNpc_ = nullptr;
     Pawn* targetPawn_ = nullptr;
 
