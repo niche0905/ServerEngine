@@ -10,5 +10,11 @@
     "name": "Cat_Monster",
     "bt_id": "Cat_MainTree",
     "bt_xml": "behavior/Cat_NPC.xml"
+  },
+  {
+    "npc_id": 3,
+    "name": "Minion",
+    "bt_id": "Minion_MainTree",
+    "bt_xml": "behavior/Minion_NPC.xml"
   }
 ]

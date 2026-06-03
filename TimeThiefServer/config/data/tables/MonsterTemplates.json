@@ -7,6 +7,14 @@
       "drop_point": 80,
       "respawn_time": 30,
       "loot_table": 1
+    },
+    {
+      "template_id": 3,
+      "name": "Minion",
+      "max_hp": 160,
+      "drop_point": 60,
+      "respawn_time": 30,
+      "loot_table": 1
     }
   ]
 }

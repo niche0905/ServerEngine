@@ -99,6 +99,12 @@
     <ClCompile Include="ThirdParty\UEDetour\DetourNavMesh.cpp" />
     <ClCompile Include="ThirdParty\UEDetour\DetourNavMeshQuery.cpp" />
     <ClCompile Include="ThirdParty\UEDetour\DetourNode.cpp" />
+    <ClCompile Include="Data\AI\Nodes\Actions\MinionIdleNode.cpp" />
+    <ClCompile Include="Data\AI\Nodes\Actions\MinionMeleeAttackNode.cpp" />
+    <ClCompile Include="Data\AI\Nodes\Actions\MinionMoveTargetNode.cpp" />
+    <ClCompile Include="Data\AI\Nodes\Actions\MinionReturnToSpawnNode.cpp" />
+    <ClCompile Include="Data\AI\Nodes\Conditions\MinionAcquireOrValidateTargetNode.cpp" />
+    <ClCompile Include="Data\AI\Nodes\Conditions\MinionIsTargetInMeleeRangeNode.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Content\Object\BaseObject.h" />
@@ -240,5 +246,11 @@
     <ClInclude Include="ThirdParty\UEDetour\DetourNode.h" />
     <ClInclude Include="ThirdParty\UEDetour\DetourStatus.h" />
     <ClInclude Include="ThirdParty\UEDetour\UEDetourCompat.h" />
+    <ClInclude Include="Data\AI\Nodes\Actions\MinionIdleNode.h" />
+    <ClInclude Include="Data\AI\Nodes\Actions\MinionMeleeAttackNode.h" />
+    <ClInclude Include="Data\AI\Nodes\Actions\MinionMoveTargetNode.h" />
+    <ClInclude Include="Data\AI\Nodes\Actions\MinionReturnToSpawnNode.h" />
+    <ClInclude Include="Data\AI\Nodes\Conditions\MinionAcquireOrValidateTargetNode.h" />
+    <ClInclude Include="Data\AI\Nodes\Conditions\MinionIsTargetInMeleeRangeNode.h" />
   </ItemGroup>
 </Project>

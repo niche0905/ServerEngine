@@ -101,6 +101,7 @@ void MonsterPawn::OnSpawn()
 
    switch (templateId_)
    {
+   case 3:     // minion
    case 2:     // cat
       {
          auto bodyCollider = std::make_unique<ColliderComponent>();

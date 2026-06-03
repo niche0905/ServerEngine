@@ -1,0 +1,43 @@
+<root BTCPP_format="4" main_tree_to_execute="Minion_MainTree">
+    <BehaviorTree ID="Minion_MainTree">
+        <ReactiveFallback>
+
+            <Sequence>
+                <MinionAcquireOrValidateTarget
+                        self_npc="{self_npc}"
+                        target_id="{target_id}"
+                        target_pawn="{target_pawn}"
+                        combat_mode="{combat_mode}" />
+
+                <Fallback>
+                    <Sequence>
+                        <MinionIsTargetInMeleeRange
+                                self_npc="{self_npc}"
+                                target_pawn="{target_pawn}"
+                                combat_mode="{combat_mode}" />
+
+                        <MinionMeleeAttack
+                                self_npc="{self_npc}"
+                                target_pawn="{target_pawn}"
+                                combat_mode="{combat_mode}" />
+                    </Sequence>
+
+                    <MinionMoveTarget
+                            self_npc="{self_npc}"
+                            target_id="{target_id}"
+                            target_pawn="{target_pawn}"
+                            combat_mode="{combat_mode}" />
+                </Fallback>
+            </Sequence>
+
+            <Sequence>
+                <MinionReturnToSpawn
+                        self_npc="{self_npc}" />
+
+                <MinionIdle
+                        self_npc="{self_npc}" />
+            </Sequence>
+
+        </ReactiveFallback>
+    </BehaviorTree>
+</root>

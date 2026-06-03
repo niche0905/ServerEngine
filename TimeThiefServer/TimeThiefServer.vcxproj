@@ -294,6 +294,10 @@
     <ClCompile Include="Data\AI\Nodes\Actions\CatMoveTargetNode.cpp" />
     <ClCompile Include="Data\AI\Nodes\Actions\CatMoveToCannonRangeNode.cpp" />
     <ClCompile Include="Data\AI\Nodes\Actions\CatPatrolAroundSpawnNode.cpp" />
+    <ClCompile Include="Data\AI\Nodes\Actions\MinionIdleNode.cpp" />
+    <ClCompile Include="Data\AI\Nodes\Actions\MinionMeleeAttackNode.cpp" />
+    <ClCompile Include="Data\AI\Nodes\Actions\MinionMoveTargetNode.cpp" />
+    <ClCompile Include="Data\AI\Nodes\Actions\MinionReturnToSpawnNode.cpp" />
     <ClCompile Include="Data\AI\Nodes\Actions\MoveTargetNode.cpp" />
     <ClCompile Include="Data\AI\Nodes\Actions\WaitForTargetNode.cpp" />
     <ClCompile Include="Data\AI\Nodes\AiNodeRegistry.cpp" />
@@ -307,6 +311,8 @@
     <ClCompile Include="Data\AI\Nodes\Conditions\CatIsTargetInCannonRangeNode.cpp" />
     <ClCompile Include="Data\AI\Nodes\Conditions\CatIsTargetInMeleeRangeNode.cpp" />
     <ClCompile Include="Data\AI\Nodes\Conditions\HaveTargetPlayerNode.cpp" />
+    <ClCompile Include="Data\AI\Nodes\Conditions\MinionAcquireOrValidateTargetNode.cpp" />
+    <ClCompile Include="Data\AI\Nodes\Conditions\MinionIsTargetInMeleeRangeNode.cpp" />
     <ClCompile Include="Data\GameDataManager.cpp" />
     <ClCompile Include="Data\Loader\ServerMapLoader.cpp" />
     <ClCompile Include="Data\Loader\ServerMapLoaderTest.cpp" />
@@ -612,6 +618,10 @@
     <ClInclude Include="Data\AI\Nodes\Actions\CatMoveTargetNode.h" />
     <ClInclude Include="Data\AI\Nodes\Actions\CatMoveToCannonRangeNode.h" />
     <ClInclude Include="Data\AI\Nodes\Actions\CatPatrolAroundSpawnNode.h" />
+    <ClInclude Include="Data\AI\Nodes\Actions\MinionIdleNode.h" />
+    <ClInclude Include="Data\AI\Nodes\Actions\MinionMeleeAttackNode.h" />
+    <ClInclude Include="Data\AI\Nodes\Actions\MinionMoveTargetNode.h" />
+    <ClInclude Include="Data\AI\Nodes\Actions\MinionReturnToSpawnNode.h" />
     <ClInclude Include="Data\AI\Nodes\Actions\MoveTargetNode.h" />
     <ClInclude Include="Data\AI\Nodes\Actions\WaitForTargetNode.h" />
     <ClInclude Include="Data\AI\Nodes\AiNodeRegistry.h" />
@@ -625,6 +635,8 @@
     <ClInclude Include="Data\AI\Nodes\Conditions\CatIsTargetInCannonRangeNode.h" />
     <ClInclude Include="Data\AI\Nodes\Conditions\CatIsTargetInMeleeRangeNode.h" />
     <ClInclude Include="Data\AI\Nodes\Conditions\HaveTargetPlayerNode.h" />
+    <ClInclude Include="Data\AI\Nodes\Conditions\MinionAcquireOrValidateTargetNode.h" />
+    <ClInclude Include="Data\AI\Nodes\Conditions\MinionIsTargetInMeleeRangeNode.h" />
     <ClInclude Include="Data\GameDataManager.h" />
     <ClInclude Include="Data\Loader\ServerMapLoader.h" />
     <ClInclude Include="Data\Loader\ServerMapLoaderTest.h" />
@@ -711,6 +723,7 @@
     <Content Include="config\data\map\placements\InteractionSpawnLocations.json" />
     <Content Include="config\data\map\placements\MonsterSpawnLocations.json" />
     <Content Include="config\data\npc\behavior\Cat_NPC.xml" />
+    <Content Include="config\data\npc\behavior\Minion_NPC.xml" />
     <Content Include="config\data\npc\behavior\Test_NPC.xml" />
     <Content Include="config\data\npc\NpcAiTable.json" />
     <Content Include="config\data\tables\LootTables.json" />

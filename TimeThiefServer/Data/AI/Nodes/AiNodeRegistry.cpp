@@ -7,6 +7,10 @@
 #include "Actions/CatMoveTargetNode.h"
 #include "Actions/CatMoveToCannonRangeNode.h"
 #include "Actions/CatPatrolAroundSpawnNode.h"
+#include "Actions/MinionIdleNode.h"
+#include "Actions/MinionMeleeAttackNode.h"
+#include "Actions/MinionMoveTargetNode.h"
+#include "Actions/MinionReturnToSpawnNode.h"
 #include "Actions/MoveTargetNode.h"
 #include "Actions/WaitForTargetNode.h"
 #include "Conditions/CatAcquireOrValidateTargetNode.h"
@@ -19,6 +23,8 @@
 #include "Conditions/CatIsTargetInCannonRangeNode.h"
 #include "Conditions/CatIsTargetInMeleeRangeNode.h"
 #include "Conditions/HaveTargetPlayerNode.h"
+#include "Conditions/MinionAcquireOrValidateTargetNode.h"
+#include "Conditions/MinionIsTargetInMeleeRangeNode.h"
 
 namespace AiNodeRegistry
 {
@@ -51,6 +57,14 @@ namespace AiNodeRegistry
         factory.registerNodeType<CatMoveTargetNode>("CatMoveTarget");
         factory.registerNodeType<CatPatrolAroundSpawnNode>("CatPatrolAroundSpawn");
         factory.registerNodeType<CatIdleNode>("CatIdle");
+
+        // Minion 노드 등록
+        factory.registerNodeType<MinionAcquireOrValidateTargetNode>("MinionAcquireOrValidateTarget");
+        factory.registerNodeType<MinionIsTargetInMeleeRangeNode>("MinionIsTargetInMeleeRange");
+        factory.registerNodeType<MinionIdleNode>("MinionIdle");
+        factory.registerNodeType<MinionMeleeAttackNode>("MinionMeleeAttack");
+        factory.registerNodeType<MinionMoveTargetNode>("MinionMoveTarget");
+        factory.registerNodeType<MinionReturnToSpawnNode>("MinionReturnToSpawn");
         
     }
 }

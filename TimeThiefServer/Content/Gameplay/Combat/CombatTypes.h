@@ -31,6 +31,10 @@ enum class CombatEventType
     CatCannonCastStart,
     CatCannonFire,
     CatCannonCancel,
+
+    MinionMelee,
+    MinionLeftAttack,
+    MinionRightAttack,
     
 };
 
