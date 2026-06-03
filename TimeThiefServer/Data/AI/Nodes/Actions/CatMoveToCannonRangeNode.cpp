@@ -22,6 +22,8 @@ namespace
     constexpr float RepathInterval = 0.35f;
     constexpr float TargetMoveRepathDistance = 150.0f;
     constexpr float TargetMoveRepathDistanceSq = TargetMoveRepathDistance * TargetMoveRepathDistance;
+    constexpr float SideSearchAngle = 35.0f * Pi / 180.0f;
+    constexpr float WideSideSearchAngle = 70.0f * Pi / 180.0f;
 
     SE::Math::Vector3 Normalize2D(const SE::Math::Vector3& v)
     {
@@ -77,14 +79,8 @@ BT::NodeStatus CatMoveToCannonRangeNode::onStart()
         return BT::NodeStatus::FAILURE;
     }
 
-    const auto selfPos = selfNpc_->GetPosition();
     const auto targetPos = targetPawn_->GetPosition();
 
-    const auto toTarget = targetPos - selfPos;
-    const auto dirToTarget = Normalize2D(toTarget);
-
-    // 처음에는 현재 위치 기준으로 좌/우 중 하나를 고정.
-    // 랜덤으로 해도 되고, NPC id 기반으로 나눠도 됨.
     orbitSide_ = (selfNpc_->GetId().value % 2 == 0) ? 1 : -1;
 
     lastTargetPos_ = targetPos;
@@ -107,8 +103,6 @@ BT::NodeStatus CatMoveToCannonRangeNode::onRunning()
     if (room == nullptr) {
         return BT::NodeStatus::FAILURE;
     }
-
-    const ServerMap& map = room->GetGameDataManager()->GetServerMap();
 
     const SE::Math::Vector3 selfPos = selfNpc_->GetPosition();
     const SE::Math::Vector3 targetPos = targetPawn_->GetPosition();
@@ -144,78 +138,32 @@ BT::NodeStatus CatMoveToCannonRangeNode::onRunning()
 
         const SE::Math::Vector3 targetToSelf = Normalize2D(selfPos - targetPos);
 
-        // 직선 후퇴 지점이 아니라, 좌/우로 비튼 사냥 위치.
-        // 60도 정도 비틀면 원을 그리며 붙는 느낌이 남.
-        const float orbitAngle = orbitSide_ * 60.0f * Pi / 180.0f;
+        // 원거리 모드는 플레이어 주변을 계속 도는 대신, 현재 방위의 사격 거리로 안정적으로 이동한다.
+        // 직선 지점이 막힌 경우에만 좌/우 후보를 제한적으로 시도한다.
+        const SE::Math::Vector3 directGoal = targetPos + targetToSelf * CannonDesiredDistance;
+        const SE::Math::Vector3 sideGoal =
+            targetPos + Rotate2D(targetToSelf, orbitSide_ * SideSearchAngle) * CannonDesiredDistance;
+        const SE::Math::Vector3 oppositeSideGoal =
+            targetPos + Rotate2D(targetToSelf, -orbitSide_ * SideSearchAngle) * CannonDesiredDistance;
+        const SE::Math::Vector3 wideSideGoal =
+            targetPos + Rotate2D(targetToSelf, orbitSide_ * WideSideSearchAngle) * CannonDesiredDistance;
+        const SE::Math::Vector3 oppositeWideSideGoal =
+            targetPos + Rotate2D(targetToSelf, -orbitSide_ * WideSideSearchAngle) * CannonDesiredDistance;
 
-        SE::Math::Vector3 orbitDir = Rotate2D(targetToSelf, orbitAngle);
-
-        SE::Math::Vector3 desiredPos =
-            targetPos + orbitDir * CannonDesiredDistance;
-
-        desiredPos.z = targetPos.z;
-
-        SE::Math::Vector3 navPos{};
-        if (!map.ProjectToNavMesh(desiredPos, navPos))
+        if (!TryMoveToGoal(selfPos, directGoal) &&
+            !TryMoveToGoal(selfPos, sideGoal) &&
+            !TryMoveToGoal(selfPos, oppositeSideGoal) &&
+            !TryMoveToGoal(selfPos, wideSideGoal) &&
+            !TryMoveToGoal(selfPos, oppositeWideSideGoal))
         {
-            if (distSq <= CannonFireRangeSq) {
+            if (distSq <= CannonFireRangeSq && CanShootTarget(selfNpc_, targetPawn_)) {
                 selfNpc_->StopMove();
                 return BT::NodeStatus::SUCCESS;
             }
 
-            // 한쪽이 막혔으면 반대쪽도 시도
-            orbitSide_ *= -1;
-
-            orbitDir = Rotate2D(targetToSelf, -orbitAngle);
-            desiredPos = targetPos + orbitDir * CannonDesiredDistance;
-            desiredPos.z = targetPos.z;
-
-            if (!map.ProjectToNavMesh(desiredPos, navPos)) {
-                if (distSq <= CannonFireRangeSq) {
-                    selfNpc_->StopMove();
-                    return BT::NodeStatus::SUCCESS;
-                }
-
-                return BT::NodeStatus::FAILURE;
-            }
+            selfNpc_->StopMove();
+            return BT::NodeStatus::FAILURE;
         }
-
-        std::vector<SE::Math::Vector3> path;
-        if (map.FindPath(selfPos, navPos, path) != NavPathResult::Success)
-        {
-            if (distSq <= CannonFireRangeSq) {
-                selfNpc_->StopMove();
-                return BT::NodeStatus::SUCCESS;
-            }
-
-            orbitSide_ *= -1;
-
-            orbitDir = Rotate2D(targetToSelf, -orbitAngle);
-            desiredPos = targetPos + orbitDir * CannonDesiredDistance;
-            desiredPos.z = targetPos.z;
-
-            if (!map.ProjectToNavMesh(desiredPos, navPos)) {
-                if (distSq <= CannonFireRangeSq) {
-                    selfNpc_->StopMove();
-                    return BT::NodeStatus::SUCCESS;
-                }
-
-                return BT::NodeStatus::FAILURE;
-            }
-
-            path.clear();
-            if (map.FindPath(selfPos, navPos, path) != NavPathResult::Success) {
-                if (distSq <= CannonFireRangeSq) {
-                    selfNpc_->StopMove();
-                    return BT::NodeStatus::SUCCESS;
-                }
-
-                return BT::NodeStatus::FAILURE;
-            }
-        }
-
-        moveGoal_ = navPos;
-        selfNpc_->MoveAlongPath(std::move(path), ArriveDistance);
     }
 
     if ((moveGoal_ - selfPos).LengthSq() <= ArriveDistanceSq)
@@ -268,4 +216,35 @@ bool CatMoveToCannonRangeNode::CanShootTarget(MonsterPawn* selfPawn, Pawn* targe
     return room->GetRoomGameSystem()
         .GetCombatSystem()
         .CanSeeTarget(ray);
+}
+
+bool CatMoveToCannonRangeNode::TryMoveToGoal(const SE::Math::Vector3& selfPos, const SE::Math::Vector3& goal)
+{
+    if (selfNpc_ == nullptr) {
+        return false;
+    }
+
+    auto room = selfNpc_->GetRoom();
+    if (room == nullptr || room->GetGameDataManager() == nullptr) {
+        return false;
+    }
+
+    const ServerMap& map = room->GetGameDataManager()->GetServerMap();
+
+    SE::Math::Vector3 desiredGoal = goal;
+    desiredGoal.z = goal.z;
+
+    SE::Math::Vector3 navGoal{};
+    if (!map.ProjectToNavMesh(desiredGoal, navGoal)) {
+        return false;
+    }
+
+    std::vector<SE::Math::Vector3> path;
+    if (map.FindPath(selfPos, navGoal, path) != NavPathResult::Success || path.empty()) {
+        return false;
+    }
+
+    moveGoal_ = navGoal;
+    selfNpc_->MoveAlongPath(std::move(path), ArriveDistance);
+    return true;
 }
