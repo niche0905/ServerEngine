@@ -135,11 +135,17 @@ bool ServerConfigReader::ParseJsonText(const std::string& jsonText, const std::f
       if (game.isMember("economy")) {
          const Json::Value& economy = game["economy"];
 
+         if (economy.isMember("initial_time_point"))
+            newConfig.game.economy.initialTimePoint = std::max(0, economy["initial_time_point"].asInt());
+
          if (economy.isMember("respawn_cost_time_point"))
             newConfig.game.economy.respawnCostTimePoint = std::max(0, economy["respawn_cost_time_point"].asInt());
 
          if (economy.isMember("player_kill_robbery_time_point"))
             newConfig.game.economy.playerKillRobberyTimePoint = std::max(0, economy["player_kill_robbery_time_point"].asInt());
+
+         if (economy.isMember("zone_damage_time_point_multiplier"))
+            newConfig.game.economy.zoneDamageTimePointMultiplier = std::max(1, economy["zone_damage_time_point_multiplier"].asInt());
 
          if (economy.isMember("chest_money_reward_min"))
             newConfig.game.economy.chestMoneyRewardMin = std::max(0, economy["chest_money_reward_min"].asInt());

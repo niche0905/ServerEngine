@@ -1803,7 +1803,10 @@ ObjectId Room::GetObjectId(PlayerId playerId) const
 
 PlayerPawn* Room::CreatePreparedPlayerPawn(PlayerId playerId, const Vector3& spawnPos)
 {
-   auto playerPawn = SpawnObject<PlayerPawn>(ObjectFlags::Replicable | ObjectFlags::Tickable);
+   auto playerPawn = SpawnObject<PlayerPawn>(
+      ObjectFlags::Replicable | ObjectFlags::Tickable,
+      gameConfig_.economy.initialTimePoint,
+      gameConfig_.economy.zoneDamageTimePointMultiplier);
    if (!playerPawn) {
       return nullptr;
    }

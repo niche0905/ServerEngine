@@ -64,14 +64,12 @@ namespace
 
 int32 PlayerPawn::ResolveIncomingDamage(int32 amount, const DamageContext& ctx)
 {
-   constexpr int32 kMultiplierForZoneDamage = 10;   // TEMP: 존 데미지에 대한 데미지 배율 (예: 1 데미지당 10 화폐 삭제)
-   
    if (ctx.type == DamageType::Zone) {
       auto room = GetRoom();
       if (!room)
          return amount;   // 방이 없는 경우에는 존 데미지 처리하지 않음
       
-      const int32 deleteMoney = amount * kMultiplierForZoneDamage;
+      const int32 deleteMoney = amount * zoneDamageTimePointMultiplier_;
       
       
       if (CanSpend(CurrencyType::TimePoint, deleteMoney)) {
@@ -90,7 +88,7 @@ int32 PlayerPawn::ResolveIncomingDamage(int32 amount, const DamageContext& ctx)
            .reason = MoneyChangeReason::ZoneDamage,
         });
       int64 remainDelete = deleteMoney - currentMoney;
-      int32 remainAmount = static_cast<int32>((remainDelete + kMultiplierForZoneDamage - 1) / kMultiplierForZoneDamage);
+      int32 remainAmount = static_cast<int32>((remainDelete + zoneDamageTimePointMultiplier_ - 1) / zoneDamageTimePointMultiplier_);
       
       return remainAmount;   // 존 데미지로 삭제할 재화가 부족해서 체력에도 데미지를 줘야 하는 경우 남은 데미지 양 반환
    }
@@ -337,8 +335,7 @@ void PlayerPawn::OnSpawn()
    respawn_.Init(this, RespawnPolicy{});
    inventory_.Init(this, 20);
    wallet_.Init(this);     
-   wallet_.SetBalanceUnsafe(CurrencyType::TimePoint, 1000);      // TEMP: 초기 재화 1000
-                                                                        // TODO: 이 값 Config로 빼기
+   wallet_.SetBalanceUnsafe(CurrencyType::TimePoint, initialTimePoint_);
    skill_.Init(this);
    upgrade_.Init(this);
    

@@ -1,4 +1,5 @@
 ﻿#pragma once
+#include <algorithm>
 #include "Pawn.h"
 #include "Content/Gameplay/Combat/PlayerCombatComponent.h"
 #include "Content/Gameplay/Economy/IWalletOwner.h"
@@ -26,6 +27,11 @@ class PlayerPawn : public Pawn
 {
 public:
     PlayerPawn() = default;
+    PlayerPawn(int32 initialTimePoint, int32 zoneDamageTimePointMultiplier)
+        : initialTimePoint_(initialTimePoint)
+        , zoneDamageTimePointMultiplier_(std::max(1, zoneDamageTimePointMultiplier))
+    {
+    }
     virtual ~PlayerPawn() = default;
     
     PlayerPawn(const PlayerPawn&) = delete;
@@ -178,6 +184,8 @@ private:
     
     int32                       speed_{};
     int32                       respawnCostTimePoint_{100};
+    int32                       initialTimePoint_{1000};
+    int32                       zoneDamageTimePointMultiplier_{10};
     
     ActionState                 actionState_{};
     

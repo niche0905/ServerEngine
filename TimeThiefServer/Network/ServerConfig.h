@@ -28,8 +28,10 @@ struct DataFilesConfig
 
 struct EconomyConfig
 {
+    int32 initialTimePoint = 1000;            // 플레이어 초기 재화
     int32 respawnCostTimePoint = 100;        // 리스폰 비용
     int32 playerKillRobberyTimePoint = 100;  // 플레이어 처치 시 강탈량
+    int32 zoneDamageTimePointMultiplier = 10; // 존 데미지 1당 차감할 재화
     int32 chestMoneyRewardMin = 60;          // 상자 화폐 보상 최소값
     int32 chestMoneyRewardMax = 120;         // 상자 화폐 보상 최대값
 };

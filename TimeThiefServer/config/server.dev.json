@@ -26,8 +26,10 @@
         "room_tick_interval_ms": 25,
         "zone_damage_tick_interval": 1.0,
         "economy": {
+            "initial_time_point": 1000,
             "respawn_cost_time_point": 200,
             "player_kill_robbery_time_point": 100,
+            "zone_damage_time_point_multiplier": 10,
             "chest_money_reward_min": 60,
             "chest_money_reward_max": 120
         },
