@@ -73,6 +73,7 @@ private:
    void FlushEvent_GrenadeExplosion(const RepEvent& ev, const RepFrame& frame) const;
    void FlushEvent_Attack(const RepEvent& ev, const RepFrame& frame) const;
    void FlushEvent_MonsterFire(const RepEvent& ev, const RepFrame& frame) const;
+   void FlushEvent_MonsterImpact(const RepEvent& ev, const RepFrame& frame) const;
    void FlushEvent_WeaponStatChange(const RepEvent& ev, const RepFrame& frame) const;
    void FlushEvent_KillPlayer(const RepEvent& ev, const RepFrame& frame) const;
    void FlushEvent_ZoneChange(const RepEvent& ev, const RepFrame& frame) const;

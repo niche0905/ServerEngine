@@ -273,6 +273,10 @@ void ReplicationSystem::DispatchImmediateEvent(const RepEvent& ev, const RepFram
    case RepEventType::MonsterFire:
       FlushEvent_MonsterFire(ev, frame);
       break;
+
+   case RepEventType::MonsterImpact:
+      FlushEvent_MonsterImpact(ev, frame);
+      break;
       
    case RepEventType::WeaponStatChange:
       FlushEvent_WeaponStatChange(ev, frame);
@@ -913,6 +917,27 @@ void ReplicationSystem::FlushEvent_MonsterFire(const RepEvent& ev, const RepFram
    dirPtr->set_z(monsterFireEv->direction.z);
    noti.set_range(monsterFireEv->range);
    
+   SendBufferRef sendBuffer = ServerPacketHandler::MakeSendBuffer(noti);
+   ownerRoom_->BroadcastReplication(sendBuffer);
+}
+
+void ReplicationSystem::FlushEvent_MonsterImpact(const RepEvent& ev, const RepFrame& frame) const
+{
+   const MonsterImpactEvent* monsterImpactEv = std::get_if<MonsterImpactEvent>(&ev.payload);
+   if (!monsterImpactEv) {
+      consoleLogger->Log(Color::Yellow, L"[ReplicationSystem] MonsterImpact event with invalid payload, skipping. objectId={}", ev.header.source.value);
+      return;
+   }
+
+   se::game::N_MonsterImpact noti;
+   auto* entityIdPtr = noti.mutable_entity_id();
+   entityIdPtr->set_value(ev.header.source.value);
+   noti.set_attack_type(monsterImpactEv->attackId);
+   auto* positionPtr = noti.mutable_position();
+   positionPtr->set_x(monsterImpactEv->position.x);
+   positionPtr->set_y(monsterImpactEv->position.y);
+   positionPtr->set_z(monsterImpactEv->position.z);
+
    SendBufferRef sendBuffer = ServerPacketHandler::MakeSendBuffer(noti);
    ownerRoom_->BroadcastReplication(sendBuffer);
 }

@@ -50,6 +50,7 @@ enum class RepEventType : uint8
     
     Attack,
     MonsterFire,
+    MonsterImpact,
     
     WeaponStatChange,       // 무기 스탯 변경 이벤트 (무기 ID, 변경된 스탯과 그 값 등 포함)
     
@@ -209,6 +210,12 @@ struct MonsterFireEvent
     float range{0};
 };
 
+struct MonsterImpactEvent
+{
+    uint32 attackId{0};
+    SE::Math::Vector3 position{};
+};
+
 struct AimChangedEvent
 {
     bool isAimed{false};
@@ -256,6 +263,7 @@ using RepEventPayload = std::variant<
     GrenadeExplosionEvent,
     AttackEvent,
     MonsterFireEvent,
+    MonsterImpactEvent,
     WeaponChangedEvent,
     AimChangedEvent,
     WeaponStatChangeEvent,

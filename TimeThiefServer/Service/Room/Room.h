@@ -243,6 +243,7 @@ public:
    void NotifyExplosion(ObjectId sourceId, ObjectId ownerId, const Vector3& pos, float radius);
    void NotifyCombatEvent(ObjectId objectId, CombatEventType combatEvent);
    void NotifyMonsterFire(ObjectId monsterId, CombatEventType eventType, const Vector3& origin, const Vector3& direction, float range);
+   void NotifyMonsterImpact(ObjectId monsterId, CombatEventType eventType, const Vector3& position);
    void NotifyThrowGrenade(ObjectId ownerId, ObjectId grenadeId, uint32 grenadeType, const Vector3& pos, const Vector3& dir);
    void NotifyGrenadeMoveSync(PlayerId ownerId, ObjectId grenadeId, const Vector3& newPos, const Vector3& newRotate, const Vector3& newVel);
    void NotifyGrenadeExplosion(PlayerId ownerId, ObjectId grenadeId, const Vector3& exPos);

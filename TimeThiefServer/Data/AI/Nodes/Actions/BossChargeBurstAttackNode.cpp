@@ -91,13 +91,14 @@ BT::NodeStatus BossChargeBurstAttackNode::onRunning()
     if (!exploded_ && elapsedTime_ >= ExplosionTiming) {
         exploded_ = true;
 
-        room->NotifyCombatEvent(selfNpc_->GetId(), CombatEventType::BossBurstExplode);
+        const SE::Math::Vector3 impactPos = selfNpc_->GetPosition();
+        room->NotifyMonsterImpact(selfNpc_->GetId(), CombatEventType::BossBurstExplode, impactPos);
 
         MeleeAttackDesc desc;
         desc.attackerId = selfNpc_->GetId();
         desc.attackType = CombatEventType::BossBurstExplode;
         desc.damage = BurstDamage;
-        SE::Physics::SphereCollider collider(selfNpc_->GetPosition() + SE::Math::Vector3{0.0f, 0.0f, 90.0f}, BurstRadius);
+        SE::Physics::SphereCollider collider(impactPos + SE::Math::Vector3{0.0f, 0.0f, 90.0f}, BurstRadius);
         desc.collider = &collider;
 
         room->HandleMonsterMelee(desc);

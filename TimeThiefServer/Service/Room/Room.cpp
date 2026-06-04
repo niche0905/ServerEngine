@@ -2303,6 +2303,16 @@ void Room::NotifyMonsterFire(ObjectId monsterId, CombatEventType eventType, cons
    roomGameSystem_.GetReplicationSystem().PushEvent(monsterFireEvent);
 }
 
+void Room::NotifyMonsterImpact(ObjectId monsterId, CombatEventType eventType, const Vector3& position)
+{
+   RepEvent monsterImpactEvent;
+   ReplicateEventSet(monsterImpactEvent, RepEventType::MonsterImpact);
+   monsterImpactEvent.header.source = monsterId;
+   monsterImpactEvent.payload = MonsterImpactEvent{static_cast<uint32>(eventType), position};
+
+   roomGameSystem_.GetReplicationSystem().PushEvent(monsterImpactEvent);
+}
+
 void Room::NotifyThrowGrenade(ObjectId ownerId, ObjectId grenadeId, uint32 grenadeType, const Vector3& pos,
    const Vector3& dir)
 {
