@@ -98,6 +98,11 @@ BT::NodeStatus CatPatrolAroundSpawnNode::onRunning()
         }
     }
 
+    auto* navQueryContext = room->GetNavigationQueryContext();
+    if (navQueryContext == nullptr) {
+        return BT::NodeStatus::FAILURE;
+    }
+
     const ServerMap& map = room->GetGameDataManager()->GetServerMap();
     const SE::Math::Vector3 spawnPos = selfNpc_->GetSavedRespawnPosition();
 
@@ -107,12 +112,12 @@ BT::NodeStatus CatPatrolAroundSpawnNode::onRunning()
             RandomPointInCircle(spawnPos, PatrolRadius);
 
         SE::Math::Vector3 navPos{};
-        if (!map.ProjectToNavMesh(randomPos, navPos)) {
+        if (!map.ProjectToNavMesh(*navQueryContext, randomPos, navPos)) {
             continue;
         }
 
         std::vector<SE::Math::Vector3> path;
-        if (map.FindPath(selfPos, navPos, path) != NavPathResult::Success) {
+        if (map.FindPath(*navQueryContext, selfPos, navPos, path) != NavPathResult::Success) {
             continue;
         }
 

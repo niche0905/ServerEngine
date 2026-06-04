@@ -145,15 +145,20 @@ bool MinionMoveTargetNode::TryMoveToGoal(const SE::Math::Vector3& goal)
         return false;
     }
 
+    auto* navQueryContext = room->GetNavigationQueryContext();
+    if (navQueryContext == nullptr) {
+        return false;
+    }
+
     const ServerMap& map = room->GetGameDataManager()->GetServerMap();
 
     SE::Math::Vector3 navGoal{};
-    if (!map.ProjectToNavMesh(goal, navGoal)) {
+    if (!map.ProjectToNavMesh(*navQueryContext, goal, navGoal)) {
         return false;
     }
 
     std::vector<SE::Math::Vector3> path;
-    if (map.FindPath(selfNpc_->GetPosition(), navGoal, path) != NavPathResult::Success || path.empty()) {
+    if (map.FindPath(*navQueryContext, selfNpc_->GetPosition(), navGoal, path) != NavPathResult::Success || path.empty()) {
         return false;
     }
 

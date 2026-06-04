@@ -250,14 +250,21 @@ void Room::Close()
 bool Room::Init(GameShard* ownerShard, const GameDataManager& gameDataManager, const GameConfig& gameConfig)
 {
    ownerShard_ = ownerShard;
+   gameDataManager_ = &gameDataManager;
    gameConfig_ = gameConfig;
    
    if (!roomGameSystem_.Init(this, gameDataManager, gameConfig_))
       return false;
    
-   gameDataManager_ = &gameDataManager;
-   
    return true;
+}
+
+SE::Nav::ServerNavigation::QueryContext* Room::GetNavigationQueryContext() const
+{
+   if (ownerShard_ == nullptr)
+      return nullptr;
+
+   return &ownerShard_->GetNavigationQueryContext();
 }
 
 void Room::SetPlayer(const std::vector<PlayerId>& playerIds, const std::vector<std::string>& playerNames)

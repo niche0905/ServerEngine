@@ -22,10 +22,14 @@ GameShard::GameShard(ShardId shardId, SessionManager& sessionManager, RoomDirect
    , roomTickIntervalMs_{ config.roomTickIntervalMs }
 {
    aiManager_.Init(gameDataManager_.GetNpcAiTable());
+   navQueryContext_.Init(gameDataManager_.GetServerMap().GetNavigation());
 }
 
 bool GameShard::Start(ThreadManager& threadManager)
 {
+   if (!navQueryContext_.IsValid())
+      return false;
+
    bool expected = false;
    if (!running_.compare_exchange_strong(expected, true))
       return false;

@@ -4,6 +4,7 @@
 #include <functional>
 
 #include "Data/AI/AiManager.h"
+#include "Data/Navigation/ServerNavigation.h"
 #include "Service/Timer/TimerTask.h"
 #include "Service/Timer/TimerQueue.h"
 #include "Service/Job/JobQueue.h"
@@ -54,6 +55,7 @@ public:
    size_t GetRoomCount() const;
    
    ShardId GetShardId() const { return shardId_; }
+   SE::Nav::ServerNavigation::QueryContext& GetNavigationQueryContext() { return navQueryContext_; }
    
 public:
    TimerId ScheduleAt(TimePoint executeAt, Job job);
@@ -84,6 +86,7 @@ private:
    
    ShardRoomManager        shardRoomManager_{};
    AiManager               aiManager_{};
+   SE::Nav::ServerNavigation::QueryContext navQueryContext_{};
    RoomTickScheduler       roomScheduler_{};
    JobQueue                jobQueue_{};
    TimerQueue              timerQueue_{};

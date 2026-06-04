@@ -53,6 +53,8 @@ private:
 private:
    std::shared_ptr<ServiceBase>                    networkService_;
    std::unique_ptr<ServerConfigReader>             configReader_;
+   GameDataManager                                 gameDataManager_{};
+
    std::unique_ptr<RoomDirectory>                  roomDirectory_;
    std::unique_ptr<MatchMaker>                     matchMaker_;
    std::unique_ptr<SessionManager>                 sessionManager_;
@@ -62,7 +64,6 @@ private:
    std::unique_ptr<PlayerSessionLifecycleService>  playerSessionLifecycleService_;
    
    ThreadManager                                   threadManager_{};
-   GameDataManager                                 gameDataManager_{};
    
    RoomIdGenerator                                 roomIdGenerator_{};
    

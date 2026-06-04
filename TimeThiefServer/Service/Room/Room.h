@@ -5,6 +5,7 @@
 #include "Content/Object/ObjectId.h"
 #include "Content/Gameplay/Combat/DamageTypes.h"
 #include "Content/Object/ObjectManager.h"
+#include "Data/Navigation/ServerNavigation.h"
 #include "Generated/ServerPacketHandler.h"
 #include "Network/ServerConfig.h"
 #include "Systems/RoomGameSystem.h"
@@ -184,6 +185,7 @@ public:
    void SetRoomState(RoomState state) { roomState_ = state; }
    
    const GameDataManager* GetGameDataManager() const { return gameDataManager_; }
+   SE::Nav::ServerNavigation::QueryContext* GetNavigationQueryContext() const;
    const GameConfig& GetGameConfig() const { return gameConfig_; }
    
 public:

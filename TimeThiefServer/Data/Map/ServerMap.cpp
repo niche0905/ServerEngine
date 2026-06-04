@@ -340,33 +340,33 @@ bool ServerMap::IsInsideStaticGeometry(const SE::Math::Vector3& point) const
    return false;
 }
 
-bool ServerMap::FindNearestPoly(const SE::Math::Vector3& pos, const SE::Math::Vector3& halfExtents, dtPolyRef& outRef,
+bool ServerMap::FindNearestPoly(SE::Nav::ServerNavigation::QueryContext& queryContext, const SE::Math::Vector3& pos, const SE::Math::Vector3& halfExtents, dtPolyRef& outRef,
                                 SE::Math::Vector3& outNearest) const
 {
-   return navigation_.FindNearestPoly(pos, halfExtents, outRef, outNearest);
+   return navigation_.FindNearestPoly(queryContext, pos, halfExtents, outRef, outNearest);
 }
 
-NavPathResult  ServerMap::FindPath(const SE::Math::Vector3& start, const SE::Math::Vector3& end,
+NavPathResult  ServerMap::FindPath(SE::Nav::ServerNavigation::QueryContext& queryContext, const SE::Math::Vector3& start, const SE::Math::Vector3& end,
    std::vector<SE::Math::Vector3>& outPath) const
 {
-   return navigation_.FindPath(start, end, outPath);
+   return navigation_.FindPath(queryContext, start, end, outPath);
 }
 
-bool ServerMap::IsReachablePosition(const SE::Math::Vector3& start, const SE::Math::Vector3& end,
+bool ServerMap::IsReachablePosition(SE::Nav::ServerNavigation::QueryContext& queryContext, const SE::Math::Vector3& start, const SE::Math::Vector3& end,
    const SE::Math::Vector3& halfExtents) const
 {
-   return navigation_.IsReachablePosition(start, end, halfExtents);
+   return navigation_.IsReachablePosition(queryContext, start, end, halfExtents);
 }
 
-bool ServerMap::ProjectToNavMesh(const SE::Math::Vector3& pos, SE::Math::Vector3& outPos) const
+bool ServerMap::ProjectToNavMesh(SE::Nav::ServerNavigation::QueryContext& queryContext, const SE::Math::Vector3& pos, SE::Math::Vector3& outPos) const
 {
-   return navigation_.ProjectToNavMesh(pos, outPos);
+   return navigation_.ProjectToNavMesh(queryContext, pos, outPos);
 }
 
-bool ServerMap::MoveAlongSurface(const SE::Math::Vector3& start, const SE::Math::Vector3& end,
+bool ServerMap::MoveAlongSurface(SE::Nav::ServerNavigation::QueryContext& queryContext, const SE::Math::Vector3& start, const SE::Math::Vector3& end,
    SE::Math::Vector3& outPos) const
 {
-   return navigation_.MoveAlongSurface(start, end, outPos);
+   return navigation_.MoveAlongSurface(queryContext, start, end, outPos);
 }
 
 bool ServerMap::TryPushOutStaticGeometry(const SE::Math::Vector3& point, SE::Math::Vector3& pushedPos) const

@@ -48,11 +48,14 @@ BT::NodeStatus CatDecideCombatModeNode::tick()
         return BT::NodeStatus::FAILURE;
     
     const ServerMap& map = gameDataManager->GetServerMap();
+    auto* navQueryContext = room->GetNavigationQueryContext();
+    if (navQueryContext == nullptr)
+        return BT::NodeStatus::FAILURE;
     
     const auto& selfPos = selfNpc->GetPosition();
     const auto& targetPos = targetPawn->GetPosition() - SE::Math::Vector3{0.0f, 0.0f, 90.0f};   // TEMP
     
-    const bool isReachable = map.IsReachablePosition(selfPos, targetPos, SE::Math::Vector3{200.0f, 200.0f, 300.0f});
+    const bool isReachable = map.IsReachablePosition(*navQueryContext, selfPos, targetPos, SE::Math::Vector3{200.0f, 200.0f, 300.0f});
     
     if (not isReachable) {
         setOutput<CombatEventType>(BB::CombatMode, CombatEventType::CatRange);

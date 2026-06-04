@@ -29,6 +29,27 @@ namespace SE::Nav
    class ServerNavigation
    {
    public:
+      class QueryContext
+      {
+         friend class ServerNavigation;
+
+      public:
+         QueryContext() = default;
+         ~QueryContext();
+
+         QueryContext(const QueryContext&) = delete;
+         QueryContext& operator=(const QueryContext&) = delete;
+
+         bool Init(const ServerNavigation& navigation);
+         void Release();
+         bool IsValid() const { return navQuery_ != nullptr && filter_ != nullptr; }
+
+      private:
+         dtNavMeshQuery*               navQuery_ = nullptr;
+         dtQueryFilter*                filter_ = nullptr;
+      };
+
+   public:
       ServerNavigation() = default;
       ~ServerNavigation();
       
@@ -37,18 +58,18 @@ namespace SE::Nav
       
       bool LoadFromFile(const std::filesystem::path& filePath);
       
-      bool FindNearestPoly(const SE::Math::Vector3& pos, const SE::Math::Vector3& halfExtents, dtPolyRef& outRef, SE::Math::Vector3& outNearest) const;
+      bool FindNearestPoly(QueryContext& queryContext, const SE::Math::Vector3& pos, const SE::Math::Vector3& halfExtents, dtPolyRef& outRef, SE::Math::Vector3& outNearest) const;
     
-      NavPathResult FindPath(const SE::Math::Vector3& start, const SE::Math::Vector3& end, std::vector<SE::Math::Vector3>& outPath) const;
+      NavPathResult FindPath(QueryContext& queryContext, const SE::Math::Vector3& start, const SE::Math::Vector3& end, std::vector<SE::Math::Vector3>& outPath) const;
       
       bool IsReachablePoly(dtPolyRef startRef, dtPolyRef endRef) const;
-      bool IsReachablePosition(const SE::Math::Vector3& start, const SE::Math::Vector3& end, const SE::Math::Vector3& halfExtents) const;
+      bool IsReachablePosition(QueryContext& queryContext, const SE::Math::Vector3& start, const SE::Math::Vector3& end, const SE::Math::Vector3& halfExtents) const;
       
-      bool ProjectToNavMesh(const Math::Vector3& pos, Math::Vector3& outPos) const;
+      bool ProjectToNavMesh(QueryContext& queryContext, const Math::Vector3& pos, Math::Vector3& outPos) const;
       
-      bool MoveAlongSurface(const Math::Vector3& start, const Math::Vector3& end, Math::Vector3& outPos) const;
+      bool MoveAlongSurface(QueryContext& queryContext, const Math::Vector3& start, const Math::Vector3& end, Math::Vector3& outPos) const;
       
-      bool IsLoaded() const { return navMesh_ != nullptr and navQuery_ != nullptr; }
+      bool IsLoaded() const { return navMesh_ != nullptr; }
       
    public:
       bool DebugValidatePoint(const SE::Math::Vector3& pos) const;
@@ -65,8 +86,6 @@ namespace SE::Nav
       
    private:
       dtNavMesh*                    navMesh_ = nullptr;
-      dtNavMeshQuery*               navQuery_ = nullptr;
-      dtQueryFilter*                filter_ = nullptr;
       
       // int32                         maxSearchNodes_ = 4096;
       // int32                         maxPathPolys_ = 256;

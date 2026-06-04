@@ -165,10 +165,16 @@ void MonsterPawn::MoveTo(const Vector3& targetPos, float acceptRadius)
       return;
    }
 
+   auto* navQueryContext = room->GetNavigationQueryContext();
+   if (navQueryContext == nullptr) {
+      StopMove();
+      return;
+   }
+
    const ServerMap& map = room->GetGameDataManager()->GetServerMap();
 
    std::vector<Vector3> path;
-   if (map.FindPath(GetPosition(), targetPos, path) != NavPathResult::Success || path.empty() ) {
+   if (map.FindPath(*navQueryContext, GetPosition(), targetPos, path) != NavPathResult::Success || path.empty() ) {
       StopMove();
       return;
    }

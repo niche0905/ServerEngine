@@ -14,6 +14,52 @@
 
 namespace SE::Nav
 {
+    ServerNavigation::QueryContext::~QueryContext()
+    {
+        Release();
+    }
+
+    bool ServerNavigation::QueryContext::Init(const ServerNavigation& navigation)
+    {
+        Release();
+
+        if (!navigation.IsLoaded())
+            return false;
+
+        navQuery_ = dtAllocNavMeshQuery();
+        if (!navQuery_) {
+            Release();
+            return false;
+        }
+
+        const dtStatus status = navQuery_->init(navigation.navMesh_, navigation.maxSearchNodes_);
+        if (dtStatusFailed(status)) {
+            Release();
+            return false;
+        }
+
+        filter_ = new dtQueryFilter();
+        if (!filter_) {
+            Release();
+            return false;
+        }
+
+        return true;
+    }
+
+    void ServerNavigation::QueryContext::Release()
+    {
+        if (filter_) {
+            delete filter_;
+            filter_ = nullptr;
+        }
+
+        if (navQuery_) {
+            dtFreeNavMeshQuery(navQuery_);
+            navQuery_ = nullptr;
+        }
+    }
+
     ServerNavigation::~ServerNavigation()
     {
         Release();
@@ -160,20 +206,6 @@ namespace SE::Nav
         }
 #endif
         
-        navQuery_ = dtAllocNavMeshQuery();
-        if (!navQuery_) {
-            Release();
-            return false;
-        }
-        
-        status = navQuery_->init(navMesh_, maxSearchNodes_);
-        if (dtStatusFailed(status)) {
-            Release();
-            return false;
-        }
-        
-        filter_ = new dtQueryFilter();
-        
         // consoleLogger->Log(Color::Blue, L"[Navigation] Successfully loaded navigation mesh from file: %S\n", filePath.string().c_str());
         // consoleLogger->Log(Color::Blue, L"[Navigation] Loaded. tiles=%d, maxTiles=%d, maxPolys=%d\n", header.tileCount, header.maxTiles, header.maxPolys);
         
@@ -182,10 +214,10 @@ namespace SE::Nav
         return true;
     }
 
-    bool ServerNavigation::FindNearestPoly(const SE::Math::Vector3& pos, const SE::Math::Vector3& halfExtents,
+    bool ServerNavigation::FindNearestPoly(QueryContext& queryContext, const SE::Math::Vector3& pos, const SE::Math::Vector3& halfExtents,
         dtPolyRef& outRef, SE::Math::Vector3& outNearest) const
     {
-        if (!IsLoaded())
+        if (!IsLoaded() || !queryContext.IsValid())
             return false;
         
         dtReal p[3];
@@ -197,7 +229,7 @@ namespace SE::Nav
         
         outRef = 0;
         
-        const dtStatus status = navQuery_->findNearestPoly(p, e, filter_, &outRef, nearest, nullptr);
+        const dtStatus status = queryContext.navQuery_->findNearestPoly(p, e, queryContext.filter_, &outRef, nearest, nullptr);
         
         if (dtStatusFailed(status) || outRef == 0)
             return false;
@@ -206,14 +238,14 @@ namespace SE::Nav
         return true;
     }
 
-    NavPathResult  ServerNavigation::FindPath(const SE::Math::Vector3& start, const SE::Math::Vector3& end,
+    NavPathResult  ServerNavigation::FindPath(QueryContext& queryContext, const SE::Math::Vector3& start, const SE::Math::Vector3& end,
         std::vector<SE::Math::Vector3>& outPath) const
     {
         using namespace SE::Math;
         
         outPath.clear();
         
-        if (!IsLoaded())
+        if (!IsLoaded() || !queryContext.IsValid())
             return NavPathResult::Failed;
         
         constexpr Vector3 startExtents{200.0f, 200.0f, 800.0f};
@@ -226,11 +258,11 @@ namespace SE::Nav
         
         Vector3 nearestStart{};
         Vector3 nearestEnd{};
-        if (!FindNearestPoly(start, startExtents, startRef, nearestStart))
+        if (!FindNearestPoly(queryContext, start, startExtents, startRef, nearestStart))
         {
             return NavPathResult::StartNotOnNavMesh;
         }
-        if (!FindNearestPoly(end, endExtents, endRef, nearestEnd))
+        if (!FindNearestPoly(queryContext, end, endExtents, endRef, nearestEnd))
         {
             return NavPathResult::EndNotOnNavMesh;
         }
@@ -260,13 +292,13 @@ namespace SE::Nav
 
         constexpr dtReal costLimit = static_cast<dtReal>(FLT_MAX);
 
-        dtStatus status = navQuery_->findPath(
+        dtStatus status = queryContext.navQuery_->findPath(
             startRef,
             endRef,
             detourStart,
             detourEnd,
             costLimit,
-            filter_,
+            queryContext.filter_,
             pathResult,
             nullptr);
         
@@ -279,7 +311,7 @@ namespace SE::Nav
         dtQueryResult straightResult;
         straightResult.reserve(maxStraightPath_);
         
-        status = navQuery_->findStraightPath(
+        status = queryContext.navQuery_->findStraightPath(
             detourStart,
             detourEnd,
             polys.data(),
@@ -311,10 +343,10 @@ namespace SE::Nav
         return false;
     }
 
-    bool ServerNavigation::IsReachablePosition(const SE::Math::Vector3& start, const SE::Math::Vector3& end,
+    bool ServerNavigation::IsReachablePosition(QueryContext& queryContext, const SE::Math::Vector3& start, const SE::Math::Vector3& end,
         const SE::Math::Vector3& halfExtents) const
     {
-        if (!IsLoaded())
+        if (!IsLoaded() || !queryContext.IsValid())
             return false;
 
         dtPolyRef startRef{};
@@ -322,25 +354,25 @@ namespace SE::Nav
         SE::Math::Vector3 startNearest{};
         SE::Math::Vector3 endNearest{};
 
-        if (!FindNearestPoly(start, halfExtents, startRef, startNearest) || startRef == 0)
+        if (!FindNearestPoly(queryContext, start, halfExtents, startRef, startNearest) || startRef == 0)
             return false;
 
-        if (!FindNearestPoly(end, halfExtents, endRef, endNearest) || endRef == 0)
+        if (!FindNearestPoly(queryContext, end, halfExtents, endRef, endNearest) || endRef == 0)
             return false;
         
         // 임시 구현: 현재는 FindPath 기반
         // 나중에 component ID 방식으로 교체
         std::vector<SE::Math::Vector3> path;
-        NavPathResult result = FindPath(startNearest, endNearest, path);
+        NavPathResult result = FindPath(queryContext, startNearest, endNearest, path);
         
         return result == NavPathResult::Success;
 
         // return IsReachablePoly(startRef, endRef);
     }
 
-    bool ServerNavigation::ProjectToNavMesh(const Math::Vector3& pos, Math::Vector3& outPos) const
+    bool ServerNavigation::ProjectToNavMesh(QueryContext& queryContext, const Math::Vector3& pos, Math::Vector3& outPos) const
     {
-        if (!IsLoaded())
+        if (!IsLoaded() || !queryContext.IsValid())
             return false;
 
         constexpr SE::Math::Vector3 halfExtents{
@@ -352,17 +384,17 @@ namespace SE::Nav
         dtPolyRef nearestRef = 0;
         SE::Math::Vector3 nearestPos{};
 
-        if (!FindNearestPoly(pos, halfExtents, nearestRef, nearestPos))
+        if (!FindNearestPoly(queryContext, pos, halfExtents, nearestRef, nearestPos))
             return false;
 
         outPos = nearestPos;
         return true;
     }
 
-    bool ServerNavigation::MoveAlongSurface(const Math::Vector3& start, const Math::Vector3& end,
+    bool ServerNavigation::MoveAlongSurface(QueryContext& queryContext, const Math::Vector3& start, const Math::Vector3& end,
         Math::Vector3& outPos) const
     {
-        if (!IsLoaded())
+        if (!IsLoaded() || !queryContext.IsValid())
             return false;
 
         constexpr Math::Vector3 halfExtents{100.0f, 100.0f, 500.0f};
@@ -370,12 +402,12 @@ namespace SE::Nav
         dtPolyRef startRef = 0;
         Math::Vector3 nearestStart{};
 
-        if (!FindNearestPoly(start, halfExtents, startRef, nearestStart))
+        if (!FindNearestPoly(queryContext, start, halfExtents, startRef, nearestStart))
             return false;
 
         dtPolyRef endRef = 0;
         Math::Vector3 nearestEnd{};
-        if (!FindNearestPoly(end, halfExtents, endRef, nearestEnd))
+        if (!FindNearestPoly(queryContext, end, halfExtents, endRef, nearestEnd))
             return false;
 
         dtReal detourStart[3];
@@ -388,11 +420,11 @@ namespace SE::Nav
         dtPolyRef visited[16]{};
         int visitedCount = 0;
 
-        const dtStatus status = navQuery_->moveAlongSurface(
+        const dtStatus status = queryContext.navQuery_->moveAlongSurface(
             startRef,
             detourStart,
             detourEnd,
-            filter_,
+            queryContext.filter_,
             result,
             visited,
             &visitedCount,
@@ -405,8 +437,8 @@ namespace SE::Nav
         outPos = FromDetour(result);
 
         dtReal height = 0.0f;
-        if (dtStatusSucceed(navQuery_->getPolyHeight(visitedCount > 0 ? visited[visitedCount - 1] : startRef, result, &height)))
-            outPos.z = height;
+        if (dtStatusSucceed(queryContext.navQuery_->getPolyHeight(visitedCount > 0 ? visited[visitedCount - 1] : startRef, result, &height)))
+            outPos.z = static_cast<float>(height);
 
         return true;
     }
@@ -421,7 +453,13 @@ namespace SE::Nav
         
         constexpr SE::Math::Vector3 halfExtents{100.0f, 100.0f, 300.0f};
         
-        if (!FindNearestPoly(pos, halfExtents, ref, nearest)) {
+        QueryContext queryContext;
+        if (!queryContext.Init(*this)) {
+            consoleLogger->Log(Color::Red, L"[Navigation] DebugValidatePoint query init failed.\n");
+            return false;
+        }
+
+        if (!FindNearestPoly(queryContext, pos, halfExtents, ref, nearest)) {
             consoleLogger->Log(Color::Red, L"[Navigation] FindNearestPoly failed. pos=(%.2f, %.2f, %.2f)\n", pos.x, pos.y, pos.z);
             return false;
         }
@@ -571,16 +609,6 @@ namespace SE::Nav
 
     void ServerNavigation::Release()
     {
-        if (filter_) {
-            delete filter_;
-            filter_ = nullptr;
-        }
-        
-        if (navQuery_) {
-            dtFreeNavMeshQuery(navQuery_);
-            navQuery_ = nullptr;
-        }
-        
         if (navMesh_) {
             dtFreeNavMesh(navMesh_);
             navMesh_ = nullptr;

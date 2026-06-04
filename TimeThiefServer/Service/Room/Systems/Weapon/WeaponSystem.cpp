@@ -3,7 +3,9 @@
 
 #include "Content/Gameplay/Upgrade/UpgradeComponent.h"
 #include "Content/Object/Actor/PlayerPawn.h"
+#include "Data/GameDataManager.h"
 #include "Data/Tables/WeaponTable.h"
+#include "Service/Room/Room.h"
 
 /*----------------
    WeaponSystem

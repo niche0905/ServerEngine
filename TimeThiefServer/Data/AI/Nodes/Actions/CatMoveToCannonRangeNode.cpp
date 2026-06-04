@@ -229,18 +229,23 @@ bool CatMoveToCannonRangeNode::TryMoveToGoal(const SE::Math::Vector3& selfPos, c
         return false;
     }
 
+    auto* navQueryContext = room->GetNavigationQueryContext();
+    if (navQueryContext == nullptr) {
+        return false;
+    }
+
     const ServerMap& map = room->GetGameDataManager()->GetServerMap();
 
     SE::Math::Vector3 desiredGoal = goal;
     desiredGoal.z = goal.z;
 
     SE::Math::Vector3 navGoal{};
-    if (!map.ProjectToNavMesh(desiredGoal, navGoal)) {
+    if (!map.ProjectToNavMesh(*navQueryContext, desiredGoal, navGoal)) {
         return false;
     }
 
     std::vector<SE::Math::Vector3> path;
-    if (map.FindPath(selfPos, navGoal, path) != NavPathResult::Success || path.empty()) {
+    if (map.FindPath(*navQueryContext, selfPos, navGoal, path) != NavPathResult::Success || path.empty()) {
         return false;
     }
 

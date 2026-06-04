@@ -53,10 +53,16 @@ BT::NodeStatus MoveTargetNode::onRunning()
         return BT::NodeStatus::SUCCESS;   // 이미 충분히 가까이 도착한 경우
     }
     
+    auto* navQueryContext = room->GetNavigationQueryContext();
+    if (navQueryContext == nullptr) {
+        selfNpc->StopMove();
+        return BT::NodeStatus::RUNNING;
+    }
+
     const ServerMap& map = room->GetGameDataManager()->GetServerMap();
     
     std::vector<Vector3> path;
-    NavPathResult result = map.FindPath(selfPos, targetPos, path);
+    NavPathResult result = map.FindPath(*navQueryContext, selfPos, targetPos, path);
     
     if (result != NavPathResult::Success || path.size() < 2) {
         selfNpc->StopMove();

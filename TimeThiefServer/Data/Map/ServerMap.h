@@ -41,11 +41,11 @@ public:
    const SE::Nav::ServerNavigation& GetNavigation() const { return navigation_; }
    bool HasNavigation() const { return navigation_.IsLoaded(); }
    
-   bool FindNearestPoly(const SE::Math::Vector3& pos, const SE::Math::Vector3& halfExtents, dtPolyRef& outRef, SE::Math::Vector3& outNearest) const;
-   NavPathResult  FindPath(const SE::Math::Vector3& start, const SE::Math::Vector3& end, std::vector<SE::Math::Vector3>& outPath) const;
-   bool IsReachablePosition(const SE::Math::Vector3& start, const SE::Math::Vector3& end, const SE::Math::Vector3& halfExtents) const;
-   bool ProjectToNavMesh(const SE::Math::Vector3& pos, SE::Math::Vector3& outPos) const;
-   bool MoveAlongSurface(const SE::Math::Vector3& start, const SE::Math::Vector3& end, SE::Math::Vector3& outPos) const;
+   bool FindNearestPoly(SE::Nav::ServerNavigation::QueryContext& queryContext, const SE::Math::Vector3& pos, const SE::Math::Vector3& halfExtents, dtPolyRef& outRef, SE::Math::Vector3& outNearest) const;
+   NavPathResult  FindPath(SE::Nav::ServerNavigation::QueryContext& queryContext, const SE::Math::Vector3& start, const SE::Math::Vector3& end, std::vector<SE::Math::Vector3>& outPath) const;
+   bool IsReachablePosition(SE::Nav::ServerNavigation::QueryContext& queryContext, const SE::Math::Vector3& start, const SE::Math::Vector3& end, const SE::Math::Vector3& halfExtents) const;
+   bool ProjectToNavMesh(SE::Nav::ServerNavigation::QueryContext& queryContext, const SE::Math::Vector3& pos, SE::Math::Vector3& outPos) const;
+   bool MoveAlongSurface(SE::Nav::ServerNavigation::QueryContext& queryContext, const SE::Math::Vector3& start, const SE::Math::Vector3& end, SE::Math::Vector3& outPos) const;
    bool TryPushOutStaticGeometry(const SE::Math::Vector3& point, SE::Math::Vector3& pushedPos) const;
 
 private:
