@@ -10,8 +10,8 @@ namespace BB = AiBlackboardKey;
 
 namespace
 {
-    constexpr float AttackAnimDuration = 2.60f;
-    constexpr float ExplosionTiming = 1.70f;
+    constexpr float AttackAnimDuration = 3.40f;
+    constexpr float ExplosionTiming = 1.50f;
     constexpr int32 BurstDamage = 55;
     constexpr float BurstRadius = 750.0f;
 
