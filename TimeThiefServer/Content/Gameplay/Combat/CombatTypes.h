@@ -35,6 +35,11 @@ enum class CombatEventType
     MinionMelee,
     MinionLeftAttack,
     MinionRightAttack,
+
+    BossGroundSlam,
+    BossBurstCharge,
+    BossBurstChargeStart,
+    BossBurstExplode,
     
 };
 

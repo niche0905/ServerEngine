@@ -4,6 +4,7 @@
 #include <utility>
 #include "Content/Gameplay/Combat/PlayerCombatComponent.h"
 #include "Content/Object/BaseObject.h"
+#include "Content/Object/Actor/BossMonsterPawn.h"
 #include "Content/Object/Actor/MonsterPawn.h"
 #include "Content/Object/Actor/Pawn.h"
 #include "Network/Session/SessionManager/SessionManager.h"
@@ -1682,7 +1683,14 @@ ChestActor* Room::CreateChestActor(const Vector3& pos, int32 tableId, float yaw)
 
 MonsterPawn* Room::CreateMonsterActor(const Vector3& pos, uint32 templateId, float yaw)
 {
-   auto* monster = SpawnObject<MonsterPawn>(ObjectFlags::Replicable | ObjectFlags::Tickable, templateId);
+   MonsterPawn* monster = nullptr;
+   if (templateId == 4) {
+      monster = SpawnObject<BossMonsterPawn>(ObjectFlags::Replicable | ObjectFlags::Tickable, templateId);
+   }
+   else {
+      monster = SpawnObject<MonsterPawn>(ObjectFlags::Replicable | ObjectFlags::Tickable, templateId);
+   }
+
    if (!monster)
       return nullptr;
    

@@ -276,6 +276,7 @@
     <ClCompile Include="Content\Object\Actor\ChestActor.cpp" />
     <ClCompile Include="Content\Object\Actor\EffectAreaActor.cpp" />
     <ClCompile Include="Content\Object\Actor\MonsterPawn.cpp" />
+    <ClCompile Include="Content\Object\Actor\BossMonsterPawn.cpp" />
     <ClCompile Include="Content\Object\Actor\Pawn.cpp" />
     <ClCompile Include="Content\Object\Actor\PlayerPawn.cpp" />
     <ClCompile Include="Content\Object\Actor\ProjectileActor.cpp" />
@@ -287,6 +288,9 @@
     <ClCompile Include="Content\Object\BaseObject.cpp" />
     <ClCompile Include="Content\Shared\BaseComponent.cpp" />
     <ClCompile Include="Data\AI\AiManager.cpp" />
+    <ClCompile Include="Data\AI\Nodes\Actions\BossChargeBurstAttackNode.cpp" />
+    <ClCompile Include="Data\AI\Nodes\Actions\BossGroundSlamAttackNode.cpp" />
+    <ClCompile Include="Data\AI\Nodes\Actions\BossIdleNode.cpp" />
     <ClCompile Include="Data\AI\Nodes\Actions\CatBiteAttackNode.cpp" />
     <ClCompile Include="Data\AI\Nodes\Actions\CatFrontClawAttackNode.cpp" />
     <ClCompile Include="Data\AI\Nodes\Actions\CatIdleNode.cpp" />
@@ -301,6 +305,11 @@
     <ClCompile Include="Data\AI\Nodes\Actions\MoveTargetNode.cpp" />
     <ClCompile Include="Data\AI\Nodes\Actions\WaitForTargetNode.cpp" />
     <ClCompile Include="Data\AI\Nodes\AiNodeRegistry.cpp" />
+    <ClCompile Include="Data\AI\Nodes\Conditions\BossAcquireOrValidateTargetNode.cpp" />
+    <ClCompile Include="Data\AI\Nodes\Conditions\BossDecideAttackTypeNode.cpp" />
+    <ClCompile Include="Data\AI\Nodes\Conditions\BossIsAttackBurstNode.cpp" />
+    <ClCompile Include="Data\AI\Nodes\Conditions\BossIsAttackSlamNode.cpp" />
+    <ClCompile Include="Data\AI\Nodes\Conditions\BossIsTargetInAttackRangeNode.cpp" />
     <ClCompile Include="Data\AI\Nodes\Conditions\CatAcquireOrValidateTargetNode.cpp" />
     <ClCompile Include="Data\AI\Nodes\Conditions\CatDecideCombatModeNode.cpp" />
     <ClCompile Include="Data\AI\Nodes\Conditions\CatDecideMeleeAttackTypeNode.cpp" />
@@ -594,6 +603,7 @@
     <ClInclude Include="Content\Object\Actor\ChestActor.h" />
     <ClInclude Include="Content\Object\Actor\EffectAreaActor.h" />
     <ClInclude Include="Content\Object\Actor\MonsterPawn.h" />
+    <ClInclude Include="Content\Object\Actor\BossMonsterPawn.h" />
     <ClInclude Include="Content\Object\Actor\Pawn.h" />
     <ClInclude Include="Content\Object\Actor\PlayerPawn.h" />
     <ClInclude Include="Content\Object\Actor\PlayerPawnState.h" />
@@ -611,6 +621,9 @@
     <ClInclude Include="Content\Shared\BaseComponent.h" />
     <ClInclude Include="Data\AI\AiBlackboard.h" />
     <ClInclude Include="Data\AI\AiManager.h" />
+    <ClInclude Include="Data\AI\Nodes\Actions\BossChargeBurstAttackNode.h" />
+    <ClInclude Include="Data\AI\Nodes\Actions\BossGroundSlamAttackNode.h" />
+    <ClInclude Include="Data\AI\Nodes\Actions\BossIdleNode.h" />
     <ClInclude Include="Data\AI\Nodes\Actions\CatBiteAttackNode.h" />
     <ClInclude Include="Data\AI\Nodes\Actions\CatFrontClawAttackNode.h" />
     <ClInclude Include="Data\AI\Nodes\Actions\CatIdleNode.h" />
@@ -625,6 +638,11 @@
     <ClInclude Include="Data\AI\Nodes\Actions\MoveTargetNode.h" />
     <ClInclude Include="Data\AI\Nodes\Actions\WaitForTargetNode.h" />
     <ClInclude Include="Data\AI\Nodes\AiNodeRegistry.h" />
+    <ClInclude Include="Data\AI\Nodes\Conditions\BossAcquireOrValidateTargetNode.h" />
+    <ClInclude Include="Data\AI\Nodes\Conditions\BossDecideAttackTypeNode.h" />
+    <ClInclude Include="Data\AI\Nodes\Conditions\BossIsAttackBurstNode.h" />
+    <ClInclude Include="Data\AI\Nodes\Conditions\BossIsAttackSlamNode.h" />
+    <ClInclude Include="Data\AI\Nodes\Conditions\BossIsTargetInAttackRangeNode.h" />
     <ClInclude Include="Data\AI\Nodes\Conditions\CatAcquireOrValidateTargetNode.h" />
     <ClInclude Include="Data\AI\Nodes\Conditions\CatDecideCombatModeNode.h" />
     <ClInclude Include="Data\AI\Nodes\Conditions\CatDecideMeleeAttackTypeNode.h" />
@@ -722,6 +740,7 @@
     <Content Include="CMakeLists.txt" />
     <Content Include="config\data\map\placements\InteractionSpawnLocations.json" />
     <Content Include="config\data\map\placements\MonsterSpawnLocations.json" />
+    <Content Include="config\data\npc\behavior\Boss_Gorilla_NPC.xml" />
     <Content Include="config\data\npc\behavior\Cat_NPC.xml" />
     <Content Include="config\data\npc\behavior\Minion_NPC.xml" />
     <Content Include="config\data\npc\behavior\Test_NPC.xml" />

@@ -15,6 +15,14 @@
       "drop_point": 60,
       "respawn_time": 30,
       "loot_table": 1
+    },
+    {
+      "template_id": 4,
+      "name": "Boss_Gorilla",
+      "max_hp": 2000,
+      "drop_point": 500,
+      "respawn_time": 300,
+      "loot_table": 1
     }
   ]
 }

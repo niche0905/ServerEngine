@@ -101,6 +101,16 @@ void MonsterPawn::OnSpawn()
 
    switch (templateId_)
    {
+   case 4:     // boss gorilla
+      {
+         auto bodyCollider = std::make_unique<ColliderComponent>();
+         auto capsuleCollider = std::make_unique<SE::Physics::CapsuleCollider>(Vector3{0.0f, -80.0f, 130.0f}, Vector3{0.0f, 80.0f, 130.0f}, 95.0f);
+         bodyCollider->Init(this, ColliderRole::Hurtbox, std::move(capsuleCollider));
+
+         colliders_.push_back(std::move(bodyCollider));
+      }
+      break;
+
    case 3:     // minion
    case 2:     // cat
       {

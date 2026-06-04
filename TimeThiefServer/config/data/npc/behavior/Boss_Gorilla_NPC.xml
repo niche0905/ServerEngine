@@ -1,0 +1,44 @@
+<root BTCPP_format="4" main_tree_to_execute="Boss_Gorilla_MainTree">
+    <BehaviorTree ID="Boss_Gorilla_MainTree">
+        <ReactiveFallback>
+
+            <Sequence>
+                <BossAcquireOrValidateTarget
+                        self_npc="{self_npc}"
+                        target_id="{target_id}"
+                        target_pawn="{target_pawn}"
+                        combat_mode="{combat_mode}" />
+
+                <BossIsTargetInAttackRange
+                        self_npc="{self_npc}"
+                        target_pawn="{target_pawn}"
+                        combat_mode="{combat_mode}" />
+
+                <BossDecideAttackType
+                        self_npc="{self_npc}"
+                        combat_mode="{combat_mode}" />
+
+                <Fallback>
+                    <Sequence>
+                        <BossIsAttackSlam combat_mode="{combat_mode}" />
+                        <BossGroundSlamAttack
+                                self_npc="{self_npc}"
+                                target_pawn="{target_pawn}"
+                                combat_mode="{combat_mode}" />
+                    </Sequence>
+
+                    <Sequence>
+                        <BossIsAttackBurst combat_mode="{combat_mode}" />
+                        <BossChargeBurstAttack
+                                self_npc="{self_npc}"
+                                target_pawn="{target_pawn}"
+                                combat_mode="{combat_mode}" />
+                    </Sequence>
+                </Fallback>
+            </Sequence>
+
+            <BossIdle self_npc="{self_npc}" />
+
+        </ReactiveFallback>
+    </BehaviorTree>
+</root>

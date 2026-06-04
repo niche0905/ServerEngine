@@ -18,6 +18,7 @@
     <ClCompile Include="Content\Object\Actor\ChestActor.cpp" />
     <ClCompile Include="Content\Object\Actor\EffectAreaActor.cpp" />
     <ClCompile Include="Content\Object\Actor\MonsterPawn.cpp" />
+    <ClCompile Include="Content\Object\Actor\BossMonsterPawn.cpp" />
     <ClCompile Include="Content\Object\Actor\Pawn.cpp" />
     <ClCompile Include="Content\Object\Actor\PlayerPawn.cpp" />
     <ClCompile Include="Content\Object\Actor\ProjectileActor.cpp" />
@@ -99,12 +100,20 @@
     <ClCompile Include="ThirdParty\UEDetour\DetourNavMesh.cpp" />
     <ClCompile Include="ThirdParty\UEDetour\DetourNavMeshQuery.cpp" />
     <ClCompile Include="ThirdParty\UEDetour\DetourNode.cpp" />
+    <ClCompile Include="Data\AI\Nodes\Actions\BossChargeBurstAttackNode.cpp" />
+    <ClCompile Include="Data\AI\Nodes\Actions\BossGroundSlamAttackNode.cpp" />
+    <ClCompile Include="Data\AI\Nodes\Actions\BossIdleNode.cpp" />
     <ClCompile Include="Data\AI\Nodes\Actions\MinionIdleNode.cpp" />
     <ClCompile Include="Data\AI\Nodes\Actions\MinionMeleeAttackNode.cpp" />
     <ClCompile Include="Data\AI\Nodes\Actions\MinionMoveTargetNode.cpp" />
     <ClCompile Include="Data\AI\Nodes\Actions\MinionReturnToSpawnNode.cpp" />
     <ClCompile Include="Data\AI\Nodes\Conditions\MinionAcquireOrValidateTargetNode.cpp" />
     <ClCompile Include="Data\AI\Nodes\Conditions\MinionIsTargetInMeleeRangeNode.cpp" />
+    <ClCompile Include="Data\AI\Nodes\Conditions\BossAcquireOrValidateTargetNode.cpp" />
+    <ClCompile Include="Data\AI\Nodes\Conditions\BossDecideAttackTypeNode.cpp" />
+    <ClCompile Include="Data\AI\Nodes\Conditions\BossIsAttackBurstNode.cpp" />
+    <ClCompile Include="Data\AI\Nodes\Conditions\BossIsAttackSlamNode.cpp" />
+    <ClCompile Include="Data\AI\Nodes\Conditions\BossIsTargetInAttackRangeNode.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Content\Object\BaseObject.h" />
@@ -112,6 +121,7 @@
     <ClInclude Include="Content\Object\ObjectHandle.h" />
     <ClInclude Include="Content\Object\ObjectId.h" />
     <ClInclude Include="Content\Object\ObjectManager.h" />
+    <ClInclude Include="Content\Object\Actor\BossMonsterPawn.h" />
     <ClInclude Include="Network\Session\PlayerSession.h" />
     <ClInclude Include="Network\Session\SessionManager\SessionManager.h" />
     <ClInclude Include="Utils\pch.h" />
@@ -246,11 +256,19 @@
     <ClInclude Include="ThirdParty\UEDetour\DetourNode.h" />
     <ClInclude Include="ThirdParty\UEDetour\DetourStatus.h" />
     <ClInclude Include="ThirdParty\UEDetour\UEDetourCompat.h" />
+    <ClInclude Include="Data\AI\Nodes\Actions\BossChargeBurstAttackNode.h" />
+    <ClInclude Include="Data\AI\Nodes\Actions\BossGroundSlamAttackNode.h" />
+    <ClInclude Include="Data\AI\Nodes\Actions\BossIdleNode.h" />
     <ClInclude Include="Data\AI\Nodes\Actions\MinionIdleNode.h" />
     <ClInclude Include="Data\AI\Nodes\Actions\MinionMeleeAttackNode.h" />
     <ClInclude Include="Data\AI\Nodes\Actions\MinionMoveTargetNode.h" />
     <ClInclude Include="Data\AI\Nodes\Actions\MinionReturnToSpawnNode.h" />
     <ClInclude Include="Data\AI\Nodes\Conditions\MinionAcquireOrValidateTargetNode.h" />
     <ClInclude Include="Data\AI\Nodes\Conditions\MinionIsTargetInMeleeRangeNode.h" />
+    <ClInclude Include="Data\AI\Nodes\Conditions\BossAcquireOrValidateTargetNode.h" />
+    <ClInclude Include="Data\AI\Nodes\Conditions\BossDecideAttackTypeNode.h" />
+    <ClInclude Include="Data\AI\Nodes\Conditions\BossIsAttackBurstNode.h" />
+    <ClInclude Include="Data\AI\Nodes\Conditions\BossIsAttackSlamNode.h" />
+    <ClInclude Include="Data\AI\Nodes\Conditions\BossIsTargetInAttackRangeNode.h" />
   </ItemGroup>
 </Project>

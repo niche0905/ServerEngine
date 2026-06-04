@@ -1,5 +1,8 @@
 ﻿#include "pch.h"
 #include "AiNodeRegistry.h"
+#include "Actions/BossChargeBurstAttackNode.h"
+#include "Actions/BossGroundSlamAttackNode.h"
+#include "Actions/BossIdleNode.h"
 #include "Actions/CatBiteAttackNode.h"
 #include "Actions/CatFrontClawAttackNode.h"
 #include "Actions/CatIdleNode.h"
@@ -13,6 +16,11 @@
 #include "Actions/MinionReturnToSpawnNode.h"
 #include "Actions/MoveTargetNode.h"
 #include "Actions/WaitForTargetNode.h"
+#include "Conditions/BossAcquireOrValidateTargetNode.h"
+#include "Conditions/BossDecideAttackTypeNode.h"
+#include "Conditions/BossIsAttackBurstNode.h"
+#include "Conditions/BossIsAttackSlamNode.h"
+#include "Conditions/BossIsTargetInAttackRangeNode.h"
 #include "Conditions/CatAcquireOrValidateTargetNode.h"
 #include "Conditions/CatDecideCombatModeNode.h"
 #include "Conditions/CatDecideMeleeAttackTypeNode.h"
@@ -65,6 +73,16 @@ namespace AiNodeRegistry
         factory.registerNodeType<MinionMeleeAttackNode>("MinionMeleeAttack");
         factory.registerNodeType<MinionMoveTargetNode>("MinionMoveTarget");
         factory.registerNodeType<MinionReturnToSpawnNode>("MinionReturnToSpawn");
+
+        // Boss Gorilla 노드 등록
+        factory.registerNodeType<BossAcquireOrValidateTargetNode>("BossAcquireOrValidateTarget");
+        factory.registerNodeType<BossIsTargetInAttackRangeNode>("BossIsTargetInAttackRange");
+        factory.registerNodeType<BossDecideAttackTypeNode>("BossDecideAttackType");
+        factory.registerNodeType<BossIsAttackSlamNode>("BossIsAttackSlam");
+        factory.registerNodeType<BossIsAttackBurstNode>("BossIsAttackBurst");
+        factory.registerNodeType<BossGroundSlamAttackNode>("BossGroundSlamAttack");
+        factory.registerNodeType<BossChargeBurstAttackNode>("BossChargeBurstAttack");
+        factory.registerNodeType<BossIdleNode>("BossIdle");
         
     }
 }

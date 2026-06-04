@@ -16,5 +16,11 @@
     "name": "Minion",
     "bt_id": "Minion_MainTree",
     "bt_xml": "behavior/Minion_NPC.xml"
+  },
+  {
+    "npc_id": 4,
+    "name": "Boss_Gorilla",
+    "bt_id": "Boss_Gorilla_MainTree",
+    "bt_xml": "behavior/Boss_Gorilla_NPC.xml"
   }
 ]
