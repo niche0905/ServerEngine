@@ -107,7 +107,7 @@ void MonsterPawn::OnSpawn()
    case 4:     // boss gorilla
       {
          auto bodyCollider = std::make_unique<ColliderComponent>();
-         auto capsuleCollider = std::make_unique<SE::Physics::CapsuleCollider>(Vector3{0.0f, -80.0f, 130.0f}, Vector3{0.0f, 80.0f, 130.0f}, 95.0f);
+         auto capsuleCollider = std::make_unique<SE::Physics::CapsuleCollider>(Vector3{0.0f, 0.0f, 160.0f}, Vector3{0.0f, 0.0f, 240.0f}, 160.0f);
          bodyCollider->Init(this, ColliderRole::Hurtbox, std::move(capsuleCollider));
 
          colliders_.push_back(std::move(bodyCollider));
@@ -115,10 +115,19 @@ void MonsterPawn::OnSpawn()
       break;
 
    case 3:     // minion
+      {
+         auto bodyCollider = std::make_unique<ColliderComponent>();
+         auto capsuleCollider = std::make_unique<SE::Physics::CapsuleCollider>(Vector3{0.0f, 0.0f, 44.0f}, Vector3{0.0f, 0.0f, 116.0f}, 44.0f);
+         bodyCollider->Init(this, ColliderRole::Hurtbox, std::move(capsuleCollider));
+
+         colliders_.push_back(std::move(bodyCollider));
+      }
+      break;
+      
    case 2:     // cat
       {
          auto bodyCollider = std::make_unique<ColliderComponent>();
-         auto capsuleCollider = std::make_unique<SE::Physics::CapsuleCollider>(Vector3{0.0f, -36.0f, 60.0f}, Vector3{0.0f,  36.0f, 60.0f},  44.0f);
+         auto capsuleCollider = std::make_unique<SE::Physics::CapsuleCollider>(Vector3{-36.0f, 0.0f, 60.0f}, Vector3{36.0f,  0.0f, 60.0f},  44.0f);
          bodyCollider->Init(this, ColliderRole::Hurtbox, std::move(capsuleCollider));
          
          colliders_.push_back(std::move(bodyCollider));
