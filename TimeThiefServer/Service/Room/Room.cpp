@@ -1,5 +1,6 @@
 ﻿#include "pch.h"
 #include "Room.h"
+#include <algorithm>
 #include <random>
 #include <utility>
 #include "Content/Gameplay/Combat/PlayerCombatComponent.h"
@@ -351,13 +352,16 @@ void Room::SetObject()
       CreateChestActor(transform.position, chest.lootTableId, transform.yaw);
    }
 
-   for (const MonsterSpawnGroupPlacement& monsterGroup : placementData.monsters.spawnGroups) {
-      if (monsterGroup.isBoss)
-         continue;
-
+   for (size_t monsterGroupIndex = 0; monsterGroupIndex < placementData.monsters.spawnGroups.size(); ++monsterGroupIndex) {
+      const MonsterSpawnGroupPlacement& monsterGroup = placementData.monsters.spawnGroups[monsterGroupIndex];
       const size_t candidateCount = monsterGroup.spawnCandidates.size();
       if (candidateCount == 0)
          continue;
+
+      if (monsterGroup.isBoss) {
+         ScheduleBossSpawn(monsterGroupIndex);
+         continue;
+      }
 
       const size_t spawnCount = std::min<size_t>(monsterGroup.spawnCount, candidateCount);
       std::vector<size_t> shuffledIndices;
@@ -1743,6 +1747,81 @@ bool Room::SpawnMonster(const Vector3& pos, uint32 templateId, float yaw)
    
    ReplicationSpawn(monster, templateId, monster->GetYaw());
    return true;
+}
+
+bool Room::SpawnBossMonster(const MonsterSpawnGroupPlacement& monsterGroup)
+{
+   const size_t candidateCount = monsterGroup.spawnCandidates.size();
+   if (candidateCount == 0)
+      return false;
+
+   std::vector<size_t> validIndices;
+   validIndices.reserve(candidateCount);
+
+   const ZoneSystem& zoneSystem = roomGameSystem_.GetZoneSystem();
+   for (size_t i = 0; i < candidateCount; ++i) {
+      const PlacementTransform& transform = monsterGroup.spawnCandidates[i];
+      if (zoneSystem.IsInsideSafeZone(transform.position)) {
+         validIndices.push_back(i);
+      }
+   }
+
+   if (validIndices.empty()) {
+      consoleLogger->Log(Color::Yellow, L"[Room] Boss spawn skipped. No valid spawn candidate in safe zone. RoomId=%u TemplateId=%u\n",
+         roomId_, monsterGroup.templateId);
+      return false;
+   }
+
+   for (size_t i = validIndices.size(); i > 1; --i) {
+      const size_t j = static_cast<size_t>(rng_.NextU32(static_cast<uint32>(i)));
+      std::swap(validIndices[i - 1], validIndices[j]);
+   }
+
+   const size_t spawnCount = std::min<size_t>(monsterGroup.spawnCount, validIndices.size());
+   bool spawnedAny = false;
+   for (size_t i = 0; i < spawnCount; ++i) {
+      const PlacementTransform& transform = monsterGroup.spawnCandidates[validIndices[i]];
+      spawnedAny = SpawnMonster(transform.position, monsterGroup.templateId, transform.yaw) || spawnedAny;
+   }
+
+   return spawnedAny;
+}
+
+void Room::ScheduleBossSpawn(size_t monsterGroupIndex)
+{
+   GameShard* ownerShard = GetOwnerShard();
+   if (!ownerShard)
+      return;
+
+   const MapPlacementData& placementData = gameDataManager_->GetMapPlacementData();
+   if (monsterGroupIndex >= placementData.monsters.spawnGroups.size())
+      return;
+
+   const MonsterSpawnGroupPlacement& monsterGroup = placementData.monsters.spawnGroups[monsterGroupIndex];
+   if (!monsterGroup.isBoss)
+      return;
+
+   const RoomId roomId = GetRoomId();
+   ScheduleAfter(Duration{Seconds{monsterGroup.spawnDelaySec}}, [ownerShard, roomId, monsterGroupIndex]()
+   {
+      auto room = ownerShard->FindRoom(roomId);
+      if (!room)
+         return;
+
+      const GameDataManager* gameDataManager = room->GetGameDataManager();
+      if (!gameDataManager)
+         return;
+
+      const MapPlacementData& placementData = gameDataManager->GetMapPlacementData();
+      if (monsterGroupIndex >= placementData.monsters.spawnGroups.size())
+         return;
+
+      const MonsterSpawnGroupPlacement& monsterGroup = placementData.monsters.spawnGroups[monsterGroupIndex];
+      if (!monsterGroup.isBoss)
+         return;
+
+      room->SpawnBossMonster(monsterGroup);
+   });
 }
 
 bool Room::SpawnChest(const Vector3& pos, int32 tableId, float yaw)

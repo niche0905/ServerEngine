@@ -66,6 +66,16 @@ namespace
          return true;
       }
 
+      if (type == "minion") {
+         outTemplateId = 3;
+         return true;
+      }
+
+      if (type == "kong" || type == "boss") {
+         outTemplateId = 4;
+         return true;
+      }
+
       if (outError) *outError = "Unknown monster type: " + type;
       return false;
    }
@@ -140,6 +150,15 @@ namespace MonsterPlacementJson
             }
 
             placementGroup.spawnCount = group["spawn_num"].asUInt();
+         }
+
+         if (group.isMember("spawn_delay_sec")) {
+            if (!group["spawn_delay_sec"].isUInt()) {
+               if (outError) *outError = "Monster spawn_delay_sec must be unsigned integer";
+               return false;
+            }
+
+            placementGroup.spawnDelaySec = group["spawn_delay_sec"].asUInt();
          }
 
          placementGroup.spawnCandidates.reserve(transforms.size());

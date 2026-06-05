@@ -28,6 +28,8 @@ class Pawn;
 class BaseObject;
 class ObjectManager;
 class Player;
+struct PlacementTransform;
+struct MonsterSpawnGroupPlacement;
 struct ObjectId;
 
 /*---------
@@ -157,6 +159,8 @@ private:
    MonsterPawn* CreateMonsterActor(const Vector3& pos, uint32 templateId, float yaw);
 
    bool SpawnMonster(const Vector3& pos, uint32 templateId, float yaw = 0.0f);
+   bool SpawnBossMonster(const MonsterSpawnGroupPlacement& monsterGroup);
+   void ScheduleBossSpawn(size_t monsterGroupIndex);
    bool SpawnChest(const Vector3& pos, int32 tableId, float yaw = 0.0f);
    bool SpawnStore(const Vector3& pos, float yaw = 0.0f);
    

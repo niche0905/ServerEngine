@@ -28,6 +28,7 @@ struct MonsterSpawnGroupPlacement
    uint32 templateId = 0;
    uint32 spawnCount = 0;
    bool isBoss = false;
+   uint32 spawnDelaySec = 0;
    std::vector<PlacementTransform> spawnCandidates;
 };
 
