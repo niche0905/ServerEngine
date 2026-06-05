@@ -85,7 +85,10 @@ void MonsterPawn::OnSpawn()
       if (auto* gameDataManager = room->GetGameDataManager()) {
          if (const MonsterTemplateDef* monsterTemplate = gameDataManager->GetMonsterTemplateTable().GetTemplate(templateId_)) {
             health_.Init(this, monsterTemplate->maxHp);
-            respawnPolicy.delayMs = static_cast<uint32>(monsterTemplate->respawnTimeSec) * 1000;
+            respawnPolicy.enabled = monsterTemplate->respawnTimeSec > 0;
+            if (respawnPolicy.enabled) {
+               respawnPolicy.delayMs = static_cast<uint32>(monsterTemplate->respawnTimeSec) * 1000;
+            }
             lootTableId = monsterTemplate->lootTableId;
             dropPoint_ = monsterTemplate->dropPoint;
          }

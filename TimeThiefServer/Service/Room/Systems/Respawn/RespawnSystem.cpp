@@ -27,6 +27,9 @@ bool RespawnSystem::RequestRespawn(ObjectId objectId)
    Pawn* pawn = ownerRoom_->GetObjectManager().FindAs<Pawn>(objectId);
    if (pawn == nullptr)
       return false;   // 오브젝트가 존재하지 않음
+
+   if (!pawn->GetRespawnComponent().IsEnabled())
+      return false;   // 리스폰 기능이 비활성화된 Pawn
    
    if (not pawn->TryReserveRespawn())
       return false;  // 리스폰 예약이 불가능한 경우 (예: 재화 부족)

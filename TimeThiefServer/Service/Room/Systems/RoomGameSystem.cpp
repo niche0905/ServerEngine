@@ -1,5 +1,6 @@
 ﻿#include "pch.h"
 #include "RoomGameSystem.h"
+#include "Content/Object/Actor/Pawn.h"
 #include "Content/Object/ObjectId.h"
 #include "Data/GameDataManager.h"
 #include "Network/ServerConfig.h"
@@ -64,6 +65,12 @@ void RoomGameSystem::Update(float deltaTime)
 void RoomGameSystem::OnPawnDeath(ObjectId pawnId)
 {
    if (not respawnSystem_.RequestRespawn(pawnId)) {
-      ownerRoom_->OnRealDeath(pawnId);
+      Pawn* pawn = ownerRoom_->GetObjectManager().FindAs<Pawn>(pawnId);
+      if (pawn && pawn->IsPlayer()) {
+         ownerRoom_->OnRealDeath(pawnId);
+      }
+      else {
+         ownerRoom_->HandleDespawn(pawnId);
+      }
    }
 }
