@@ -139,55 +139,42 @@ namespace SE::Physics::NarrowPhase
         const float e = v.Dot(w);
         
         constexpr float EPS = 1e-12f;
-        float sN, sD = a;
-        float tN, tD = c;
-        
-        const float D = a * c - b * b;
-        
-        if (D < EPS) {
-            // 선분이 거의 평행함
-            sN = 0.0f;
-            sD = 1.0f;
-            tN = e;
-            tD = c;
+        float s = 0.0f;
+        float t = 0.0f;
+
+        if (a <= EPS && c <= EPS) {
+            outS = 0.0f;
+            outT = 0.0f;
+            outPa = P0;
+            outPb = Q0;
+            return;
+        }
+
+        if (a <= EPS) {
+            t = SE::Math::Clamp(e / c, 0.0f, 1.0f);
+        }
+        else if (c <= EPS) {
+            s = SE::Math::Clamp(-d / a, 0.0f, 1.0f);
         }
         else {
-            sN = b * e - c * d;
-            tN = a * e - b * d;
-            
-            if (sN < 0.0f) {
-                sN = 0.0f;
-                tN = e;
-                tD = c;
+            const float D = a * c - b * b;
+            if (D > EPS) {
+                s = SE::Math::Clamp((b * e - c * d) / D, 0.0f, 1.0f);
             }
-            else if (sN > sD) {
-                sN = sD;
-                tN = e + b;
-                tD = c;
-            }
-        }
-        
-        if (tN < 0.0f) {
-            tN = 0.0f;
-            if (-d < 0.0f) sN = 0.0f;
-            else if (-d > a) sN = sD;
             else {
-                sN = -d;
-                sD = a;
+                s = 0.0f;
+            }
+
+            t = (b * s + e) / c;
+            if (t < 0.0f) {
+                t = 0.0f;
+                s = SE::Math::Clamp(-d / a, 0.0f, 1.0f);
+            }
+            else if (t > 1.0f) {
+                t = 1.0f;
+                s = SE::Math::Clamp((b - d) / a, 0.0f, 1.0f);
             }
         }
-        else if (tN > tD) {
-            tN = tD;
-            if ((-d + b) < 0.0f) sN = 0.0f;
-            else if ((-d + b) > a) sN = sD;
-            else {
-                sN = -d + b;
-                sD = a;
-            }
-        }
-        
-        const float s = (SE::Math::Abs(sN) < EPS) ? 0.0f : sN / sD;
-        const float t = (SE::Math::Abs(tN) < EPS) ? 0.0f : tN / tD;
         
         outS = s;
         outT = t;

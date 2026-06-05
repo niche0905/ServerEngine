@@ -93,6 +93,13 @@ BT::NodeStatus BossChargeBurstAttackNode::onRunning()
 
         const SE::Math::Vector3 impactPos = selfNpc_->GetPosition();
         room->NotifyMonsterImpact(selfNpc_->GetId(), CombatEventType::BossBurstExplode, impactPos);
+        
+        // Debug Draw
+        // Room::DebugDrawOptions drawOptions;
+        // drawOptions.colorRgba = 0xFF3030FF;
+        // drawOptions.duration = 1.0f;
+        // drawOptions.thickness = 2.0f;
+        // room->NotifyDebugDrawSphere(impactPos + SE::Math::Vector3{0.0f, 0.0f, 90.0f}, BurstRadius, drawOptions);
 
         MeleeAttackDesc desc;
         desc.attackerId = selfNpc_->GetId();

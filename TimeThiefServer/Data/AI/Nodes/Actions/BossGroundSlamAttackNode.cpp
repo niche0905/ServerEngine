@@ -97,6 +97,13 @@ BT::NodeStatus BossGroundSlamAttackNode::onRunning()
         const SE::Math::Vector3 attackStart = selfNpc_->TransformLocalOffsetToWorld(AttackStartOffset);
         const SE::Math::Vector3 attackEnd = selfNpc_->TransformLocalOffsetToWorld(AttackEndOffset);
 
+        // Debug Draw
+        // Room::DebugDrawOptions drawOptions;
+        // drawOptions.colorRgba = 0xFF3030FF;
+        // drawOptions.duration = 1.0f;
+        // drawOptions.thickness = 2.0f;
+        // room->NotifyDebugDrawCapsule(attackStart, attackEnd, SlamRadius, drawOptions);
+
         MeleeAttackDesc desc;
         desc.attackerId = selfNpc_->GetId();
         desc.attackType = CombatEventType::BossGroundSlam;
