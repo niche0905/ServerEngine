@@ -32,15 +32,22 @@ public:
    void PushEvent(const RepEvent& event);
    
    void MarkDirty(ObjectId objectId);
+
+   void SetDebugDrawCollidersEnabled(bool enabled) { debugDrawCollidersEnabled_ = enabled; }
+   bool IsDebugDrawCollidersEnabled() const { return debugDrawCollidersEnabled_; }
+   void SetDebugDrawColliderIntervalMs(uint64 intervalMs);
+   uint64 GetDebugDrawColliderIntervalMs() const { return debugDrawColliderIntervalMs_; }
    
    void FlushImmediate(const RepFrame& frame);
    void FlushPeriodic(const RepFrame& frame);
+   void FlushDebugDrawColliders(const RepFrame& frame);
    
 private:
    const IObjectReplicator* GetReplicator(ObjectType objectType);
    
    void NormalizeEvent(RepEvent& ev, const RepFrame& frame, uint64 nowMs) const;
    void DispatchImmediateEvent(const RepEvent& ev, const RepFrame& frame) const;
+   void FlushDebugDrawObjectColliders(BaseObject& obj) const;
 
 private:
    void FlushEvent_Spawn(const RepEvent& ev, const RepFrame& frame) const;
@@ -86,6 +93,10 @@ private:
    std::vector<ObjectId>         dirtyObjects_;   // 복제 대상이 된 오브젝트들의 ID 리스트
    std::unordered_set<ObjectId>  dirtyObjectSet_;
    std::vector<RepEvent>         replicationEvents_;
+
+   bool                          debugDrawCollidersEnabled_ = false;
+   uint64                        debugDrawColliderIntervalMs_ = 500;
+   uint64                        lastDebugDrawColliderTimeMs_ = 0;
    
 private:
    PlayerReplicator              playerReplicator_;

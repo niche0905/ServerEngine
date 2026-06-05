@@ -27,6 +27,9 @@
 
 namespace 
 {
+   void SetProtoVector3(se::common::Vector3* out, const SE::Math::Vector3& value);
+   void SetProtoRotator(se::common::Rotator* out, float yaw, float pitch, float roll);
+   void ApplyDebugDrawOptions(se::game::N_DebugDraw* out, const Room::DebugDrawOptions& options);
    void FillSpawnInfoBase(BaseObject* obj, uint32 templateId, se::room::SpawnInfo* outInfo);
    bool BuildPlayerSpawnInfo(PlayerPawn* playerPawn, se::room::SpawnInfo* outInfo);
    bool BuildMonsterSpawnInfo(MonsterPawn* monsterPawn, se::room::SpawnInfo* outInfo);
@@ -63,6 +66,36 @@ namespace
       default:
          return false;
       }
+   }
+
+   void SetProtoVector3(se::common::Vector3* out, const SE::Math::Vector3& value)
+   {
+      if (!out)
+         return;
+
+      out->set_x(value.x);
+      out->set_y(value.y);
+      out->set_z(value.z);
+   }
+
+   void SetProtoRotator(se::common::Rotator* out, float yaw, float pitch, float roll)
+   {
+      if (!out)
+         return;
+
+      out->set_yaw(yaw);
+      out->set_pitch(pitch);
+      out->set_roll(roll);
+   }
+
+   void ApplyDebugDrawOptions(se::game::N_DebugDraw* out, const Room::DebugDrawOptions& options)
+   {
+      if (!out)
+         return;
+
+      out->set_color_rgba(options.colorRgba);
+      out->set_duration(options.duration);
+      out->set_thickness(options.thickness);
    }
    
    void FillSpawnInfoBase(BaseObject* obj, uint32 templateId, se::room::SpawnInfo* outInfo)
@@ -229,6 +262,7 @@ Room::~Room()
 void Room::PostCreate()
 {
    objectManager_.SetRoom(shared_from_this());
+   // SetDebugDrawCollidersEnabled(true);
 }
 
 void Room::Close()
@@ -1757,6 +1791,26 @@ bool Room::Start()
    return true;
 }
 
+void Room::SetDebugDrawCollidersEnabled(bool enabled)
+{
+   roomGameSystem_.GetReplicationSystem().SetDebugDrawCollidersEnabled(enabled);
+}
+
+bool Room::IsDebugDrawCollidersEnabled() const
+{
+   return roomGameSystem_.GetReplicationSystem().IsDebugDrawCollidersEnabled();
+}
+
+void Room::SetDebugDrawColliderIntervalMs(uint64 intervalMs)
+{
+   roomGameSystem_.GetReplicationSystem().SetDebugDrawColliderIntervalMs(intervalMs);
+}
+
+uint64 Room::GetDebugDrawColliderIntervalMs() const
+{
+   return roomGameSystem_.GetReplicationSystem().GetDebugDrawColliderIntervalMs();
+}
+
 void Room::Tick(const RepFrame& frame)
 {
    // Room 정책
@@ -1776,6 +1830,7 @@ void Room::Tick(const RepFrame& frame)
 
    roomGameSystem_.GetReplicationSystem().FlushImmediate(frame);
    roomGameSystem_.GetReplicationSystem().FlushPeriodic(frame);
+   roomGameSystem_.GetReplicationSystem().FlushDebugDrawColliders(frame);
 }
 
 TimerId Room::ScheduleAt(TimePoint executeAt, Job job)
@@ -2346,6 +2401,47 @@ void Room::NotifyGrenadeExplosion(PlayerId ownerId, ObjectId grenadeId, const Ve
    grenadeExplosionEvent.payload = GrenadeExplosionEvent{exPos};
    
    roomGameSystem_.GetReplicationSystem().PushEvent(grenadeExplosionEvent);
+}
+
+void Room::NotifyDebugDrawSphere(const Vector3& position, float radius, const DebugDrawOptions& options)
+{
+   if (radius <= 0.0f)
+      return;
+
+   se::game::N_DebugDraw noti;
+   auto* sphere = noti.mutable_sphere();
+
+   SetProtoVector3(sphere->mutable_position(), position);
+   sphere->set_radius(radius);
+   ApplyDebugDrawOptions(&noti, options);
+
+   SendBufferRef sendBuffer = ServerPacketHandler::MakeSendBuffer(noti);
+   Broadcast(sendBuffer, options.exceptPlayerId);
+}
+
+void Room::NotifyDebugDrawCapsule(const Vector3& pointA, const Vector3& pointB, float radius,
+                                  const DebugDrawOptions& options)
+{
+   NotifyDebugDrawSphere(pointA, radius, options);
+   NotifyDebugDrawSphere(pointB, radius, options);
+}
+
+void Room::NotifyDebugDrawOBB(const Vector3& center, const Vector3& halfExtents, float yaw, float pitch, float roll,
+                              const DebugDrawOptions& options)
+{
+   if (halfExtents.x <= 0.0f || halfExtents.y <= 0.0f || halfExtents.z <= 0.0f)
+      return;
+
+   se::game::N_DebugDraw noti;
+   auto* obb = noti.mutable_obb();
+
+   SetProtoVector3(obb->mutable_center(), center);
+   SetProtoVector3(obb->mutable_half_extents(), halfExtents);
+   SetProtoRotator(obb->mutable_rotation(), yaw, pitch, roll);
+   ApplyDebugDrawOptions(&noti, options);
+
+   SendBufferRef sendBuffer = ServerPacketHandler::MakeSendBuffer(noti);
+   Broadcast(sendBuffer, options.exceptPlayerId);
 }
 
 void Room::ReplicateEventSet(RepEvent& ev, RepEventType eventType)

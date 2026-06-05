@@ -46,6 +46,14 @@ private:
    
 public:
    using Vector3 = SE::Math::Vector3;
+
+   struct DebugDrawOptions
+   {
+      uint32 colorRgba = 0;      // 0xRRGGBBAA, 0이면 클라이언트 기본 색상
+      float duration = 0.0f;     // 0이면 클라이언트 기본 지속 시간
+      float thickness = 0.0f;    // 0이면 클라이언트 기본 두께
+      PlayerId exceptPlayerId = 0;
+   };
    
 public:
    static std::shared_ptr<Room> Create(RoomId roomId, SessionManager& sessionManager)
@@ -159,6 +167,11 @@ public:
    float GetDelta() const { return lastDeltaTime_; }
    
    bool IsPlaying() const { return roomState_ == RoomState::Playing; }
+
+   void SetDebugDrawCollidersEnabled(bool enabled);
+   bool IsDebugDrawCollidersEnabled() const;
+   void SetDebugDrawColliderIntervalMs(uint64 intervalMs);
+   uint64 GetDebugDrawColliderIntervalMs() const;
    
 public:
    TimerId ScheduleAt(TimePoint executeAt, Job job);
@@ -247,6 +260,10 @@ public:
    void NotifyThrowGrenade(ObjectId ownerId, ObjectId grenadeId, uint32 grenadeType, const Vector3& pos, const Vector3& dir);
    void NotifyGrenadeMoveSync(PlayerId ownerId, ObjectId grenadeId, const Vector3& newPos, const Vector3& newRotate, const Vector3& newVel);
    void NotifyGrenadeExplosion(PlayerId ownerId, ObjectId grenadeId, const Vector3& exPos);
+   void NotifyDebugDrawSphere(const Vector3& position, float radius, const DebugDrawOptions& options = {});
+   void NotifyDebugDrawCapsule(const Vector3& pointA, const Vector3& pointB, float radius, const DebugDrawOptions& options = {});
+   void NotifyDebugDrawOBB(const Vector3& center, const Vector3& halfExtents, float yaw = 0.0f, float pitch = 0.0f,
+                           float roll = 0.0f, const DebugDrawOptions& options = {});
    
 private:
    void ReplicateEventSet(RepEvent& ev, RepEventType eventType);

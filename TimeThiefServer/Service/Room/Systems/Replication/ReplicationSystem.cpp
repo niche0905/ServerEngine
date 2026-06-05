@@ -2,13 +2,57 @@
 #include "ReplicationSystem.h"
 #include <algorithm>
 #include <chrono>
+#include <cmath>
+#include "Content/Gameplay/Collider/ColliderComponent.h"
 #include "Content/Gameplay/Replication/IObjectReplicator.h"
 #include "Content/Gameplay/Replication/ReplicationEvent.h"
 #include "Content/Object/BaseObject.h"
 #include "Content/Object/ObjectManager.h"
 #include "Content/Object/Actor/Pawn.h"
 #include "Content/Object/Actor/ProjectileActor.h"
+#include "Physics/Collider/AABBCollider.h"
+#include "Physics/Collider/CapsuleCollider.h"
+#include "Physics/Collider/CharacterCapsuleCollider.h"
+#include "Physics/Collider/OBBCollider.h"
+#include "Physics/Collider/SphereCollider.h"
 #include "Service/Room/Room.h"
+
+namespace
+{
+   constexpr uint64 kMinDebugDrawColliderIntervalMs = 100;
+   constexpr float kRadToDeg = 57.2957795131f;
+
+   uint32 DebugDrawColorForRole(ColliderRole role)
+   {
+      switch (role)
+      {
+      case ColliderRole::Movement:
+         return 0x00A0FFFF;
+
+      case ColliderRole::Hit:
+      case ColliderRole::Hitbox:
+         return 0xFF3030FF;
+
+      case ColliderRole::Hurtbox:
+         return 0x30FF30FF;
+
+      case ColliderRole::Block:
+         return 0xFFFFFFFF;
+
+      case ColliderRole::Trigger:
+      default:
+         return 0xFFD030FF;
+      }
+   }
+
+   float YawFromAxisX(const SE::Math::Vector3& axisX)
+   {
+      if (axisX.Length2DSq() <= 1e-6f)
+         return 0.0f;
+
+      return std::atan2(axisX.y, axisX.x) * kRadToDeg;
+   }
+}
 
 /*---------------------
    ReplicationSystem
@@ -23,6 +67,7 @@ bool ReplicationSystem::Init(Room* ownerRoom)
    dirtyObjects_.clear();
    dirtyObjectSet_.clear();
    replicationEvents_.clear();
+   lastDebugDrawColliderTimeMs_ = 0;
    
    return true;
 }
@@ -44,6 +89,11 @@ void ReplicationSystem::MarkDirty(ObjectId objectId)
    if (inserted) {
       dirtyObjects_.push_back(objectId);
    }
+}
+
+void ReplicationSystem::SetDebugDrawColliderIntervalMs(uint64 intervalMs)
+{
+   debugDrawColliderIntervalMs_ = std::max(intervalMs, kMinDebugDrawColliderIntervalMs);
 }
 
 void ReplicationSystem::FlushImmediate(const RepFrame& frame)
@@ -122,6 +172,33 @@ void ReplicationSystem::FlushPeriodic(const RepFrame& frame)
    dirtyObjectSet_.swap(nextDirtySet);
 }
 
+void ReplicationSystem::FlushDebugDrawColliders(const RepFrame& frame)
+{
+   if (!ownerRoom_)
+      return;
+
+   if (!debugDrawCollidersEnabled_)
+      return;
+
+   const uint64 nowMs = std::chrono::duration_cast<Milliseconds>(frame.now.time_since_epoch()).count();
+   if (lastDebugDrawColliderTimeMs_ != 0 && nowMs - lastDebugDrawColliderTimeMs_ < debugDrawColliderIntervalMs_)
+      return;
+
+   lastDebugDrawColliderTimeMs_ = nowMs;
+
+   ownerRoom_->GetObjectManager().ForEachAlive([&](BaseObject* obj)
+   {
+      if (!obj)
+         return;
+
+      const ObjectType objectType = obj->GetObjectType();
+      if (objectType != ObjectType::OBJ_PLAYER && objectType != ObjectType::OBJ_MONSTER)
+         return;
+
+      FlushDebugDrawObjectColliders(*obj);
+   });
+}
+
 const IObjectReplicator* ReplicationSystem::GetReplicator(ObjectType objectType)
 {
    switch (objectType)
@@ -138,6 +215,66 @@ const IObjectReplicator* ReplicationSystem::GetReplicator(ObjectType objectType)
    default:
       return nullptr;
    }
+}
+
+void ReplicationSystem::FlushDebugDrawObjectColliders(BaseObject& obj) const
+{
+   obj.ForEachCollider([&](ColliderComponent* colliderComp)
+   {
+      if (!colliderComp)
+         return;
+
+      const SE::Physics::Collider* collider = colliderComp->GetCollider();
+      if (!collider)
+         return;
+
+      Room::DebugDrawOptions options;
+      options.colorRgba = DebugDrawColorForRole(colliderComp->GetRole());
+      options.duration = static_cast<float>(debugDrawColliderIntervalMs_ + 100) * 0.001f;
+      options.thickness = 1.5f;
+
+      switch (collider->GetType())
+      {
+      case SE::Physics::ColliderType::Sphere:
+         {
+            const auto* sphere = static_cast<const SE::Physics::SphereCollider*>(collider);
+            ownerRoom_->NotifyDebugDrawSphere(sphere->GetWorldAABB().GetCenter(), sphere->GetRadius(), options);
+         }
+         break;
+
+      case SE::Physics::ColliderType::Capsule:
+         {
+            const auto* capsule = static_cast<const SE::Physics::CapsuleCollider*>(collider);
+            ownerRoom_->NotifyDebugDrawCapsule(capsule->GetPointA(), capsule->GetPointB(), capsule->GetRadius(), options);
+         }
+         break;
+
+      case SE::Physics::ColliderType::CharacterCapsule:
+         {
+            const auto* capsule = static_cast<const SE::Physics::CharacterCapsuleCollider*>(collider);
+            ownerRoom_->NotifyDebugDrawCapsule(capsule->GetPointA(), capsule->GetPointB(), capsule->GetRadius(), options);
+         }
+         break;
+
+      case SE::Physics::ColliderType::AABB:
+         {
+            const auto* aabb = static_cast<const SE::Physics::AABBCollider*>(collider);
+            ownerRoom_->NotifyDebugDrawOBB(aabb->GetCenter(), aabb->GetExtent(), 0.0f, 0.0f, 0.0f, options);
+         }
+         break;
+
+      case SE::Physics::ColliderType::OBB:
+         {
+            const auto* obb = static_cast<const SE::Physics::OBBCollider*>(collider);
+            ownerRoom_->NotifyDebugDrawOBB(obb->GetCenter(), obb->GetHalfExtent(), YawFromAxisX(obb->GetAxisX()),
+                                          0.0f, 0.0f, options);
+         }
+         break;
+
+      default:
+         break;
+      }
+   });
 }
 
 void ReplicationSystem::NormalizeEvent(RepEvent& ev, const RepFrame& frame, uint64 nowMs) const
