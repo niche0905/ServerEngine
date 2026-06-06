@@ -14,13 +14,13 @@
       "weapon_id": 2,
       "category": 2,
       "fire_type": 0,
-      "damage": 8,
+      "damage": 6,
       "magazine_size": 8,
       "fire_interval": 0.545454,
       "reload_time": 2.0,
       "range": 3000.0,
       "pellet_count": 12,
-      "cone_angle": 3.5
+      "cone_angle": 7.0
     },
     {
       "weapon_id": 3,
