@@ -6,6 +6,7 @@
 #include "Tables/MonsterTemplateTable.h"
 #include "Tables/NpcAiTable.h"
 #include "Tables/PlayerSpawnTable.h"
+#include "Tables/SkillTable.h"
 #include "Tables/StoreEntryTable.h"
 #include "Tables/UpgradeTable.h"
 #include "Tables/WeaponTable.h"
@@ -28,6 +29,7 @@ public:
    const LootTable& GetLootTable() const { return lootTable_; }
    const MonsterTemplateTable& GetMonsterTemplateTable() const { return monsterTemplateTable_; }
    const StoreEntryTable& GetStoreEntryTable() const { return storeEntryTable_; }
+   const SkillTable& GetSkillTable() const { return skillTable_; }
    const WeaponTable& GetWeaponTable() const { return weaponTable_; }
    const UpgradeTable& GetUpgradeTable() const { return upgradeTable_; }
    const PlayerSpawnTable& GetPlayerSpawnTable() const { return playerSpawnTable_; }
@@ -40,6 +42,7 @@ private:
    LootTable                  lootTable_;
    MonsterTemplateTable       monsterTemplateTable_;
    StoreEntryTable            storeEntryTable_;
+   SkillTable                 skillTable_;
    WeaponTable                weaponTable_;
    UpgradeTable               upgradeTable_;
    PlayerSpawnTable           playerSpawnTable_;

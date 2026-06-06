@@ -7,6 +7,7 @@
 #include "Tables/LootTableJson.h"
 #include "Tables/MonsterTemplateTableJson.h"
 #include "Tables/PlayerSpawnTableJson.h"
+#include "Tables/SkillTableJson.h"
 #include "Tables/StoreEntryTableJson.h"
 #include "Tables/UpgradeTableJson.h"
 #include "Tables/WeaponTableJson.h"
@@ -89,6 +90,11 @@ bool GameDataManager::Init(const ServerConfig& config)
    
    if (not StoreEntryTableJson::LoadFromFile(config.dataFiles.storeEntryTablePath, storeEntryTable_, &error)) {
       consoleLogger->Log(Color::Red, L"[GDM] Failed to load StoreEntryTable: %hs\n", error.c_str());
+      return false;
+   }
+
+   if (not SkillTableJson::LoadFromFile(config.dataFiles.skillTablePath, skillTable_, &error)) {
+      consoleLogger->Log(Color::Red, L"[GDM] Failed to load SkillTable: %hs\n", error.c_str());
       return false;
    }
    
