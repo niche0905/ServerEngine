@@ -10,6 +10,7 @@ void SkillComponent::Init(BaseObject* owner)
 {
    SetOwner(owner);
    
+   unlockSkills_.clear();
    for (SkillId& skillId : activeSkills_) {
       skillId = 0;   // 0은 스킬이 장착되지 않은 상태를 나타냄
    }
@@ -33,21 +34,30 @@ bool SkillComponent::CanUnlockSkill(SkillId skillId) const
    return !HasSkill(skillId);
 }
 
-bool SkillComponent::UnlockSkill(SkillId skillId)
+SkillComponent::SkillUnlockResult SkillComponent::TryUnlockSkill(SkillId skillId)
 {
+   SkillUnlockResult result;
+   
    if (!CanUnlockSkill(skillId)) {
-      return false;
+      return result;
    }
    
    unlockSkills_.insert(skillId);
+   result.unlocked = true;
+   result.autoEquipped = TryAutoEquipSkill(skillId, &result.equippedSlotIndex);
    
-   // TODO: Replicated 할 것이라면 여기서 Dirty flag 설정
-   
-   if (PlayerPawn* player = GetOwnerAs<PlayerPawn>()) {
-      
+   if (!result.autoEquipped) {
+      if (PlayerPawn* player = GetOwnerAs<PlayerPawn>()) {
+         player->OnSkillChanged(skillId);
+      }
    }
    
-   return true;
+   return result;
+}
+
+bool SkillComponent::UnlockSkill(SkillId skillId)
+{
+   return TryUnlockSkill(skillId).unlocked;
 }
 
 bool SkillComponent::IsEquipped(SkillId skillId) const
@@ -65,6 +75,17 @@ bool SkillComponent::IsEquipped(SkillId skillId) const
    return false;
 }
 
+int32 SkillComponent::FindEmptySlot() const
+{
+   for (int32 i = 0; i < MaxActiveSkills; ++i) {
+      if (activeSkills_[i] == 0) {
+         return i;
+      }
+   }
+   
+   return -1;
+}
+
 SkillId SkillComponent::GetEquippedSkill(int32 slotIndex) const
 {
    if (!IsValidSlot(slotIndex)) {
@@ -72,6 +93,11 @@ SkillId SkillComponent::GetEquippedSkill(int32 slotIndex) const
    }
    
    return activeSkills_[slotIndex];
+}
+
+const std::array<SkillId, MaxActiveSkills>& SkillComponent::GetEquippedSkills() const
+{
+   return activeSkills_;
 }
 
 bool SkillComponent::CanEquipSkill(SkillId skillId, int32 slotIndex) const
@@ -108,6 +134,33 @@ bool SkillComponent::EquipSkill(SkillId skillId, int32 slotIndex)
    }
    
    activeSkills_[slotIndex] = skillId;
+   
+   if (PlayerPawn* player = GetOwnerAs<PlayerPawn>()) {
+      player->OnSkillChanged(skillId);
+   }
+   
+   return true;
+}
+
+bool SkillComponent::TryAutoEquipSkill(SkillId skillId, int32* outSlotIndex)
+{
+   if (outSlotIndex) {
+      *outSlotIndex = -1;
+   }
+   
+   const int32 emptySlot = FindEmptySlot();
+   if (emptySlot < 0) {
+      return false;
+   }
+   
+   if (!EquipSkill(skillId, emptySlot)) {
+      return false;
+   }
+   
+   if (outSlotIndex) {
+      *outSlotIndex = emptySlot;
+   }
+   
    return true;
 }
 
@@ -117,7 +170,16 @@ bool SkillComponent::UnequipSkill(int32 slotIndex)
       return false;
    }
    
+   const SkillId prevSkillId = activeSkills_[slotIndex];
+   
    activeSkills_[slotIndex] = 0;   // 슬롯을 비움
+   
+   if (prevSkillId != 0) {
+      if (PlayerPawn* player = GetOwnerAs<PlayerPawn>()) {
+         player->OnSkillChanged(prevSkillId);
+      }
+   }
+   
    return true;
 }
 
@@ -141,6 +203,10 @@ void SkillComponent::RestoreSnapshot(const SkillSnapshot& snapshot)
    unlockSkills_ = snapshot.unlockSkills;
    for (int32 i = 0; i < MaxActiveSkills; ++i) {
       activeSkills_[i] = snapshot.equippedSkills[i];
+   }
+
+   if (PlayerPawn* player = GetOwnerAs<PlayerPawn>()) {
+      player->MarkReplicationDirty(ReplicationDirty::SkillState);
    }
 }
 

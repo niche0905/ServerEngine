@@ -134,6 +134,18 @@ ReplicateResult PlayerReplicator::FlushPlayerPeriodic(PlayerPawn& player, Replic
             for (const auto& skillId : unlockedSkills) {
                 noti.add_unlocked_skill_ids(skillId);
             }
+            
+            const auto& equippedSkills = skillComp.GetEquippedSkills();
+            for (int32 slotIndex = 0; slotIndex < MaxActiveSkills; ++slotIndex) {
+                SkillId skillId = equippedSkills[slotIndex];
+                if (skillId == 0) {
+                    continue;
+                }
+                
+                auto* slotPtr = noti.add_equipped_skill_slots();
+                slotPtr->set_slot_index(static_cast<uint32>(slotIndex));
+                slotPtr->set_skill_id(skillId);
+            }
         }
         
         SendBufferRef sendBuffer = ServerPacketHandler::MakeSendBuffer(noti);

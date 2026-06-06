@@ -13,20 +13,29 @@
 class SkillComponent : public BaseComponent
 {
 public:
-    
-public:
     virtual void Init(BaseObject* owner);
    
 public:
+    struct SkillUnlockResult
+    {
+        bool unlocked{false};
+        bool autoEquipped{false};
+        int32 equippedSlotIndex{-1};
+    };
+    
     bool HasSkill(SkillId skillId) const;
     bool CanUnlockSkill(SkillId skillId) const;
+    SkillUnlockResult TryUnlockSkill(SkillId skillId);
     bool UnlockSkill(SkillId skillId);
     
     bool IsEquipped(SkillId skillId) const;
+    int32 FindEmptySlot() const;
     SkillId GetEquippedSkill(int32 slotIndex) const;
+    const std::array<SkillId, MaxActiveSkills>& GetEquippedSkills() const;
     
     bool CanEquipSkill(SkillId skillId, int32 slotIndex) const;
     bool EquipSkill(SkillId skillId, int32 slotIndex);
+    bool TryAutoEquipSkill(SkillId skillId, int32* outSlotIndex = nullptr);
     bool UnequipSkill(int32 slotIndex);
     
     const std::unordered_set<SkillId>& GetUnlockSkills() const;
