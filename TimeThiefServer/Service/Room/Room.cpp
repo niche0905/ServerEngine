@@ -28,6 +28,9 @@
 
 namespace 
 {
+   uint64 GetNowMs();
+   void FillUseSkillRes(se::game::S_UseSkillRes& res, bool success, se::common::ErrorCode code,
+      const char* message, uint32 slotIndex, SkillId skillId, uint64 cooldownEndMs = 0, uint32 remainingCooldownMs = 0);
    void SetProtoVector3(se::common::Vector3* out, const SE::Math::Vector3& value);
    void SetProtoRotator(se::common::Rotator* out, float yaw, float pitch, float roll);
    void ApplyDebugDrawOptions(se::game::N_DebugDraw* out, const Room::DebugDrawOptions& options);
@@ -67,6 +70,25 @@ namespace
       default:
          return false;
       }
+   }
+
+   uint64 GetNowMs()
+   {
+      return static_cast<uint64>(std::chrono::duration_cast<Milliseconds>(Clock::now().time_since_epoch()).count());
+   }
+
+   void FillUseSkillRes(se::game::S_UseSkillRes& res, bool success, se::common::ErrorCode code,
+      const char* message, uint32 slotIndex, SkillId skillId, uint64 cooldownEndMs, uint32 remainingCooldownMs)
+   {
+      res.set_success(success);
+      res.set_slot_index(slotIndex);
+      res.set_skill_id(skillId);
+      res.set_cooldown_end_ms(cooldownEndMs);
+      res.set_remaining_cooldown_ms(remainingCooldownMs);
+
+      auto* resultPtr = res.mutable_result();
+      resultPtr->set_code(code);
+      resultPtr->set_message(message ? message : "");
    }
 
    void SetProtoVector3(se::common::Vector3* out, const SE::Math::Vector3& value)
@@ -977,6 +999,7 @@ bool Room::HandleUseSkill(PlayerId playerId, const se::game::C_UseSkillReq& pkt)
    
    if (!sessionRef) return false;   // 세션이 존재하지 않음 (정상적이지 않은 상황)
    
+   do
    {
       if (playerId == 0)
          return false;
@@ -991,19 +1014,109 @@ bool Room::HandleUseSkill(PlayerId playerId, const se::game::C_UseSkillReq& pkt)
       auto* playerPawn = objectManager_.FindAs<PlayerPawn>(it->second.pawnObjectId);
       if (!playerPawn)
          return false;
-      
-      // TODO: 스킬 장착/쿨타임 검증 후 성공 응답과 N_UseSkill 브로드캐스트로 분리.
+
+      const uint32 slotIndex = pkt.slot_index();
+      const SkillId requestedSkillId = pkt.skill_id();
       se::game::S_UseSkillRes res;
-      {
-         res.set_success(false);
-         res.set_slot_index(pkt.slot_index());
-         auto* resultPtr = res.mutable_result();
-         resultPtr->set_code(se::common::ERR_ABILITY_NOT_AVAILABLE);
-         resultPtr->set_message("Skill use is not implemented yet.");
+
+      if (!playerPawn->IsHpAlive()) {
+         FillUseSkillRes(res, false, se::common::ERR_ENTITY_ALREADY_DEAD,
+            "Dead players cannot use skills.", slotIndex, requestedSkillId);
+         useSkillResultBuffer = ServerPacketHandler::MakeSendBuffer(res);
+         break;
+      }
+
+      if (requestedSkillId == 0) {
+         FillUseSkillRes(res, false, se::common::ERR_ABILITY_NOT_AVAILABLE,
+            "Invalid skill id.", slotIndex, requestedSkillId, 0, 0);
+         useSkillResultBuffer = ServerPacketHandler::MakeSendBuffer(res);
+         break;
       }
       
+      if (slotIndex >= MaxActiveSkills) {
+         FillUseSkillRes(res, false, se::common::ERR_ABILITY_NOT_AVAILABLE,
+            "Invalid skill slot.", slotIndex, requestedSkillId);
+         useSkillResultBuffer = ServerPacketHandler::MakeSendBuffer(res);
+         break;
+      }
+
+      SkillComponent& skillComp = playerPawn->GetSkill();
+      if (!skillComp.HasSkill(requestedSkillId)) {
+         FillUseSkillRes(res, false, se::common::ERR_ABILITY_NOT_AVAILABLE,
+            "Requested skill is not unlocked.", slotIndex, requestedSkillId, 0, 0);
+         useSkillResultBuffer = ServerPacketHandler::MakeSendBuffer(res);
+         break;
+      }
+      
+      if (!skillComp.IsEquipped(requestedSkillId)) {
+         FillUseSkillRes(res, false, se::common::ERR_ABILITY_NOT_AVAILABLE,
+            "Requested skill is not equipped.", slotIndex, requestedSkillId, 0, 0);
+         useSkillResultBuffer = ServerPacketHandler::MakeSendBuffer(res);
+         break;
+      }
+      
+      const SkillId equippedSkillId = skillComp.GetEquippedSkill(static_cast<int32>(slotIndex));
+      if (equippedSkillId != requestedSkillId) {
+         FillUseSkillRes(res, false, se::common::ERR_ABILITY_NOT_AVAILABLE,
+            "Requested skill is not equipped in the slot.", slotIndex, requestedSkillId, 0, 0);
+         useSkillResultBuffer = ServerPacketHandler::MakeSendBuffer(res);
+         break;
+      }
+
+      if (!gameDataManager_) {
+         FillUseSkillRes(res, false, se::common::ERR_INTERNAL_ERROR,
+            "Skill data is unavailable.", slotIndex, requestedSkillId, 0, 0);
+         useSkillResultBuffer = ServerPacketHandler::MakeSendBuffer(res);
+         break;
+      }
+
+      const SkillDef* skillDef = gameDataManager_->GetSkillTable().Find(requestedSkillId);
+      if (!skillDef) {
+         FillUseSkillRes(res, false, se::common::ERR_ABILITY_NOT_AVAILABLE,
+            "Skill data not found.", slotIndex, requestedSkillId, 0, 0);
+         useSkillResultBuffer = ServerPacketHandler::MakeSendBuffer(res);
+         break;
+      }
+
+      const uint64 nowMs = GetNowMs();
+      const CooldownId cooldownId = skillDef->cooldownGroupId;
+      if (cooldownId == 0) {
+         FillUseSkillRes(res, false, se::common::ERR_INTERNAL_ERROR,
+            "Invalid cooldown group id.", slotIndex, requestedSkillId, 0, 0);
+         useSkillResultBuffer = ServerPacketHandler::MakeSendBuffer(res);
+         break;
+      }
+      
+      CooldownResult cooldownResult = playerPawn->GetCooldowns().TryConsume(cooldownId, nowMs, skillDef->cooldownMs);
+      if (!cooldownResult.ok) {
+         const uint32 remainingCooldownMs =
+            static_cast<uint32>(std::min<uint64>(
+               cooldownResult.remainingMs,
+               std::numeric_limits<uint32>::max()));
+
+         FillUseSkillRes(res, false, se::common::ERR_ABILITY_NOT_AVAILABLE,
+            "Skill is on cooldown.", slotIndex, requestedSkillId,
+            cooldownResult.endMs, remainingCooldownMs);
+
+         useSkillResultBuffer = ServerPacketHandler::MakeSendBuffer(res);
+         break;
+      }
+
+      const uint32 remainingCooldownMs =
+         static_cast<uint32>(std::min<uint64>(
+            cooldownResult.remainingMs,
+            std::numeric_limits<uint32>::max()));
+
+      FillUseSkillRes(res, true, se::common::ERR_NONE,
+         "OK", slotIndex, requestedSkillId,
+         cooldownResult.endMs, remainingCooldownMs);
+
       useSkillResultBuffer = ServerPacketHandler::MakeSendBuffer(res);
-   }
+      
+      // TODO: 스킬 효과 적용 (예: 공격 스킬이면 피해 적용, 회복 스킬이면 회복 적용 등)
+      
+      
+   } while (false);
    
    if (useSkillResultBuffer)
       SendToPlayer(playerId, useSkillResultBuffer);
@@ -1232,51 +1345,120 @@ bool Room::HandleUseStore(PlayerId playerId, const se::game::C_UseStoreReq& pkt)
 
 bool Room::HandleSetSavePoint(PlayerId playerId, const se::game::C_SetSavePointReq& pkt)
 {
-   // THINK: 안전상 쿨타임이 존재해야 하지만 우선은 쿨타임 없이 바로 적용하는 구조로 (현재는 패킷이 너무 자주 요청 될 수 있음...)
-   
    SendBufferRef setSavePointResultBuffer;
    std::shared_ptr<PlayerSession> sessionRef = sessionManager_.FindByPlayerId(playerId);
    
-   if (!sessionRef) return false;   // 세션이 존재하지 않음 (정상적이지 않은 상황)
+   if (!sessionRef) return false;
    
+   do
    {
       if (playerId == 0)
          return false;
       
       auto it = roomPlayers_.find(playerId);
       if (it == roomPlayers_.end())
-         return false;   // 방에 존재하지 않는 플레이어
+         return false;
       
       auto* playerPawn = objectManager_.FindAs<PlayerPawn>(it->second.pawnObjectId);
       if (!playerPawn)
          return false;
       
+      se::game::S_SetSavePointRes res;
+
+      if (!gameDataManager_) {
+         res.set_success(false);
+         auto* resultPtr = res.mutable_result();
+         resultPtr->set_code(se::common::ERR_INTERNAL_ERROR);
+         resultPtr->set_message("Skill data is unavailable.");
+
+         setSavePointResultBuffer = ServerPacketHandler::MakeSendBuffer(res);
+         break;
+      }
+
+      constexpr SkillId SavePointSkillId = 4;
+
+      const SkillDef* skillDef = gameDataManager_->GetSkillTable().Find(SavePointSkillId);
+      if (!skillDef) {
+         res.set_success(false);
+         auto* resultPtr = res.mutable_result();
+         resultPtr->set_code(se::common::ERR_ABILITY_NOT_AVAILABLE);
+         resultPtr->set_message("Save point skill data not found.");
+
+         setSavePointResultBuffer = ServerPacketHandler::MakeSendBuffer(res);
+         break;
+      }
+
+      const CooldownId cooldownId = skillDef->cooldownGroupId;
+      if (cooldownId == 0) {
+         res.set_success(false);
+         auto* resultPtr = res.mutable_result();
+         resultPtr->set_code(se::common::ERR_INTERNAL_ERROR);
+         resultPtr->set_message("Invalid save point cooldown group id.");
+
+         setSavePointResultBuffer = ServerPacketHandler::MakeSendBuffer(res);
+         break;
+      }
+      
       const auto& savePointPos = pkt.position();
       const Vector3 savePos{ savePointPos.x(), savePointPos.y(), savePointPos.z() };
       
-      bool saved = playerPawn->TrySetSavePoint(savePos);
-      
-      se::game::S_SetSavePointRes res;
-      {
-         res.set_success(saved);   // TEMP: 세이브 포인트 설정 성공 여부 (실제 로직에서는 유효성 판정 결과에 따라 결정되어야 함)
-         
-         if (saved) {
-            auto* savePosPtr = res.mutable_position();
-            savePosPtr->set_x(savePointPos.x());
-            savePosPtr->set_y(savePointPos.y());
-            savePosPtr->set_z(savePointPos.z());
-         }
-         else {
-            auto* resultPtr = res.mutable_result();
-            resultPtr->set_message("Failed to set save point.");
-            resultPtr->set_code(se::common::ERR_ABILITY_NOT_AVAILABLE);
-         }
+      constexpr float MaxSavePointDistance = 1000.0f;
+      constexpr float MaxSavePointDistanceSq = MaxSavePointDistance * MaxSavePointDistance;
+
+      const Vector3 playerPos = playerPawn->GetPosition();
+
+      const Vector3 diff = savePos - playerPos;
+      const float distSq = diff.LengthSq();
+
+      if (distSq > MaxSavePointDistanceSq) {
+         res.set_success(false);
+
+         auto* resultPtr = res.mutable_result();
+         resultPtr->set_code(se::common::ERR_ABILITY_NOT_AVAILABLE);
+         resultPtr->set_message("Save point position is too far from player.");
+
+         setSavePointResultBuffer = ServerPacketHandler::MakeSendBuffer(res);
+         break;
       }
+
+      const uint64 nowMs = GetNowMs();
+
+      CooldownResult cooldownResult =
+         playerPawn->GetCooldowns().TryConsume(cooldownId, nowMs, skillDef->cooldownMs);
+
+      if (!cooldownResult.ok) {
+         res.set_success(false);
+
+         auto* resultPtr = res.mutable_result();
+         resultPtr->set_code(se::common::ERR_ABILITY_NOT_AVAILABLE);
+         resultPtr->set_message("Save point is on cooldown.");
+
+         setSavePointResultBuffer = ServerPacketHandler::MakeSendBuffer(res);
+         break;
+      }
+
+      const bool saved = playerPawn->TrySetSavePoint(savePos);
+
+      res.set_success(saved);
+
+      if (saved) {
+         auto* savePosPtr = res.mutable_position();
+         savePosPtr->set_x(savePointPos.x());
+         savePosPtr->set_y(savePointPos.y());
+         savePosPtr->set_z(savePointPos.z());
+      }
+      else {
+         auto* resultPtr = res.mutable_result();
+         resultPtr->set_code(se::common::ERR_ABILITY_NOT_AVAILABLE);
+         resultPtr->set_message("Failed to set save point.");
+      }
+
       setSavePointResultBuffer = ServerPacketHandler::MakeSendBuffer(res);
-   }
+
+   } while (false);
    
    if (setSavePointResultBuffer)
-      SendToPlayer(playerId, setSavePointResultBuffer); // 세이브 포인트 설정 결과를 해당 플레이어에게 전송
+      SendToPlayer(playerId, setSavePointResultBuffer);
    
    return true;
 }

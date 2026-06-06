@@ -299,18 +299,8 @@ void PlayerPawn::OnStatUpgradeApplied(StatUpgradeCode code, int32 newLevel)
 
 bool PlayerPawn::TrySetSavePoint(const Vector3& location)
 {
-   // TODO: 쿨타임 체크 진행하기
-   //       쿨타임 통과 할 시
-   
-   // TODO: Player의 위치와 세이브 포인트 위치의 차가 너무 크지 않은지 체크하기
-   
-   // TODO: 현재 정보에서 저장해야 할 것들 저장하기
-   //       플레이어 상태 (체력, 인벤토리, 스킬, 업데이트 등)
-   //       Save Component를 작성하는 것이 좋아 보인다
-   {
-      save_.CaptureSnapshot();
-      SetSavedRespawnPosition(location);
-   }
+   save_.CaptureSnapshot();
+   SetSavedRespawnPosition(location);
    
    return true;
 }
