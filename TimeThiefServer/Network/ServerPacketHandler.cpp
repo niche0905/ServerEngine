@@ -191,10 +191,10 @@ bool Handle_C_WeaponChangeReq(PacketSessionRef& session, const se::game::C_Weapo
     return Dispatcher()->Handle_C_WeaponChangeReq(session, pkt);
 }
     
-bool Handle_C_UseAbilityReq(PacketSessionRef& session, const se::game::C_UseAbilityReq& pkt)
+bool Handle_C_UseSkillReq(PacketSessionRef& session, const se::game::C_UseSkillReq& pkt)
 {
     if (!Dispatcher()) return false;
-    return Dispatcher()->Handle_C_UseAbilityReq(session, pkt);
+    return Dispatcher()->Handle_C_UseSkillReq(session, pkt);
 }
     
 bool Handle_C_UseItemReq(PacketSessionRef& session, const se::game::C_UseItemReq& pkt)

@@ -310,11 +310,11 @@ bool ServerPacketDispatcher::Handle_C_WeaponChangeReq(PacketSessionRef& session,
     });
 }
 
-bool ServerPacketDispatcher::Handle_C_UseAbilityReq(PacketSessionRef& session, const se::game::C_UseAbilityReq& pkt)
+bool ServerPacketDispatcher::Handle_C_UseSkillReq(PacketSessionRef& session, const se::game::C_UseSkillReq& pkt)
 {
-    return EnqueueToPlayerRoom(session, pkt, [](Room& room, PlayerId playerId, const se::game::C_UseAbilityReq& pkt)
+    return EnqueueToPlayerRoom(session, pkt, [](Room& room, PlayerId playerId, const se::game::C_UseSkillReq& pkt)
     {
-        room.HandleUseAbility(playerId, pkt);
+        room.HandleUseSkill(playerId, pkt);
     });
 }
 

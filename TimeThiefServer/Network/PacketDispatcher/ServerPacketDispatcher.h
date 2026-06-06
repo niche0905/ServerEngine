@@ -57,7 +57,7 @@ public:
    bool Handle_C_GrenadeExplosionReq(PacketSessionRef& session, const se::game::C_GrenadeExplosionReq& pkt);
    bool Handle_C_ReloadReq(PacketSessionRef& session, const se::game::C_ReloadReq& pkt);
    bool Handle_C_WeaponChangeReq(PacketSessionRef& session, const se::game::C_WeaponChangeReq& pkt);
-   bool Handle_C_UseAbilityReq(PacketSessionRef& session, const se::game::C_UseAbilityReq& pkt);
+   bool Handle_C_UseSkillReq(PacketSessionRef& session, const se::game::C_UseSkillReq& pkt);
    bool Handle_C_UseItemReq(PacketSessionRef& session, const se::game::C_UseItemReq& pkt);
    bool Handle_C_ChestInteractReq(PacketSessionRef& session, const se::game::C_ChestInteractReq& pkt);
    bool Handle_C_PickupItemReq(PacketSessionRef& session, const se::game::C_PickupItemReq& pkt);

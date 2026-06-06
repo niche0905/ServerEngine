@@ -98,7 +98,7 @@ public:
    bool HandleWeaponChange(PlayerId playerId, const se::game::C_WeaponChangeReq& pkt);
    bool HandleGrenadeMoveSync(PlayerId playerId, const se::game::C_GrenadeMoveSyncReq& pkt);
    bool HandleGrenadeExplosion(PlayerId playerId, const se::game::C_GrenadeExplosionReq& pkt);
-   bool HandleUseAbility(PlayerId playerId, const se::game::C_UseAbilityReq& pkt);
+   bool HandleUseSkill(PlayerId playerId, const se::game::C_UseSkillReq& pkt);
    bool HandleUseItem(PlayerId playerId, const se::game::C_UseItemReq& pkt);
    bool HandleChestInteract(PlayerId playerId, const se::game::C_ChestInteractReq& pkt);
    bool HandlePickupItem(PlayerId playerId, const se::game::C_PickupItemReq& pkt);

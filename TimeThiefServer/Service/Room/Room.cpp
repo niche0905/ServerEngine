@@ -970,9 +970,9 @@ bool Room::HandleGrenadeExplosion(PlayerId playerId, const se::game::C_GrenadeEx
    return true;
 }
 
-bool Room::HandleUseAbility(PlayerId playerId, const se::game::C_UseAbilityReq& pkt)
+bool Room::HandleUseSkill(PlayerId playerId, const se::game::C_UseSkillReq& pkt)
 {
-   SendBufferRef abilityUseBroadcastBuffer;
+   SendBufferRef useSkillResultBuffer;
    std::shared_ptr<PlayerSession> sessionRef = sessionManager_.FindByPlayerId(playerId);
    
    if (!sessionRef) return false;   // 세션이 존재하지 않음 (정상적이지 않은 상황)
@@ -992,24 +992,21 @@ bool Room::HandleUseAbility(PlayerId playerId, const se::game::C_UseAbilityReq& 
       if (!playerPawn)
          return false;
       
-      // TODO: Player Ability 사용 처리 로직 (예: Ability 효과 적용, 쿨타임 체크 등)
-      //       유효 하다면 다음으로
-      
-      se::game::N_UseAbility noti;
+      // TODO: 스킬 장착/쿨타임 검증 후 성공 응답과 N_UseSkill 브로드캐스트로 분리.
+      se::game::S_UseSkillRes res;
       {
-         auto* entityIdPtr = noti.mutable_entity_id();
-         entityIdPtr->set_value(it->second.pawnObjectId.value);
-         
-         // TODO: 추가되는 정보가 있다면 noti에 더 넣어주기 (예: 타겟 정보, Direction 등)
-         noti.set_ability_id(pkt.ability_id());
+         res.set_success(false);
+         res.set_slot_index(pkt.slot_index());
+         auto* resultPtr = res.mutable_result();
+         resultPtr->set_code(se::common::ERR_ABILITY_NOT_AVAILABLE);
+         resultPtr->set_message("Skill use is not implemented yet.");
       }
       
-      abilityUseBroadcastBuffer = ServerPacketHandler::MakeSendBuffer(noti);
+      useSkillResultBuffer = ServerPacketHandler::MakeSendBuffer(res);
    }
    
-   if (abilityUseBroadcastBuffer)
-      Broadcast(abilityUseBroadcastBuffer);   // 모두에게 Ability 사용 정보 Broadcast
-                                              // 본인에게도 보내는 이유는 버프형 스킬의 경우 이 패킷을 받은 뒤 부터 적용되도록
+   if (useSkillResultBuffer)
+      SendToPlayer(playerId, useSkillResultBuffer);
    
    return true;
 }
