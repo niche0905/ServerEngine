@@ -1358,12 +1358,25 @@ bool Room::HandleSetSavePoint(PlayerId playerId, const se::game::C_SetSavePointR
       auto it = roomPlayers_.find(playerId);
       if (it == roomPlayers_.end())
          return false;
+
+      if (not it->second.loaded)
+         return false;
       
       auto* playerPawn = objectManager_.FindAs<PlayerPawn>(it->second.pawnObjectId);
       if (!playerPawn)
          return false;
       
       se::game::S_SetSavePointRes res;
+
+      if (!playerPawn->IsHpAlive()) {
+         res.set_success(false);
+         auto* resultPtr = res.mutable_result();
+         resultPtr->set_code(se::common::ERR_ENTITY_ALREADY_DEAD);
+         resultPtr->set_message("Dead players cannot set save points.");
+
+         setSavePointResultBuffer = ServerPacketHandler::MakeSendBuffer(res);
+         break;
+      }
 
       if (!gameDataManager_) {
          res.set_success(false);
@@ -1422,11 +1435,8 @@ bool Room::HandleSetSavePoint(PlayerId playerId, const se::game::C_SetSavePointR
       }
 
       const uint64 nowMs = GetNowMs();
-
-      CooldownResult cooldownResult =
-         playerPawn->GetCooldowns().TryConsume(cooldownId, nowMs, skillDef->cooldownMs);
-
-      if (!cooldownResult.ok) {
+      CooldownComponent& cooldowns = playerPawn->GetCooldowns();
+      if (!cooldowns.IsReady(cooldownId, nowMs)) {
          res.set_success(false);
 
          auto* resultPtr = res.mutable_result();
@@ -1442,6 +1452,8 @@ bool Room::HandleSetSavePoint(PlayerId playerId, const se::game::C_SetSavePointR
       res.set_success(saved);
 
       if (saved) {
+         cooldowns.Start(cooldownId, nowMs, skillDef->cooldownMs);
+         
          auto* savePosPtr = res.mutable_position();
          savePosPtr->set_x(savePointPos.x());
          savePosPtr->set_y(savePointPos.y());
