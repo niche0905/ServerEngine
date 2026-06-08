@@ -1284,6 +1284,7 @@ void Room::ExecuteTimeRewind(PlayerId playerId, PlayerPawn& playerPawn, const Sk
    ev.startedAtMs = nowMs;
    ev.detailType = UseSkillDetailType::TimeRewind;
    ev.rewindDurationMs = TimeRewindDurationMs;
+   ev.invulnerableDurationMs = skillDef.durationMs;
 
    PlayerPawn::TimeRewindFrame rewindFrame{};
    if (playerPawn.RestoreTimeRewind(TimeRewindDurationMs, &rewindFrame)) {
