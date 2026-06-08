@@ -568,6 +568,7 @@ bool Room::UpdateSession(PlayerId playerId, SessionId newSessionId)
 void Room::JoinPlayerProcess(PlayerId playerId, PlayerPawn* playerPawn)
 {
    SendBufferRef enterResBuffer;
+   SendBufferRef gameDataInitBuffer;
    SendBufferRef entitiesSpawnBuffer;
    SendBufferRef playerInitBuffer;
    
@@ -592,6 +593,27 @@ void Room::JoinPlayerProcess(PlayerId playerId, PlayerPawn* playerPawn)
          myEntityId->set_value(playerPawn->GetId().value);
       }
       enterResBuffer = ServerPacketHandler::MakeSendBuffer(res);
+   }
+
+   // 입장한 플레이어에게 게임 데이터 초기값 전송하기
+   {
+      se::game::N_GameDataInit gameDataInit;
+      if (gameDataManager_) {
+         const StoreEntryTable& storeEntryTable = gameDataManager_->GetStoreEntryTable();
+         std::vector<uint32> entryIds;
+         entryIds.reserve(storeEntryTable.Entries.size());
+         for (const auto& entry : storeEntryTable.Entries) {
+            entryIds.push_back(entry.first);
+         }
+         std::sort(entryIds.begin(), entryIds.end());
+         
+         for (uint32 entryId : entryIds) {
+            auto* storeEntry = gameDataInit.add_store_entries();
+            storeEntry->set_store_item_id(entryId);
+            storeEntry->set_price(storeEntryTable.GetCost(entryId));
+         }
+      }
+      gameDataInitBuffer = ServerPacketHandler::MakeSendBuffer(gameDataInit);
    }
    
    // 입장한 플레이어에게 월드의 Object 들의 스폰 정보 전송하기
@@ -672,6 +694,8 @@ void Room::JoinPlayerProcess(PlayerId playerId, PlayerPawn* playerPawn)
    
    if (enterResBuffer)
       SendToPlayer(playerId, enterResBuffer);
+   if (gameDataInitBuffer)
+      SendToPlayer(playerId, gameDataInitBuffer);
    if (entitiesSpawnBuffer)
       SendToPlayer(playerId, entitiesSpawnBuffer);
    if (playerInitBuffer)
