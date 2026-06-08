@@ -74,6 +74,8 @@ struct WeaponState
     uint32              weaponId = 0;
     int                 ammoInMag = 0;
     bool                isReloading = false;
+    uint64              reloadToken = 0;
+    TimePoint           nextAllowedFireTime{};
 };
 
 struct WeaponSlotState

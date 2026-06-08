@@ -481,6 +481,10 @@ void PlayerPawn::Tick(float dt)
 
 void PlayerPawn::OnDeath(ObjectManager& om, const DamageContext& ctx, const DamageResult& dmgResult)
 {
+   if (auto* playerCombat = GetPlayerCombat()) {
+      playerCombat->CancelAllReloads();
+   }
+
    Pawn::OnDeath(om, ctx, dmgResult);
    
    StartDeadState(om, dmgResult);

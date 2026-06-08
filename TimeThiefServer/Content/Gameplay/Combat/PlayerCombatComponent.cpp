@@ -11,6 +11,8 @@
 
 namespace 
 {
+    constexpr Milliseconds FireIntervalGrace{80};
+
     uint8 WeaponSlotFromWeaponId(uint32 weaponId)
     {
         switch (weaponId)
@@ -64,6 +66,9 @@ bool PlayerCombatComponent::CanAttack(const AttackRequest& request) const
             
             if (weaponState->runtime.ammoInMag <= 0)
                 return false;   // 탄약이 없는 무기는 공격할 수 없음
+
+            if (!CanPassFireInterval(*weaponState))
+                return false;   // 아직 다음 사격 가능 시간이 되지 않음
         }
         break;
         
@@ -81,6 +86,9 @@ bool PlayerCombatComponent::CanAttack(const AttackRequest& request) const
             
             if (weaponState->runtime.ammoInMag <= 0)
                 return false;   // 탄약이 없는 무기는 공격할 수 없음
+
+            if (!CanPassFireInterval(*weaponState))
+                return false;   // 아직 다음 사격 가능 시간이 되지 않음
         }
         break;
     }
@@ -88,7 +96,7 @@ bool PlayerCombatComponent::CanAttack(const AttackRequest& request) const
     return true;
 }
 
-bool PlayerCombatComponent::TryReload()
+bool PlayerCombatComponent::TryStartReload(uint64& outReloadToken, Milliseconds& outReloadDelay)
 {
     WeaponSlotState* currentWeapon = GetCurrentWeaponSlot();
     if (!currentWeapon)
@@ -101,13 +109,78 @@ bool PlayerCombatComponent::TryReload()
     if (currentWeapon->runtime.ammoInMag >= magCapacity)
         return false;   // 탄창이 이미 가득 찬 경우
     
-    const int needAmmo = magCapacity - currentWeapon->runtime.ammoInMag;
-    const int reloadAmmo = needAmmo;
+    const float reloadTimeSec = GetEffectiveReloadTimeSec(*currentWeapon);
+    const int64 reloadDelayMs = static_cast<int64>(std::max(0.0f, reloadTimeSec) * 1000.0f);
     
-    currentWeapon->runtime.ammoInMag += reloadAmmo;
-    currentWeapon->runtime.isReloading = false;   // TODO: 실제 재장전 시간과 애니메이션이 필요하다면, 재장전 시작 시점에 true로 설정하고, 일정 시간 후에 false로 변경하는 로직 추가
+    currentWeapon->runtime.isReloading = true;
+    outReloadToken = ++currentWeapon->runtime.reloadToken;
+    outReloadDelay = Milliseconds(reloadDelayMs);
     
     return true;
+}
+
+bool PlayerCombatComponent::CompleteReload(uint32 weaponId, uint64 reloadToken, ReloadCompleteResult* outResult)
+{
+    WeaponSlotState* weapon = GetWeaponSlot(weaponId);
+    if (!weapon)
+        return false;
+
+    if (!weapon->runtime.isReloading)
+        return false;
+
+    if (weapon->runtime.reloadToken != reloadToken)
+        return false;
+
+    if (GetCurrentWeaponId() != weaponId)
+        return false;
+
+    Pawn* ownerPawn = GetOwnerPawn();
+    if (!ownerPawn || !ownerPawn->IsHpAlive())
+        return false;
+
+    const int magCapacity = weapon->stat.common.magCapacity;
+    if (weapon->runtime.ammoInMag >= magCapacity) {
+        weapon->runtime.isReloading = false;
+        return false;
+    }
+
+    const int ammoBeforeReload = weapon->runtime.ammoInMag;
+    weapon->runtime.ammoInMag = magCapacity;
+    weapon->runtime.isReloading = false;
+
+    if (outResult) {
+        outResult->reloadedAmmo = static_cast<uint32>(std::max(0, magCapacity - ammoBeforeReload));
+        outResult->ammoInMag = static_cast<uint32>(std::max(0, weapon->runtime.ammoInMag));
+    }
+
+    return true;
+}
+
+void PlayerCombatComponent::CancelReload()
+{
+    WeaponSlotState* currentWeapon = GetCurrentWeaponSlot();
+    if (!currentWeapon || !currentWeapon->runtime.isReloading)
+        return;
+
+    currentWeapon->runtime.isReloading = false;
+    ++currentWeapon->runtime.reloadToken;
+}
+
+void PlayerCombatComponent::CancelAllReloads()
+{
+    for (WeaponSlotState& weapon : combatState_.slots) {
+        if (!weapon.runtime.isReloading)
+            continue;
+
+        weapon.runtime.isReloading = false;
+        ++weapon.runtime.reloadToken;
+    }
+}
+
+bool PlayerCombatComponent::IsReloading() const
+{
+    const WeaponSlotState* currentWeapon = GetCurrentWeaponSlot();
+    return currentWeapon && currentWeapon->runtime.isReloading;
 }
 
 uint32 PlayerCombatComponent::GetHandWeaponId() const
@@ -129,6 +202,7 @@ bool PlayerCombatComponent::SwitchWeapon(uint32 newWeaponId)
     if (!weaponState || weaponState->runtime.weaponId == 0)
         return false;
     
+    CancelReload();
     combatState_.currentWeaponSlot = newSlotIndex;
     return true;
 }
@@ -273,6 +347,10 @@ bool PlayerCombatComponent::ExecuteAttack(AttackRequest& request)
         break;
     default:
         break;
+    }
+
+    if (auto* firedWeapon = GetWeaponSlot(request.weaponId)) {
+        MarkFireAccepted(*firedWeapon);
     }
     
     return true;
@@ -480,4 +558,32 @@ bool PlayerCombatComponent::CanFireWeapon(uint8 slotIndex) const
         return false;
     
     return weaponState->runtime.ammoInMag > 0;
+}
+
+bool PlayerCombatComponent::CanPassFireInterval(const WeaponSlotState& weaponSlot) const
+{
+    const TimePoint nextAllowedFireTime = weaponSlot.runtime.nextAllowedFireTime;
+    if (nextAllowedFireTime == TimePoint{})
+        return true;
+
+    return Clock::now() + FireIntervalGrace >= nextAllowedFireTime;
+}
+
+void PlayerCombatComponent::MarkFireAccepted(WeaponSlotState& weaponSlot)
+{
+    const float fireIntervalSec = GetEffectiveFireIntervalSec(weaponSlot);
+    if (fireIntervalSec <= 0.0f) {
+        weaponSlot.runtime.nextAllowedFireTime = Clock::now();
+        return;
+    }
+
+    const auto fireInterval = Milliseconds(static_cast<int64>(fireIntervalSec * 1000.0f));
+    const TimePoint now = Clock::now();
+
+    if (weaponSlot.runtime.nextAllowedFireTime == TimePoint{} || weaponSlot.runtime.nextAllowedFireTime <= now) {
+        weaponSlot.runtime.nextAllowedFireTime = now + fireInterval;
+        return;
+    }
+
+    weaponSlot.runtime.nextAllowedFireTime += fireInterval;
 }

@@ -18,13 +18,24 @@ private:
    struct PalletPattern;
    
 public:
+   struct ReloadCompleteResult
+   {
+      uint32 reloadedAmmo = 0;
+      uint32 ammoInMag = 0;
+   };
+
+public:
    virtual ~PlayerCombatComponent() = default;
    
 public:
    virtual void Init(BaseObject* owner) override;
    
    virtual bool CanAttack(const AttackRequest& request) const override;
-   virtual bool TryReload();
+   bool TryStartReload(uint64& outReloadToken, Milliseconds& outReloadDelay);
+   bool CompleteReload(uint32 weaponId, uint64 reloadToken, ReloadCompleteResult* outResult = nullptr);
+   void CancelReload();
+   void CancelAllReloads();
+   bool IsReloading() const;
    
    uint32 GetHandWeaponId() const;
    bool SwitchWeapon(uint32 newWeaponId);
@@ -69,6 +80,8 @@ private:
    bool IsValidWeaponSlot(uint8 slotIndex) const;
    bool ConsumeAmmo(uint8 slotIndex, int amount);
    bool CanFireWeapon(uint8 slotIndex) const;
+   bool CanPassFireInterval(const WeaponSlotState& weaponSlot) const;
+   void MarkFireAccepted(WeaponSlotState& weaponSlot);
    
 private:
    struct PalletPattern

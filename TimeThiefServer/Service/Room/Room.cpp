@@ -824,6 +824,10 @@ bool Room::HandleFire(PlayerId playerId, const se::game::C_FireReq& pkt)
          consoleLogger->Log(Color::Yellow, L"[Room] PlayerPawn has no CombatComponent\n");
          return false;
       }
+
+      if (auto* playerCombatComp = playerPawn->GetPlayerCombat()) {
+         playerCombatComp->CancelReload();
+      }
       
       AttackRequest attackReq;
       attackReq.weaponId = pkt.weapon_id();
@@ -898,8 +902,6 @@ bool Room::HandleThrowGrenade(PlayerId playerId, const se::game::C_ThrowGrenadeR
 
 bool Room::HandleReload(PlayerId playerId, const se::game::C_ReloadReq& pkt)
 {
-   // TODO: 재장전 결과 패킷 (S_ReleadRes 를 작성해서 프로토콜 업데이트 하기)
-   SendBufferRef reloadResultBuffer;      // 재장전 결과를 해당 플레이어에게 보내는 패킷 (예: 재장전 성공 여부, 남은 탄창 수 등)
    std::shared_ptr<PlayerSession> sessionRef = sessionManager_.FindByPlayerId(playerId);
    
    if (!sessionRef) return false;   // 세션이 존재하지 않음 (정상적이지 않은 상황)
@@ -929,15 +931,53 @@ bool Room::HandleReload(PlayerId playerId, const se::game::C_ReloadReq& pkt)
       const uint32 handWeaponId = playerCombatComp->GetCurrentWeaponId();
       if (handWeaponId != weaponId) {
          consoleLogger->Log(Color::Yellow, L"[Room] Reload Failed: weapon_id mismatch (handWeaponId: %u, pkt.weapon_id: %u)\n", handWeaponId, pkt.weapon_id());
+         return true;
       }
-      playerCombatComp->TryReload();
+
+      uint64 reloadToken = 0;
+      Milliseconds reloadDelay{0};
+      if (!playerCombatComp->TryStartReload(reloadToken, reloadDelay)) {
+         consoleLogger->Log(Color::Yellow, L"[Room] Reload Failed: invalid reload state. playerId=%u weaponId=%u\n", playerId, weaponId);
+         return true;
+      }
+
+      GameShard* ownerShard = GetOwnerShard();
+      const RoomId roomId = GetRoomId();
+      const ObjectId playerObjectId = playerPawn->GetId();
+      ScheduleAfter(reloadDelay, [ownerShard, roomId, playerObjectId, weaponId, reloadToken]()
+      {
+         if (!ownerShard)
+            return;
+
+         auto room = ownerShard->FindRoom(roomId);
+         if (!room)
+            return;
+
+         auto* playerPawn = room->GetObjectManager().FindAs<PlayerPawn>(playerObjectId);
+         if (!playerPawn)
+            return;
+
+         auto* playerCombatComp = playerPawn->GetPlayerCombat();
+         if (!playerCombatComp)
+            return;
+
+         PlayerCombatComponent::ReloadCompleteResult reloadResult{};
+         if (!playerCombatComp->CompleteReload(weaponId, reloadToken, &reloadResult))
+            return;
+
+         se::game::S_ReloadRes res;
+         res.set_success(true);
+         res.set_weapon_id(weaponId);
+         res.set_reloaded_ammo(reloadResult.reloadedAmmo);
+         res.set_remaining_ammo(reloadResult.ammoInMag);
+
+         SendBufferRef reloadResultBuffer = ServerPacketHandler::MakeSendBuffer(res);
+         if (reloadResultBuffer)
+            room->SendToPlayer(playerPawn->GetOwnerPlayerId(), reloadResultBuffer);
+      });
       
       NotifyReload(playerId, it->second.pawnObjectId, weaponId);
    }
-   
-   // TODO: 여기서 보낼 게 아니다 (재장전 완료 시간에 보내야 한다)
-   if (reloadResultBuffer)
-      SendToPlayer(playerId, reloadResultBuffer);   // 재장전 결과를 해당 플레이어에게 전송
    
    return true;
 }
