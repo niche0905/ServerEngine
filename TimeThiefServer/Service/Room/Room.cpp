@@ -32,6 +32,12 @@ namespace
    constexpr SkillId TimeAccelSkillId = 1;
    constexpr SkillId TimeAfterImageSkillId = 2;
    constexpr SkillId TimeRewindSkillId = 3;
+   constexpr uint32 TimeAccelMoveSpeedBonusPercent = 30;
+   constexpr uint32 TimeAccelCombatSpeedBonusPercent = 30;
+   constexpr uint32 TimeRewindDurationMs = 3000;
+   constexpr float TimeRewindMaxPredictedPositionError = 200.0f;
+   constexpr float TimeRewindMaxPredictedPositionErrorSq =
+      TimeRewindMaxPredictedPositionError * TimeRewindMaxPredictedPositionError;
 
    uint64 GetNowMs();
    void FillUseSkillRes(se::game::S_UseSkillRes& res, bool success, se::common::ErrorCode code,
@@ -118,8 +124,6 @@ namespace
       case TimeRewindSkillId:
          if (!pkt.has_rewind())
             return "Time rewind detail is required.";
-         if (pkt.rewind().rewind_duration_ms() == 0)
-            return "Invalid time rewind duration.";
          if (!IsFiniteVector3(pkt.rewind().predicted_target_position()))
             return "Invalid time rewind predicted position.";
          return nullptr;
@@ -1202,17 +1206,38 @@ bool Room::HandleUseSkill(PlayerId playerId, const se::game::C_UseSkillReq& pkt)
 void Room::ExecuteTimeAccel(PlayerId playerId, PlayerPawn& playerPawn, const SkillDef& skillDef,
                             const se::game::C_UseSkillReq& pkt, uint64 nowMs)
 {
-   (void)playerId;
-
    UseSkillEvent ev{};
    ev.skillId = pkt.skill_id();
    ev.slotIndex = pkt.slot_index();
    ev.durationMs = skillDef.durationMs;
    ev.startedAtMs = nowMs;
    ev.detailType = UseSkillDetailType::TimeAccel;
+   ev.fireRateBonusPercent = TimeAccelCombatSpeedBonusPercent;
+   ev.moveSpeedBonusPercent = TimeAccelMoveSpeedBonusPercent;
 
-   // TODO: 실제 버프 및 타이머 적용 (후 다시 설정)
-   //       Apply temporary move-speed and fire-rate acceleration.
+   playerPawn.ApplyTimeAccel(TimeAccelMoveSpeedBonusPercent, TimeAccelCombatSpeedBonusPercent);
+
+   if (skillDef.durationMs > 0) {
+      GameShard* ownerShard = GetOwnerShard();
+      const RoomId roomId = GetRoomId();
+      const ObjectId playerObjectId = playerPawn.GetId();
+      const uint64 accelToken = playerPawn.GetTimeAccelToken();
+
+      ScheduleAfter(Milliseconds(skillDef.durationMs), [ownerShard, roomId, playerObjectId, accelToken]()
+      {
+         if (!ownerShard)
+            return;
+
+         auto room = ownerShard->FindRoom(roomId);
+         if (!room)
+            return;
+
+         if (auto* player = room->GetObjectManager().FindAs<PlayerPawn>(playerObjectId)) {
+            player->ClearTimeAccel(accelToken);
+         }
+      });
+   }
+
    NotifyUseSkill(playerPawn.GetId(), ev);
 }
 
@@ -1238,10 +1263,19 @@ void Room::ExecuteTimeAfterImage(PlayerId playerId, PlayerPawn& playerPawn, cons
 void Room::ExecuteTimeRewind(PlayerId playerId, PlayerPawn& playerPawn, const SkillDef& skillDef,
                              const se::game::C_UseSkillReq& pkt, uint64 nowMs)
 {
-   (void)playerId;
-
    const auto& rewindReq = pkt.rewind();
    const auto& predictedTargetPosition = rewindReq.predicted_target_position();
+   const uint32 requestedRewindDurationMs = rewindReq.rewind_duration_ms();
+   const Vector3 predictedPosition{
+      predictedTargetPosition.x(),
+      predictedTargetPosition.y(),
+      predictedTargetPosition.z()};
+
+   if (requestedRewindDurationMs != TimeRewindDurationMs) {
+      consoleLogger->Log(Color::Yellow,
+         L"[Room] Time rewind duration mismatch. playerId=%u requested=%u server=%u\n",
+         playerId, requestedRewindDurationMs, TimeRewindDurationMs);
+   }
 
    UseSkillEvent ev{};
    ev.skillId = pkt.skill_id();
@@ -1249,19 +1283,26 @@ void Room::ExecuteTimeRewind(PlayerId playerId, PlayerPawn& playerPawn, const Sk
    ev.durationMs = skillDef.durationMs;
    ev.startedAtMs = nowMs;
    ev.detailType = UseSkillDetailType::TimeRewind;
-   
-   // TODO: Rewind를 위한 Buffer가 PlayerPawn에 필요하다
-   //       Restore server-owned health and position from a rewind history buffer.
-   
-   // TODO: rewind_duration_ms 도 검증 해야 한다 (서버와 클라이언트간의 값이 같은지)
-   ev.rewindDurationMs = rewindReq.rewind_duration_ms();
-   // TODO: Rewind Buffer에서 HP도 가져와서 사용해야 한다
-   ev.targetHealth = playerPawn.GetHealth().GetHp();
-   // TODO: 아래 Pos도 검증을 하여 너무 차이가 크다면 Server의 값으로 혹은 스킬 사용 실패를 해야한다
-   ev.targetPosition = Vector3{
-      predictedTargetPosition.x(),
-      predictedTargetPosition.y(),
-      predictedTargetPosition.z()};
+   ev.rewindDurationMs = TimeRewindDurationMs;
+
+   PlayerPawn::TimeRewindFrame rewindFrame{};
+   if (playerPawn.RestoreTimeRewind(TimeRewindDurationMs, &rewindFrame)) {
+      ev.targetHealth = rewindFrame.hp;
+      ev.targetPosition = predictedPosition;
+
+      const Vector3 rewindPositionDiff = predictedPosition - rewindFrame.position;
+      const float rewindPositionDistSq = rewindPositionDiff.LengthSq();
+      if (rewindPositionDistSq > TimeRewindMaxPredictedPositionErrorSq) {
+         consoleLogger->Log(Color::Yellow,
+            L"[Room] Time rewind predicted position mismatch. playerId=%u distSq=%.2f limitSq=%.2f\n",
+            playerId, rewindPositionDistSq, TimeRewindMaxPredictedPositionErrorSq);
+         ev.targetPosition = rewindFrame.position;
+      }
+   }
+   else {
+      ev.targetHealth = playerPawn.GetHealth().GetHp();
+      ev.targetPosition = playerPawn.GetPosition();
+   }
 
    NotifyUseSkill(playerPawn.GetId(), ev);
 }

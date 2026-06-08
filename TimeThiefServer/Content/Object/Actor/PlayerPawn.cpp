@@ -114,6 +114,12 @@ void PlayerPawn::Heal(int32 amount)
    }
 }
 
+void PlayerPawn::SetSpeed(int32 speed)
+{
+   speed_ = std::max(0, speed);
+   MarkReplicationDirty(ReplicationDirty::Stat);
+}
+
 void PlayerPawn::OnPreRespawn(ObjectManager& om)
 {
    Pawn::OnPreRespawn(om);
@@ -124,6 +130,7 @@ void PlayerPawn::OnPreRespawn(ObjectManager& om)
 void PlayerPawn::OnPostRespawn(ObjectManager& om)
 {
    Pawn::OnPostRespawn(om);
+   ResetTimeRewindHistory();
 }
 
 bool PlayerPawn::TryReserveRespawn()
@@ -305,6 +312,113 @@ bool PlayerPawn::TrySetSavePoint(const Vector3& location)
    return true;
 }
 
+void PlayerPawn::ApplyTimeAccel(uint32 moveSpeedBonusPercent, uint32 combatSpeedBonusPercent)
+{
+   RestoreTimeAccelSnapshot();
+
+   ++timeAccelToken_;
+   timeAccelActive_ = true;
+   timeAccelMoveSpeedMultiplier_ = 1.0f + static_cast<float>(moveSpeedBonusPercent) / 100.0f;
+
+   if (auto* playerCombat = GetPlayerCombat()) {
+      const float combatSpeedMultiplier = 1.0f + static_cast<float>(combatSpeedBonusPercent) / 100.0f;
+      playerCombat->SetTimeAccelCombatSpeedMultiplier(combatSpeedMultiplier);
+   }
+}
+
+void PlayerPawn::ClearTimeAccel(uint64 token)
+{
+   if (!timeAccelActive_)
+      return;
+
+   if (token != 0 and token != timeAccelToken_)
+      return;
+
+   RestoreTimeAccelSnapshot();
+}
+
+void PlayerPawn::RestoreTimeAccelSnapshot()
+{
+   if (!timeAccelActive_)
+      return;
+
+   timeAccelMoveSpeedMultiplier_ = 1.0f;
+   if (auto* playerCombat = GetPlayerCombat()) {
+      playerCombat->ClearTimeAccelCombatSpeedMultiplier();
+   }
+
+   timeAccelActive_ = false;
+}
+
+PlayerPawn::TimeRewindFrame PlayerPawn::MakeCurrentTimeRewindFrame() const
+{
+   return TimeRewindFrame{
+      .hp = GetHealth().GetHp(),
+      .position = GetPosition(),
+   };
+}
+
+void PlayerPawn::ResetTimeRewindHistory()
+{
+   const TimeRewindFrame frame = MakeCurrentTimeRewindFrame();
+   timeRewindHistory_.fill(frame);
+   timeRewindNextIndex_ = 0;
+   timeRewindValidCount_ = TimeRewindHistoryCapacity;
+   timeRewindSampleAccumSec_ = 0.0f;
+}
+
+void PlayerPawn::PushTimeRewindFrame()
+{
+   timeRewindHistory_[timeRewindNextIndex_] = MakeCurrentTimeRewindFrame();
+   timeRewindNextIndex_ = (timeRewindNextIndex_ + 1) % TimeRewindHistoryCapacity;
+   timeRewindValidCount_ = std::min(timeRewindValidCount_ + 1, TimeRewindHistoryCapacity);
+}
+
+void PlayerPawn::TickTimeRewindHistory(float dt)
+{
+   if (dt <= 0.0f)
+      return;
+
+   timeRewindSampleAccumSec_ += dt;
+   const float sampleIntervalSec = static_cast<float>(TimeRewindSampleIntervalMs) / 1000.0f;
+
+   while (timeRewindSampleAccumSec_ >= sampleIntervalSec) {
+      PushTimeRewindFrame();
+      timeRewindSampleAccumSec_ -= sampleIntervalSec;
+   }
+}
+
+bool PlayerPawn::TryGetTimeRewindFrame(uint32 rewindDurationMs, TimeRewindFrame& outFrame) const
+{
+   if (timeRewindValidCount_ == 0)
+      return false;
+
+   const uint32 samplesBack = std::max<uint32>(1, (rewindDurationMs + TimeRewindSampleIntervalMs - 1) / TimeRewindSampleIntervalMs);
+   const size_t clampedSamplesBack = std::min<size_t>(samplesBack, timeRewindValidCount_);
+   const size_t newestIndex = (timeRewindNextIndex_ + TimeRewindHistoryCapacity - 1) % TimeRewindHistoryCapacity;
+   const size_t offset = clampedSamplesBack - 1;
+   const size_t targetIndex = (newestIndex + TimeRewindHistoryCapacity - (offset % TimeRewindHistoryCapacity)) % TimeRewindHistoryCapacity;
+
+   outFrame = timeRewindHistory_[targetIndex];
+   return true;
+}
+
+bool PlayerPawn::RestoreTimeRewind(uint32 rewindDurationMs, TimeRewindFrame* outFrame)
+{
+   TimeRewindFrame frame{};
+   if (!TryGetTimeRewindFrame(rewindDurationMs, frame))
+      return false;
+
+   GetHealth().SetHpUnsafe(frame.hp);
+   // SetPosition(frame.position);
+
+   if (outFrame)
+      *outFrame = frame;
+
+   ResetTimeRewindHistory();
+   return true;
+}
+
 void PlayerPawn::OnSpawn()
 {
    Pawn::OnSpawn();
@@ -331,6 +445,7 @@ void PlayerPawn::OnSpawn()
    
    save_.Init(this);
    save_.CaptureSnapshot();   // 초기 상태 저장
+   ResetTimeRewindHistory();
    
    deathCount_ = 0;
    
@@ -346,7 +461,7 @@ void PlayerPawn::Tick(float dt)
 {
    // Pawn::Tick(dt);
    
-   (void)dt;
+   TickTimeRewindHistory(dt);
 }
 
 void PlayerPawn::OnDeath(ObjectManager& om, const DamageContext& ctx, const DamageResult& dmgResult)

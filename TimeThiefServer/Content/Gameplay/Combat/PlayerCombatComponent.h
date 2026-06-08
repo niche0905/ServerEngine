@@ -46,6 +46,12 @@ public:
    const std::array<WeaponSlotState, MaxWeaponSlots>& GetWeaponSlots() const { return combatState_.slots; }
    
    void OnWeaponUpgrade();
+
+   void SetTimeAccelCombatSpeedMultiplier(float multiplier);
+   void ClearTimeAccelCombatSpeedMultiplier();
+   float GetTimeAccelCombatSpeedMultiplier() const { return timeAccelCombatSpeedMultiplier_; }
+   float GetEffectiveFireIntervalSec(const WeaponSlotState& weaponSlot) const;
+   float GetEffectiveReloadTimeSec(const WeaponSlotState& weaponSlot) const;
    
 public:
    const PlayerCombatState& GetCombatState() const { return combatState_; }
@@ -72,5 +78,6 @@ private:
 
 private:
    PlayerCombatState combatState_{};
+   float timeAccelCombatSpeedMultiplier_{1.0f};
    
 };

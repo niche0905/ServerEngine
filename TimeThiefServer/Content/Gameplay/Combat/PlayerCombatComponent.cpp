@@ -198,6 +198,26 @@ void PlayerCombatComponent::OnWeaponUpgrade()
     // none
 }
 
+void PlayerCombatComponent::SetTimeAccelCombatSpeedMultiplier(float multiplier)
+{
+    timeAccelCombatSpeedMultiplier_ = std::max(1.0f, multiplier);
+}
+
+void PlayerCombatComponent::ClearTimeAccelCombatSpeedMultiplier()
+{
+    timeAccelCombatSpeedMultiplier_ = 1.0f;
+}
+
+float PlayerCombatComponent::GetEffectiveFireIntervalSec(const WeaponSlotState& weaponSlot) const
+{
+    return weaponSlot.stat.common.fireIntervalSec / timeAccelCombatSpeedMultiplier_;
+}
+
+float PlayerCombatComponent::GetEffectiveReloadTimeSec(const WeaponSlotState& weaponSlot) const
+{
+    return weaponSlot.stat.common.reloadTimeSec / timeAccelCombatSpeedMultiplier_;
+}
+
 bool PlayerCombatComponent::ExecuteAttack(AttackRequest& request)
 {
     bool hit = false;

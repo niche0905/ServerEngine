@@ -1,5 +1,6 @@
 ﻿#pragma once
 #include <algorithm>
+#include <array>
 #include "Pawn.h"
 #include "Content/Gameplay/Combat/PlayerCombatComponent.h"
 #include "Content/Gameplay/Economy/IWalletOwner.h"
@@ -61,6 +62,7 @@ public:
     void SetMovementMode(int32 movementMode) { movementMode_ = movementMode; }
     
     int32 GetSpeed() const { return speed_; }
+    void SetSpeed(int32 speed);
     
 // Component
 public:
@@ -150,6 +152,24 @@ public:
     
 public:
     bool TrySetSavePoint(const Vector3& location);
+
+// Time skills
+public:
+    void ApplyTimeAccel(uint32 moveSpeedBonusPercent, uint32 combatSpeedBonusPercent);
+    void ClearTimeAccel(uint64 token);
+    bool IsTimeAccelActive() const { return timeAccelActive_; }
+    uint64 GetTimeAccelToken() const { return timeAccelToken_; }
+    float GetTimeAccelMoveSpeedMultiplier() const { return timeAccelMoveSpeedMultiplier_; }
+    float GetEffectiveSpeed() const { return static_cast<float>(speed_) * timeAccelMoveSpeedMultiplier_; }
+
+    struct TimeRewindFrame
+    {
+        int32 hp{0};
+        Vector3 position{};
+    };
+
+    void ResetTimeRewindHistory();
+    bool RestoreTimeRewind(uint32 rewindDurationMs, TimeRewindFrame* outFrame = nullptr);
     
 protected:
     void OnSpawn() override;
@@ -167,6 +187,11 @@ private:
     
 private:
     void InitDefaultLoadout();
+    void TickTimeRewindHistory(float dt);
+    void PushTimeRewindFrame();
+    TimeRewindFrame MakeCurrentTimeRewindFrame() const;
+    bool TryGetTimeRewindFrame(uint32 rewindDurationMs, TimeRewindFrame& outFrame) const;
+    void RestoreTimeAccelSnapshot();
     
 private:
     PlayerId                    playerId_;
@@ -188,5 +213,16 @@ private:
     int32                       zoneDamageTimePointMultiplier_{10};
     
     ActionState                 actionState_{};
+
+    bool                        timeAccelActive_{false};
+    uint64                      timeAccelToken_{0};
+    float                       timeAccelMoveSpeedMultiplier_{1.0f};
+
+    static constexpr uint32     TimeRewindSampleIntervalMs = 500;
+    static constexpr size_t     TimeRewindHistoryCapacity = 12;
+    std::array<TimeRewindFrame, TimeRewindHistoryCapacity> timeRewindHistory_{};
+    size_t                      timeRewindNextIndex_{0};
+    size_t                      timeRewindValidCount_{0};
+    float                       timeRewindSampleAccumSec_{0.0f};
     
 };
