@@ -7,7 +7,7 @@
       "damage": 12,
       "magazine_size": 30,
       "fire_interval": 0.1,
-      "reload_time": 2.0,
+      "reload_time": 1.33,
       "range": 10000.0
     },
     {
@@ -17,7 +17,7 @@
       "damage": 6,
       "magazine_size": 8,
       "fire_interval": 0.545454,
-      "reload_time": 2.0,
+      "reload_time": 1.5,
       "range": 3000.0,
       "pellet_count": 12,
       "cone_angle": 7.0
@@ -29,7 +29,7 @@
       "damage": 80,
       "magazine_size": 1,
       "fire_interval": 1.25,
-      "reload_time": 3.0,
+      "reload_time": 2.2,
       "range": 200.0,
       "projectile_speed": 2000.0,
       "explosion_radius": 480.0
