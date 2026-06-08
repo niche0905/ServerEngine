@@ -12,6 +12,7 @@
 namespace 
 {
     constexpr Milliseconds FireIntervalGrace{80};
+    constexpr float ReloadCommitLeadTimeSec = 0.15f;
 
     uint8 WeaponSlotFromWeaponId(uint32 weaponId)
     {
@@ -110,7 +111,8 @@ bool PlayerCombatComponent::TryStartReload(uint64& outReloadToken, Milliseconds&
         return false;   // 탄창이 이미 가득 찬 경우
     
     const float reloadTimeSec = GetEffectiveReloadTimeSec(*currentWeapon);
-    const int64 reloadDelayMs = static_cast<int64>(std::max(0.0f, reloadTimeSec) * 1000.0f);
+    const float reloadApplyDelaySec = std::max(0.0f, reloadTimeSec - ReloadCommitLeadTimeSec);
+    const int64 reloadDelayMs = static_cast<int64>(reloadApplyDelaySec * 1000.0f);
     
     currentWeapon->runtime.isReloading = true;
     outReloadToken = ++currentWeapon->runtime.reloadToken;
