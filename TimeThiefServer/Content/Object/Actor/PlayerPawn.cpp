@@ -350,6 +350,21 @@ void PlayerPawn::RestoreTimeAccelSnapshot()
    timeAccelActive_ = false;
 }
 
+uint64 PlayerPawn::BeginTimeRewindInvulnerability()
+{
+   ++timeRewindInvulnerabilityToken_;
+   GetHealth().SetInvincible(true);
+   return timeRewindInvulnerabilityToken_;
+}
+
+void PlayerPawn::ClearTimeRewindInvulnerability(uint64 token)
+{
+   if (token != timeRewindInvulnerabilityToken_)
+      return;
+
+   GetHealth().SetInvincible(false);
+}
+
 PlayerPawn::TimeRewindFrame PlayerPawn::MakeCurrentTimeRewindFrame() const
 {
    return TimeRewindFrame{

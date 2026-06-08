@@ -1286,6 +1286,27 @@ void Room::ExecuteTimeRewind(PlayerId playerId, PlayerPawn& playerPawn, const Sk
    ev.rewindDurationMs = TimeRewindDurationMs;
    ev.invulnerableDurationMs = skillDef.durationMs;
 
+   if (ev.invulnerableDurationMs > 0) {
+      GameShard* ownerShard = GetOwnerShard();
+      const RoomId roomId = GetRoomId();
+      const ObjectId playerObjectId = playerPawn.GetId();
+      const uint64 invulnerabilityToken = playerPawn.BeginTimeRewindInvulnerability();
+
+      ScheduleAfter(Milliseconds(ev.invulnerableDurationMs), [ownerShard, roomId, playerObjectId, invulnerabilityToken]()
+      {
+         if (!ownerShard)
+            return;
+
+         auto room = ownerShard->FindRoom(roomId);
+         if (!room)
+            return;
+
+         if (auto* player = room->GetObjectManager().FindAs<PlayerPawn>(playerObjectId)) {
+            player->ClearTimeRewindInvulnerability(invulnerabilityToken);
+         }
+      });
+   }
+
    PlayerPawn::TimeRewindFrame rewindFrame{};
    if (playerPawn.RestoreTimeRewind(TimeRewindDurationMs, &rewindFrame)) {
       ev.targetHealth = rewindFrame.hp;

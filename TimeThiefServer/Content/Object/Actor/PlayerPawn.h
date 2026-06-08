@@ -162,6 +162,9 @@ public:
     float GetTimeAccelMoveSpeedMultiplier() const { return timeAccelMoveSpeedMultiplier_; }
     float GetEffectiveSpeed() const { return static_cast<float>(speed_) * timeAccelMoveSpeedMultiplier_; }
 
+    uint64 BeginTimeRewindInvulnerability();
+    void ClearTimeRewindInvulnerability(uint64 token);
+
     struct TimeRewindFrame
     {
         int32 hp{0};
@@ -217,6 +220,7 @@ private:
     bool                        timeAccelActive_{false};
     uint64                      timeAccelToken_{0};
     float                       timeAccelMoveSpeedMultiplier_{1.0f};
+    uint64                      timeRewindInvulnerabilityToken_{0};
 
     static constexpr uint32     TimeRewindSampleIntervalMs = 500;
     static constexpr size_t     TimeRewindHistoryCapacity = 12;
