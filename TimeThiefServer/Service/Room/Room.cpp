@@ -1,6 +1,7 @@
 ﻿#include "pch.h"
 #include "Room.h"
 #include <algorithm>
+#include <cmath>
 #include <random>
 #include <utility>
 #include "Content/Gameplay/Combat/PlayerCombatComponent.h"
@@ -28,9 +29,16 @@
 
 namespace 
 {
+   constexpr SkillId TimeAccelSkillId = 1;
+   constexpr SkillId TimeAfterImageSkillId = 2;
+   constexpr SkillId TimeRewindSkillId = 3;
+
    uint64 GetNowMs();
    void FillUseSkillRes(se::game::S_UseSkillRes& res, bool success, se::common::ErrorCode code,
       const char* message, uint32 slotIndex, SkillId skillId, uint64 cooldownEndMs = 0, uint32 remainingCooldownMs = 0);
+   const char* ValidateUseSkillDetail(const se::game::C_UseSkillReq& pkt);
+   bool IsFiniteVector3(const se::common::Vector3& value);
+   bool IsNonZeroDirection(const se::common::Vector3& value);
    void SetProtoVector3(se::common::Vector3* out, const SE::Math::Vector3& value);
    void SetProtoRotator(se::common::Rotator* out, float yaw, float pitch, float roll);
    void ApplyDebugDrawOptions(se::game::N_DebugDraw* out, const Room::DebugDrawOptions& options);
@@ -89,6 +97,51 @@ namespace
       auto* resultPtr = res.mutable_result();
       resultPtr->set_code(code);
       resultPtr->set_message(message ? message : "");
+   }
+
+   const char* ValidateUseSkillDetail(const se::game::C_UseSkillReq& pkt)
+   {
+      switch (pkt.skill_id())
+      {
+      case TimeAccelSkillId:
+         return nullptr;
+
+      case TimeAfterImageSkillId:
+         if (!pkt.has_after_image())
+            return "Time after image detail is required.";
+         if (!IsFiniteVector3(pkt.after_image().start_position()))
+            return "Invalid time after image start position.";
+         if (!IsNonZeroDirection(pkt.after_image().direction()))
+            return "Invalid time after image direction.";
+         return nullptr;
+
+      case TimeRewindSkillId:
+         if (!pkt.has_rewind())
+            return "Time rewind detail is required.";
+         if (pkt.rewind().rewind_duration_ms() == 0)
+            return "Invalid time rewind duration.";
+         if (!IsFiniteVector3(pkt.rewind().predicted_target_position()))
+            return "Invalid time rewind predicted position.";
+         return nullptr;
+
+      default:
+         return "Unsupported skill id.";
+      }
+   }
+
+   bool IsFiniteVector3(const se::common::Vector3& value)
+   {
+      return std::isfinite(value.x()) and std::isfinite(value.y()) and std::isfinite(value.z());
+   }
+
+   bool IsNonZeroDirection(const se::common::Vector3& value)
+   {
+      if (!IsFiniteVector3(value))
+         return false;
+
+      constexpr float MinDirectionLengthSq = 0.0001f;
+      const float lengthSq = value.x() * value.x() + value.y() * value.y() + value.z() * value.z();
+      return lengthSq >= MinDirectionLengthSq;
    }
 
    void SetProtoVector3(se::common::Vector3* out, const SE::Math::Vector3& value)
@@ -1079,6 +1132,13 @@ bool Room::HandleUseSkill(PlayerId playerId, const se::game::C_UseSkillReq& pkt)
       }
 
       const uint64 nowMs = GetNowMs();
+      if (const char* detailError = ValidateUseSkillDetail(pkt)) {
+         FillUseSkillRes(res, false, se::common::ERR_ABILITY_NOT_AVAILABLE,
+            detailError, slotIndex, requestedSkillId, 0, 0);
+         useSkillResultBuffer = ServerPacketHandler::MakeSendBuffer(res);
+         break;
+      }
+
       const CooldownId cooldownId = skillDef->cooldownGroupId;
       if (cooldownId == 0) {
          FillUseSkillRes(res, false, se::common::ERR_INTERNAL_ERROR,
@@ -1112,9 +1172,24 @@ bool Room::HandleUseSkill(PlayerId playerId, const se::game::C_UseSkillReq& pkt)
          cooldownResult.endMs, remainingCooldownMs);
 
       useSkillResultBuffer = ServerPacketHandler::MakeSendBuffer(res);
-      
-      // TODO: 스킬 효과 적용 (예: 공격 스킬이면 피해 적용, 회복 스킬이면 회복 적용 등)
-      
+
+      switch (requestedSkillId)
+      {
+      case TimeAccelSkillId:
+         ExecuteTimeAccel(playerId, *playerPawn, *skillDef, pkt, nowMs);
+         break;
+
+      case TimeAfterImageSkillId:
+         ExecuteTimeAfterImage(playerId, *playerPawn, *skillDef, pkt, nowMs);
+         break;
+
+      case TimeRewindSkillId:
+         ExecuteTimeRewind(playerId, *playerPawn, *skillDef, pkt, nowMs);
+         break;
+
+      default:
+         break;
+      }
       
    } while (false);
    
@@ -1122,6 +1197,73 @@ bool Room::HandleUseSkill(PlayerId playerId, const se::game::C_UseSkillReq& pkt)
       SendToPlayer(playerId, useSkillResultBuffer);
    
    return true;
+}
+
+void Room::ExecuteTimeAccel(PlayerId playerId, PlayerPawn& playerPawn, const SkillDef& skillDef,
+                            const se::game::C_UseSkillReq& pkt, uint64 nowMs)
+{
+   (void)playerId;
+
+   UseSkillEvent ev{};
+   ev.skillId = pkt.skill_id();
+   ev.slotIndex = pkt.slot_index();
+   ev.durationMs = skillDef.durationMs;
+   ev.startedAtMs = nowMs;
+   ev.detailType = UseSkillDetailType::TimeAccel;
+
+   // TODO: 실제 버프 및 타이머 적용 (후 다시 설정)
+   //       Apply temporary move-speed and fire-rate acceleration.
+   NotifyUseSkill(playerPawn.GetId(), ev);
+}
+
+void Room::ExecuteTimeAfterImage(PlayerId playerId, PlayerPawn& playerPawn, const SkillDef& skillDef,
+                                 const se::game::C_UseSkillReq& pkt, uint64 nowMs)
+{
+   const auto& afterImageReq = pkt.after_image();
+   const auto& startPos = afterImageReq.start_position();
+   const auto& direction = afterImageReq.direction();
+
+   UseSkillEvent ev{};
+   ev.skillId = pkt.skill_id();
+   ev.slotIndex = pkt.slot_index();
+   ev.durationMs = skillDef.durationMs;
+   ev.startedAtMs = nowMs;
+   ev.detailType = UseSkillDetailType::TimeAfterImage;
+   ev.startPos = Vector3{startPos.x(), startPos.y(), startPos.z()};
+   ev.direction = Vector3{direction.x(), direction.y(), direction.z()};
+
+   NotifyUseSkill(playerPawn.GetId(), ev);
+}
+
+void Room::ExecuteTimeRewind(PlayerId playerId, PlayerPawn& playerPawn, const SkillDef& skillDef,
+                             const se::game::C_UseSkillReq& pkt, uint64 nowMs)
+{
+   (void)playerId;
+
+   const auto& rewindReq = pkt.rewind();
+   const auto& predictedTargetPosition = rewindReq.predicted_target_position();
+
+   UseSkillEvent ev{};
+   ev.skillId = pkt.skill_id();
+   ev.slotIndex = pkt.slot_index();
+   ev.durationMs = skillDef.durationMs;
+   ev.startedAtMs = nowMs;
+   ev.detailType = UseSkillDetailType::TimeRewind;
+   
+   // TODO: Rewind를 위한 Buffer가 PlayerPawn에 필요하다
+   //       Restore server-owned health and position from a rewind history buffer.
+   
+   // TODO: rewind_duration_ms 도 검증 해야 한다 (서버와 클라이언트간의 값이 같은지)
+   ev.rewindDurationMs = rewindReq.rewind_duration_ms();
+   // TODO: Rewind Buffer에서 HP도 가져와서 사용해야 한다
+   ev.targetHealth = playerPawn.GetHealth().GetHp();
+   // TODO: 아래 Pos도 검증을 하여 너무 차이가 크다면 Server의 값으로 혹은 스킬 사용 실패를 해야한다
+   ev.targetPosition = Vector3{
+      predictedTargetPosition.x(),
+      predictedTargetPosition.y(),
+      predictedTargetPosition.z()};
+
+   NotifyUseSkill(playerPawn.GetId(), ev);
 }
 
 bool Room::HandleUseItem(PlayerId playerId, const se::game::C_UseItemReq& pkt)
@@ -2514,6 +2656,16 @@ void Room::NotifyWireEnd(PlayerId playerId, ObjectId pawnId)
    wireEndEvent.header.source = pawnId;
    
    roomGameSystem_.GetReplicationSystem().PushEvent(wireEndEvent);
+}
+
+void Room::NotifyUseSkill(ObjectId pawnId, const UseSkillEvent& useSkillEvent)
+{
+   RepEvent useSkillRepEvent;
+   ReplicateEventSet(useSkillRepEvent, RepEventType::UseSkill);
+   useSkillRepEvent.header.source = pawnId;
+   useSkillRepEvent.payload = useSkillEvent;
+
+   roomGameSystem_.GetReplicationSystem().PushEvent(useSkillRepEvent);
 }
 
 void Room::NotifyItemChange(PlayerId playerId, uint32 itemId, int32 newCount, int32 deltaCount)

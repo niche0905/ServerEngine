@@ -37,6 +37,8 @@ enum class RepEventType : uint8
     WireLaunch,
     WireAction,
     WireActionEnd,
+
+    UseSkill,               // 스킬 사용 이벤트 (VFX/Sound 등 클라이언트 연출 트리거)
     
     Aim,                    // 조준 상태 변경 이벤트 (조준 시작, 조준 해제 등 포함) 
     Fire,                   // 발사 이벤트 (무기 종류, 발사 위치, 방향 등 포함)
@@ -149,6 +151,36 @@ struct WireActionEvent
     SE::Math::Vector3 anchorPoint{};
 };
 
+enum class UseSkillDetailType : uint8
+{
+    None = 0,
+    TimeAccel,
+    TimeAfterImage,
+    TimeRewind,
+};
+
+struct UseSkillEvent
+{
+    uint32 skillId{0};
+    uint32 slotIndex{0};
+    uint32 durationMs{0};
+    uint64 startedAtMs{0};
+
+    UseSkillDetailType detailType{UseSkillDetailType::None};
+
+    uint32 fireRateBonusPercent{0};
+    uint32 moveSpeedBonusPercent{0};
+
+    SE::Math::Vector3 startPos{};
+    SE::Math::Vector3 direction{};
+    float moveSpeed{0.0f};
+
+    uint32 rewindDurationMs{0};
+    uint32 invulnerableDurationMs{0};
+    int32 targetHealth{0};
+    SE::Math::Vector3 targetPosition{};
+};
+
 struct AimEvent
 {
     bool isAimed{false};
@@ -254,6 +286,7 @@ using RepEventPayload = std::variant<
     CrouchEvent,
     WireLaunchEvent,
     WireActionEvent,
+    UseSkillEvent,
     AimEvent,
     FireEvent,
     ReloadEvent,

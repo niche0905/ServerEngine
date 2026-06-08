@@ -24,6 +24,7 @@ class GameShard;
 class GameDataManager;
 class SessionManager;
 struct DamageContext;
+struct SkillDef;
 class Pawn;
 class BaseObject;
 class ObjectManager;
@@ -221,6 +222,10 @@ private:
    bool GiveItem(PlayerId playerId, const ItemStack& itemStack);
    bool GiveMoney(PlayerId playerId, int32 amount);
    
+   void ExecuteTimeAccel(PlayerId playerId, PlayerPawn& playerPawn, const SkillDef& skillDef, const se::game::C_UseSkillReq& pkt, uint64 nowMs);
+   void ExecuteTimeAfterImage(PlayerId playerId, PlayerPawn& playerPawn, const SkillDef& skillDef, const se::game::C_UseSkillReq& pkt, uint64 nowMs);
+   void ExecuteTimeRewind(PlayerId playerId, PlayerPawn& playerPawn, const SkillDef& skillDef, const se::game::C_UseSkillReq& pkt, uint64 nowMs);
+   
 private:
    void Broadcast(SendBufferRef sendBuffer, PlayerId exceptPlayerId = 0);
    bool SendToPlayer(PlayerId playerId, SendBufferRef sendBuffer);
@@ -252,6 +257,7 @@ public:
    void NotifyWireLaunch(PlayerId playerId, ObjectId pawnId, const Vector3& startPos, const Vector3& direction);
    void NotifyWireAction(PlayerId playerId, ObjectId pawnId, const Vector3& anchorPoint);
    void NotifyWireEnd(PlayerId playerId, ObjectId pawnId);
+   void NotifyUseSkill(ObjectId pawnId, const UseSkillEvent& useSkillEvent);
    void NotifyHealthChange(PlayerId id, int newHealth, int deltaHealth);
    void NotifyMaxHealthChange(PlayerId id, int newMaxHealth, int newHealth);
    void NotifyTimePointChange(PlayerId id, int newTimePoint, int deltaTimePoint);

@@ -370,6 +370,10 @@ void ReplicationSystem::DispatchImmediateEvent(const RepEvent& ev, const RepFram
    case RepEventType::WireActionEnd:
       FlushEvent_WireActionEnd(ev, frame);
       break;
+
+   case RepEventType::UseSkill:
+      FlushEvent_UseSkill(ev, frame);
+      break;
       
    case RepEventType::Aim:
       FlushEvent_Aim(ev, frame);
@@ -854,6 +858,72 @@ void ReplicationSystem::FlushEvent_Aim(const RepEvent& ev, const RepFrame& frame
    
    SendBufferRef sendBuffer = ServerPacketHandler::MakeSendBuffer(aimPkt);
    ownerRoom_->BroadcastReplication(sendBuffer, ev.header.exceptPlayerId);
+}
+
+void ReplicationSystem::FlushEvent_UseSkill(const RepEvent& ev, const RepFrame& frame) const
+{
+   const UseSkillEvent* useSkillEv = std::get_if<UseSkillEvent>(&ev.payload);
+   if (!useSkillEv) {
+      consoleLogger->Log(Color::Yellow, L"[ReplicationSystem] UseSkill event with invalid payload, skipping. objectId={}", ev.header.source.value);
+      return;
+   }
+
+   se::game::N_UseSkill noti;
+   noti.mutable_entity_id()->set_value(ev.header.source.value);
+   noti.set_skill_id(useSkillEv->skillId);
+   noti.set_slot_index(useSkillEv->slotIndex);
+   noti.set_duration_ms(useSkillEv->durationMs);
+   noti.set_started_at_ms(useSkillEv->startedAtMs);
+
+   switch (useSkillEv->detailType)
+   {
+   case UseSkillDetailType::TimeAccel:
+      {
+         auto* detail = noti.mutable_time_accel();
+         detail->set_fire_rate_bonus_percent(useSkillEv->fireRateBonusPercent);
+         detail->set_move_speed_bonus_percent(useSkillEv->moveSpeedBonusPercent);
+      }
+      break;
+
+   case UseSkillDetailType::TimeAfterImage:
+      {
+         auto* detail = noti.mutable_after_image();
+         auto* startPos = detail->mutable_start_position();
+         startPos->set_x(useSkillEv->startPos.x);
+         startPos->set_y(useSkillEv->startPos.y);
+         startPos->set_z(useSkillEv->startPos.z);
+
+         auto* direction = detail->mutable_direction();
+         direction->set_x(useSkillEv->direction.x);
+         direction->set_y(useSkillEv->direction.y);
+         direction->set_z(useSkillEv->direction.z);
+         detail->set_move_speed(useSkillEv->moveSpeed);
+      }
+      break;
+
+   case UseSkillDetailType::TimeRewind:
+      {
+         auto* detail = noti.mutable_rewind();
+         detail->set_rewind_duration_ms(useSkillEv->rewindDurationMs);
+         detail->set_invulnerable_duration_ms(useSkillEv->invulnerableDurationMs);
+         detail->set_target_health(useSkillEv->targetHealth);
+
+         auto* targetPos = detail->mutable_target_position();
+         targetPos->set_x(useSkillEv->targetPosition.x);
+         targetPos->set_y(useSkillEv->targetPosition.y);
+         targetPos->set_z(useSkillEv->targetPosition.z);
+      }
+      break;
+
+   case UseSkillDetailType::None:
+   default:
+      break;
+   }
+
+   (void)frame;
+
+   SendBufferRef sendBuffer = ServerPacketHandler::MakeSendBuffer(noti);
+   ownerRoom_->BroadcastReplication(sendBuffer);
 }
 
 void ReplicationSystem::FlushEvent_Fire(const RepEvent& ev, const RepFrame& frame) const

@@ -70,6 +70,7 @@ private:
    void FlushEvent_WireLaunch(const RepEvent& ev, const RepFrame& frame) const;
    void FlushEvent_WireAction(const RepEvent& ev, const RepFrame& frame) const;
    void FlushEvent_WireActionEnd(const RepEvent& ev, const RepFrame& frame) const;
+   void FlushEvent_UseSkill(const RepEvent& ev, const RepFrame& frame) const;
    void FlushEvent_Aim(const RepEvent& ev, const RepFrame& frame) const;
    void FlushEvent_Fire(const RepEvent& ev, const RepFrame& frame) const;
    void FlushEvent_Reload(const RepEvent& ev, const RepFrame& frame) const;
