@@ -31,31 +31,24 @@ namespace
       return true;
    }
 
-   Vector3 RotateEulerXYZ(const Vector3& value, const Vector3& degrees)
+   Vector3 RotateUnrealRotator(const Vector3& value, const Vector3& degrees)
    {
-      const float rx = SE::Math::DegreesToRadians(degrees.x);
-      const float ry = SE::Math::DegreesToRadians(degrees.y);
-      const float rz = SE::Math::DegreesToRadians(degrees.z);
+      const float pitch = SE::Math::DegreesToRadians(degrees.x);
+      const float yaw = SE::Math::DegreesToRadians(degrees.y);
+      const float roll = SE::Math::DegreesToRadians(degrees.z);
 
-      Vector3 v = value;
+      const float sp = std::sin(pitch);
+      const float cp = std::cos(pitch);
+      const float sy = std::sin(yaw);
+      const float cy = std::cos(yaw);
+      const float sr = std::sin(roll);
+      const float cr = std::cos(roll);
 
-      {
-         const float c = std::cos(rx);
-         const float s = std::sin(rx);
-         v = Vector3{v.x, v.y * c - v.z * s, v.y * s + v.z * c};
-      }
-      {
-         const float c = std::cos(ry);
-         const float s = std::sin(ry);
-         v = Vector3{v.x * c + v.z * s, v.y, -v.x * s + v.z * c};
-      }
-      {
-         const float c = std::cos(rz);
-         const float s = std::sin(rz);
-         v = Vector3{v.x * c - v.y * s, v.x * s + v.y * c, v.z};
-      }
+      const Vector3 axisX{cp * cy, cp * sy, sp};
+      const Vector3 axisY{sr * sp * cy - cr * sy, sr * sp * sy + cr * cy, -sr * cp};
+      const Vector3 axisZ{-(cr * sp * cy + sr * sy), cy * sr - cr * sp * sy, cr * cp};
 
-      return v;
+      return axisX * value.x + axisY * value.y + axisZ * value.z;
    }
 
    bool HasFlag(const Json::Value& row, const std::string& flag)
@@ -188,7 +181,7 @@ namespace
             return false;
          }
          {
-            const Vector3 axis = RotateEulerXYZ(Vector3::Up(), out.localRotationDegrees).Normalized(Vector3::Up());
+            const Vector3 axis = RotateUnrealRotator(Vector3::Up(), out.localRotationDegrees).Normalized(Vector3::Up());
             const float segmentHalfHeight = std::max(0.0f, out.halfHeight - out.radius);
             out.localPointA = out.localOffset - axis * segmentHalfHeight;
             out.localPointB = out.localOffset + axis * segmentHalfHeight;
@@ -214,14 +207,20 @@ namespace
                return false;
             }
          }
+         else if (row.isMember("extents")) {
+            if (!ReadVector3(row["extents"], out.halfExtent)) {
+               if (outError) *outError = "Invalid OBB extents";
+               return false;
+            }
+         }
          else {
             if (outError) *outError = "OBB collider requires half_extent";
             return false;
          }
 
-         out.localAxisX = RotateEulerXYZ(Vector3{1.0f, 0.0f, 0.0f}, out.localRotationDegrees).Normalized(Vector3{1.0f, 0.0f, 0.0f});
-         out.localAxisY = RotateEulerXYZ(Vector3{0.0f, 1.0f, 0.0f}, out.localRotationDegrees).Normalized(Vector3{0.0f, 1.0f, 0.0f});
-         out.localAxisZ = RotateEulerXYZ(Vector3{0.0f, 0.0f, 1.0f}, out.localRotationDegrees).Normalized(Vector3{0.0f, 0.0f, 1.0f});
+         out.localAxisX = RotateUnrealRotator(Vector3{1.0f, 0.0f, 0.0f}, out.localRotationDegrees).Normalized(Vector3{1.0f, 0.0f, 0.0f});
+         out.localAxisY = RotateUnrealRotator(Vector3{0.0f, 1.0f, 0.0f}, out.localRotationDegrees).Normalized(Vector3{0.0f, 1.0f, 0.0f});
+         out.localAxisZ = RotateUnrealRotator(Vector3{0.0f, 0.0f, 1.0f}, out.localRotationDegrees).Normalized(Vector3{0.0f, 0.0f, 1.0f});
          break;
       }
 
