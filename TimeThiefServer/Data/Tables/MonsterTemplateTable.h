@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include <string>
 #include <unordered_map>
 
@@ -10,6 +10,7 @@ struct MonsterTemplateDef
    int32 dropPoint = 0;
    int32 respawnTimeSec = 0;
    int32 lootTableId = 0;
+   uint32 collisionProfileId = 0;
 
    bool IsValid() const
    {
@@ -18,7 +19,8 @@ struct MonsterTemplateDef
          && maxHp > 0
          && dropPoint >= 0
          && respawnTimeSec >= 0
-         && lootTableId > 0;
+         && lootTableId > 0
+         && collisionProfileId != 0;
    }
 };
 

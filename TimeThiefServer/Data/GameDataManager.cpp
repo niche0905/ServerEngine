@@ -6,6 +6,7 @@
 #include "Placements/MonsterPlacementJson.h"
 #include "Tables/LootTableJson.h"
 #include "Tables/MonsterTemplateTableJson.h"
+#include "Tables/PawnCollisionProfileTableJson.h"
 #include "Tables/PlayerSpawnTableJson.h"
 #include "Tables/SkillTableJson.h"
 #include "Tables/StoreEntryTableJson.h"
@@ -81,12 +82,33 @@ bool GameDataManager::Init(const ServerConfig& config)
       return false;
    }
 
+   if (not PawnCollisionProfileTableJson::LoadFromFile(config.dataFiles.pawnCollisionProfileTablePath, pawnCollisionProfileTable_, &error)) {
+      consoleLogger->Log(Color::Red, L"[GDM] Failed to load PawnCollisionProfileTable: %hs\n", error.c_str());
+      return false;
+   }
+   
+   // consoleLogger->Log(Color::Green, L"[GDM] PawnCollisionProfileTable loaded successfully. Number of profiles: %zu\n", pawnCollisionProfileTable_.profiles.size());
+
+   if (!pawnCollisionProfileTable_.HasProfile(1)) {
+      consoleLogger->Log(Color::Red, L"[GDM] Missing required player PawnCollisionProfile.\n");
+      return false;
+   }
+
    for (const auto& [templateId, monsterTemplate] : monsterTemplateTable_.templates) {
       if (!lootTable_.HasTable(monsterTemplate.lootTableId)) {
          consoleLogger->Log(Color::Red, L"[GDM] MonsterTemplate %u references missing LootTable %d.\n", templateId, monsterTemplate.lootTableId);
          return false;
       }
+
+      if (monsterTemplate.collisionProfileId != 0
+         && !pawnCollisionProfileTable_.HasProfile(monsterTemplate.collisionProfileId)) {
+         consoleLogger->Log(Color::Red, L"[GDM] MonsterTemplate %u references missing PawnCollisionProfile %u.\n",
+            templateId, monsterTemplate.collisionProfileId);
+         return false;
+      }
    }
+   
+   // consoleLogger->Log(Color::Green, L"[GDM] MonsterTemplateTable loaded successfully. Number of templates: %zu\n", monsterTemplateTable_.templates.size());
    
    if (not StoreEntryTableJson::LoadFromFile(config.dataFiles.storeEntryTablePath, storeEntryTable_, &error)) {
       consoleLogger->Log(Color::Red, L"[GDM] Failed to load StoreEntryTable: %hs\n", error.c_str());

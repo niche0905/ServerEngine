@@ -13,7 +13,8 @@ namespace
          && row.isMember("max_hp")
          && row.isMember("drop_point")
          && row.isMember("respawn_time")
-         && row.isMember("loot_table");
+         && row.isMember("loot_table")
+         && row.isMember("collision_profile_id");
    }
 }
 
@@ -61,7 +62,8 @@ namespace MonsterTemplateTableJson
             || !row["max_hp"].isInt()
             || !row["drop_point"].isInt()
             || !row["respawn_time"].isInt()
-            || !row["loot_table"].isInt()) {
+            || !row["loot_table"].isInt()
+            || !row["collision_profile_id"].isUInt()) {
             if (outError) *outError = "Invalid monster template field type";
             return false;
          }
@@ -73,6 +75,7 @@ namespace MonsterTemplateTableJson
          monsterTemplate.dropPoint = row["drop_point"].asInt();
          monsterTemplate.respawnTimeSec = row["respawn_time"].asInt();
          monsterTemplate.lootTableId = row["loot_table"].asInt();
+         monsterTemplate.collisionProfileId = row["collision_profile_id"].asUInt();
 
          if (!monsterTemplate.IsValid()) {
             if (outError) *outError = "Monster template validation failed: " + std::to_string(monsterTemplate.templateId);

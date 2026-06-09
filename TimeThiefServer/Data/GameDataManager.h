@@ -5,6 +5,7 @@
 #include "Tables/LootTableTypes.h"
 #include "Tables/MonsterTemplateTable.h"
 #include "Tables/NpcAiTable.h"
+#include "Tables/PawnCollisionProfileTable.h"
 #include "Tables/PlayerSpawnTable.h"
 #include "Tables/SkillTable.h"
 #include "Tables/StoreEntryTable.h"
@@ -28,6 +29,7 @@ public:
    const ZoneTable& GetZoneTable() const { return zoneTable_; }
    const LootTable& GetLootTable() const { return lootTable_; }
    const MonsterTemplateTable& GetMonsterTemplateTable() const { return monsterTemplateTable_; }
+   const PawnCollisionProfileTable& GetPawnCollisionProfileTable() const { return pawnCollisionProfileTable_; }
    const StoreEntryTable& GetStoreEntryTable() const { return storeEntryTable_; }
    const SkillTable& GetSkillTable() const { return skillTable_; }
    const WeaponTable& GetWeaponTable() const { return weaponTable_; }
@@ -41,6 +43,7 @@ private:
    ZoneTable                  zoneTable_;
    LootTable                  lootTable_;
    MonsterTemplateTable       monsterTemplateTable_;
+   PawnCollisionProfileTable  pawnCollisionProfileTable_;
    StoreEntryTable            storeEntryTable_;
    SkillTable                 skillTable_;
    WeaponTable                weaponTable_;
