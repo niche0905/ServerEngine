@@ -446,6 +446,7 @@ void PlayerPawn::OnSpawn()
    }
    
    respawn_.Init(this, RespawnPolicy{});
+   BindHitboxProfile(1);      // Player Hitbox Profile은 1
    inventory_.Init(this, 20);
    wallet_.Init(this);     
    wallet_.SetBalanceUnsafe(CurrencyType::TimePoint, initialTimePoint_);

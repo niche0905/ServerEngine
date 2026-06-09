@@ -91,6 +91,7 @@ void MonsterPawn::OnSpawn()
             }
             lootTableId = monsterTemplate->lootTableId;
             dropPoint_ = monsterTemplate->dropPoint;
+            BindHitboxProfile(monsterTemplate->collisionProfileId);
          }
       }
    }
