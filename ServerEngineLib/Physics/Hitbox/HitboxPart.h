@@ -1,11 +1,14 @@
 ﻿#pragma once
+#include <memory>
+#include "Utils/Types.h"
 #include "HitGroup.h"
+#include "Physics/Collider/Collider.h"
 
 /*--------------
    HitboxPart
 --------------*/
 //
-// HitboxPart는 피격 가능한 한 부위의 정보 집합입니다
+// HitboxPart는 피격 가능한 한 부위와 해당 collider prototype을 가집니다.
 //
 
 namespace SE::Physics::Hit
@@ -19,12 +22,18 @@ namespace SE::Physics::Hit
     
     struct HitboxPart
     {
-        HitShapeType type;
-        HitGroup group;
-        float damageMultiplier;
+        HitboxPart() = default;
+        ~HitboxPart() = default;
+
+        HitboxPart(const HitboxPart&) = delete;
+        HitboxPart& operator=(const HitboxPart&) = delete;
         
-        SE::Math::Vector3 localOffset;  // root에서의 중심/기준점 으로부터
-        float radius;
+        HitboxPart(HitboxPart&&) noexcept = default;
+        HitboxPart& operator=(HitboxPart&&) noexcept = default;
+
+        HitShapeType type{ HitShapeType::Sphere };
+        HitGroup group{ HitGroup::Unknown };
+        float damageMultiplier{1.0f};
+        std::unique_ptr<Collider> collider;
     };
-    
 }

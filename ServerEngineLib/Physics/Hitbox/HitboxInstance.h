@@ -1,52 +1,44 @@
 ﻿#pragma once
+#include <vector>
 #include "HitboxPart.h"
+#include "HitResult.h"
 #include "Physics/Collider/AABBCollider.h"
 
 /*------------------
    HitboxInstance
 ------------------*/
 //
-// HitboxInstance는 한 객체(Hitbox를 가져야 할) Hitbox 정보를 가지게 될 클래스입니다
+// HitboxInstance는 한 객체가 가진 Hitbox collider들을 런타임 월드 상태로 갱신합니다.
 //
+
+namespace SE::Physics
+{
+    class Collider;
+    struct Ray;
+}
 
 namespace SE::Physics::Hit
 {
-    class HitboxAsset
-    {
-    public:
-        std::vector<HitboxPart> parts;
-        
-    };
-    
     class HitboxInstance
     {
     public:
         using Vector3 = SE::Math::Vector3;
         
     public:
-        void Bind(const HitboxAsset* asset);
-        void Update(const Vector3& rootPos, float yawRadians);
+        void Bind(std::vector<HitboxPart> parts);
+        void Clear();
+        bool IsBound() const { return !parts_.empty(); }
+        void Update(const Vector3& rootPos, float yawDegrees);
         
         const AABBCollider& GetWorldAABB() const;
+        const std::vector<HitboxPart>& GetParts() const { return parts_; }
         
-        // TODO: Ray 먼저 작성하기 SE::Physics의 영역이다
-        bool Raycast(Ray& ray, RaycastHit& out) const;
+        bool Raycast(const Ray& ray, HitResult& out) const;
+        bool SphereCast(const Vector3& from, const Vector3& to, float radius, HitResult& out) const;
+        bool Intersect(const Collider& other, HitResult* out = nullptr) const;
 
     private:
-        const HitboxAsset* asset_ = nullptr;
-        
-        // TODO: 런타임 캐시가 필요하게 된다면 사용할 것
-        struct WorldPart
-        {
-            HitShapeType type;
-            HitGroup group;
-            float mult;
-            
-        };
-        
-        std::vector<WorldPart> worldParts_;
+        std::vector<HitboxPart> parts_;
         AABBCollider worldAABB_;
-    
     };
-    
 }

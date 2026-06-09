@@ -1,24 +1,16 @@
 ﻿#pragma once
+#include "Utils/Types.h"
 #include "HitGroup.h"
 
 class Actor;
-
-/*-------------
-   HitResult
--------------*/
-//
-// 전투(Hitbox) 전용 Raycast 결과 구조체입니다
-//
 
 namespace SE::Physics::Hit
 {
     struct HitResult
     {
-    public:
         using Vector3 = SE::Math::Vector3;
         
         bool hit{false};                    // 히트 여부
-        
         float t{0.0f};                      // 레이캐스트 시 t값
         
         Vector3 point{};                    // 히트 위치
@@ -27,8 +19,8 @@ namespace SE::Physics::Hit
         HitGroup group{HitGroup::Unknown};  // 히트 그룹
         float damageMultiplier{1.0f};       // 데미지 배율
         
-        uint16 partIndex{0};               // 히트한 부위 인덱스(없으면 0)
-        Actor* actor{nullptr};             // 히트한 Actor (없으면 nullptr)
+        uint16 partIndex{0};                // 히트한 부위 인덱스(없으면 0)
+        Actor* actor{nullptr};              // 히트한 Actor (없으면 nullptr)
         
         void Reset()
         {
