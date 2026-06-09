@@ -196,10 +196,32 @@ namespace
          break;
 
       case HitShapeType::OBB:
-         if (!row.isMember("half_extent") || !ReadVector3(row["half_extent"], out.halfExtent)) {
+         if (row.isMember("half_extent")) {
+            if (!ReadVector3(row["half_extent"], out.halfExtent)) {
+               if (outError) *outError = "Invalid OBB half_extent";
+               return false;
+            }
+         }
+         else if (row.isMember("extent")) {
+            if (!ReadVector3(row["extent"], out.halfExtent)) {
+               if (outError) *outError = "Invalid OBB extent";
+               return false;
+            }
+         }
+         else if (row.isMember("box_extent")) {
+            if (!ReadVector3(row["box_extent"], out.halfExtent)) {
+               if (outError) *outError = "Invalid OBB box_extent";
+               return false;
+            }
+         }
+         else {
             if (outError) *outError = "OBB collider requires half_extent";
             return false;
          }
+
+         out.localAxisX = RotateEulerXYZ(Vector3{1.0f, 0.0f, 0.0f}, out.localRotationDegrees).Normalized(Vector3{1.0f, 0.0f, 0.0f});
+         out.localAxisY = RotateEulerXYZ(Vector3{0.0f, 1.0f, 0.0f}, out.localRotationDegrees).Normalized(Vector3{0.0f, 1.0f, 0.0f});
+         out.localAxisZ = RotateEulerXYZ(Vector3{0.0f, 0.0f, 1.0f}, out.localRotationDegrees).Normalized(Vector3{0.0f, 0.0f, 1.0f});
          break;
       }
 

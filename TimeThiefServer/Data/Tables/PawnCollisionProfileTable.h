@@ -15,6 +15,9 @@ struct PawnCollisionPartData
    SE::Math::Vector3 localPointA{};
    SE::Math::Vector3 localPointB{};
    SE::Math::Vector3 halfExtent{};
+   SE::Math::Vector3 localAxisX{1.0f, 0.0f, 0.0f};
+   SE::Math::Vector3 localAxisY{0.0f, 1.0f, 0.0f};
+   SE::Math::Vector3 localAxisZ{0.0f, 0.0f, 1.0f};
    float radius{0.0f};
    float halfHeight{0.0f};
 };
