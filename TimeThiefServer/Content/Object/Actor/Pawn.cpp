@@ -1,12 +1,64 @@
 ﻿#include "pch.h"
 #include "Pawn.h"
+#include "Data/GameDataManager.h"
 #include "Data/Tables/ZoneTableJson.h"
+#include "Physics/Collider/CapsuleCollider.h"
+#include "Physics/Collider/OBBCollider.h"
+#include "Physics/Collider/SphereCollider.h"
 #include "Service/Room/Room.h"
 #include "Shard/GameShard.h"
 
 /*--------
    Pawn
 --------*/
+
+namespace
+{
+   std::unique_ptr<SE::Physics::Collider> CreateHitboxCollider(const PawnCollisionPartData& data)
+   {
+      using namespace SE::Physics;
+      using SE::Physics::Hit::HitShapeType;
+
+      switch (data.shape)
+      {
+      case HitShapeType::Sphere:
+         return std::make_unique<SphereCollider>(data.localOffset, data.radius);
+
+      case HitShapeType::Capsule:
+         return std::make_unique<CapsuleCollider>(data.localPointA, data.localPointB, data.radius);
+
+      case HitShapeType::OBB:
+         return std::make_unique<OBBCollider>(
+            data.localOffset,
+            data.halfExtent,
+            data.localAxisX,
+            data.localAxisY,
+            data.localAxisZ
+         );
+      }
+
+      return nullptr;
+   }
+
+   std::vector<SE::Physics::Hit::HitboxPart> BuildHitboxParts(const PawnCollisionProfileDef& profile)
+   {
+      std::vector<SE::Physics::Hit::HitboxPart> parts;
+      parts.reserve(profile.parts.size());
+
+      for (const PawnCollisionPartData& data : profile.parts) {
+         SE::Physics::Hit::HitboxPart part;
+         part.type = data.shape;
+         part.group = data.group;
+         part.damageMultiplier = data.damageMultiplier;
+         part.collider = CreateHitboxCollider(data);
+
+         if (part.collider)
+            parts.push_back(std::move(part));
+      }
+
+      return parts;
+   }
+}
 
 void Pawn::IntegrateMove(float dt)
 {
@@ -118,6 +170,46 @@ int32 Pawn::GetHp() const
 int32 Pawn::GetMaxHp() const
 {
    return health_.GetMaxHp();
+}
+
+bool Pawn::BindHitboxProfile(uint32 collisionProfileId)
+{
+   if (collisionProfileId == 0)
+      return false;
+
+   auto room = GetRoom();
+   if (!room)
+      return false;
+
+   const GameDataManager* gameDataManager = room->GetGameDataManager();
+   if (!gameDataManager)
+      return false;
+
+   const PawnCollisionProfileDef* profile = gameDataManager->GetPawnCollisionProfileTable().GetProfile(collisionProfileId);
+   if (!profile)
+      return false;
+
+   std::vector<SE::Physics::Hit::HitboxPart> parts = BuildHitboxParts(*profile);
+   if (parts.empty())
+      return false;
+
+   hitbox_.Bind(std::move(parts));
+   SyncColliders();
+   return true;
+}
+
+void Pawn::UpdateHitboxWorld()
+{
+   if (!hitbox_.IsBound())
+      return;
+
+   hitbox_.Update(GetPosition(), GetYaw());
+}
+
+void Pawn::SyncColliders()
+{
+   Actor::SyncColliders();
+   UpdateHitboxWorld();
 }
 
 SE::Math::Vector3 Pawn::ResolveRespawnPosition(ObjectManager& om)

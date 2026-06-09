@@ -50,7 +50,7 @@ public:
    
    const std::vector<std::unique_ptr<ColliderComponent>>& GetColliders() const { return colliders_; }
    
-   void SyncColliders();
+   virtual void SyncColliders();
    
 // Replication 관련 함수들
 public:

@@ -9,6 +9,7 @@
 #include "Content/Gameplay/Effects/IEffectOwner.h"
 #include "Content/Gameplay/Spawn/IRespawnOwner.h"
 #include "Content/Gameplay/Spawn/RespawnComponent.h"
+#include "Physics/Hitbox/HitboxInstance.h"
 
 /*--------
    Pawn
@@ -64,6 +65,15 @@ public:
     virtual bool IsHpAlive() const override;
     virtual int32 GetHp() const override;
     virtual int32 GetMaxHp() const override;
+
+// Hitbox
+public:
+    bool BindHitboxProfile(uint32 collisionProfileId);
+    bool HasHitbox() const { return hitbox_.IsBound(); }
+    void UpdateHitboxWorld();
+    const SE::Physics::Hit::HitboxInstance& GetHitbox() const { return hitbox_; }
+    SE::Physics::Hit::HitboxInstance& GetHitbox() { return hitbox_; }
+    virtual void SyncColliders() override;
     
 protected:
     virtual int32 ResolveIncomingDamage(int32 amount, const DamageContext& ctx) { return amount; }
@@ -130,6 +140,7 @@ protected:
     CooldownComponent                   cooldowns_;
     EffectComponent                     effects_;
     RespawnComponent                    respawn_;
+    SE::Physics::Hit::HitboxInstance    hitbox_;
     std::unique_ptr<CombatComponent>    combat_;
     ObjectId                            lastKillerId_{0};
     
