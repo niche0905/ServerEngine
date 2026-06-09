@@ -2817,6 +2817,27 @@ void Room::NotifyEquipItem(PlayerId playerId, ObjectId pawnId, uint32 itemId)
    roomGameSystem_.GetReplicationSystem().PushEvent(equipItemEvent);
 }
 
+void Room::NotifySkillUnlock(PlayerId playerId, uint32 skillId)
+{
+   se::game::N_SkillUnlock noti;
+   noti.set_skill_id(skillId);
+   
+   SendBufferRef sendBuffer = ServerPacketHandler::MakeSendBuffer(noti);
+   if (sendBuffer)
+      SendToPlayer(playerId, sendBuffer);
+}
+
+void Room::NotifySkillEquip(PlayerId playerId, uint32 skillId, uint32 slotIndex)
+{
+   se::game::N_SkillEquip noti;
+   noti.set_skill_id(skillId);
+   noti.set_slot_index(slotIndex);
+   
+   SendBufferRef sendBuffer = ServerPacketHandler::MakeSendBuffer(noti);
+   if (sendBuffer)
+      SendToPlayer(playerId, sendBuffer);
+}
+
 void Room::NotifyHealthChange(PlayerId id, int newHealth, int deltaHealth)
 {
    RepEvent healthChangeEvent;

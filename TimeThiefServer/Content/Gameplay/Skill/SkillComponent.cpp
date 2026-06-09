@@ -46,12 +46,6 @@ SkillComponent::SkillUnlockResult SkillComponent::TryUnlockSkill(SkillId skillId
    result.unlocked = true;
    result.autoEquipped = TryAutoEquipSkill(skillId, &result.equippedSlotIndex);
    
-   if (!result.autoEquipped) {
-      if (PlayerPawn* player = GetOwnerAs<PlayerPawn>()) {
-         player->OnSkillChanged(skillId);
-      }
-   }
-   
    return result;
 }
 
@@ -135,10 +129,6 @@ bool SkillComponent::EquipSkill(SkillId skillId, int32 slotIndex)
    
    activeSkills_[slotIndex] = skillId;
    
-   if (PlayerPawn* player = GetOwnerAs<PlayerPawn>()) {
-      player->OnSkillChanged(skillId);
-   }
-   
    return true;
 }
 
@@ -170,15 +160,7 @@ bool SkillComponent::UnequipSkill(int32 slotIndex)
       return false;
    }
    
-   const SkillId prevSkillId = activeSkills_[slotIndex];
-   
    activeSkills_[slotIndex] = 0;   // 슬롯을 비움
-   
-   if (prevSkillId != 0) {
-      if (PlayerPawn* player = GetOwnerAs<PlayerPawn>()) {
-         player->OnSkillChanged(prevSkillId);
-      }
-   }
    
    return true;
 }

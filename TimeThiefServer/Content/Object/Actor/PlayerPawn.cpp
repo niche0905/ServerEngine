@@ -213,12 +213,6 @@ MoneyChangeResult PlayerPawn::SpendMoney(CurrencyType currency, CurrencyAmount a
    return result;
 }
 
-void PlayerPawn::OnSkillChanged(SkillId skillId)
-{
-   MarkReplicationDirty(ReplicationDirty::SkillState);
-   // TODO: 작성하기
-}
-
 void PlayerPawn::OnWeaponUpgradeApplied(WeaponUpgradeCode code)
 {
    auto* playerCombat = GetPlayerCombat();

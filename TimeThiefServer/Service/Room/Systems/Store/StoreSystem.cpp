@@ -286,10 +286,21 @@ bool StoreSystem::TryApplyItemReward(const StoreBuyContext& ctx)
 
 bool StoreSystem::TryApplySkillReward(const StoreBuyContext& ctx)
 {
-   // TODO: 아래 Player Pawn으로 옮기고 Replication으로 클라이언트에 전달하기
    SkillComponent& skillComp = ctx.playerPawn->GetSkill();
    const StoreEntryDef* entryDef = ctx.entryDef;
-   return skillComp.UnlockSkill(entryDef->skillId);
+   SkillComponent::SkillUnlockResult result = skillComp.TryUnlockSkill(entryDef->skillId);
+   if (!result.unlocked) {
+      return false;
+   }
+   
+   const PlayerId playerId = ctx.playerPawn->GetOwnerPlayerId();
+   ownerRoom_->NotifySkillUnlock(playerId, entryDef->skillId);
+   
+   if (result.autoEquipped) {
+      ownerRoom_->NotifySkillEquip(playerId, entryDef->skillId, static_cast<uint32>(result.equippedSlotIndex));
+   }
+   
+   return true;
 }
 
 bool StoreSystem::TryApplyWeaponUpgradeReward(const StoreBuyContext& ctx)
