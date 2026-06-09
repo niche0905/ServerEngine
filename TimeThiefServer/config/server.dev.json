@@ -11,6 +11,7 @@
         "zone_table": "data/tables/ZoneDataTable.json",
         "loot_table": "data/tables/LootTables.json",
         "monster_template_table": "data/tables/MonsterTemplates.json",
+        "pawn_collision_profile_table": "data/tables/PawnCollisionProfiles.json",
         "store_entry_table": "data/tables/StoreEntryTable.json",
         "skill_table": "data/tables/SkillTable.json",
         "weapon_table": "data/tables/WeaponTable.json",

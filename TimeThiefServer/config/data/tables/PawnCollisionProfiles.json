@@ -1,0 +1,322 @@
+{
+  "pawn_collision_profiles": [
+    {
+      "collision_id": 2,
+      "pawn_type": "cat",
+      "actor_name": "BP_Monster_Cat_C_1",
+      "colliders": [
+        {
+          "collider_id": "cat.head.head",
+          "component_name": "Head",
+          "part": "head",
+          "local_position": {
+            "x": 93.54890294751033,
+            "y": 0.0,
+            "z": 123.08206882308851
+          },
+          "local_rotation": {
+            "x": 0.0,
+            "y": -90.0,
+            "z": 90.0
+          },
+          "flags": [
+            "damage_receiver"
+          ],
+          "shape": "sphere",
+          "radius": 20.0
+        },
+        {
+          "collider_id": "cat.body.body",
+          "component_name": "Body",
+          "part": "body",
+          "local_position": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 60.0
+          },
+          "local_rotation": {
+            "x": 0.0,
+            "y": -90.0,
+            "z": 90.0
+          },
+          "flags": [
+            "damage_receiver"
+          ],
+          "shape": "capsule",
+          "radius": 44.0,
+          "half_height": 80.0
+        }
+      ]
+    },
+    {
+      "collision_id": 4,
+      "pawn_type": "kong",
+      "actor_name": "BP_Monster_Kong_C_1",
+      "colliders": [
+        {
+          "collider_id": "kong.head.head",
+          "component_name": "Head",
+          "part": "head",
+          "local_position": {
+            "x": 97.4148209657933,
+            "y": 0.0,
+            "z": 315.39515223383557
+          },
+          "local_rotation": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "flags": [
+            "damage_receiver"
+          ],
+          "shape": "sphere",
+          "radius": 72.0
+        },
+        {
+          "collider_id": "kong.body.body",
+          "component_name": "Body",
+          "part": "body",
+          "local_position": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 160.0
+          },
+          "local_rotation": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "flags": [
+            "damage_receiver"
+          ],
+          "shape": "capsule",
+          "radius": 120.0,
+          "half_height": 160.0
+        },
+        {
+          "collider_id": "kong.leftarm.leftarm",
+          "component_name": "LeftArm",
+          "part": "leftarm",
+          "local_position": {
+            "x": 70.7161317177293,
+            "y": -147.89943887345044,
+            "z": 169.75566356364513
+          },
+          "local_rotation": {
+            "x": 5.739101730787615,
+            "y": 1.856885204206775,
+            "z": 17.962952952471532
+          },
+          "flags": [
+            "damage_receiver"
+          ],
+          "shape": "capsule",
+          "radius": 60.0,
+          "half_height": 160.0
+        },
+        {
+          "collider_id": "kong.rightarm.rightarm",
+          "component_name": "RightArm",
+          "part": "rightarm",
+          "local_position": {
+            "x": 31.068500874061385,
+            "y": 142.72112389715153,
+            "z": 199.34121475829687
+          },
+          "local_rotation": {
+            "x": -10.308278895620045,
+            "y": 0.0,
+            "z": -22.50970545484727
+          },
+          "flags": [
+            "damage_receiver"
+          ],
+          "shape": "capsule",
+          "radius": 60.0,
+          "half_height": 160.0
+        }
+      ]
+    },
+    {
+      "collision_id": 3,
+      "pawn_type": "minion",
+      "actor_name": "BP_Monster_Minion_C_1",
+      "colliders": [
+        {
+          "collider_id": "minion.head.head",
+          "component_name": "Head",
+          "part": "head",
+          "local_position": {
+            "x": 8.148604376658,
+            "y": 0.0,
+            "z": 122.04963926719796
+          },
+          "local_rotation": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "flags": [
+            "damage_receiver"
+          ],
+          "shape": "sphere",
+          "radius": 20.0
+        },
+        {
+          "collider_id": "minion.body.body",
+          "component_name": "Body",
+          "part": "body",
+          "local_position": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 60.0
+          },
+          "local_rotation": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "flags": [
+            "damage_receiver"
+          ],
+          "shape": "capsule",
+          "radius": 30.0,
+          "half_height": 60.0
+        }
+      ]
+    },
+    {
+      "collision_id": 1,
+      "pawn_type": "player",
+      "actor_name": "BP_TimeThiefCharacter_C_1",
+      "colliders": [
+        {
+          "collider_id": "player.head.head",
+          "component_name": "Head",
+          "part": "head",
+          "local_position": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 70.0
+          },
+          "local_rotation": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "flags": [
+            "damage_receiver"
+          ],
+          "shape": "sphere",
+          "radius": 16.0
+        },
+        {
+          "collider_id": "player.body.body",
+          "component_name": "Body",
+          "part": "body",
+          "local_position": {
+            "x": 0.0,
+            "y": -1.7951678371301796,
+            "z": 24.8526890779614
+          },
+          "local_rotation": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "flags": [
+            "damage_receiver"
+          ],
+          "shape": "capsule",
+          "radius": 25.0,
+          "half_height": 36.0
+        },
+        {
+          "collider_id": "player.leftarm.leftarm",
+          "component_name": "LeftArm",
+          "part": "leftarm",
+          "local_position": {
+            "x": 20.539227747975872,
+            "y": -18.426441307303094,
+            "z": 40.78112589840566
+          },
+          "local_rotation": {
+            "x": 66.95430389833429,
+            "y": 62.85434659087358,
+            "z": 38.368420070965236
+          },
+          "flags": [
+            "damage_receiver"
+          ],
+          "shape": "capsule",
+          "radius": 10.0,
+          "half_height": 30.0
+        },
+        {
+          "collider_id": "player.rightarm.rightarm",
+          "component_name": "RightArm",
+          "part": "rightarm",
+          "local_position": {
+            "x": -5.603650409086981,
+            "y": 7.502666808086815,
+            "z": 47.968985828377185
+          },
+          "local_rotation": {
+            "x": 55.03914327226846,
+            "y": 14.725925103460957,
+            "z": 14.469993622893064
+          },
+          "flags": [
+            "damage_receiver"
+          ],
+          "shape": "capsule",
+          "radius": 10.0,
+          "half_height": 30.0
+        },
+        {
+          "collider_id": "player.leftleg.leftleg",
+          "component_name": "LeftLeg",
+          "part": "leftleg",
+          "local_position": {
+            "x": 19.851730420214722,
+            "y": -24.010968246416155,
+            "z": -45.82121587372949
+          },
+          "local_rotation": {
+            "x": 15.481214177509825,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "flags": [
+            "damage_receiver"
+          ],
+          "shape": "capsule",
+          "radius": 15.0,
+          "half_height": 50.0
+        },
+        {
+          "collider_id": "player.rightleg.rightleg",
+          "component_name": "RightLeg",
+          "part": "rightleg",
+          "local_position": {
+            "x": -26.51932908336147,
+            "y": 7.349224348685539,
+            "z": -43.31271678607891
+          },
+          "local_rotation": {
+            "x": -12.27480489923358,
+            "y": 0.0,
+            "z": -8.636866371022386
+          },
+          "flags": [
+            "damage_receiver"
+          ],
+          "shape": "capsule",
+          "radius": 15.0,
+          "half_height": 50.0
+        }
+      ]
+    }
+  ]
+}
