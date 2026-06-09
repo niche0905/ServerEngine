@@ -21,6 +21,7 @@
 #include "Content/Object/Actor/SubProjectile/GrenadeActor.h"
 #include "Data/GameDataManager.h"
 #include "Physics/Collider/CollisionResult.h"
+#include "Physics/Hitbox/HitResult.h"
 #include "Physics/Ray/RaycastHit.h"
 
 /*-----------------
@@ -55,6 +56,7 @@ namespace
    bool BuildProjectileSpawnInfo(ProjectileActor* projectile, se::room::SpawnInfo* outInfo);
    bool BuildChestSpawnInfo(ChestActor* chest, se::room::SpawnInfo* outInfo);
    bool BuildStoreSpawnInfo(StoreActor* store, se::room::SpawnInfo* outInfo);
+   int32 ApplyHitDamageMultiplier(int32 damage, float multiplier);
    
    bool BuildSpawnInfo(BaseObject* obj, se::room::SpawnInfo* outInfo)
    {
@@ -84,6 +86,17 @@ namespace
       default:
          return false;
       }
+   }
+
+   int32 ApplyHitDamageMultiplier(int32 damage, float multiplier)
+   {
+      if (damage <= 0)
+         return 0;
+
+      if (multiplier <= 0.0f)
+         return 0;
+
+      return std::max(1, static_cast<int32>(std::round(static_cast<float>(damage) * multiplier)));
    }
 
    uint64 GetNowMs()
@@ -3170,9 +3183,11 @@ void Room::HandleMonsterFire(ObjectId monsterId, CombatEventType eventType, cons
    
    const ObjectId victimId = victim ? victim->GetId() : ObjectId{};
    NotifyMonsterFire(monsterId, eventType, origin, fireDir, range);
+
+   const int32 finalDamage = ApplyHitDamageMultiplier(damage, outHit.damageMultiplier);
    
    if (outHit.hit)
-      NotifyHit(victimId, outHit.point, damage);
+      NotifyHit(victimId, outHit.point, finalDamage);
    
    if (victim == nullptr) 
       return;   // 히트한 Actor가 없는 경우
@@ -3186,7 +3201,7 @@ void Room::HandleMonsterFire(ObjectId monsterId, CombatEventType eventType, cons
    ctx.type = DamageType::Ranged;
    ctx.source = DamageSource::Weapon;
     
-   damageable->ApplyDamage(GetObjectManager(), damage, ctx);
+   damageable->ApplyDamage(GetObjectManager(), finalDamage, ctx);
 }
 
 void Room::HandleMonsterMelee(const MeleeAttackDesc& desc)
@@ -3235,8 +3250,12 @@ void Room::HandleMonsterMelee(const MeleeAttackDesc& desc)
          const SE::Physics::Collider* hitCollider = collider->GetCollider();
          if (!hitCollider) return;
 
+         SE::Physics::Hit::HitResult hitboxHit{};
+         const bool hitByHitbox = pawn->HasHitbox()
+            && pawn->GetHitbox().Intersect(*desc.collider, &hitboxHit);
+
          SE::Physics::CollisionResult collisionResult;
-         if (desc.collider->Intersect(*hitCollider, collisionResult) && collisionResult.hit) {
+         if (hitByHitbox || (desc.collider->Intersect(*hitCollider, collisionResult) && collisionResult.hit)) {
             damagedPawns.insert(pawn->GetId());
             pawn->ApplyDamage(GetObjectManager(), desc.damage, ctx);
          }

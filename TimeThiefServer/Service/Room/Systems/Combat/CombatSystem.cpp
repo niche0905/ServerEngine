@@ -50,23 +50,74 @@ bool CombatSystem::TraceHit(const SE::Physics::Ray& ray, ObjectId exceptId, SE::
    bool hasHit = false;
    float closestT = std::numeric_limits<float>::max();
 
+   auto TryPickMapHit = [&](const SE::Physics::RaycastHit& rayHit)
+   {
+      if (!rayHit.hit || rayHit.t >= closestT)
+         return;
+
+      outHit.hit = true;
+      outHit.t = rayHit.t;
+      outHit.point = rayHit.point;
+      outHit.normal = rayHit.normal;
+
+      outHit.group = SE::Physics::Hit::HitGroup::NotHurtBox;
+      outHit.damageMultiplier = 0.0f;
+      outHit.partIndex = 0;
+      outHit.actor = nullptr;
+
+      closestT = rayHit.t;
+      hasHit = true;
+   };
+
+   auto TryPickHitboxHit = [&](Pawn& pawn)
+   {
+      SE::Physics::Hit::HitResult hitboxHit{};
+      if (!pawn.GetHitbox().Raycast(ray, hitboxHit))
+         return;
+
+      if (!hitboxHit.hit || hitboxHit.t >= closestT)
+         return;
+
+      hitboxHit.actor = &pawn;
+      outHit = hitboxHit;
+
+      closestT = hitboxHit.t;
+      hasHit = true;
+   };
+
+   auto TryPickColliderHit = [&](ColliderComponent& collider)
+   {
+      if (collider.GetRole() != ColliderRole::Hurtbox)
+         return;
+
+      const SE::Physics::Collider* hitCollider = collider.GetCollider();
+      if (!hitCollider)
+         return;
+
+      SE::Physics::RaycastHit rayHit{};
+      if (!hitCollider->Raycast(ray, rayHit))
+         return;
+
+      if (!rayHit.hit || rayHit.t >= closestT)
+         return;
+
+      outHit.hit = rayHit.hit;
+      outHit.t = rayHit.t;
+      outHit.point = rayHit.point;
+      outHit.normal = rayHit.normal;
+
+      outHit.group = SE::Physics::Hit::HitGroup::Torso;
+      outHit.damageMultiplier = 1.0f;
+      outHit.partIndex = 0;
+      outHit.actor = collider.GetOwnerActor();
+
+      closestT = rayHit.t;
+      hasHit = true;
+   };
+
    SE::Physics::RaycastHit raycastResult;
-   if (mapData_->Raycast(ray, raycastResult)) {
-      if (raycastResult.hit and raycastResult.t < closestT) {
-         outHit.hit = raycastResult.hit;
-         outHit.t = raycastResult.t;
-         outHit.point = raycastResult.point;
-         outHit.normal = raycastResult.normal;
-         
-         outHit.group = SE::Physics::Hit::HitGroup::NotHurtBox;
-         outHit.damageMultiplier = 0.0f;
-         outHit.partIndex = 0;
-         outHit.actor = nullptr;
-         
-         closestT = raycastResult.t;
-         hasHit = true;
-      }
-   }
+   if (mapData_->Raycast(ray, raycastResult))
+      TryPickMapHit(raycastResult);
    
    ownerRoom_->GetObjectManager().ForEachAlive([&](BaseObject* obj)
    {
@@ -79,39 +130,19 @@ bool CombatSystem::TraceHit(const SE::Physics::Ray& ray, ObjectId exceptId, SE::
       if (Pawn* pawn = dynamic_cast<Pawn*>(obj)) {
          if (pawn->IsDead())
             return;   // 이미 죽은 Pawn은 명중 판정에서 제외하기
+
+         if (pawn->HasHitbox()) {
+            TryPickHitboxHit(*pawn);
+            return;
+         }
       }
       
       obj->ForEachCollider([&](ColliderComponent* collider)
       {
          if (!collider)
             return;
-         
-         const ColliderRole role = collider->GetRole();
-         if (role != ColliderRole::Hurtbox)
-            return;   // 명중 판정이 필요한 콜라이더가 아닌 경우 건너 뛰기
-         
-         SE::Physics::RaycastHit rayHit{};
-         if (!collider->GetCollider()->Raycast(ray, rayHit)) 
-            return;
-         
-         if (!rayHit.hit)
-            return;
-         
-         if (rayHit.t >= closestT) 
-            return;
-         
-         outHit.hit = rayHit.hit;
-         outHit.t = rayHit.t;
-         outHit.point = rayHit.point;
-         outHit.normal = rayHit.normal;
-         
-         outHit.group = SE::Physics::Hit::HitGroup::Torso;
-         outHit.damageMultiplier = 1.0f;   // TODO: HitGroup에 따른 데미지 배율 적용하기
-         outHit.partIndex = 0;   // TODO: HitGroup에 따른 부위 인덱스 적용하기
-         outHit.actor = collider->GetOwnerActor();
-         
-         closestT = rayHit.t;
-         hasHit = true;
+
+         TryPickColliderHit(*collider);
       });
    });
    
@@ -198,6 +229,23 @@ bool CombatSystem::SweepProjectile(const ProjectileSweepQuery& query, SE::Physic
       if (obj->GetId() == query.ownerId)
          return;   // 발사체 자신과 발사체의 소유자는 명중 판정에서 제외하기
       
+      // 투사체 충돌 여부 판단에 Hitbox는 과한 거 같다
+      // if (Pawn* pawn = dynamic_cast<Pawn*>(obj)) {
+      //    if (query.hitHurtBox && pawn->HasHitbox()) {
+      //       SE::Physics::Hit::HitResult hitboxHit{};
+      //       if (pawn->GetHitbox().SphereCast(query.from, query.to, query.radius, hitboxHit) && hitboxHit.hit) {
+      //          SE::Physics::RaycastHit actorHit{};
+      //          actorHit.hit = true;
+      //          actorHit.t = hitboxHit.t;
+      //          actorHit.point = hitboxHit.point;
+      //          actorHit.normal = hitboxHit.normal;
+      //
+      //          TryPickClosest(actorHit, hitboxHit.group, hitboxHit.damageMultiplier, pawn);
+      //       }
+      //
+      //       return;
+      //    }
+      // }
       obj->ForEachCollider([&](ColliderComponent* collider)
       {
          if (!collider || !collider->GetCollider())

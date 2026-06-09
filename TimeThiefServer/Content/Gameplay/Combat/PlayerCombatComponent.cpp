@@ -28,6 +28,17 @@ namespace
             return MaxWeaponSlots;  // 유효하지 않은 슬롯 인덱스 반환
         }
     }
+
+    int32 ApplyHitDamageMultiplier(int32 damage, float multiplier)
+    {
+        if (damage <= 0)
+            return 0;
+
+        if (multiplier <= 0.0f)
+            return 0;
+
+        return std::max(1, static_cast<int32>(std::round(static_cast<float>(damage) * multiplier)));
+    }
     
 }
 
@@ -378,8 +389,10 @@ bool PlayerCombatComponent::TraceHit(const AttackRequest& request, const SE::Phy
     
     ObjectId victimId = victim ? victim->GetId() : ObjectId{};
     
+    const int32 finalDamage = ApplyHitDamageMultiplier(request.damage, outHit.damageMultiplier);
+
     if (outHit.hit)
-        room->NotifyHit(victimId, outHit.point, request.damage);
+        room->NotifyHit(victimId, outHit.point, finalDamage);
     
     if (victim == nullptr) 
         return false;   // 히트한 Actor가 없는 경우
@@ -393,7 +406,7 @@ bool PlayerCombatComponent::TraceHit(const AttackRequest& request, const SE::Phy
     ctx.type = DamageType::Ranged;
     ctx.source = DamageSource::Weapon;
     
-    DamageResult damageResult = damageable->ApplyDamage(room->GetObjectManager(), request.damage, ctx);
+    DamageResult damageResult = damageable->ApplyDamage(room->GetObjectManager(), finalDamage, ctx);
     
     return true;
 }
