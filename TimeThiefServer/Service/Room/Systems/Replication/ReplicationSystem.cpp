@@ -45,12 +45,85 @@ namespace
       }
    }
 
-   float YawFromAxisX(const SE::Math::Vector3& axisX)
+   uint32 DebugDrawColorForHitGroup(SE::Physics::Hit::HitGroup group)
    {
-      if (axisX.Length2DSq() <= 1e-6f)
-         return 0.0f;
+      switch (group)
+      {
+      case SE::Physics::Hit::HitGroup::Head:
+         return 0xFF4040FF;
 
-      return std::atan2(axisX.y, axisX.x) * kRadToDeg;
+      case SE::Physics::Hit::HitGroup::Torso:
+         return 0x40D0FFFF;
+
+      case SE::Physics::Hit::HitGroup::Arms:
+         return 0xFFD030FF;
+
+      case SE::Physics::Hit::HitGroup::Legs:
+         return 0x30FF80FF;
+
+      case SE::Physics::Hit::HitGroup::NotHurtBox:
+         return 0x808080FF;
+
+      case SE::Physics::Hit::HitGroup::Unknown:
+      default:
+         return 0xFFFFFFFF;
+      }
+   }
+
+   SE::Math::Vector3 UnrealRotatorFromAxes(const SE::Math::Vector3& axisX,
+                                           const SE::Math::Vector3& axisY,
+                                           const SE::Math::Vector3& axisZ)
+   {
+      const float pitch = std::asin(std::clamp(axisX.z, -1.0f, 1.0f)) * kRadToDeg;
+      const float yaw = std::atan2(axisX.y, axisX.x) * kRadToDeg;
+      const float roll = std::atan2(-axisY.z, axisZ.z) * kRadToDeg;
+
+      return SE::Math::Vector3{pitch, yaw, roll};
+   }
+
+   void DrawDebugCollider(Room& room, const SE::Physics::Collider& collider, const Room::DebugDrawOptions& options)
+   {
+      switch (collider.GetType())
+      {
+      case SE::Physics::ColliderType::Sphere:
+         {
+            const auto* sphere = static_cast<const SE::Physics::SphereCollider*>(&collider);
+            room.NotifyDebugDrawSphere(sphere->GetWorldAABB().GetCenter(), sphere->GetRadius(), options);
+         }
+         break;
+
+      case SE::Physics::ColliderType::Capsule:
+         {
+            const auto* capsule = static_cast<const SE::Physics::CapsuleCollider*>(&collider);
+            room.NotifyDebugDrawCapsule(capsule->GetPointA(), capsule->GetPointB(), capsule->GetRadius(), options);
+         }
+         break;
+
+      case SE::Physics::ColliderType::CharacterCapsule:
+         {
+            const auto* capsule = static_cast<const SE::Physics::CharacterCapsuleCollider*>(&collider);
+            room.NotifyDebugDrawCapsule(capsule->GetPointA(), capsule->GetPointB(), capsule->GetRadius(), options);
+         }
+         break;
+
+      case SE::Physics::ColliderType::AABB:
+         {
+            const auto* aabb = static_cast<const SE::Physics::AABBCollider*>(&collider);
+            room.NotifyDebugDrawOBB(aabb->GetCenter(), aabb->GetExtent(), 0.0f, 0.0f, 0.0f, options);
+         }
+         break;
+
+      case SE::Physics::ColliderType::OBB:
+         {
+            const auto* obb = static_cast<const SE::Physics::OBBCollider*>(&collider);
+            const SE::Math::Vector3 rotation = UnrealRotatorFromAxes(obb->GetAxisX(), obb->GetAxisY(), obb->GetAxisZ());
+            room.NotifyDebugDrawOBB(obb->GetCenter(), obb->GetHalfExtent(), rotation.y, rotation.x, rotation.z, options);
+         }
+         break;
+
+      default:
+         break;
+      }
    }
 }
 
@@ -196,6 +269,10 @@ void ReplicationSystem::FlushDebugDrawColliders(const RepFrame& frame)
          return;
 
       FlushDebugDrawObjectColliders(*obj);
+
+      if (Pawn* pawn = dynamic_cast<Pawn*>(obj)) {
+         FlushDebugDrawPawnHitboxes(*pawn);
+      }
    });
 }
 
@@ -233,48 +310,30 @@ void ReplicationSystem::FlushDebugDrawObjectColliders(BaseObject& obj) const
       options.duration = static_cast<float>(debugDrawColliderIntervalMs_ + 100) * 0.001f;
       options.thickness = 1.5f;
 
-      switch (collider->GetType())
-      {
-      case SE::Physics::ColliderType::Sphere:
-         {
-            const auto* sphere = static_cast<const SE::Physics::SphereCollider*>(collider);
-            ownerRoom_->NotifyDebugDrawSphere(sphere->GetWorldAABB().GetCenter(), sphere->GetRadius(), options);
-         }
-         break;
-
-      case SE::Physics::ColliderType::Capsule:
-         {
-            const auto* capsule = static_cast<const SE::Physics::CapsuleCollider*>(collider);
-            ownerRoom_->NotifyDebugDrawCapsule(capsule->GetPointA(), capsule->GetPointB(), capsule->GetRadius(), options);
-         }
-         break;
-
-      case SE::Physics::ColliderType::CharacterCapsule:
-         {
-            const auto* capsule = static_cast<const SE::Physics::CharacterCapsuleCollider*>(collider);
-            ownerRoom_->NotifyDebugDrawCapsule(capsule->GetPointA(), capsule->GetPointB(), capsule->GetRadius(), options);
-         }
-         break;
-
-      case SE::Physics::ColliderType::AABB:
-         {
-            const auto* aabb = static_cast<const SE::Physics::AABBCollider*>(collider);
-            ownerRoom_->NotifyDebugDrawOBB(aabb->GetCenter(), aabb->GetExtent(), 0.0f, 0.0f, 0.0f, options);
-         }
-         break;
-
-      case SE::Physics::ColliderType::OBB:
-         {
-            const auto* obb = static_cast<const SE::Physics::OBBCollider*>(collider);
-            ownerRoom_->NotifyDebugDrawOBB(obb->GetCenter(), obb->GetHalfExtent(), YawFromAxisX(obb->GetAxisX()),
-                                          0.0f, 0.0f, options);
-         }
-         break;
-
-      default:
-         break;
-      }
+      DrawDebugCollider(*ownerRoom_, *collider, options);
    });
+}
+
+void ReplicationSystem::FlushDebugDrawPawnHitboxes(Pawn& pawn) const
+{
+   if (!ownerRoom_)
+      return;
+
+   if (!pawn.HasHitbox())
+      return;
+
+   for (const SE::Physics::Hit::HitboxPart& part : pawn.GetHitbox().GetParts())
+   {
+      if (!part.collider)
+         continue;
+
+      Room::DebugDrawOptions options;
+      options.colorRgba = DebugDrawColorForHitGroup(part.group);
+      options.duration = static_cast<float>(debugDrawColliderIntervalMs_ + 100) * 0.001f;
+      options.thickness = 2.5f;
+
+      DrawDebugCollider(*ownerRoom_, *part.collider, options);
+   }
 }
 
 void ReplicationSystem::NormalizeEvent(RepEvent& ev, const RepFrame& frame, uint64 nowMs) const

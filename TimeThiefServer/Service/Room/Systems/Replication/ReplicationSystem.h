@@ -13,6 +13,7 @@ class ProjectileActor;
 struct RepFrame;
 struct RepEvent;
 class BaseObject;
+class Pawn;
 class Room;
 
 /*---------------------
@@ -48,6 +49,7 @@ private:
    void NormalizeEvent(RepEvent& ev, const RepFrame& frame, uint64 nowMs) const;
    void DispatchImmediateEvent(const RepEvent& ev, const RepFrame& frame) const;
    void FlushDebugDrawObjectColliders(BaseObject& obj) const;
+   void FlushDebugDrawPawnHitboxes(Pawn& pawn) const;
 
 private:
    void FlushEvent_Spawn(const RepEvent& ev, const RepFrame& frame) const;
