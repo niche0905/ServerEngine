@@ -16,6 +16,7 @@ struct DataFilesConfig
     std::filesystem::path zoneTablePath;
     std::filesystem::path lootTablePath;
     std::filesystem::path monsterTemplateTablePath;
+    std::filesystem::path pawnCollisionProfileTablePath;
     std::filesystem::path storeEntryTablePath;
     std::filesystem::path skillTablePath;
     std::filesystem::path weaponTablePath;

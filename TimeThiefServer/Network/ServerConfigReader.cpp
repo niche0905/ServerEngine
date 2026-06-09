@@ -89,6 +89,9 @@ bool ServerConfigReader::ParseJsonText(const std::string& jsonText, const std::f
       if (dataFiles.isMember("monster_template_table"))
          newConfig.dataFiles.monsterTemplateTablePath = ResolvePath(dataFiles["monster_template_table"].asString(), baseDir);
 
+      if (dataFiles.isMember("pawn_collision_profile_table"))
+         newConfig.dataFiles.pawnCollisionProfileTablePath = ResolvePath(dataFiles["pawn_collision_profile_table"].asString(), baseDir);
+
       if (dataFiles.isMember("store_entry_table"))
          newConfig.dataFiles.storeEntryTablePath = ResolvePath(dataFiles["store_entry_table"].asString(), baseDir);
 
