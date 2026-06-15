@@ -26,6 +26,7 @@ enum class RepEventType : uint8
     
     PickupItem,
     ItemChange,
+    StoreEntryBlock,
     EquipItem,
     UseItem,
     ChestInteract,
@@ -128,6 +129,12 @@ struct ItemChangeEvent
 struct EquipItemEvent
 {
     uint32 itemId{0};
+};
+
+struct StoreEntryBlockEvent
+{
+    uint32 entryId{0};
+    bool blocked{false};
 };
 
 struct UseItemEvent
@@ -282,6 +289,7 @@ using RepEventPayload = std::variant<
     ExplosionEvent,
     ItemChangeEvent,
     EquipItemEvent,
+    StoreEntryBlockEvent,
     UseItemEvent,
     CrouchEvent,
     WireLaunchEvent,

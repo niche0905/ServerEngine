@@ -247,33 +247,73 @@ bool StoreSystem::CanPurchaseReward(PlayerPawn* playerPawn, const StoreEntryDef*
    switch (entryDef->rewardType)
    {
    case StoreRewardType::Item:
-      return true;      // 아이템은 항상 구매 가능
+      return CanApplyItemReward(playerPawn, entryDef);
       
    case StoreRewardType::Skill:
-      {
-         auto& skillComp = playerPawn->GetSkill();
-         return skillComp.CanUnlockSkill(entryDef->skillId);
-      }
+      return CanApplySkillReward(playerPawn, entryDef);
       
    case StoreRewardType::WeaponUpgrade:
-      {
-         auto& upgradeComp = playerPawn->GetUpgrade();
-         return upgradeComp.CanApplyWeaponUpgrade(entryDef->weaponUpgradeType);
-      }
+      return CanApplyWeaponUpgradeReward(playerPawn, entryDef);
    case StoreRewardType::StatUpgrade:
-      {
-         auto& upgradeComp = playerPawn->GetUpgrade();
-         if (entryDef->upgradeLineId == 0)
-            return false;
-   
-         int32 maxLevel = storeEntryTable_->GetMaxLevel(entryDef->upgradeLineId);
-         if (maxLevel <= 0)
-            return false;
-         return upgradeComp.CanApplyUpgrade(entryDef->upgradeLineId, maxLevel);
-      }
+      return CanApplyStatUpgradeReward(playerPawn, entryDef);
    default:
       return false;
    }
+}
+
+bool StoreSystem::CanApplyItemReward(PlayerPawn* playerPawn, const StoreEntryDef* entryDef) const
+{
+   if (!playerPawn or !entryDef)
+      return false;
+
+   if (entryDef->itemId == 0 or entryDef->itemCount <= 0)
+      return false;
+
+   const auto& inventory = playerPawn->GetInventory();
+   for (const ItemStack& slot : inventory.GetSlots()) {
+      if (slot.id == entryDef->itemId and slot.count > 0)
+         return true;
+
+      if (!slot.IsValid())
+         return true;
+   }
+
+   return false;
+}
+
+bool StoreSystem::CanApplySkillReward(PlayerPawn* playerPawn, const StoreEntryDef* entryDef) const
+{
+   if (!playerPawn or !entryDef)
+      return false;
+
+   auto& skillComp = playerPawn->GetSkill();
+   return skillComp.CanUnlockSkill(entryDef->skillId) and skillComp.FindEmptySlot() != -1;
+}
+
+bool StoreSystem::CanApplyWeaponUpgradeReward(PlayerPawn* playerPawn, const StoreEntryDef* entryDef) const
+{
+   if (!playerPawn or !entryDef)
+      return false;
+
+   auto& upgradeComp = playerPawn->GetUpgrade();
+   return upgradeComp.CanApplyWeaponUpgrade(entryDef->weaponUpgradeType);
+}
+
+bool StoreSystem::CanApplyStatUpgradeReward(PlayerPawn* playerPawn, const StoreEntryDef* entryDef) const
+{
+   if (!playerPawn or !entryDef)
+      return false;
+
+   if (entryDef->upgradeLineId == 0)
+      return false;
+
+   int32 maxLevel = storeEntryTable_->GetMaxLevel(entryDef->upgradeLineId);
+   if (maxLevel <= 0)
+      return false;
+
+   auto& upgradeComp = playerPawn->GetUpgrade();
+   return upgradeComp.CanApplyUpgrade(entryDef->upgradeLineId, maxLevel)
+      and upgradeComp.CanApplyStatUpgrade(entryDef->statUpgradeType, maxLevel);
 }
 
 bool StoreSystem::TryApplyItemReward(const StoreBuyContext& ctx)
@@ -287,6 +327,10 @@ bool StoreSystem::TryApplyItemReward(const StoreBuyContext& ctx)
 bool StoreSystem::TryApplySkillReward(const StoreBuyContext& ctx)
 {
    SkillComponent& skillComp = ctx.playerPawn->GetSkill();
+   if (skillComp.FindEmptySlot() == -1) {
+      // 장착 가능한 슬롯이 없는 경우 구매 실패 처리 (자동 장착이 불가능하므로)
+      return false;
+   }
    const StoreEntryDef* entryDef = ctx.entryDef;
    SkillComponent::SkillUnlockResult result = skillComp.TryUnlockSkill(entryDef->skillId);
    if (!result.unlocked) {
@@ -298,6 +342,22 @@ bool StoreSystem::TryApplySkillReward(const StoreBuyContext& ctx)
    
    if (result.autoEquipped) {
       ownerRoom_->NotifySkillEquip(playerId, entryDef->skillId, static_cast<uint32>(result.equippedSlotIndex));
+   }
+   
+   if (skillComp.FindEmptySlot() == -1) {
+      // 구매 성공 후 자동 장착이 되고, 남은 슬롯이 없는 경우 나머지 스킬 구매 슬롯 오프 처리
+      
+      const auto& equpipedSkills = skillComp.GetEquippedSkills();
+      for (const auto& [entryId, storeEntryDef] : storeEntryTable_->Entries)
+      {
+         if (storeEntryDef.rewardType != StoreRewardType::Skill)
+            continue;
+      
+         if (std::ranges::find(equpipedSkills, storeEntryDef.skillId) != equpipedSkills.end())
+            continue;   // 이미 장착된 스킬은 패스 (이미 구매 슬롯이 오프되어 있을 것)
+      
+         ownerRoom_->NotifyStoreEntryBlock(playerId, entryId, true);   // 구매 슬롯 오프 처리
+      }
    }
    
    return true;

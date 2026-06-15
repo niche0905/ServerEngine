@@ -394,6 +394,10 @@ void ReplicationSystem::DispatchImmediateEvent(const RepEvent& ev, const RepFram
       FlushEvent_EquipItem(ev, frame);
       break;
       
+   case RepEventType::StoreEntryBlock:
+      FlushEvent_StoreEntryBlock(ev, frame);
+      break;
+      
    case RepEventType::UseItem:
       FlushEvent_UseItem(ev, frame);
       break;
@@ -770,6 +774,22 @@ void ReplicationSystem::FlushEvent_EquipItem(const RepEvent& ev, const RepFrame&
    
    SendBufferRef sendBuffer = ServerPacketHandler::MakeSendBuffer(equipItemPkt);
    ownerRoom_->BroadcastReplication(sendBuffer, ev.header.exceptPlayerId);
+}
+
+void ReplicationSystem::FlushEvent_StoreEntryBlock(const RepEvent& ev, const RepFrame& frame) const
+{
+   const StoreEntryBlockEvent* storeEntryBlockEv = std::get_if<StoreEntryBlockEvent>(&ev.payload);
+   if (!storeEntryBlockEv) {
+      consoleLogger->Log(Color::Yellow, L"[ReplicationSystem] StoreEntryBlock event with invalid payload, skipping. PlayerId={}", ev.header.playerId);
+      return;   // 페이로드가 StoreEntryBlockEvent가 아닌 경우 (잘못된 이벤트)
+   }
+   
+   se::game::N_StoreEntryBlock storeEntryBlockPkt;
+   storeEntryBlockPkt.set_store_item_id(storeEntryBlockEv->entryId);
+   storeEntryBlockPkt.set_is_blocked(storeEntryBlockEv->blocked);
+   
+   SendBufferRef sendBuffer = ServerPacketHandler::MakeSendBuffer(storeEntryBlockPkt);
+   ownerRoom_->SendReplication(ev.header.playerId, sendBuffer);
 }
 
 void ReplicationSystem::FlushEvent_UseItem(const RepEvent& ev, const RepFrame& frame) const

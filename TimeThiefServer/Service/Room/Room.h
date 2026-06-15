@@ -248,6 +248,7 @@ public:
    void NotifyPickupItem(ObjectId playerObjectId, ObjectId itemObjectId);
    void NotifyItemChange(PlayerId playerId, uint32 itemId, int32 newCount, int32 deltaCount);
    void NotifyEquipItem(PlayerId playerId, ObjectId pawnId, uint32 itemId);
+   void NotifyStoreEntryBlock(PlayerId playerId, uint32 entryId, bool blocked);
    void NotifySkillUnlock(PlayerId playerId, uint32 skillId);
    void NotifySkillEquip(PlayerId playerId, uint32 skillId, uint32 slotIndex);
    void NotifyUseItem(PlayerId playerId, ObjectId playerObjectId, uint32 itemId);

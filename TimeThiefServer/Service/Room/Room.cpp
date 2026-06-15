@@ -2830,6 +2830,16 @@ void Room::NotifyEquipItem(PlayerId playerId, ObjectId pawnId, uint32 itemId)
    roomGameSystem_.GetReplicationSystem().PushEvent(equipItemEvent);
 }
 
+void Room::NotifyStoreEntryBlock(PlayerId playerId, uint32 entryId, bool blocked)
+{
+   RepEvent storeEntryBlockEvent;
+   ReplicateEventSet(storeEntryBlockEvent, RepEventType::StoreEntryBlock);
+   storeEntryBlockEvent.header.playerId = playerId;
+   storeEntryBlockEvent.payload = StoreEntryBlockEvent{entryId, blocked};
+   
+   roomGameSystem_.GetReplicationSystem().PushEvent(storeEntryBlockEvent);
+}
+
 void Room::NotifySkillUnlock(PlayerId playerId, uint32 skillId)
 {
    se::game::N_SkillUnlock noti;
