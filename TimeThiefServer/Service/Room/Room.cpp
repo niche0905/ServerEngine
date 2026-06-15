@@ -2840,6 +2840,28 @@ void Room::NotifyStoreEntryBlock(PlayerId playerId, uint32 entryId, bool blocked
    roomGameSystem_.GetReplicationSystem().PushEvent(storeEntryBlockEvent);
 }
 
+void Room::NotifyStoreEntrySnapshot(PlayerId playerId, PlayerPawn* playerPawn)
+{
+   if (!playerPawn)
+      return;
+
+   std::vector<StoreEntrySnapshotData> snapshotEntries;
+   if (!roomGameSystem_.GetStoreSystem().BuildEntrySnapshot(playerPawn, snapshotEntries))
+      return;
+
+   se::game::N_StoreEntrySnapshot snapshotPkt;
+   for (const StoreEntrySnapshotData& snapshotEntry : snapshotEntries) {
+      auto* storeEntry = snapshotPkt.add_store_entries();
+      storeEntry->set_store_item_id(snapshotEntry.entryId);
+      storeEntry->set_price(snapshotEntry.price);
+      storeEntry->set_is_available(snapshotEntry.isAvailable);
+   }
+
+   SendBufferRef sendBuffer = ServerPacketHandler::MakeSendBuffer(snapshotPkt);
+   if (sendBuffer)
+      SendToPlayer(playerId, sendBuffer);
+}
+
 void Room::NotifySkillUnlock(PlayerId playerId, uint32 skillId)
 {
    se::game::N_SkillUnlock noti;

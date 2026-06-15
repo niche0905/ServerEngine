@@ -85,6 +85,13 @@ struct StoreBuyContext
     uint32 entryId{0};
 };
 
+struct StoreEntrySnapshotData
+{
+    uint32 entryId{0};
+    int32 price{0};
+    bool isAvailable{false};
+};
+
 struct UpgradeStepDef
 {
     int32 cost{0};

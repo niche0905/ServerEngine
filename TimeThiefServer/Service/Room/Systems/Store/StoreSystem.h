@@ -1,4 +1,5 @@
 ﻿#pragma once
+#include <vector>
 #include "Content/Gameplay/Economy/StoreTypes.h"
 #include "Data/Tables/StoreEntryTable.h"
 
@@ -19,6 +20,7 @@ public:
    bool Init(Room* ownerRoom, const StoreEntryTable& storeEntryTable);
    
    StoreBuyResult Buy(const StoreBuyRequest& req);
+   bool BuildEntrySnapshot(PlayerPawn* playerPawn, std::vector<StoreEntrySnapshotData>& outEntries) const;
    
 private:
    StoreBuyResult ValidateBuyRequest(const StoreBuyRequest& req, StoreBuyContext& ctx);

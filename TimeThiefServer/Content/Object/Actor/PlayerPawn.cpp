@@ -125,6 +125,10 @@ void PlayerPawn::OnPreRespawn(ObjectManager& om)
    Pawn::OnPreRespawn(om);
    
    save_.Rollback();
+
+   if (auto room = GetRoom()) {
+      room->NotifyStoreEntrySnapshot(GetOwnerPlayerId(), this);
+   }
 }
 
 void PlayerPawn::OnPostRespawn(ObjectManager& om)

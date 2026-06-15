@@ -1,4 +1,5 @@
 ﻿#include "pch.h"
+#include <algorithm>
 #include "StoreSystem.h"
 #include "Content/Object/Actor/PlayerPawn.h"
 #include "Service/Room/Room.h"
@@ -59,6 +60,41 @@ StoreBuyResult StoreSystem::Buy(const StoreBuyRequest& req)
    result.success = true;
    result.resultCode = StoreBuyResultCode::Success;
    return result;
+}
+
+bool StoreSystem::BuildEntrySnapshot(PlayerPawn* playerPawn, std::vector<StoreEntrySnapshotData>& outEntries) const
+{
+   outEntries.clear();
+   if (!playerPawn or !storeEntryTable_)
+      return false;
+
+   std::vector<uint32> entryIds;
+   entryIds.reserve(storeEntryTable_->Entries.size());
+   for (const auto& [entryId, entryDef] : storeEntryTable_->Entries) {
+      entryIds.push_back(entryId);
+   }
+   std::sort(entryIds.begin(), entryIds.end());
+
+   outEntries.reserve(entryIds.size());
+   for (const uint32 entryId : entryIds) {
+      const StoreEntryDef* entryDef = FindStoreEntry(entryId);
+      if (!entryDef)
+         continue;
+
+      uint32 nowLevel = 0;
+      if (entryDef->upgradeLineId != 0) {
+         const auto& upgradeComp = playerPawn->GetUpgrade();
+         nowLevel = upgradeComp.GetUpgradeLineLevel(entryDef->upgradeLineId);
+      }
+
+      StoreEntrySnapshotData snapshotEntry;
+      snapshotEntry.entryId = entryId;
+      snapshotEntry.price = storeEntryTable_->GetCost(entryId, nowLevel);
+      snapshotEntry.isAvailable = CanPurchaseReward(playerPawn, entryDef);
+      outEntries.push_back(snapshotEntry);
+   }
+
+   return true;
 }
 
 StoreBuyResult StoreSystem::ValidateBuyRequest(const StoreBuyRequest& req, StoreBuyContext& ctx)
