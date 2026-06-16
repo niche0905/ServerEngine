@@ -102,6 +102,31 @@ public:
    {
       return cdEndMs_.erase(id) > 0;
    }
+
+   bool ReduceRemaining(CooldownId id, uint64 nowMs, uint32 reductionMs)
+   {
+      if (not enabled_ or id == 0 or reductionMs == 0)
+         return false;
+
+      auto it = cdEndMs_.find(id);
+      if (it == cdEndMs_.end())
+         return false;
+
+      if (nowMs >= it->second) {
+         cdEndMs_.erase(it);
+         return false;
+      }
+
+      const uint64 remainingMs = it->second - nowMs;
+      if (remainingMs <= static_cast<uint64>(reductionMs)) {
+         cdEndMs_.erase(it);
+      }
+      else {
+         it->second -= static_cast<uint64>(reductionMs);
+      }
+
+      return true;
+   }
    
    void ClearAll()
    {

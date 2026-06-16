@@ -33,6 +33,8 @@ namespace
    constexpr SkillId TimeAccelSkillId = 1;
    constexpr SkillId TimeAfterImageSkillId = 2;
    constexpr SkillId TimeRewindSkillId = 3;
+   constexpr SkillId SkillBoostTargetSkillId = 4;
+   constexpr uint32 SkillBoostCooldownReductionMs = 30000;
    constexpr uint32 TimeAccelMoveSpeedBonusPercent = 30;
    constexpr uint32 TimeAccelCombatSpeedBonusPercent = 30;
    constexpr uint32 TimeRewindDurationMs = 3000;
@@ -1453,7 +1455,18 @@ bool Room::HandleUseItem(PlayerId playerId, const se::game::C_UseItemReq& pkt)
          playerPawn->Heal(60);
          break;
       case 10:    // 스킬 부스트
-         // 스킬 쿨타임 감소 (그 뭐냐 Save Point 하는 거)
+         {
+            CooldownId cooldownId = SkillBoostTargetSkillId;
+            if (gameDataManager_) {
+               if (const SkillDef* skillDef = gameDataManager_->GetSkillTable().Find(SkillBoostTargetSkillId)) {
+                  if (skillDef->cooldownGroupId != 0) {
+                     cooldownId = skillDef->cooldownGroupId;
+                  }
+               }
+            }
+
+            playerPawn->GetCooldowns().ReduceRemaining(cooldownId, GetNowMs(), SkillBoostCooldownReductionMs);
+         }
          break;
       }
       
