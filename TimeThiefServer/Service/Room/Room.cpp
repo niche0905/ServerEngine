@@ -472,6 +472,11 @@ void Room::SetObject()
          CreateMonsterActor(transform.position, monsterGroup.templateId, transform.yaw);
       }
    }
+
+   // Testing
+   // CreateMonsterActor(Vector3{-5000.0f, 0.0f, 0.0f}, 2, 0.0f);
+   // CreateMonsterActor(Vector3{-3000.0f, 1000.0f, 0.0f}, 3, 0.0f);
+   // CreateMonsterActor(Vector3{-3000.0f, 2000.0f, 0.0f}, 4, 0.0f);
 }
 
 bool Room::Join(PlayerId playerId, SessionId sessionId)
