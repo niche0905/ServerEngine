@@ -3,8 +3,8 @@
     {
       "radius": 45000.0,
       "damagePerSecond": 1.0,
-      "waitTimeSeconds": 60.0,
-      "shrinkTimeSeconds": 90.0
+      "waitTimeSeconds": 30.0,
+      "shrinkTimeSeconds": 60.0
     },
     {
       "radius": 30000.0,
