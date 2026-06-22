@@ -70,19 +70,24 @@ byte* RioSession::GetRecvBuffer()
    return recvBuffer_.Data();
 }
 
+bool RioSession::PrepareForConnectedIo()
+{
+   if (rq_ == RIO_INVALID_RQ)
+      return false;
+
+   if (recvBuffer_.IsRegistered())
+      return true;
+
+   return recvBuffer_.Register(&SocketUtils::Rio);
+}
+
 bool RioSession::PostConnect()
 {
    if (IsConnected())
       return false;
 
-   if (rq_ == RIO_INVALID_RQ)
+   if (PrepareForConnectedIo() == false)
       return false;
-
-   if (recvBuffer_.IsRegistered() == false)
-   {
-      if (recvBuffer_.Register(&SocketUtils::Rio) == false)
-         return false;
-   }
 
    ProcessConnect();
    return true;

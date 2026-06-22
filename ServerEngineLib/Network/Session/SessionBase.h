@@ -58,6 +58,7 @@ public:
 
 // Event interface
 protected:
+	virtual bool PrepareForConnectedIo() { return true; }
 	
 	// post is to request
 	virtual bool PostConnect() = 0;

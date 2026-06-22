@@ -30,6 +30,7 @@ public:
     
 // Event interface
 protected:
+	virtual bool PrepareForConnectedIo() override final;
 
     // post is to request
     virtual bool PostConnect() override final;

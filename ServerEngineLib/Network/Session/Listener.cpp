@@ -132,6 +132,11 @@ void Listener::ProcessAccept(AcceptEvent* acceptEvent)
 	}
 
 	session->SetNetAddr(NetAddr(sockAddress));
+	if (session->PrepareForConnectedIo() == false) {
+		PostAccept(acceptEvent);
+		return;
+	}
+
 	session->ProcessConnect();
 
 	PostAccept(acceptEvent);
