@@ -55,7 +55,6 @@ bool RioService::RegisterSession(std::shared_ptr<SessionBase> session)
     if (!rioCore_->AttachIoObject(session))
         return false;
 
-    AddSession(session);
     return true;
 }
 

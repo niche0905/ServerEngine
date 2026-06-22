@@ -55,7 +55,6 @@ bool IocpService::RegisterSession(std::shared_ptr<SessionBase> session)
 		return false;
 	}
 	
-	AddSession(session);
 	return true;
 }
 
