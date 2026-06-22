@@ -45,13 +45,10 @@ protected:
 
 // Rio object interface
 public:
-    void SetRio(RIO_EXTENSION_FUNCTION_TABLE* rio) { rio_ = rio; }
-    
     virtual void SetRequestQueue(RIO_RQ rq) override { rq_ = rq; }
     virtual RIO_RQ GetRequestQueue() const override { return rq_; }
     
 private:
-    RIO_EXTENSION_FUNCTION_TABLE* rio_;
     RIO_RQ rq_ = RIO_INVALID_RQ;
 
     RioRecvBuffer recvBuffer_;

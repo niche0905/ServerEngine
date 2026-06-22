@@ -75,15 +75,12 @@ bool RioSession::PostConnect()
    if (IsConnected())
       return false;
 
-   if (rio_ == nullptr)
-      return false;
-
    if (rq_ == RIO_INVALID_RQ)
       return false;
 
    if (recvBuffer_.IsRegistered() == false)
    {
-      if (recvBuffer_.Register(rio_) == false)
+      if (recvBuffer_.Register(&SocketUtils::Rio) == false)
          return false;
    }
 
@@ -102,7 +99,7 @@ void RioSession::PostRecv()
    if (IsConnected() == false)
       return;
 
-   if (rio_ == nullptr || rq_ == RIO_INVALID_RQ)
+   if (rq_ == RIO_INVALID_RQ)
       return;
 
    if (recvBuffer_.FreeSize() == 0) {
@@ -115,7 +112,7 @@ void RioSession::PostRecv()
    recvBuffer_.PrepareWrite();
    RIO_BUF rioBuf = recvBuffer_.MakeRecvRioBuf();
 
-   if (rio_->RIOReceive(
+   if (SocketUtils::Rio.RIOReceive(
        rq_,
        &rioBuf,
        1,
@@ -133,7 +130,7 @@ void RioSession::PostSend()
    if (IsConnected() == false)
       return;
 
-   if (rio_ == nullptr || rq_ == RIO_INVALID_RQ)
+   if (rq_ == RIO_INVALID_RQ)
       return;
 
    sendEvent_.SetOwner(shared_from_this());
@@ -164,7 +161,7 @@ void RioSession::PostSend()
       return;
    }
 
-   if (rio_->RIOSend(
+   if (SocketUtils::Rio.RIOSend(
       rq_,
       rioBufs.data(),
       static_cast<ULONG>(rioBufs.size()),
