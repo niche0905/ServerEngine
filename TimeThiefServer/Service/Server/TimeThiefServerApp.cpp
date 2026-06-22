@@ -77,6 +77,7 @@ void TimeThiefServerApp::Shutdown()
    
    if (networkService_) {
       networkService_->StopService();
+      networkService_->WaitForSessionDrain();
    }
    
    if (shardManager_) {
@@ -251,7 +252,8 @@ RoomId TimeThiefServerApp::GenerateRoomId()
 
 void TimeThiefServerApp::WorkerLoop()
 {
-   while (running_.load()) {
+   while (running_.load() ||
+          (networkService_ && networkService_->GetCurrentSessionCount() > 0)) {
       
       if (networkService_) {
          networkService_->Dispatch(1000);

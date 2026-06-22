@@ -21,9 +21,13 @@ public:
 
 	void* GetNativeContext() noexcept override { return this; }
 
+	void SetCompletionStatus(LONG status) noexcept { completionStatus_ = status; }
+	LONG GetCompletionStatus() const noexcept { return completionStatus_; }
+
 private:
 	IoEventType					type_{ IoEventType::None };
 	std::shared_ptr<IoObject>	owner_{ nullptr };
+	LONG						completionStatus_{ NO_ERROR };
 
 };
 

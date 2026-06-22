@@ -111,6 +111,8 @@ bool IocpSession::PostDisconnect()
 		int32 errorCode = ::WSAGetLastError();
 		if (errorCode != ERROR_IO_PENDING) {
 			disconnectEvent_.SetOwner(nullptr);	// Release reference
+			SocketUtils::Close(socket_);
+			ProcessDisconnect();
 			return false;
 		}
 	}
@@ -194,7 +196,10 @@ void IocpSession::ProcessConnect()
 	connected_.store(true);
 
 	// Session registeration to Service
-	GetService()->AddSession(GetSessionRef());
+	if (GetService()->AddSession(GetSessionRef()) == false) {
+		Disconnect(L"Service stopping");
+		return;
+	}
 
 	// on connected event (content override)
 	OnConnected();
@@ -207,9 +212,11 @@ void IocpSession::ProcessDisconnect()
 {
 	disconnectEvent_.SetOwner(nullptr);	// Release reference
 
-	// on disconnected event (content override)
-	OnDisconnected();
-	GetService()->RemoveSession(GetSessionRef());
+	if (activeRegistered_.exchange(false)) {
+		// on disconnected event (content override)
+		OnDisconnected();
+		GetService()->RemoveSession(GetSessionRef());
+	}
 }
 
 void IocpSession::ProcessRecv(int32 numOfBytes)

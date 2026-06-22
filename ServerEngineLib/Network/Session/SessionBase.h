@@ -17,6 +17,7 @@ class SessionBase : public IoObject
 public:
 	using SessionId = uint64;
 	friend class Listener;
+	friend class ServiceBase;
 
 	enum
 	{
@@ -92,6 +93,7 @@ protected:
 	NetAddr						netAddr_{};
 
 	std::atomic<bool>			connected_{ false };
+	std::atomic<bool>			activeRegistered_{ false };
 
 };
 

@@ -78,6 +78,8 @@ bool RioCore::Dispatch(DWORD timeoutMs)
 
 		if (ioEvent)
 		{
+			ioEvent->SetCompletionStatus(result.Status);
+
 			if (std::shared_ptr<IoObject> owner = ioEvent->GetOwner())
 			{
 				owner->Dispatch(ioEvent, static_cast<int32>(result.BytesTransferred));

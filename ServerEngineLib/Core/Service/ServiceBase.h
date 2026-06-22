@@ -1,4 +1,5 @@
 ﻿#pragma once
+#include <condition_variable>
 #include "Network/IoBackend.h"
 #include "Network/Session/SessionBase.h"
 
@@ -26,6 +27,7 @@ public:
 	virtual bool CanStart() const;
 
 	virtual void StopService();
+	void WaitForSessionDrain();
 	
 	virtual bool Dispatch(uint32 timeoutMs) = 0;
 
@@ -36,7 +38,7 @@ public:
 	std::shared_ptr<SessionBase> CreateSession();
 	virtual bool RegisterSession(std::shared_ptr<SessionBase> session) = 0;
 	virtual bool RegisterIoObject(std::shared_ptr<IoObject> session) = 0;
-	void AddSession(std::shared_ptr<SessionBase> session);
+	bool AddSession(std::shared_ptr<SessionBase> session);
 	void RemoveSession(std::shared_ptr<SessionBase> session);
 	int32 GetCurrentSessionCount() const { return sessionCount_; }
 	int32 GetMaxSessionCount() const { return maxSessionCount_; }
@@ -54,8 +56,10 @@ protected:
 	int32 maxSessionCount_;								// maximum session count
 	std::atomic<int32> sessionCount_;					// current session count
 	std::set<std::shared_ptr<SessionBase>> sessions_;	// active sessions
+	std::atomic<bool> stopping_{ false };
 
 	std::mutex sessionMutex_;							// mutex for session management
+	std::condition_variable sessionDrainCv_;
 
 };
 

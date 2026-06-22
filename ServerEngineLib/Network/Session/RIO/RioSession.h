@@ -50,6 +50,10 @@ public:
     virtual RIO_RQ GetRequestQueue() const override { return rq_; }
     
 private:
+    void TryFinalizeDisconnect();
+    void HandleRioCompletionError(std::wstring_view operation, LONG status);
+
+private:
     RIO_RQ rq_ = RIO_INVALID_RQ;
 
     RioRecvBuffer recvBuffer_;
@@ -58,6 +62,12 @@ private:
 
     std::queue<std::shared_ptr<RioSendBuffer>> sendQueue_;
     std::mutex sendMutex_;
+    std::mutex ioStateMutex_;
     std::atomic<bool> sending_ = false;
+    std::atomic<bool> closing_ = false;
+    std::atomic<bool> disconnectFinalized_ = false;
+    std::atomic<bool> recvPending_ = false;
+    std::atomic<bool> sendPending_ = false;
+    std::atomic<int32> completionDispatchCount_ = 0;
     
 };
