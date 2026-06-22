@@ -12,6 +12,8 @@
 RioSession::RioSession()
    : recvBuffer_(SessionBase::BUFFER_SIZE)
 {
+   sendEvent_.sendBuffers_.reserve(RioMaxSendDataBuffers);
+   sendEvent_.rioBuffers_.reserve(RioMaxSendDataBuffers);
 }
 
 RioSession::~RioSession()
@@ -140,11 +142,10 @@ void RioSession::PostSend()
 
    sendEvent_.SetOwner(shared_from_this());
    sendEvent_.sendBuffers_.clear();
+   sendEvent_.rioBuffers_.clear();
 
-   std::vector<RIO_BUF> rioBufs;
-   int32 totalWriteSize = 0;
-
-   while (sendQueue_.empty() == false) {
+   while (sendQueue_.empty() == false &&
+          sendEvent_.rioBuffers_.size() < RioMaxSendDataBuffers) {
       std::shared_ptr<RioSendBuffer> sendBuffer = sendQueue_.front();
       sendQueue_.pop();
 
@@ -154,13 +155,11 @@ void RioSession::PostSend()
       if (sendBuffer->WriteSize() <= 0)
          continue;
 
-      totalWriteSize += sendBuffer->WriteSize();
-
       sendEvent_.sendBuffers_.push_back(sendBuffer);
-      rioBufs.push_back(sendBuffer->MakeRioBuf());
+      sendEvent_.rioBuffers_.push_back(sendBuffer->MakeRioBuf());
    }
 
-   if (rioBufs.empty()) {
+   if (sendEvent_.rioBuffers_.empty()) {
       sendEvent_.SetOwner(nullptr);
       sending_.store(false);
       return;
@@ -168,8 +167,8 @@ void RioSession::PostSend()
 
    if (SocketUtils::Rio.RIOSend(
       rq_,
-      rioBufs.data(),
-      static_cast<ULONG>(rioBufs.size()),
+      sendEvent_.rioBuffers_.data(),
+      static_cast<ULONG>(sendEvent_.rioBuffers_.size()),
       0,
       reinterpret_cast<PVOID>(&sendEvent_)) == FALSE)
    {
@@ -177,6 +176,7 @@ void RioSession::PostSend()
 
       sendEvent_.SetOwner(nullptr);
       sendEvent_.sendBuffers_.clear();
+      sendEvent_.rioBuffers_.clear();
       sending_.store(false);
 
       HandleError(L"RioSession::PostSend", errorCode);
@@ -208,6 +208,7 @@ void RioSession::ProcessDisconnect()
          sendQueue_.pop();
 
       sendEvent_.sendBuffers_.clear();
+      sendEvent_.rioBuffers_.clear();
       sending_.store(false);
    }
 
@@ -256,6 +257,7 @@ void RioSession::ProcessSend(int32 numOfBytes)
 {
    sendEvent_.SetOwner(nullptr);
    sendEvent_.sendBuffers_.clear();
+   sendEvent_.rioBuffers_.clear();
 
    if (numOfBytes == 0)
    {

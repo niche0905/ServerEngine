@@ -30,6 +30,10 @@ using AcceptEvent = IocpAcceptEvent;
 
 constexpr uint32 RioSendBlockSize = 4096;
 constexpr uint32 RioSendBlockCount = 8192;
+constexpr ULONG RioMaxOutstandingReceive = 1;
+constexpr ULONG RioMaxReceiveDataBuffers = 1;
+constexpr ULONG RioMaxOutstandingSend = 1;
+constexpr ULONG RioMaxSendDataBuffers = 16;
 
 //using SelectedService = ServiceType::RioService;
 using IoCoreType = RioCore;

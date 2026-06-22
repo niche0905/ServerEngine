@@ -107,8 +107,10 @@ bool RioCore::AttachIoObject(std::shared_ptr<IoObject> ioObject)
 
 	RIO_RQ rq = SocketUtils::Rio.RIOCreateRequestQueue(
 		socket,
-		64, 1,
-		64, 1,
+		RioMaxOutstandingReceive,
+		RioMaxReceiveDataBuffers,
+		RioMaxOutstandingSend,
+		RioMaxSendDataBuffers,
 		rioCq_,
 		rioCq_,
 		ioObject.get()
