@@ -107,6 +107,13 @@ bool RioCore::AttachIoObject(std::shared_ptr<IoObject> ioObject)
 	
 	SOCKET socket = reinterpret_cast<SOCKET>(ioObject->GetHandle());
 
+	if (SocketUtils::ValidateRioSocket(socket) == false) {
+		int32 errorCode = ::WSAGetLastError();
+		std::wstring message = SocketUtils::GetWinErrorToString(errorCode);
+		consoleLogger->Log(Color::Yellow, L"[Session] ERROR in RioCore::ValidateRioSocket (code: %d): %s\n", errorCode, message.c_str());
+		return false;
+	}
+
 	RIO_RQ rq = SocketUtils::Rio.RIOCreateRequestQueue(
 		socket,
 		RioMaxOutstandingReceive,
@@ -121,7 +128,16 @@ bool RioCore::AttachIoObject(std::shared_ptr<IoObject> ioObject)
 	if (rq == RIO_INVALID_RQ) {
 		int32 errorCode = ::WSAGetLastError();
 		std::wstring message = SocketUtils::GetWinErrorToString(errorCode);
-		consoleLogger->Log(Color::Yellow, L"[Session] ERROR in RioCore::AttachIoObejct (code: %d): %s\n", errorCode, message.c_str());
+		consoleLogger->Log(
+			Color::Yellow,
+			L"[Session] ERROR in RioCore::AttachIoObject socket=%llu recv=(%lu,%lu) send=(%lu,%lu) (code: %d): %s\n",
+			static_cast<unsigned long long>(socket),
+			RioMaxOutstandingReceive,
+			RioMaxReceiveDataBuffers,
+			RioMaxOutstandingSend,
+			RioMaxSendDataBuffers,
+			errorCode,
+			message.c_str());
 		return false;
 	}
 	

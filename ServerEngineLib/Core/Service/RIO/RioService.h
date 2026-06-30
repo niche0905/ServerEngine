@@ -24,10 +24,13 @@ public:
    virtual bool Dispatch(uint32 timeoutMs) override;
 
 	// Session Management
+   virtual bool PrepareSessionForConnectedIo(std::shared_ptr<SessionBase> session) override;
    virtual bool RegisterSession(std::shared_ptr<SessionBase> session) override;
    virtual bool RegisterIoObject(std::shared_ptr<IoObject> ioObject) override;
 
 protected:
+   virtual bool ShouldRegisterSessionOnCreate() const override { return false; }
+
    std::shared_ptr<RioCore> rioCore_;
     
 };

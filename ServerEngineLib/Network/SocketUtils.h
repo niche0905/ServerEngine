@@ -48,6 +48,8 @@ public:
 	
 	// RIO 함수 테이블 로드
 	static bool LoadRioFunctions();
+	static bool LoadRioFunctions(SOCKET socket);
+	static bool ValidateRioSocket(SOCKET socket);
 
 // Windows Error
 public:
@@ -65,6 +67,7 @@ public:
 	static bool SetSendBufferSize(SOCKET socket, int32 size);
 	// TCP No Delay 옵션 설정 (Nagle 알고리즘 비활성화)
 	static bool SetTcpNoDelay(SOCKET socket, bool flag);
+	static bool SetNonBlocking(SOCKET socket, bool flag);
 	// AcceptEx 함수 사용을 위한 소켓 설정
 	static bool SetUpdateAcceptContext(SOCKET socket, SOCKET listenSocket);
 

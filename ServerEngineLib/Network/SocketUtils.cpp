@@ -79,11 +79,23 @@ bool SocketUtils::LoadRioFunctions()
 	if (tempSocket == INVALID_SOCKET)
 		return false;
 
+	const bool result = LoadRioFunctions(tempSocket);
+
+	::closesocket(tempSocket);
+
+	return result;
+}
+
+bool SocketUtils::LoadRioFunctions(SOCKET socket)
+{
+	if (socket == INVALID_SOCKET)
+		return false;
+
 	GUID functionTableId = WSAID_MULTIPLE_RIO;
 	DWORD bytes = 0;
 
 	const int result = ::WSAIoctl(
-		tempSocket,
+		socket,
 		SIO_GET_MULTIPLE_EXTENSION_FUNCTION_POINTER,
 		&functionTableId,
 		sizeof(functionTableId),
@@ -93,7 +105,28 @@ bool SocketUtils::LoadRioFunctions()
 		nullptr,
 		nullptr);
 
-	::closesocket(tempSocket);
+	return result != SOCKET_ERROR;
+}
+
+bool SocketUtils::ValidateRioSocket(SOCKET socket)
+{
+	if (socket == INVALID_SOCKET)
+		return false;
+
+	RIO_EXTENSION_FUNCTION_TABLE rio{};
+	GUID functionTableId = WSAID_MULTIPLE_RIO;
+	DWORD bytes = 0;
+
+	const int result = ::WSAIoctl(
+		socket,
+		SIO_GET_MULTIPLE_EXTENSION_FUNCTION_POINTER,
+		&functionTableId,
+		sizeof(functionTableId),
+		&rio,
+		sizeof(rio),
+		&bytes,
+		nullptr,
+		nullptr);
 
 	return result != SOCKET_ERROR;
 }
@@ -159,7 +192,13 @@ bool SocketUtils::SetSendBufferSize(SOCKET socket, int32 size)
 bool SocketUtils::SetTcpNoDelay(SOCKET socket, bool flag)
 {
 	int32 opt = flag ? 1 : 0;
-	return SetSocketOption<int32>(socket, SOL_SOCKET, TCP_NODELAY, opt);
+	return SetSocketOption<int32>(socket, IPPROTO_TCP, TCP_NODELAY, opt);
+}
+
+bool SocketUtils::SetNonBlocking(SOCKET socket, bool flag)
+{
+	u_long mode = flag ? 1 : 0;
+	return ::ioctlsocket(socket, FIONBIO, &mode) != SOCKET_ERROR;
 }
 
 bool SocketUtils::SetUpdateAcceptContext(SOCKET socket, SOCKET listenSocket)

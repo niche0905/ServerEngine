@@ -11,7 +11,7 @@ enum class ServiceType
     RioServerService
 };
 
-// #define USE_RIO
+#define USE_RIO
 
 #include "Network/Event/IOCP/IocpConnectionEvent.h"
 
@@ -28,12 +28,12 @@ using AcceptEvent = IocpAcceptEvent;
 #include "Network/Event/RIO/RioEvent.h"
 #include "Network/Event/RIO/RioIoEvent.h"
 
-constexpr uint32 RioSendBlockSize = 4096;
-constexpr uint32 RioSendBlockCount = 8192;
+constexpr uint32 RioSendBlockSize = 32768;
+constexpr uint32 RioSendBlockCount = 256;
 constexpr ULONG RioMaxOutstandingReceive = 1;
 constexpr ULONG RioMaxReceiveDataBuffers = 1;
 constexpr ULONG RioMaxOutstandingSend = 1;
-constexpr ULONG RioMaxSendDataBuffers = 16;
+constexpr ULONG RioMaxSendDataBuffers = 1;
 
 //using SelectedService = ServiceType::RioService;
 using IoCoreType = RioCore;

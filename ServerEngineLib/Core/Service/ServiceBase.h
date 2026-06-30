@@ -36,6 +36,8 @@ public:
 
 	// Session Management
 	std::shared_ptr<SessionBase> CreateSession();
+	bool AcceptSession(std::shared_ptr<SessionBase> session, SOCKET socket, const NetAddr& addr);
+	virtual bool PrepareSessionForConnectedIo(std::shared_ptr<SessionBase> session);
 	virtual bool RegisterSession(std::shared_ptr<SessionBase> session) = 0;
 	virtual bool RegisterIoObject(std::shared_ptr<IoObject> session) = 0;
 	bool AddSession(std::shared_ptr<SessionBase> session);
@@ -49,6 +51,8 @@ public:
 	NetAddr GetNetAddress() const { return netAddress_; }
 
 protected:
+	virtual bool ShouldRegisterSessionOnCreate() const { return true; }
+
 	ServiceType type_;									// what kind of service
 	NetAddr netAddress_;								// network address info
 

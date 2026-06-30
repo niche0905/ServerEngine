@@ -47,6 +47,14 @@ bool RioService::Dispatch(uint32 timeoutMs)
     return rioCore_->Dispatch(static_cast<DWORD>(timeoutMs));
 }
 
+bool RioService::PrepareSessionForConnectedIo(std::shared_ptr<SessionBase> session)
+{
+    if (RegisterSession(session) == false)
+        return false;
+
+    return ServiceBase::PrepareSessionForConnectedIo(session);
+}
+
 bool RioService::RegisterSession(std::shared_ptr<SessionBase> session)
 {
     if (session == nullptr)

@@ -1,6 +1,8 @@
 ﻿#include "pch.h"
 #include "ThreadManager.h"
+#include "Core/Global/CoreGlobal.h"
 #include "ThreadLocalStorage.h"
+#include "Utils/Logger/ConsoleLogger.h"
 
 /*-----------------
    ThreadManager
@@ -46,7 +48,10 @@ void ThreadManager::InitTLS()
 	TLS().thread_id = SThreadID.fetch_add(1);	// unique thread id assign
 	
 #ifdef USE_RIO
-	TLS().rioBufferPool.Init(&SocketUtils::Rio, RioSendBlockSize , RioSendBlockCount);
+	if (TLS().rioBufferPool.Init(&SocketUtils::Rio, RioSendBlockSize, RioSendBlockCount) == false) {
+		if (consoleLogger)
+			consoleLogger->Log(Color::Yellow, L"[Thread] RIO send buffer pool init failed. threadId=%u blockSize=%u blockCount=%u\n", TLS().thread_id, RioSendBlockSize, RioSendBlockCount);
+	}
 #endif
 }
 

@@ -32,6 +32,7 @@ public:
     
     void DrainRemoteFrees();
     
+    bool IsInitialized() const { return initialized_.load(); }
     uint32 GetBlockSize() const { return blockSize_; }
     uint32 GetBlockCount() const { return blockCount_; }
     

@@ -1,5 +1,6 @@
 ﻿#include "pch.h"
 #include "ServiceBase.h"
+#include "Network/SocketUtils.h"
 
 /*----------------
    ServiceBase
@@ -56,12 +57,40 @@ std::shared_ptr<SessionBase> ServiceBase::CreateSession()
 	std::shared_ptr<SessionBase> session = sessionFactory_();
 
 	session->SetService(std::static_pointer_cast<ServiceBase>(shared_from_this()));
-	bool registerSuccess = RegisterSession(session);
-	if (not registerSuccess) {
-		return nullptr;
+	if (ShouldRegisterSessionOnCreate()) {
+		bool registerSuccess = RegisterSession(session);
+		if (not registerSuccess) {
+			return nullptr;
+		}
 	}
 
 	return session;
+}
+
+bool ServiceBase::AcceptSession(std::shared_ptr<SessionBase> session, SOCKET socket, const NetAddr& addr)
+{
+	if (session == nullptr || socket == INVALID_SOCKET)
+		return false;
+
+	SocketUtils::Close(session->socket_);
+	session->socket_ = socket;
+	session->SetNetAddr(addr);
+
+	if (PrepareSessionForConnectedIo(session) == false) {
+		SocketUtils::Close(session->socket_);
+		return false;
+	}
+
+	session->ProcessConnect();
+	return true;
+}
+
+bool ServiceBase::PrepareSessionForConnectedIo(std::shared_ptr<SessionBase> session)
+{
+	if (session == nullptr)
+		return false;
+
+	return session->PrepareForConnectedIo();
 }
 
 bool ServiceBase::AddSession(std::shared_ptr<SessionBase> session)
