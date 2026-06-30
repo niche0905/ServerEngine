@@ -11,7 +11,7 @@ enum class ServiceType
     RioServerService
 };
 
-#define USE_RIO
+// #define USE_RIO
 
 #include "Network/Event/IOCP/IocpConnectionEvent.h"
 
