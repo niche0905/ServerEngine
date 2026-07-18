@@ -299,6 +299,8 @@ void CombatSystem::ProjectileExplosion(ObjectId projectileId, const SE::Math::Ve
    if (ownerId == ObjectId{}) {
       consoleLogger->Log(Color::Yellow, L"[CombatSystem] ProjectileExplosion called with invalid ownerId\n");
    }
+
+   ownerRoom_->EmitMonsterNoise(ownerId, pos, radius * 3.0f, 70.0f);
    
    const float radiusSq = radius * radius;
    

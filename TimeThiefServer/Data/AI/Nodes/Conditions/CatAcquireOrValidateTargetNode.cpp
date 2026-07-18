@@ -9,7 +9,6 @@ namespace BB = AiBlackboardKey;
 namespace 
 {
     constexpr float AcquireRange = 3000.0f;
-    constexpr float AcquireRangeSq = AcquireRange * AcquireRange;
     
     constexpr float LoseRange = 10000.0f;
     constexpr float LoseRangeSq = LoseRange * LoseRange;
@@ -120,41 +119,7 @@ BT::NodeStatus CatAcquireOrValidateTargetNode::tick()
     }
 
     // 3. 새 타겟 탐색
-    Pawn* bestTarget = nullptr;
-    float bestDistSq = AcquireRangeSq;
-
-    const SE::Math::Vector3 selfPos = selfNpc->GetPosition();
-
-    room->GetObjectManager().ForEachAlive([&](BaseObject* obj)
-    {
-        auto* pawn = dynamic_cast<Pawn*>(obj);
-        if (pawn == nullptr) {
-            return;
-        }
-
-        if (pawn->GetId() == selfNpc->GetId()) {
-            return;
-        }
-
-        if (pawn->IsDead()) {
-            return;
-        }
-
-        if (pawn->GetObjectType() != ObjectType::OBJ_PLAYER) {
-            return;
-        }
-
-        const float distSq = (pawn->GetPosition() - selfPos).LengthSq();
-        if (distSq > AcquireRangeSq) {
-            return;
-        }
-
-        if (distSq < bestDistSq)
-        {
-            bestDistSq = distSq;
-            bestTarget = pawn;
-        }
-    });
+    Pawn* bestTarget = selfNpc->SelectTarget(AcquireRange);
 
     if (bestTarget == nullptr)
     {

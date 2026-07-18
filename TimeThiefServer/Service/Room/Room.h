@@ -274,6 +274,7 @@ public:
    void NotifyThrowGrenade(ObjectId ownerId, ObjectId grenadeId, uint32 grenadeType, const Vector3& pos, const Vector3& dir);
    void NotifyGrenadeMoveSync(PlayerId ownerId, ObjectId grenadeId, const Vector3& newPos, const Vector3& newRotate, const Vector3& newVel);
    void NotifyGrenadeExplosion(PlayerId ownerId, ObjectId grenadeId, const Vector3& exPos);
+   void EmitMonsterNoise(ObjectId sourceId, const Vector3& position, float radius, float loudness);
    void NotifyDebugDrawSphere(const Vector3& position, float radius, const DebugDrawOptions& options = {});
    void NotifyDebugDrawCapsule(const Vector3& pointA, const Vector3& pointB, float radius, const DebugDrawOptions& options = {});
    void NotifyDebugDrawOBB(const Vector3& center, const Vector3& halfExtents, float yaw = 0.0f, float pitch = 0.0f,

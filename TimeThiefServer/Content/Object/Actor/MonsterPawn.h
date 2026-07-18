@@ -2,8 +2,18 @@
 #include "Pawn.h"
 #include "Content/Gameplay/AI/MonsterAiComponent.h"
 #include "Content/Gameplay/Loot/LootSourceComponent.h"
+#include <functional>
+#include <unordered_map>
 
 class ObjectManager;
+
+enum class MonsterAlertLevel : uint8
+{
+   Calm,
+   Suspicious,
+   Alerted,
+   Combat,
+};
 
 /*---------------
    MonsterPawn
@@ -36,9 +46,16 @@ public:
    int32 GetDropPoint() const { return dropPoint_; }
    
    ObjectId GetTargetId() const { return ai_.GetTargetId(); }
+   MonsterAlertLevel GetAlertLevel() const { return alertLevel_; }
+   float GetAlertValue() const { return alertValue_; }
+   float GetHate(ObjectId targetId) const;
+   const Vector3& GetLastStimulusPosition() const { return lastStimulusPosition_; }
    
    void SetTarget(Pawn* pawn);
    void ClearTarget();
+   void AddHate(ObjectId targetId, float amount);
+   void ReceiveNoiseStimulus(ObjectId sourceId, const Vector3& position, float loudness);
+   Pawn* SelectTarget(float acquireRange, const std::function<bool(Pawn*)>& predicate = {}) const;
    
 public:
    virtual DamageResult ApplyDamage(ObjectManager& om, int32 amount, const DamageContext& ctx) override;
@@ -67,6 +84,9 @@ public:
    
 private:
    void UpdateMove(float dt);
+   void UpdateAwareness(float dt);
+   void RefreshAlertLevel();
+   void ResetAwareness();
    
 public:
    void StartAI();
@@ -98,5 +118,11 @@ private:
    float moveSpeed_{ 600.0f };
    float moveAcceptRadius_{ 30.0f };
    float waypointAcceptRadius_{ 40.0f };
+
+   std::unordered_map<ObjectId, float> hateByTarget_;
+   MonsterAlertLevel alertLevel_{ MonsterAlertLevel::Calm };
+   float alertValue_{ 0.0f };
+   Vector3 lastStimulusPosition_{};
+   bool hasStimulusPosition_{ false };
     
 };

@@ -12,7 +12,6 @@ namespace
     constexpr float BoundaryRadiusSq = BoundaryRadius * BoundaryRadius;
 
     constexpr float AggroRange = 1000.0f;
-    constexpr float AggroRangeSq = AggroRange * AggroRange;
 
     constexpr float AttackHoldRange = 240.0f;
     constexpr float AttackHoldRangeSq = AttackHoldRange * AttackHoldRange;
@@ -124,41 +123,10 @@ BT::NodeStatus MinionAcquireOrValidateTargetNode::tick()
         ClearTargetState(*this, selfNpc);
     }
 
-    Pawn* bestTarget = nullptr;
-    float bestDistSq = AggroRangeSq;
-
-    const SE::Math::Vector3 selfPos = selfNpc->GetPosition();
     const SE::Math::Vector3 spawnPos = selfNpc->GetSavedRespawnPosition();
-
-    room->GetObjectManager().ForEachAlive([&](BaseObject* obj)
+    Pawn* bestTarget = selfNpc->SelectTarget(AggroRange, [&](Pawn* pawn)
     {
-        Pawn* pawn = dynamic_cast<Pawn*>(obj);
-        if (pawn == nullptr) {
-            return;
-        }
-
-        if (pawn->GetId() == selfNpc->GetId()) {
-            return;
-        }
-
-        if (pawn->IsDead() || pawn->GetObjectType() != ObjectType::OBJ_PLAYER) {
-            return;
-        }
-
-        if (!IsInsideBoundary(spawnPos, pawn->GetPosition())) {
-            return;
-        }
-
-        SE::Math::Vector3 diff = pawn->GetPosition() - selfPos;
-        diff.z = 0.0f;
-
-        const float distSq = diff.LengthSq();
-        if (distSq > AggroRangeSq || distSq >= bestDistSq) {
-            return;
-        }
-
-        bestDistSq = distSq;
-        bestTarget = pawn;
+        return IsInsideBoundary(spawnPos, pawn->GetPosition());
     });
 
     if (bestTarget == nullptr) {

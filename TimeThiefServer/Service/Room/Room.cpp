@@ -866,6 +866,7 @@ bool Room::HandleFire(PlayerId playerId, const se::game::C_FireReq& pkt)
       }
       
       NotifyFire(playerId, it->second.pawnObjectId, FireEvent{attackReq.weaponId, attackReq.shotSeed, attackReq.origin, attackReq.direction});
+      EmitMonsterNoise(it->second.pawnObjectId, attackReq.origin, 2500.0f, 35.0f);
    }
    
    return true;
@@ -3034,6 +3035,29 @@ void Room::NotifyGrenadeExplosion(PlayerId ownerId, ObjectId grenadeId, const Ve
    grenadeExplosionEvent.payload = GrenadeExplosionEvent{exPos};
    
    roomGameSystem_.GetReplicationSystem().PushEvent(grenadeExplosionEvent);
+}
+
+void Room::EmitMonsterNoise(ObjectId sourceId, const Vector3& position, float radius, float loudness)
+{
+   if (radius <= 0.0f || loudness <= 0.0f)
+      return;
+
+   const float radiusSq = radius * radius;
+   objectManager_.ForEachAlive([&](BaseObject* obj)
+   {
+      MonsterPawn* monster = dynamic_cast<MonsterPawn*>(obj);
+      if (!monster || monster->IsDead())
+         return;
+
+      Vector3 diff = position - monster->GetPosition();
+      diff.z = 0.0f;
+      const float distSq = diff.LengthSq();
+      if (distSq > radiusSq)
+         return;
+
+      const float falloff = 1.0f - std::sqrt(distSq) / radius;
+      monster->ReceiveNoiseStimulus(sourceId, position, loudness * falloff);
+   });
 }
 
 void Room::NotifyDebugDrawSphere(const Vector3& position, float radius, const DebugDrawOptions& options)

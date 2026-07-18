@@ -8,6 +8,18 @@
 
 namespace BB = AiBlackboardKey;
 
+namespace
+{
+   constexpr float MaxAwareness = 100.0f;
+   constexpr float SuspiciousThreshold = 20.0f;
+   constexpr float AlertedThreshold = 55.0f;
+   constexpr float CombatThreshold = 80.0f;
+   constexpr float AwarenessDecayPerSecond = 8.0f;
+   constexpr float HateDecayPerSecond = 2.0f;
+   constexpr float DamageHateMultiplier = 2.0f;
+   constexpr float TargetSwitchHateMargin = 25.0f;
+}
+
 /*---------------
    MonsterPawn
 ---------------*/
@@ -22,24 +34,101 @@ void MonsterPawn::SetTarget(Pawn* pawn)
    
    ai_.SetTargetId(newTargetId);
    MarkReplicationDirty(ReplicationDirty::Target);
+   RefreshAlertLevel();
 }
 
 void MonsterPawn::ClearTarget()
 {
    ai_.ClearTarget();
    MarkReplicationDirty(ReplicationDirty::Target);
+   RefreshAlertLevel();
+}
+
+float MonsterPawn::GetHate(ObjectId targetId) const
+{
+   const auto it = hateByTarget_.find(targetId);
+   return (it != hateByTarget_.end()) ? it->second : 0.0f;
+}
+
+void MonsterPawn::AddHate(ObjectId targetId, float amount)
+{
+   if (targetId == ObjectId{} || amount <= 0.0f)
+      return;
+
+   hateByTarget_[targetId] += amount;
+}
+
+void MonsterPawn::ReceiveNoiseStimulus(ObjectId sourceId, const Vector3& position, float loudness)
+{
+   if (IsDead() || loudness <= 0.0f)
+      return;
+
+   lastStimulusPosition_ = position;
+   hasStimulusPosition_ = true;
+   alertValue_ = std::clamp(alertValue_ + loudness, 0.0f, MaxAwareness);
+   AddHate(sourceId, loudness * 0.5f);
+   RefreshAlertLevel();
+
+   if (GetTargetId() == ObjectId{} && !hasMovePath_)
+      LookAtPosition(position);
+}
+
+Pawn* MonsterPawn::SelectTarget(float acquireRange, const std::function<bool(Pawn*)>& predicate) const
+{
+   auto room = GetRoom();
+   if (!room || acquireRange <= 0.0f)
+      return nullptr;
+
+   Pawn* bestTarget = nullptr;
+   float bestScore = -std::numeric_limits<float>::infinity();
+   const float acquireRangeSq = acquireRange * acquireRange;
+   const Vector3 selfPos = GetPosition();
+
+   room->GetObjectManager().ForEachAlive([&](BaseObject* obj)
+   {
+      Pawn* pawn = dynamic_cast<Pawn*>(obj);
+      if (!pawn || pawn->IsDead() || pawn->GetObjectType() != ObjectType::OBJ_PLAYER)
+         return;
+      if (predicate && !predicate(pawn))
+         return;
+
+      Vector3 diff = pawn->GetPosition() - selfPos;
+      diff.z = 0.0f;
+      const float distSq = diff.LengthSq();
+      if (distSq > acquireRangeSq)
+         return;
+
+      // Hate가 우선권을 주되, 같은 Hate에서는 가까운 대상을 선택한다.
+      const float distanceRatio = std::sqrt(distSq) / acquireRange;
+      const float score = GetHate(pawn->GetId()) - distanceRatio * 10.0f;
+      if (score > bestScore) {
+         bestScore = score;
+         bestTarget = pawn;
+      }
+   });
+
+   return bestTarget;
 }
 
 DamageResult MonsterPawn::ApplyDamage(ObjectManager& om, int32 amount, const DamageContext& ctx)
 {
    DamageResult pawnApplyResult = Pawn::ApplyDamage(om, amount, ctx);
+
+   const ObjectId threatId = (ctx.instigator != ObjectId{}) ? ctx.instigator : ctx.attacker;
+   if (pawnApplyResult.accepted && threatId != ObjectId{}) {
+      AddHate(threatId, static_cast<float>(pawnApplyResult.applied) * DamageHateMultiplier);
+      alertValue_ = MaxAwareness;
+      RefreshAlertLevel();
+   }
    
-   if (ctx.instigator == ObjectId{}) {
-      PlayerPawn* attacker = om.FindAs<PlayerPawn>(ctx.attacker);
+   if (threatId != ObjectId{}) {
+      PlayerPawn* attacker = om.FindAs<PlayerPawn>(threatId);
       
       if (attacker) {
          if (auto blackboard = ai_.GetBlackboard()) {
-            if (blackboard->get<ObjectId>(BB::TargetId) != ObjectId{} )
+            const ObjectId currentTargetId = blackboard->get<ObjectId>(BB::TargetId);
+            if (currentTargetId != ObjectId{}
+                && GetHate(threatId) < GetHate(currentTargetId) + TargetSwitchHateMargin)
                return pawnApplyResult;
             
             blackboard->set<Pawn*>(BB::TargetPawn, attacker);
@@ -147,8 +236,51 @@ void MonsterPawn::Tick(float dt)
    // Pawn::Tick(dt);
    
    ai_.Tick(dt);
+   UpdateAwareness(dt);
    
    UpdateMove(dt);
+}
+
+void MonsterPawn::UpdateAwareness(float dt)
+{
+   if (dt <= 0.0f)
+      return;
+
+   if (GetTargetId() == ObjectId{})
+      alertValue_ = std::max(0.0f, alertValue_ - AwarenessDecayPerSecond * dt);
+   else
+      alertValue_ = MaxAwareness;
+
+   for (auto it = hateByTarget_.begin(); it != hateByTarget_.end(); ) {
+      it->second -= HateDecayPerSecond * dt;
+      if (it->second <= 0.0f)
+         it = hateByTarget_.erase(it);
+      else
+         ++it;
+   }
+
+   RefreshAlertLevel();
+}
+
+void MonsterPawn::RefreshAlertLevel()
+{
+   if (GetTargetId() != ObjectId{} || alertValue_ >= CombatThreshold)
+      alertLevel_ = MonsterAlertLevel::Combat;
+   else if (alertValue_ >= AlertedThreshold)
+      alertLevel_ = MonsterAlertLevel::Alerted;
+   else if (alertValue_ >= SuspiciousThreshold)
+      alertLevel_ = MonsterAlertLevel::Suspicious;
+   else
+      alertLevel_ = MonsterAlertLevel::Calm;
+}
+
+void MonsterPawn::ResetAwareness()
+{
+   hateByTarget_.clear();
+   alertValue_ = 0.0f;
+   alertLevel_ = MonsterAlertLevel::Calm;
+   lastStimulusPosition_ = Vector3{};
+   hasStimulusPosition_ = false;
 }
 
 void MonsterPawn::OnPreDestroy()
@@ -168,6 +300,7 @@ void MonsterPawn::OnPreRespawn(ObjectManager& om)
    ai_.ResetBlackboard();
 
    StopMove();
+   ResetAwareness();
 }
 
 void MonsterPawn::OnPostRespawn(ObjectManager& om)
