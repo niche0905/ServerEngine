@@ -409,9 +409,10 @@ void Room::SetPlayer(const std::vector<PlayerId>& playerIds, const std::vector<s
    
    std::vector<Vector3> spawnPoints(gameDataManager_->GetPlayerSpawnTable().spawnPoints);
    
-   std::random_device rd;
-   std::mt19937 rng(rd());
-   std::ranges::shuffle(spawnPoints, rng);
+   // 기존 랜덤 스폰 포인트 배정 로직
+   // std::random_device rd;
+   // std::mt19937 rng(rd());
+   // std::ranges::shuffle(spawnPoints, rng);
    
    for (size_t i = 0; i < playerIds.size(); ++i) {
       const PlayerId playerId = playerIds[i];
