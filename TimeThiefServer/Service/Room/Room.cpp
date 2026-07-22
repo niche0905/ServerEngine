@@ -30,6 +30,24 @@
 
 namespace 
 {
+   constexpr size_t EntitiesSpawnBatchTargetBytes = 12 * 1024; // EntitesSpawn 패킷이 너무 길어져 잘라서 보내기 위함
+
+   size_t GetVarintSize(size_t value)
+   {
+      size_t size = 1;
+      while (value >= 0x80) {
+         value >>= 7;
+         ++size;
+      }
+      return size;
+   }
+
+   size_t GetSpawnInfoFieldSize(const se::room::SpawnInfo& info)
+   {
+      const size_t payloadSize = info.ByteSizeLong();
+      return 1 + GetVarintSize(payloadSize) + payloadSize; // field tag + length + payload
+   }
+
    constexpr SkillId TimeAccelSkillId = 1;
    constexpr SkillId TimeAfterImageSkillId = 2;
    constexpr SkillId TimeRewindSkillId = 3;
@@ -590,7 +608,7 @@ void Room::JoinPlayerProcess(PlayerId playerId, PlayerPawn* playerPawn)
 {
    SendBufferRef enterResBuffer;
    SendBufferRef gameDataInitBuffer;
-   SendBufferRef entitiesSpawnBuffer;
+   std::vector<SendBufferRef> entitiesSpawnBuffers;
    SendBufferRef playerInitBuffer;
    
    // 입장한 플레이어에게 방 스냅샷 전송하기
@@ -640,20 +658,41 @@ void Room::JoinPlayerProcess(PlayerId playerId, PlayerPawn* playerPawn)
    // 입장한 플레이어에게 월드의 Object 들의 스폰 정보 전송하기
    {
       se::room::N_EntitiesSpawn spawnPkt;
+      size_t spawnPktBytes = 0;
+
+      auto flushSpawnBatch = [&]()
       {
-         objectManager_.ForEachAlive([&](BaseObject* obj)
+         if (spawnPkt.infos_size() == 0)
+            return;
+
+         if (SendBufferRef buffer = ServerPacketHandler::MakeSendBuffer(spawnPkt))
+            entitiesSpawnBuffers.push_back(std::move(buffer));
+
+         spawnPkt.Clear();
+         spawnPktBytes = 0;
+      };
+
+      objectManager_.ForEachAlive([&](BaseObject* obj)
+      {
+         if (obj == nullptr)
+            return;
+
+         se::room::SpawnInfo tempInfo;
+         if (!BuildSpawnInfo(obj, &tempInfo))
+            return;
+
+         const size_t infoFieldBytes = GetSpawnInfoFieldSize(tempInfo);
+         if (spawnPkt.infos_size() > 0 &&
+             spawnPktBytes + infoFieldBytes > EntitiesSpawnBatchTargetBytes)
          {
-            if (obj == nullptr)
-               return;
-            
-            se::room::SpawnInfo tempInfo;
-            if (!BuildSpawnInfo(obj, &tempInfo)) 
-               return;
-            
-            spawnPkt.add_infos()->CopyFrom(tempInfo);
-         });
-      }
-      entitiesSpawnBuffer = ServerPacketHandler::MakeSendBuffer(spawnPkt);
+            flushSpawnBatch();
+         }
+
+         spawnPkt.add_infos()->CopyFrom(tempInfo);
+         spawnPktBytes += infoFieldBytes;
+      });
+
+      flushSpawnBatch();
    }
    
    // 입장한 플레이어의 초기 값 세팅
@@ -717,7 +756,7 @@ void Room::JoinPlayerProcess(PlayerId playerId, PlayerPawn* playerPawn)
       SendToPlayer(playerId, enterResBuffer);
    if (gameDataInitBuffer)
       SendToPlayer(playerId, gameDataInitBuffer);
-   if (entitiesSpawnBuffer)
+   for (const SendBufferRef& entitiesSpawnBuffer : entitiesSpawnBuffers)
       SendToPlayer(playerId, entitiesSpawnBuffer);
    if (playerInitBuffer)
       SendToPlayer(playerId, playerInitBuffer);
