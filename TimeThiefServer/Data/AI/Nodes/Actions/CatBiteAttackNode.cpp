@@ -13,7 +13,7 @@ namespace
     constexpr float AttackAnimDuration = 1.20f;
     constexpr float HitTiming = 0.525f;
 
-    constexpr int32 BiteDamage = 40;
+    constexpr int32 BiteDamage = 20;
 
     constexpr float BiteAttackRadius = 85.0f;
     

@@ -12,7 +12,7 @@ namespace
 {
     constexpr float AttackAnimDuration = 3.40f;
     constexpr float ExplosionTiming = 1.50f;
-    constexpr int32 BurstDamage = 55;
+    constexpr int32 BurstDamage = 45;
     constexpr float BurstRadius = 750.0f;
 
     void ResetCombatReservation(BT::TreeNode& node)

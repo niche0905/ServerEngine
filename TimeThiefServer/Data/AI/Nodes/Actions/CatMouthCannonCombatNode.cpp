@@ -11,6 +11,7 @@ namespace BB = AiBlackboardKey;
 namespace
 {
     constexpr float CannonRange = 2500.0f;
+    constexpr int32 CannonDamage = 25;
 
     // 애니메이션 길이
     constexpr float AttackAnimDuration = 1.33f;
@@ -156,7 +157,7 @@ BT::NodeStatus CatMouthCannonCombatNode::onRunning()
         fireDir = fireDir.Normalized();
 
         // 발사 판정
-        room->HandleMonsterFire(selfId, CombatEventType::CatCannonFire, origin, fireDir, CannonRange, 50);
+        room->HandleMonsterFire(selfId, CombatEventType::CatCannonFire, origin, fireDir, CannonRange, CannonDamage);
     }
 
     if (elapsedTime_ >= AttackAnimDuration)

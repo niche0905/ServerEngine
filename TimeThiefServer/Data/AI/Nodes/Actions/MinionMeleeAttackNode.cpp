@@ -11,7 +11,7 @@ namespace
 {
     constexpr float AttackDuration = 0.95f;
     constexpr float HitTiming = 0.35f;
-    constexpr int32 AttackDamage = 36;
+    constexpr int32 AttackDamage = 18;
     constexpr float AttackRadius = 80.0f;
 
     constexpr SE::Math::Vector3 AttackStartOffset{70.0f, 0.0f, 80.0f};

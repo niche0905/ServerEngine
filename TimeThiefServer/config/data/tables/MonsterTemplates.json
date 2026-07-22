@@ -21,7 +21,7 @@
     {
       "template_id": 4,
       "name": "Boss_Gorilla",
-      "max_hp": 2000,
+      "max_hp": 1000,
       "drop_point": 500,
       "respawn_time": 0,
       "loot_table": 1,
