@@ -7,7 +7,7 @@
     },
     "data_files": {
         "map_file": "data/map/TestMap_Tagged.servermap",
-        "nav_mesh_file": "data/map/VirtualMetaCity_NavMesh.bin",
+        "nav_mesh_file": "data/map/LV_Main_NavMesh.bin",
         "zone_table": "data/tables/ZoneDataTable.json",
         "loot_table": "data/tables/LootTables.json",
         "monster_template_table": "data/tables/MonsterTemplates.json",
