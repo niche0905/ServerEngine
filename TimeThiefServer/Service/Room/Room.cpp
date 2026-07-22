@@ -2173,6 +2173,38 @@ bool Room::HandleMaxHealth(PlayerId playerId, const se::test::C_MaxHealthReq& pk
    return true;
 }
 
+bool Room::HandleTPAll(PlayerId playerId, const se::test::C_TPAllReq& pkt)
+{
+   if (playerId == 0 or roomPlayers_.find(playerId) == roomPlayers_.end())
+      return false;
+
+   const auto& requestedPosition = pkt.position();
+   const Vector3 position{requestedPosition.x(), requestedPosition.y(), requestedPosition.z()};
+   bool teleported = false;
+
+   for (const auto& entry : roomPlayers_) {
+      const RoomPlayer& roomPlayer = entry.second;
+      auto* playerPawn = objectManager_.FindAs<PlayerPawn>(roomPlayer.pawnObjectId);
+      if (!playerPawn)
+         continue;
+
+      playerPawn->SetPosition(position);
+      teleported = true;
+   }
+
+   if (teleported) {
+      se::test::N_TPPos notify;
+      auto* notifyPosition = notify.mutable_position();
+      notifyPosition->set_x(position.x);
+      notifyPosition->set_y(position.y);
+      notifyPosition->set_z(position.z);
+
+      Broadcast(ServerPacketHandler::MakeSendBuffer(notify));
+   }
+
+   return teleported;
+}
+
 bool Room::HandleZoneStop(PlayerId playerId, const se::test::C_ZoneStopReq& pkt)
 {
    ZoneSystem& zoneSystem = roomGameSystem_.GetZoneSystem();

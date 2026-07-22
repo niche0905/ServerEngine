@@ -282,6 +282,11 @@ bool Handle_C_MaxHealthReq(PacketSessionRef& session, const se::test::C_MaxHealt
     if (!Dispatcher()) return false;
     return Dispatcher()->Handle_C_MaxHealthReq(session, pkt);
 }
+bool Handle_C_TPAllReq(PacketSessionRef& session, const se::test::C_TPAllReq& pkt)
+{
+    if (!Dispatcher()) return false;
+    return Dispatcher()->Handle_C_TPAllReq(session, pkt);
+}
 bool Handle_C_ZoneStopReq(PacketSessionRef& session, const se::test::C_ZoneStopReq& pkt)
 {
     if (!Dispatcher()) return false;

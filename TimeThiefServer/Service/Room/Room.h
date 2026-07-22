@@ -124,6 +124,7 @@ public:
    bool HandleMoney(PlayerId playerId, const se::test::C_MoneyReq& pkt);
    bool HandleHealth(PlayerId playerId, const se::test::C_HealthReq& pkt);
    bool HandleMaxHealth(PlayerId playerId, const se::test::C_MaxHealthReq& pkt);
+   bool HandleTPAll(PlayerId playerId, const se::test::C_TPAllReq& pkt);
    bool HandleZoneStop(PlayerId playerId, const se::test::C_ZoneStopReq& pkt);
    bool HandleZoneStart(PlayerId playerId, const se::test::C_ZoneStartReq& pkt);
    bool HandleZoneReset(PlayerId playerId, const se::test::C_ZoneResetReq& pkt);

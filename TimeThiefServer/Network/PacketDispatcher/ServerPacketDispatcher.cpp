@@ -431,6 +431,14 @@ bool ServerPacketDispatcher::Handle_C_MaxHealthReq(PacketSessionRef& session, co
     });
 }
 
+bool ServerPacketDispatcher::Handle_C_TPAllReq(PacketSessionRef& session, const se::test::C_TPAllReq& pkt)
+{
+    return EnqueueToPlayerRoom(session, pkt, [](Room& room, PlayerId playerId, const se::test::C_TPAllReq& pkt)
+    {
+        room.HandleTPAll(playerId, pkt);
+    });
+}
+
 bool ServerPacketDispatcher::Handle_C_ZoneStopReq(PacketSessionRef& session, const se::test::C_ZoneStopReq& pkt)
 {
     return EnqueueToPlayerRoom(session, pkt, [](Room& room, PlayerId playerId, const se::test::C_ZoneStopReq& pkt)
