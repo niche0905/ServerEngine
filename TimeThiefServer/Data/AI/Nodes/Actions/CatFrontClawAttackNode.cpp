@@ -13,7 +13,7 @@ namespace
     constexpr float AttackAnimDuration = 1.10f;
     constexpr float HitTiming = 0.375f;
 
-    constexpr int32 ClawDamage = 13;
+    constexpr int32 ClawDamage = 7;
     
     constexpr float ClawAttackRadius = 95.0f;
     

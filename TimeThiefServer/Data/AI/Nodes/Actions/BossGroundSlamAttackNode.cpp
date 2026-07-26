@@ -12,7 +12,7 @@ namespace
 {
     constexpr float AttackAnimDuration = 3.00f;
     constexpr float HitTiming = 0.93f;
-    constexpr int32 SlamDamage = 35;
+    constexpr int32 SlamDamage = 15;
 
     constexpr float SlamRadius = 130.0f;
     constexpr SE::Math::Vector3 AttackStartOffset{180.0f, 0.0f, 80.0f};
