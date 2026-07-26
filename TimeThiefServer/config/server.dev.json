@@ -35,10 +35,10 @@
             "chest_money_reward_min": 60,
             "chest_money_reward_max": 120
         },
-        "match_size": 2,
+        "match_size": 8,
         "partial_match": true,
         "partial_match_size": 2,
-        "partial_match_wait_time_sec": 10,
-        "test_spawn_points": true
+        "partial_match_wait_time_sec": 5,
+        "test_spawn_points": false
     }
 }
