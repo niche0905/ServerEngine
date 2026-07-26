@@ -610,6 +610,7 @@ void Room::JoinPlayerProcess(PlayerId playerId, PlayerPawn* playerPawn)
    SendBufferRef gameDataInitBuffer;
    std::vector<SendBufferRef> entitiesSpawnBuffers;
    SendBufferRef playerInitBuffer;
+   SendBufferRef roomSetupEndBuffer;
    
    // 입장한 플레이어에게 방 스냅샷 전송하기
    {
@@ -751,6 +752,12 @@ void Room::JoinPlayerProcess(PlayerId playerId, PlayerPawn* playerPawn)
       }
       playerInitBuffer = ServerPacketHandler::MakeSendBuffer(playerInitSetup);
    }
+
+   // 초기 방 세팅 패킷 전송 종료 신호
+   {
+      se::room::S_RoomSetupEnd setupEnd;
+      roomSetupEndBuffer = ServerPacketHandler::MakeSendBuffer(setupEnd);
+   }
    
    if (enterResBuffer)
       SendToPlayer(playerId, enterResBuffer);
@@ -760,6 +767,8 @@ void Room::JoinPlayerProcess(PlayerId playerId, PlayerPawn* playerPawn)
       SendToPlayer(playerId, entitiesSpawnBuffer);
    if (playerInitBuffer)
       SendToPlayer(playerId, playerInitBuffer);
+   if (roomSetupEndBuffer)
+      SendToPlayer(playerId, roomSetupEndBuffer);
 }
 
 bool Room::HandleLoadingComplete(PlayerId playerId)
