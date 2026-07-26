@@ -19,8 +19,7 @@ namespace
     constexpr float TargetMoveRepathDistanceSq = TargetMoveRepathDistance * TargetMoveRepathDistance;
 
     constexpr float ApproachSideAngle = 35.0f * Pi / 180.0f;
-    constexpr float ApproachDistance = 180.0f;
-    constexpr float DirectApproachDistance = 120.0f;
+    constexpr float ApproachSideOffset = 80.0f;
     
     SE::Math::Vector3 Normalize2D(const SE::Math::Vector3& v)
     {
@@ -133,17 +132,17 @@ BT::NodeStatus CatMoveTargetNode::onRunning()
 
         const SE::Math::Vector3 targetToSelf = Normalize2D(selfPos - targetPos);
 
-        // 정면으로 꽂히지 않도록 살짝 좌/우로 비틀어서 접근한다.
-        // 후보 지점이 NavMesh 밖이면 MoveTo 내부에서 StopMove만 되고 이 노드가
-        // RUNNING에 머무를 수 있으므로, 여기서 경로 생성까지 검증한다.
+        // 플레이어와 일정 거리를 유지하는 목표점을 만들지 않고 플레이어 위치로
+        // 직접 접근한다. 직선 목표의 경로 생성이 실패한 경우에만 근접 공격 범위
+        // 안쪽의 작은 좌/우 오프셋을 보조 목표로 사용한다.
         const SE::Math::Vector3 primaryDir =
             Rotate2D(targetToSelf, orbitSide_ * ApproachSideAngle);
         const SE::Math::Vector3 secondaryDir =
             Rotate2D(targetToSelf, -orbitSide_ * ApproachSideAngle);
 
-        if (!TryMoveToGoal(selfPos, targetPos + primaryDir * ApproachDistance) &&
-            !TryMoveToGoal(selfPos, targetPos + secondaryDir * ApproachDistance) &&
-            !TryMoveToGoal(selfPos, targetPos + targetToSelf * DirectApproachDistance))
+        if (!TryMoveToGoal(selfPos, targetPos) &&
+            !TryMoveToGoal(selfPos, targetPos + primaryDir * ApproachSideOffset) &&
+            !TryMoveToGoal(selfPos, targetPos + secondaryDir * ApproachSideOffset))
         {
             selfNpc_->StopMove();
             setOutput<CombatEventType>(BB::CombatMode, CombatEventType::None);
