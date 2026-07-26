@@ -52,7 +52,7 @@ namespace
    constexpr SkillId TimeAfterImageSkillId = 2;
    constexpr SkillId TimeRewindSkillId = 3;
    constexpr SkillId SkillBoostTargetSkillId = 4;
-   constexpr uint32 SkillBoostCooldownReductionMs = 30000;
+   constexpr uint32 SkillBoostCooldownReductionMs = 60000;
    constexpr uint32 TimeAccelMoveSpeedBonusPercent = 30;
    constexpr uint32 TimeAccelCombatSpeedBonusPercent = 30;
    constexpr uint32 TimeRewindDurationMs = 3000;
