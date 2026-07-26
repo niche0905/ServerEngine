@@ -2319,6 +2319,13 @@ bool Room::SpawnMonster(const Vector3& pos, uint32 templateId, float yaw)
    monster->StartAI();
    
    ReplicationSpawn(monster, templateId, monster->GetYaw());
+
+   if (templateId == 4) {
+      const Vector3& spawnPosition = monster->GetPosition();
+      consoleLogger->Log(Color::Yellow, L"[Room] Boss monster spawned. RoomId=%u Position=(%.2f, %.2f, %.2f)\n",
+         roomId_, spawnPosition.x, spawnPosition.y, spawnPosition.z);
+   }
+
    return true;
 }
 
