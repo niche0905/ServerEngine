@@ -19,6 +19,7 @@ public:
 private:
     bool CanShootTarget(MonsterPawn* selfPawn, Pawn* targetPawn);
     bool TryMoveToGoal(const SE::Math::Vector3& selfPos, const SE::Math::Vector3& goal);
+    void SwitchToMeleeMode();
     
 private:
     MonsterPawn* selfNpc_ = nullptr;

@@ -11,10 +11,9 @@ namespace BB = AiBlackboardKey;
 namespace
 {
     constexpr float CannonDesiredDistance = 1500.0f;
-    constexpr float CannonMinDistance = 900.0f;
-    constexpr float CannonMaxDistance = 1800.0f;
     constexpr float CannonFireRange = 2000.0f;
     constexpr float CannonFireRangeSq = CannonFireRange * CannonFireRange;
+    constexpr SE::Math::Vector3 CannonAimOffset{112.150f, 6.806f, 42.250f};
 
     constexpr float ArriveDistance = 120.0f;
     constexpr float ArriveDistanceSq = ArriveDistance * ArriveDistance;
@@ -54,7 +53,8 @@ BT::PortsList CatMoveToCannonRangeNode::providedPorts()
 {
     return {
         BT::InputPort<MonsterPawn*>(BB::SelfNpc),
-        BT::InputPort<Pawn*>(BB::TargetPawn)
+        BT::InputPort<Pawn*>(BB::TargetPawn),
+        BT::OutputPort<CombatEventType>(BB::CombatMode)
     };
 }
 
@@ -113,16 +113,22 @@ BT::NodeStatus CatMoveToCannonRangeNode::onRunning()
     const SE::Math::Vector3 toTarget = targetPos - selfPos;
     const float distSq = toTarget.LengthSq();
 
-    const bool goodDistance =
-    distSq >= CannonMinDistance * CannonMinDistance &&
-    distSq <= CannonMaxDistance * CannonMaxDistance;
-    
     // 이미 포격 가능한 거리면 이 노드는 성공.
-    if (goodDistance &&
+    if (distSq <= CannonFireRangeSq &&
         CanShootTarget(selfNpc_, targetPawn_))
     {
         selfNpc_->StopMove();
         return BT::NodeStatus::SUCCESS;
+    }
+
+    // 이미 원하는 포격 거리보다 가까운데 시야가 없다면 뒤로 물러나서
+    // 거리를 유지하지 않는다. 원거리 모드를 포기하고 다음 판단에서
+    // 근접 공격을 선택할 수 있도록 한다.
+    if (distSq <= CannonDesiredDistance * CannonDesiredDistance)
+    {
+        selfNpc_->StopMove();
+        SwitchToMeleeMode();
+        return BT::NodeStatus::FAILURE;
     }
 
     const bool targetMovedEnough =
@@ -162,6 +168,7 @@ BT::NodeStatus CatMoveToCannonRangeNode::onRunning()
             }
 
             selfNpc_->StopMove();
+            SwitchToMeleeMode();
             return BT::NodeStatus::FAILURE;
         }
     }
@@ -169,10 +176,25 @@ BT::NodeStatus CatMoveToCannonRangeNode::onRunning()
     if ((moveGoal_ - selfPos).LengthSq() <= ArriveDistanceSq)
     {
         selfNpc_->StopMove();
-        return BT::NodeStatus::SUCCESS;
+
+        if (distSq <= CannonFireRangeSq &&
+            CanShootTarget(selfNpc_, targetPawn_))
+        {
+            return BT::NodeStatus::SUCCESS;
+        }
+
+        // 이동 목표에 도착했어도 사격할 수 없다면 성공으로 처리하지 않는다.
+        // 원거리 모드를 해제해야 다음 틱에 근접 행동을 다시 선택할 수 있다.
+        SwitchToMeleeMode();
+        return BT::NodeStatus::FAILURE;
     }
 
     return BT::NodeStatus::RUNNING;
+}
+
+void CatMoveToCannonRangeNode::SwitchToMeleeMode()
+{
+    setOutput<CombatEventType>(BB::CombatMode, CombatEventType::CatMelee);
 }
 
 void CatMoveToCannonRangeNode::onHalted()
@@ -197,7 +219,7 @@ bool CatMoveToCannonRangeNode::CanShootTarget(MonsterPawn* selfPawn, Pawn* targe
     }
 
     const SE::Math::Vector3 origin =
-        selfPawn->GetPosition();
+        selfPawn->TransformLocalOffsetToWorld(CannonAimOffset);
 
     const SE::Math::Vector3 target =
         targetPawn->GetPosition();

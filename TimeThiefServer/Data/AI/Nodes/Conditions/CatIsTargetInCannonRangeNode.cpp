@@ -7,6 +7,10 @@
 #include "Service/Room/Room.h"
 
 namespace BB = AiBlackboardKey;
+namespace
+{
+    constexpr SE::Math::Vector3 CannonAimOffset{112.150f, 6.806f, 42.250f};
+}
 
 
 BT::PortsList CatIsTargetInCannonRangeNode::providedPorts()
@@ -54,7 +58,10 @@ BT::NodeStatus CatIsTargetInCannonRangeNode::tick()
         return BT::NodeStatus::FAILURE;
     }
 
-    const SE::Math::Vector3 toTarget = targetPos - selfPos;
+    const SE::Math::Vector3 sightOrigin =
+        selfNpc->TransformLocalOffsetToWorld(CannonAimOffset);
+
+    const SE::Math::Vector3 toTarget = targetPos - sightOrigin;
     const float targetDistance = toTarget.Length();
     if (targetDistance <= 0.0001f) {
         return BT::NodeStatus::FAILURE;
@@ -64,7 +71,7 @@ BT::NodeStatus CatIsTargetInCannonRangeNode::tick()
     constexpr float TargetEndpointEpsilon = 1.0f;
     const SE::Math::Vector3 dir = toTarget / targetDistance;
     SE::Physics::Ray ray(
-        selfPos,
+        sightOrigin,
         dir,
         std::max(0.0f, targetDistance - TargetEndpointEpsilon));
 

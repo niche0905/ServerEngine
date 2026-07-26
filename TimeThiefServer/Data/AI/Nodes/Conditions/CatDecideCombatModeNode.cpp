@@ -22,11 +22,11 @@ BT::PortsList CatDecideCombatModeNode::providedPorts()
 BT::NodeStatus CatDecideCombatModeNode::tick()
 {
     CombatEventType mode = CombatEventType::None;
+    getInput<CombatEventType>(BB::CombatMode, mode);
 
-    if (getInput<CombatEventType>(BB::CombatMode, mode)) {
-        if (mode != CombatEventType::None) {
-            return BT::NodeStatus::SUCCESS;
-        }
+    // 이미 선택한 전투 방식은 해당 공격이나 이동이 끝날 때까지 유지한다.
+    if (mode != CombatEventType::None) {
+        return BT::NodeStatus::SUCCESS;
     }
     
     Pawn* targetPawn = nullptr;
@@ -56,15 +56,16 @@ BT::NodeStatus CatDecideCombatModeNode::tick()
     const auto& targetPos = targetPawn->GetPosition() - SE::Math::Vector3{0.0f, 0.0f, 90.0f};   // TEMP
     
     const bool isReachable = map.IsReachablePosition(*navQueryContext, selfPos, targetPos, SE::Math::Vector3{200.0f, 200.0f, 300.0f});
-    
+
     if (not isReachable) {
+        // NavMesh 경로로 접근할 수 없는 타깃에게만 원거리 공격을 사용한다.
         setOutput<CombatEventType>(BB::CombatMode, CombatEventType::CatRange);
     }
     else {
-        if (BBH::RandomChance(0.3f)) {  // 30% 확률로 원거리 공격
+        if (BBH::RandomChance(0.3f)) {
             setOutput<CombatEventType>(BB::CombatMode, CombatEventType::CatRange);
         }
-        else {  // 70% 확률로 원거리 공격
+        else {
             setOutput<CombatEventType>(BB::CombatMode, CombatEventType::CatMelee);
         }
     }

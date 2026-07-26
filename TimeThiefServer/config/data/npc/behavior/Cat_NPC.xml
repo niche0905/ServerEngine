@@ -36,7 +36,8 @@
 
                             <CatMoveToCannonRange
                                     self_npc="{self_npc}"
-                                    target_pawn="{target_pawn}" />
+                                    target_pawn="{target_pawn}"
+                                    combat_mode="{combat_mode}" />
                         </Fallback>
                     </Sequence>
 
