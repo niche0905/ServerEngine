@@ -121,6 +121,7 @@ public:
    bool HandleSpawnChest(PlayerId playerId, const se::test::C_SpawnChestReq& pkt);
    bool HandleSpawnStore(PlayerId playerId, const se::test::C_SpawnStoreReq& pkt);
    bool HandleItem(PlayerId playerId, const se::test::C_ItemReq& pkt);
+   bool HandleItemAll(PlayerId playerId, const se::test::C_ItemReqAll& pkt);
    bool HandleMoney(PlayerId playerId, const se::test::C_MoneyReq& pkt);
    bool HandleHealth(PlayerId playerId, const se::test::C_HealthReq& pkt);
    bool HandleMaxHealth(PlayerId playerId, const se::test::C_MaxHealthReq& pkt);

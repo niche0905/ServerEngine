@@ -72,6 +72,7 @@ public:
    bool Handle_C_SpawnChestReq(PacketSessionRef& session, const se::test::C_SpawnChestReq& pkt);
    bool Handle_C_SpawnStoreReq(PacketSessionRef& session, const se::test::C_SpawnStoreReq& pkt);
    bool Handle_C_ItemReq(PacketSessionRef& session, const se::test::C_ItemReq& pkt);
+   bool Handle_C_ItemReqAll(PacketSessionRef& session, const se::test::C_ItemReqAll& pkt);
    bool Handle_C_MoneyReq(PacketSessionRef& session, const se::test::C_MoneyReq& pkt);
    bool Handle_C_HealthReq(PacketSessionRef& session, const se::test::C_HealthReq& pkt);
    bool Handle_C_MaxHealthReq(PacketSessionRef& session, const se::test::C_MaxHealthReq& pkt);

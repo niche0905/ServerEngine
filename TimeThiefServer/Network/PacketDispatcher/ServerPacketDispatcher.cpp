@@ -407,6 +407,14 @@ bool ServerPacketDispatcher::Handle_C_ItemReq(PacketSessionRef& session, const s
     });
 }
 
+bool ServerPacketDispatcher::Handle_C_ItemReqAll(PacketSessionRef& session, const se::test::C_ItemReqAll& pkt)
+{
+    return EnqueueToPlayerRoom(session, pkt, [](Room& room, PlayerId playerId, const se::test::C_ItemReqAll& pkt)
+    {
+        room.HandleItemAll(playerId, pkt);
+    });
+}
+
 bool ServerPacketDispatcher::Handle_C_MoneyReq(PacketSessionRef& session, const se::test::C_MoneyReq& pkt)
 {
     return EnqueueToPlayerRoom(session, pkt, [](Room& room, PlayerId playerId, const se::test::C_MoneyReq& pkt)

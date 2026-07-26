@@ -2135,6 +2135,21 @@ bool Room::HandleItem(PlayerId playerId, const se::test::C_ItemReq& pkt)
    return GiveItem(playerId, ItemStack{pkt.item_id(), static_cast<int32>(pkt.quantity())});
 }
 
+bool Room::HandleItemAll(PlayerId playerId, const se::test::C_ItemReqAll& pkt)
+{
+   if (playerId == 0 or roomPlayers_.find(playerId) == roomPlayers_.end())
+      return false;
+
+   const ItemStack itemStack{pkt.item_id(), static_cast<int32>(pkt.quantity())};
+   bool itemGiven = false;
+
+   for (const auto& entry : roomPlayers_) {
+      itemGiven = GiveItem(entry.first, itemStack) or itemGiven;
+   }
+
+   return itemGiven;
+}
+
 bool Room::HandleMoney(PlayerId playerId, const se::test::C_MoneyReq& pkt)
 {
    return GiveMoney(playerId, static_cast<int32>(pkt.amount()));

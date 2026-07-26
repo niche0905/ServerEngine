@@ -267,6 +267,11 @@ bool Handle_C_ItemReq(PacketSessionRef& session, const se::test::C_ItemReq& pkt)
     if (!Dispatcher()) return false;
     return Dispatcher()->Handle_C_ItemReq(session, pkt);
 }
+bool Handle_C_ItemReqAll(PacketSessionRef& session, const se::test::C_ItemReqAll& pkt)
+{
+    if (!Dispatcher()) return false;
+    return Dispatcher()->Handle_C_ItemReqAll(session, pkt);
+}
 bool Handle_C_MoneyReq(PacketSessionRef& session, const se::test::C_MoneyReq& pkt)
 {
     if (!Dispatcher()) return false;
