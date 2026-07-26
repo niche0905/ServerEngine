@@ -120,7 +120,8 @@ BT::NodeStatus CatMouthCannonCombatNode::onRunning()
             targetPawn_->GetPosition();
 
         SE::Math::Vector3 rawDir = rawTargetPos - origin;
-        if (rawDir.LengthSq() <= 0.0001f)
+        const float targetDistance = rawDir.Length();
+        if (targetDistance <= 0.0001f)
         {
             room->NotifyCombatEvent(selfId, CombatEventType::CatCannonCancel);
             cancelled_ = true;
@@ -128,9 +129,15 @@ BT::NodeStatus CatMouthCannonCombatNode::onRunning()
             return BT::NodeStatus::FAILURE;
         }
 
-        rawDir = rawDir.Normalized();
+        rawDir /= targetDistance;
 
-        SE::Physics::Ray visibilityRay(origin, rawDir, CannonRange);
+        // 타깃을 지나 계속 진행한 레이가 뒤쪽 벽에 맞아 캐스팅을 취소하지 않도록
+        // 실제 타깃까지의 구간만 최종 시야 검증에 사용한다.
+        constexpr float TargetEndpointEpsilon = 1.0f;
+        SE::Physics::Ray visibilityRay(
+            origin,
+            rawDir,
+            std::max(0.0f, targetDistance - TargetEndpointEpsilon));
 
         // 발사 직전에 서버가 최종 검증.
         // 엄폐했거나 시야가 끊겼으면 캐스팅 취소.

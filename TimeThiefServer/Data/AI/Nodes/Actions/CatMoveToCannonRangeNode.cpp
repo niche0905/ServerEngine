@@ -196,8 +196,6 @@ bool CatMoveToCannonRangeNode::CanShootTarget(MonsterPawn* selfPawn, Pawn* targe
         return false;
     }
 
-    constexpr float CannonRange = 2000.0f;
-
     const SE::Math::Vector3 origin =
         selfPawn->GetPosition();
 
@@ -205,13 +203,20 @@ bool CatMoveToCannonRangeNode::CanShootTarget(MonsterPawn* selfPawn, Pawn* targe
         targetPawn->GetPosition();
 
     SE::Math::Vector3 dir = target - origin;
-    if (dir.LengthSq() <= 0.0001f) {
+    const float targetDistance = dir.Length();
+    if (targetDistance <= 0.0001f) {
         return false;
     }
 
-    dir = dir.Normalized();
+    // 사거리 자체는 호출부에서 검사한다. 여기서는 타깃 뒤의 지형이 아니라
+    // Cat과 타깃 사이에 있는 지형만 시야 차단물로 취급한다.
+    constexpr float TargetEndpointEpsilon = 1.0f;
+    dir /= targetDistance;
 
-    SE::Physics::Ray ray(origin, dir, CannonRange);
+    SE::Physics::Ray ray(
+        origin,
+        dir,
+        std::max(0.0f, targetDistance - TargetEndpointEpsilon));
 
     return room->GetRoomGameSystem()
         .GetCombatSystem()

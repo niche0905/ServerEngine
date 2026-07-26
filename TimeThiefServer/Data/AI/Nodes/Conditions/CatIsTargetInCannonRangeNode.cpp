@@ -54,12 +54,20 @@ BT::NodeStatus CatIsTargetInCannonRangeNode::tick()
         return BT::NodeStatus::FAILURE;
     }
 
-    const SE::Math::Vector3 dir = (targetPos - selfPos).Normalized();
-    if (dir == SE::Math::Vector3::Zero()) {
+    const SE::Math::Vector3 toTarget = targetPos - selfPos;
+    const float targetDistance = toTarget.Length();
+    if (targetDistance <= 0.0001f) {
         return BT::NodeStatus::FAILURE;
     }
-    
-    SE::Physics::Ray ray(selfPos, dir, CannonRange + 300.0f);
+
+    // 타깃 뒤쪽의 벽을 시야 차단물로 오인하지 않도록 실제 타깃까지의 구간만 검사한다.
+    constexpr float TargetEndpointEpsilon = 1.0f;
+    const SE::Math::Vector3 dir = toTarget / targetDistance;
+    SE::Physics::Ray ray(
+        selfPos,
+        dir,
+        std::max(0.0f, targetDistance - TargetEndpointEpsilon));
+
     if (!combatSystem.CanSeeTarget(ray)) {
         return BT::NodeStatus::FAILURE;
     }
