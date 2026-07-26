@@ -76,6 +76,9 @@ public:
    bool Handle_C_MoneyReq(PacketSessionRef& session, const se::test::C_MoneyReq& pkt);
    bool Handle_C_HealthReq(PacketSessionRef& session, const se::test::C_HealthReq& pkt);
    bool Handle_C_MaxHealthReq(PacketSessionRef& session, const se::test::C_MaxHealthReq& pkt);
+   bool Handle_C_MoneyReqAll(PacketSessionRef& session, const se::test::C_MoneyReqAll& pkt);
+   bool Handle_C_HealthReqAll(PacketSessionRef& session, const se::test::C_HealthReqAll& pkt);
+   bool Handle_C_MaxHealthReqAll(PacketSessionRef& session, const se::test::C_MaxHealthReqAll& pkt);
    bool Handle_C_TPAllReq(PacketSessionRef& session, const se::test::C_TPAllReq& pkt);
    bool Handle_C_ZoneStopReq(PacketSessionRef& session, const se::test::C_ZoneStopReq& pkt);
    bool Handle_C_ZoneStartReq(PacketSessionRef& session, const se::test::C_ZoneStartReq& pkt);

@@ -439,6 +439,30 @@ bool ServerPacketDispatcher::Handle_C_MaxHealthReq(PacketSessionRef& session, co
     });
 }
 
+bool ServerPacketDispatcher::Handle_C_MoneyReqAll(PacketSessionRef& session, const se::test::C_MoneyReqAll& pkt)
+{
+    return EnqueueToPlayerRoom(session, pkt, [](Room& room, PlayerId playerId, const se::test::C_MoneyReqAll& pkt)
+    {
+        room.HandleMoneyAll(playerId, pkt);
+    });
+}
+
+bool ServerPacketDispatcher::Handle_C_HealthReqAll(PacketSessionRef& session, const se::test::C_HealthReqAll& pkt)
+{
+    return EnqueueToPlayerRoom(session, pkt, [](Room& room, PlayerId playerId, const se::test::C_HealthReqAll& pkt)
+    {
+        room.HandleHealthAll(playerId, pkt);
+    });
+}
+
+bool ServerPacketDispatcher::Handle_C_MaxHealthReqAll(PacketSessionRef& session, const se::test::C_MaxHealthReqAll& pkt)
+{
+    return EnqueueToPlayerRoom(session, pkt, [](Room& room, PlayerId playerId, const se::test::C_MaxHealthReqAll& pkt)
+    {
+        room.HandleMaxHealthAll(playerId, pkt);
+    });
+}
+
 bool ServerPacketDispatcher::Handle_C_TPAllReq(PacketSessionRef& session, const se::test::C_TPAllReq& pkt)
 {
     return EnqueueToPlayerRoom(session, pkt, [](Room& room, PlayerId playerId, const se::test::C_TPAllReq& pkt)

@@ -2197,6 +2197,65 @@ bool Room::HandleMaxHealth(PlayerId playerId, const se::test::C_MaxHealthReq& pk
    return true;
 }
 
+bool Room::HandleMoneyAll(PlayerId playerId, const se::test::C_MoneyReqAll& pkt)
+{
+   if (playerId == 0 or roomPlayers_.find(playerId) == roomPlayers_.end())
+      return false;
+
+   bool moneyGiven = false;
+   for (const auto& entry : roomPlayers_) {
+      moneyGiven = GiveMoney(entry.first, static_cast<int32>(pkt.amount())) or moneyGiven;
+   }
+
+   return moneyGiven;
+}
+
+bool Room::HandleHealthAll(PlayerId playerId, const se::test::C_HealthReqAll& pkt)
+{
+   if (playerId == 0 or roomPlayers_.find(playerId) == roomPlayers_.end())
+      return false;
+
+   bool healthChanged = false;
+   for (const auto& entry : roomPlayers_) {
+      const PlayerId targetPlayerId = entry.first;
+      auto* playerPawn = objectManager_.FindAs<PlayerPawn>(entry.second.pawnObjectId);
+      if (!playerPawn)
+         continue;
+
+      auto& health = playerPawn->GetHealth();
+      const int32 currentHp = health.GetHp();
+      health.SetHpUnsafe(static_cast<int32>(pkt.health()));
+      const int32 newHp = health.GetHp();
+      NotifyHealthChange(targetPlayerId, newHp, newHp - currentHp);
+      healthChanged = true;
+   }
+
+   return healthChanged;
+}
+
+bool Room::HandleMaxHealthAll(PlayerId playerId, const se::test::C_MaxHealthReqAll& pkt)
+{
+   if (playerId == 0 or roomPlayers_.find(playerId) == roomPlayers_.end())
+      return false;
+
+   bool maxHealthChanged = false;
+   for (const auto& entry : roomPlayers_) {
+      const PlayerId targetPlayerId = entry.first;
+      auto* playerPawn = objectManager_.FindAs<PlayerPawn>(entry.second.pawnObjectId);
+      if (!playerPawn)
+         continue;
+
+      auto& health = playerPawn->GetHealth();
+      health.SetMaxHpUnsafe(static_cast<int32>(pkt.max_health()));
+      const int32 newMaxHp = health.GetMaxHp();
+      const int32 currentHp = health.GetHp();
+      NotifyMaxHealthChange(targetPlayerId, newMaxHp, currentHp);
+      maxHealthChanged = true;
+   }
+
+   return maxHealthChanged;
+}
+
 bool Room::HandleTPAll(PlayerId playerId, const se::test::C_TPAllReq& pkt)
 {
    if (playerId == 0 or roomPlayers_.find(playerId) == roomPlayers_.end())

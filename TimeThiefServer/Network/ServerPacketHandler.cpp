@@ -287,6 +287,21 @@ bool Handle_C_MaxHealthReq(PacketSessionRef& session, const se::test::C_MaxHealt
     if (!Dispatcher()) return false;
     return Dispatcher()->Handle_C_MaxHealthReq(session, pkt);
 }
+bool Handle_C_MoneyReqAll(PacketSessionRef& session, const se::test::C_MoneyReqAll& pkt)
+{
+    if (!Dispatcher()) return false;
+    return Dispatcher()->Handle_C_MoneyReqAll(session, pkt);
+}
+bool Handle_C_HealthReqAll(PacketSessionRef& session, const se::test::C_HealthReqAll& pkt)
+{
+    if (!Dispatcher()) return false;
+    return Dispatcher()->Handle_C_HealthReqAll(session, pkt);
+}
+bool Handle_C_MaxHealthReqAll(PacketSessionRef& session, const se::test::C_MaxHealthReqAll& pkt)
+{
+    if (!Dispatcher()) return false;
+    return Dispatcher()->Handle_C_MaxHealthReqAll(session, pkt);
+}
 bool Handle_C_TPAllReq(PacketSessionRef& session, const se::test::C_TPAllReq& pkt)
 {
     if (!Dispatcher()) return false;
